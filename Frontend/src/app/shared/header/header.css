@@ -2,27 +2,35 @@
    FORMA HEADER — STYLES
    ========================================= */
 
-/* --- Outer wrapper --- */
 .site-header {
   max-width: 1240px;
   width: 100%;
-  border-radius: 100px;
-  background-color: #f2f2f2;
-  padding: 12px 16px;
+  margin: 30px auto 0;
+  padding: 0 16px;
 }
 
-/* --- Inner pill container --- */
 .header-inner {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  width: 100%;
+  min-height: 72px;
   gap: 20px;
-  max-width: 1040px;
-  min-height: 56px;
-  margin: 0 auto;
-  padding: 8px 18px;
+  padding: 12px 18px;
   background-color: #f4f3f6;
-  border-radius: 9999px;
+  border-radius: 36px;
+  transition:
+    min-height 0.35s ease,
+    border-radius 0.35s ease,
+    padding 0.35s ease;
+  overflow: hidden;
+}
+
+/* Expand whole header when one dropdown item is hovered */
+.header-inner:has(.nav-item.has-menu:hover) {
+  min-height: 260px;
+  border-radius: 36px;
 }
 
 /* =========================================
@@ -32,7 +40,7 @@
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 14px;
+  min-height: 48px;
 }
 
 .logo-link {
@@ -55,33 +63,131 @@
 .primary-nav {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: 34px;
+  gap: 14px;
+  position: relative;
+  min-height: 48px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .nav-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 15px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
   color: #111111;
   text-decoration: none;
   white-space: nowrap;
-  transition: opacity 0.2s ease;
+  transition:
+    background-color 0.8s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
 }
 
-.nav-link:hover {
-  opacity: 0.7;
+/* darker hover bg for middle buttons */
+.nav-item:hover .nav-link {
+  background-color: #dfdede;
 }
 
+/* centered, larger, wider arrow */
 .nav-chevron {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   color: #444444;
+  display: block;
+  transform-origin: center;
+  transition:
+    transform 0.3s ease,
+    color 0.25s ease;
+}
+
+/* rotate arrow on hover */
+.nav-item:hover .nav-chevron {
+  transform: rotate(180deg);
+  color: #111111;
+}
+
+/* =========================================
+   DROPDOWN PANEL
+   ========================================= */
+
+.nav-dropdown {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  min-width: 320px;
+  width: max-content;
+  max-width: 520px;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  pointer-events: none;
+
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    visibility 0.28s ease;
+}
+
+.nav-item.has-menu:hover .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 18px 4px 4px;
+}
+
+.dropdown-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  text-decoration: none;
+  color: #111111;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dropdown-link strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dropdown-link span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #5f5b66;
+}
+
+.dropdown-link:hover {
+  background-color: #f0eef5;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(17, 17, 17, 0.06);
 }
 
 /* =========================================
@@ -92,15 +198,15 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  min-height: 48px;
 }
 
-/* Globe icon link */
 .icon-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   color: #111111;
   text-decoration: none;
   transition: opacity 0.2s ease;
@@ -111,11 +217,10 @@
 }
 
 .icon-globe {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 
-/* Vertical divider */
 .divider {
   display: inline-block;
   width: 1px;
@@ -123,7 +228,6 @@
   background-color: #d8d6dc;
 }
 
-/* Login link */
 .login-link {
   font-size: 15px;
   font-weight: 600;
@@ -137,7 +241,6 @@
   opacity: 0.7;
 }
 
-/* CTA button */
 .btn-try {
   display: inline-flex;
   align-items: center;
@@ -146,20 +249,21 @@
   padding: 0 18px;
   background-color: #6f63ff;
   color: #ffffff;
+  letter-spacing: 0.5px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
   border-radius: 9999px;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-try:hover {
   opacity: 0.95;
-  transform: translateY(-1px);
 }
 
-/* Mobile hamburger — hidden on desktop */
 .menu-toggle {
   display: none;
   align-items: center;
@@ -177,12 +281,19 @@
 }
 
 /* =========================================
-   RESPONSIVE — ≤ 900px
+   RESPONSIVE
    ========================================= */
 
 @media (max-width: 900px) {
   .header-inner {
-    padding: 8px 16px;
+    align-items: center;
+    min-height: 72px;
+    padding: 12px 16px;
+  }
+
+  .header-inner:has(.nav-item.has-menu:hover) {
+    min-height: 72px;
+    box-shadow: none;
   }
 
   .primary-nav,
@@ -197,20 +308,11 @@
   }
 }
 
-/* =========================================
-   RESPONSIVE — ≤ 560px
-   ========================================= */
-
 @media (max-width: 560px) {
   .btn-try {
     display: none;
   }
 }
-
-/* =========================================
-   RESPONSIVE — tablet CTA size tweak
-   (max 900px but > 560px)
-   ========================================= */
 
 @media (max-width: 900px) and (min-width: 561px) {
   .btn-try {
