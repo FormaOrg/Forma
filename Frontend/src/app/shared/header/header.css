@@ -1,0 +1,221 @@
+/* =========================================
+   FORMA HEADER — STYLES
+   ========================================= */
+
+/* --- Outer wrapper --- */
+.site-header {
+  max-width: 1240px;
+  width: 100%;
+  border-radius: 100px;
+  background-color: #f2f2f2;
+  padding: 12px 16px;
+}
+
+/* --- Inner pill container --- */
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1040px;
+  min-height: 56px;
+  margin: 0 auto;
+  padding: 8px 18px;
+  background-color: #f4f3f6;
+  border-radius: 9999px;
+}
+
+/* =========================================
+   LOGO
+   ========================================= */
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111111;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logo-link img {
+  display: block;
+}
+
+/* =========================================
+   PRIMARY NAVIGATION
+   ========================================= */
+
+.primary-nav {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  color: #111111;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+  opacity: 0.7;
+}
+
+.nav-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #444444;
+}
+
+/* =========================================
+   RIGHT-SIDE ACTIONS
+   ========================================= */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Globe icon link */
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #111111;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.icon-link:hover {
+  opacity: 0.7;
+}
+
+.icon-globe {
+  width: 18px;
+  height: 18px;
+}
+
+/* Vertical divider */
+.divider {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background-color: #d8d6dc;
+}
+
+/* Login link */
+.login-link {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111111;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.login-link:hover {
+  opacity: 0.7;
+}
+
+/* CTA button */
+.btn-try {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  background-color: #6f63ff;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-try:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+/* Mobile hamburger — hidden on desktop */
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #111111;
+}
+
+.icon-menu {
+  width: 22px;
+  height: 22px;
+}
+
+/* =========================================
+   RESPONSIVE — ≤ 900px
+   ========================================= */
+
+@media (max-width: 900px) {
+  .header-inner {
+    padding: 8px 16px;
+  }
+
+  .primary-nav,
+  .lang-link,
+  .divider,
+  .login-link {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+}
+
+/* =========================================
+   RESPONSIVE — ≤ 560px
+   ========================================= */
+
+@media (max-width: 560px) {
+  .btn-try {
+    display: none;
+  }
+}
+
+/* =========================================
+   RESPONSIVE — tablet CTA size tweak
+   (max 900px but > 560px)
+   ========================================= */
+
+@media (max-width: 900px) and (min-width: 561px) {
+  .btn-try {
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
