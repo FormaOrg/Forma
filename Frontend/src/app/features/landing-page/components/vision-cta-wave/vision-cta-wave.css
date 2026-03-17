@@ -1,0 +1,188 @@
+:host { 
+    display: block;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    margin-top: -100vh;
+    height: 200vh;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.vision-cta-wave {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0) 55%,
+            rgba(255,255,255,0.35) 72%,
+            rgba(255,255,255,0.75) 84%,
+            rgba(255,255,255,0.96) 93%,
+            #ffffff 100%
+        ),
+        radial-gradient(circle at 50% 85%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 20%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0) 65%),
+        linear-gradient(135deg, #c86cff 0%, #ff74c8 42%, #ffd1a8 100%);
+}
+
+.vision-cta-wave__background {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    filter: blur(30px);
+    pointer-events: none;
+}
+
+.vision-cta-wave__blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.95;
+    will-change: transform;
+    mix-blend-mode: screen;
+}
+
+.vision-cta-wave__blob--one {
+    top: -120px;
+    left: -120px;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, rgba(155,0,255,0.9) 0%, rgba(155,0,255,0.2) 55%, rgba(155,0,255,0) 75%);
+    animation: blobFloatOne 18s ease-in-out infinite alternate;
+}
+
+.vision-cta-wave__blob--two {
+    top: 80px;
+    left: 28%;
+    width: 620px;
+    height: 620px;
+    background: radial-gradient(circle, rgba(255,0,153,0.55) 0%, rgba(255,0,153,0.18) 55%, rgba(255,0,153,0) 75%);
+    animation: blobFloatTwo 22s ease-in-out infinite alternate;
+}
+
+.vision-cta-wave__blob--three {
+    top: 10px;
+    right: -140px;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, rgba(255,183,77,0.68) 0%, rgba(255,183,77,0.18) 55%, rgba(255,183,77,0) 75%);
+    animation: blobFloatThree 20s ease-in-out infinite alternate;
+}
+
+.vision-cta-wave__blob--four {
+    bottom: -180px;
+    left: 28%;
+    width: 780px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.45) 38%, rgba(255,255,255,0.08) 62%, rgba(255,255,255,0) 78%);
+    animation: blobFloatFour 24s ease-in-out infinite alternate;
+}
+
+.vision-cta-wave__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1400px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 0 150px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.vision-cta-wave__title {
+    margin: 0;
+    max-width: 1100px;
+    color: #000000;
+    font-size: clamp(3.5rem, 7vw, 5.9rem);
+    line-height: 1.06;
+    font-weight: 400;
+    letter-spacing: -0.05em;
+}
+
+.vision-cta-wave__button {
+    margin-top: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 205px;
+    height: 62px;
+    padding: 0 30px;
+    border-radius: 999px;
+    background: #f4e44a;
+    color: #111111;
+    text-decoration: none;
+    font-size: 1.15rem;
+    font-weight: 500;
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.vision-cta-wave__button:hover {
+    opacity: 0.96;
+}
+
+@keyframes blobFloatOne {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(120px,70px,0) scale(1.08); }
+}
+
+@keyframes blobFloatTwo {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(-90px,55px,0) scale(1.12); }
+}
+
+@keyframes blobFloatThree {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(-110px,85px,0) scale(1.06); }
+}
+
+@keyframes blobFloatFour {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    100% { transform: translate3d(60px,-40px,0) scale(1.08); }
+}
+
+@media (max-width: 1200px) {
+    .vision-cta-wave__content {
+        padding: 0 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .vision-cta-wave {
+        min-height: 100vh;
+    }
+
+    .vision-cta-wave__content {
+        min-height: 100vh;
+        padding: 0 20px;
+    }
+
+    .vision-cta-wave__button {
+        min-width: 180px;
+        height: 56px;
+        margin-top: 38px;
+        font-size: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vision-cta-wave__blob {
+        animation: none;
+    }
+
+    .vision-cta-wave__button {
+        transition: none;
+    }
+}
