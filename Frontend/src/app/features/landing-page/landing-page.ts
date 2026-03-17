@@ -6,6 +6,7 @@ import { TemplatesShowcase } from './components/templates-showcase/templates-sho
 import { DomainSection } from './components/domain-section/domain-section';
 import { FaqSection } from './components/faq-section/faq-section';
 import { MadeOnForma } from './components/made-on-forma/made-on-forma';
+import { BuilderHelpDeck } from './components/builder-help-deck/builder-help-deck';
 
 @Component({
   selector: 'app-landing-page',
@@ -16,7 +17,8 @@ import { MadeOnForma } from './components/made-on-forma/made-on-forma';
     TemplatesShowcase,
     DomainSection,
     FaqSection,
-    MadeOnForma
+    MadeOnForma,
+    BuilderHelpDeck
 ],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',

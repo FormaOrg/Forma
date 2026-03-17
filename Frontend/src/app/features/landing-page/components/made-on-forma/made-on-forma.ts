@@ -39,7 +39,7 @@ export class MadeOnForma {
 
     readonly bottomTransform = computed(() => {
         const scrollOffset = this.scrollY() * 0.12;
-        const initialOffset = -630;
+        const initialOffset = -800;
 
         return `translate3d(${initialOffset + scrollOffset}px, 0, 0)`;
     });
