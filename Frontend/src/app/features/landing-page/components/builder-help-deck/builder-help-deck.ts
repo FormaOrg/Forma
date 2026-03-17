@@ -33,7 +33,7 @@ export class BuilderHelpDeck {
         },
         {
             question: 'Does Forma offer AI features?',
-            answer: 'Yes. Forma can help speed up content creation, design suggestions, and workflow automation with AI-powered tools.'
+            answer: 'Not yet — Forma is currently focused on delivering a powerful and intuitive website-building experience. AI features are planned for the future to help streamline content creation and design workflows.'
         }
     ]);
 
