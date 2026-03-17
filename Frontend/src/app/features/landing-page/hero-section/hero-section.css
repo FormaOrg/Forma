@@ -39,6 +39,42 @@ button {
     margin-top: 50px;
 }
 
+.btn-arrow {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    position: absolute;
+    right: 10px;
+    transform: translateX(5px); /* starts far right */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.btn.purple:hover .btn-arrow {
+    opacity: 1;
+    transform: translateX(-5px); /* lands in place from the right */
+}
+
+.btn-text {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.btn.purple:hover .btn-text {
+    transform: translateX(-10px); /* slides left */
+}
+
+.btn.purple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+    padding: 10px 30px;
+    position: relative;
+}
+
 .bottom {
     margin-top: 20px;
     position: relative;

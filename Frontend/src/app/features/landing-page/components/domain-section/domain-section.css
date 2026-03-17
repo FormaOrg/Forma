@@ -7,8 +7,8 @@
 }
 
 section {
-    background: radial-gradient(ellipse at center, #1e6678 0%, #194c59 60%);
-    margin: 150px;
+    background: radial-gradient(ellipse at top, #395B64 0%, #014051 70%);
+    margin: 100px 150px;
     padding: 125px 250px;
     border-radius: 35px;
 }
