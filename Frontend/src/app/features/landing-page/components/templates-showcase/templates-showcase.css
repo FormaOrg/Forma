@@ -1,0 +1,12 @@
+.templates-showcase {
+    display: flex;
+    flex-direction: column;
+
+    height: 70vh;
+    
+}
+
+.templates-showcase_intro {
+    display: flex;
+    justify-content: space-between;
+}
