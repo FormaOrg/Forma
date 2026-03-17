@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Header } from '../../shared/header/header';
 import { HeroSection } from './hero-section/hero-section';
-import { Section1 } from './first-section/section1';
+import { Section1 } from './section1/section1';
 
 @Component({
   selector: 'app-landing-page',
