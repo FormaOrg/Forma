@@ -1,0 +1,36 @@
+<section class="made-on-forma">
+    <div class="made-on-forma__intro">
+        <div class="made-on-forma__left">
+            <p>Made on Forma</p>
+        </div>
+
+        <div class="made-on-forma__right">
+            <p>
+                Over 100 sites are launched with our website builder every day. Dive into our top picks to find your
+                inspiration.
+            </p>
+
+            <a href="#" class="made-on-forma__button">Explore sites</a>
+        </div>
+    </div>
+
+    <div class="made-on-forma__gallery">
+        <div class="made-on-forma__track made-on-forma__track--top" [style.transform]="topTransform()">
+            @for (item of topRow(); track item.image) {
+                <article class="made-on-forma__card made-on-forma__card--top">
+                    <img [src]="item.image" [alt]="item.alt" />
+                </article>
+            }
+
+        </div>
+
+        <div class="made-on-forma__track made-on-forma__track--bottom" [style.transform]="bottomTransform()">
+            @for (item of bottomRow(); track item.image) {
+                <article class="made-on-forma__card made-on-forma__card--bottom">
+                    <img [src]="item.image" [alt]="item.alt" />
+                </article>
+            }
+
+        </div>
+    </div>
+</section>

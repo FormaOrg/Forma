@@ -1,0 +1,145 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.made-on-forma {
+    width: 100%;
+    overflow: hidden;
+    padding: 36px 0 40px;
+    background: #CDCFFF;
+}
+
+.made-on-forma__intro {
+    display: flex;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 0 150px;
+    margin-top: 30px;
+    margin-bottom: 130px;
+}
+
+.made-on-forma__left {
+    max-width: fit-content;
+}
+
+.made-on-forma__left p {
+    margin: 0;
+    color: #101585;
+    font-size: 7rem;
+    line-height: 0.95;
+    font-weight: 400;
+}
+
+.made-on-forma__right {
+    max-width: 600px;
+    padding-top: 20px;
+}
+
+.made-on-forma__right p {
+    margin: 0 0 14px;
+    color: #101585;
+    font-size: 1.8rem;
+    line-height: 1.2;
+}
+
+.made-on-forma__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55px;
+    width: 190px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: #101585;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 400;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.made-on-forma__button:hover {
+    opacity: 0.95;
+}
+
+.made-on-forma__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: hidden;
+}
+
+.made-on-forma__track {
+    display: flex;
+    gap: 30px;
+    width: max-content;
+    will-change: transform;
+    transition: transform 0.08s linear;
+}
+
+.made-on-forma__card {
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.made-on-forma__card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.made-on-forma__card--top {
+    height: 336px;
+}
+
+.made-on-forma__card--bottom {
+    height: 336px;
+}
+
+@media (max-width: 1024px) {
+    .made-on-forma__intro {
+        padding: 0 28px;
+        gap: 30px;
+    }
+
+    .made-on-forma__left h2 {
+        font-size: 3.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .made-on-forma {
+        padding-top: 28px;
+    }
+
+    .made-on-forma__intro {
+        flex-direction: column;
+        padding: 0 20px;
+        margin-bottom: 24px;
+    }
+
+    .made-on-forma__right {
+        max-width: 100%;
+        padding-top: 0;
+    }
+
+    .made-on-forma__left h2 {
+        font-size: 2.5rem;
+    }
+
+    .made-on-forma__card--top,
+    .made-on-forma__card--bottom {
+        width: 210px;
+        height: 118px;
+    }
+}

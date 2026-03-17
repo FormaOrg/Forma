@@ -7,16 +7,16 @@
 .faq-section {
     display: flex;
     flex-direction: column;
-    padding: 50px 150px;
+    padding: 70px 150px 230px 150px;
     gap: 50px;
 }
 
 .faq-title {
-    font-size: 4em;
-    font-weight: 500;
+    font-size: 4.5em;
+    font-weight: 400;
     line-height: 1.15;
     margin: 0;
-    max-width: 700px; /* keeps it from stretching full width */
+    max-width: 800px; /* keeps it from stretching full width */
 }
 
 .faq-bottom {
@@ -62,8 +62,8 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 1.3em;
-    font-weight: 600;
+    font-size: 1.6em;
+    font-weight: 500;
     text-align: left;
     flex-shrink: 0;
 }
