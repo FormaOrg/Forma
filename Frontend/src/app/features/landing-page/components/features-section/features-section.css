@@ -1,5 +1,9 @@
 :host {
+    max-width: 2000px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 section {
@@ -32,6 +36,7 @@ button {
     display: flex;
     justify-content: space-between;
     margin-top: 75px;
+    gap: 30px;
 }
 
 .features div {
