@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { Header } from '../../shared/header/header';
 import { HeroSection } from './hero-section/hero-section';
-import { Section1 } from './section1/section1';
+import { FeaturesSection } from './features-section/features-section';
 
 @Component({
   selector: 'app-landing-page',
   imports: [
     Header,
     HeroSection,
-    Section1
-  ],
+    FeaturesSection
+],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',
 })
