@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Header } from '../../shared/header/header';
 import { HeroSection } from './components/hero-section/hero-section';
-import { Section1 } from './components/first-section/section1';
+import { FeaturesSection } from './components/features-section/features-section';
 import { TemplatesShowcase } from './components/templates-showcase/templates-showcase';
 
 @Component({
@@ -9,9 +9,9 @@ import { TemplatesShowcase } from './components/templates-showcase/templates-sho
   imports: [
     Header,
     HeroSection,
-    Section1,
+    FeaturesSection,
     TemplatesShowcase
-  ],
+],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',
 })

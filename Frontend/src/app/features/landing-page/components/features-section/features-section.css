@@ -1,0 +1,71 @@
+:host {
+    width: 100%;
+}
+
+section {
+    padding: 200px;
+    width: 100%;
+}
+
+.logo {
+    margin-bottom: 30px;
+}
+
+.right {
+    width: 500px;
+}
+
+.right p {
+    font-size: 1.3em;
+}
+
+.left {
+    font-size: 2em;
+    width: 700px;
+}
+
+button {
+    margin-top: 30px;
+}
+
+.features {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 75px;
+}
+
+.features div {
+    padding: 150px 30px 75px 30px;
+    border-radius: 25px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.features p {
+    margin-top: auto;
+}
+
+.features .title {
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.feature1 {
+    background-color: #014051;
+    color: #fff;
+}
+
+.feature2 {
+    background-color: #ffc2fe;
+}
+
+.feature3 {
+    background-color: #d1e6d1;
+}
+
+.feature4 {
+    background-color: #863a29;
+    color: #fff;
+}
