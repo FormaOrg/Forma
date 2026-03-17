@@ -5,8 +5,12 @@
 .site-header {
   max-width: 1240px;
   width: 100%;
-  margin: 30px auto 0;
   padding: 0 16px;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 30px;
+  z-index: 100;
 }
 
 .header-inner {
