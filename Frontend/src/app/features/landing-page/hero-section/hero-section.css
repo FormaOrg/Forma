@@ -4,6 +4,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+}
+
+:host::before {
+    content: '';
+    position: absolute;
+    top: 250px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 1300px;
+    background: radial-gradient(ellipse at center, #c4b8ff 0%, #a89eff 30%, transparent 70%);
+    filter: blur(250px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .top {
@@ -35,44 +51,8 @@
 }
 
 
-button {
+link-button {
     margin-top: 50px;
-}
-
-.btn-arrow {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    opacity: 0;
-    position: absolute;
-    right: 10px;
-    transform: translateX(5px); /* starts far right */
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    flex-shrink: 0;
-}
-
-.btn.purple:hover .btn-arrow {
-    opacity: 1;
-    transform: translateX(-5px); /* lands in place from the right */
-}
-
-.btn-text {
-    transition: transform 0.3s ease;
-    display: inline-block;
-}
-
-.btn.purple:hover .btn-text {
-    transform: translateX(-10px); /* slides left */
-}
-
-.btn.purple {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    overflow: hidden;
-    padding: 10px 30px;
-    position: relative;
 }
 
 .bottom {
@@ -101,20 +81,6 @@ button {
     bottom: 30px;
     transform-origin: top left;
     animation: cursorMove 4s ease-in-out alternate infinite;
-}
-
-.glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 150%;
-    padding-bottom: 90%;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center, #604eff66 0%, #604eff33 40%, transparent 70%);
-    filter: blur(60px);
-    z-index: -1;
-    pointer-events: none;
 }
 
 @keyframes cardMove {

@@ -63,22 +63,121 @@
    ========================================= */
 
 .header-logo {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    width: 200px; /* increase — needs to fit longest word + icon */
+    flex-shrink: 0;
+    /* remove overflow: hidden — let the word show fully */
 }
 
 .logo-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #111111;
-  text-decoration: none;
-  white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    color: #111111;
+    text-decoration: none;
+    white-space: nowrap;
+    /* remove overflow: hidden from here too */
 }
-
 .logo-link img {
   display: block;
+}
+
+.logo-word-container {
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    transition: max-width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-right: 0;
+}
+
+
+.logo-word {
+    display: inline-block;
+    font-size: 1.3em;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-right: 8px;
+}
+
+.logo-icon {
+    display: flex;
+    align-items: self-start;
+    width: fit-content; /* takes only the space the images need */
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+
+.logo-icon img {
+    display: block;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-link img:nth-child(4) {
+  margin-left: 3px;
+  margin-right: 0px;
+}
+
+/* flip each piece horizontally */
+.logo-link.animating .logo-icon {
+    transform: translateX(0px);
+}
+
+.logo-link.animating .logo-icon img:nth-child(1) {
+    transform: scaleX(-1);
+}
+
+.logo-link.animating .logo-icon img:nth-child(2) {
+    transform: scaleX(-1);
+}
+
+.logo-link.animating .logo-icon img:nth-child(3) {
+    transform: scaleX(-1);
+}
+
+/* dot flips position to the left side */
+.logo-link.animating .logo-icon img:nth-child(4) {
+    transform: scaleX(-1);
+    order: -1; /* moves dot to the left of the shapes */
+    margin-left: 0px;
+    margin-right: 3px;
+}
+
+.logo-link.animating .logo-word-container {
+    max-width: 100px;
+    opacity: 1;
+    margin-right: 8px; /* only add spacing when word is visible */
+}
+
+.logo-link:not(.animating) .logo-icon {
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s; /* translateX waits for flip to start */
+}
+
+.logo-link:not(.animating) .logo-icon img {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* flip starts immediately on return */
+}
+
+.logo-name {
+    font-size: 1.45em;
+    font-weight: 500;
+    margin-left: 8px;
+    opacity: 1;
+    max-width: 200px;
+    transition: opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.7s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.logo-link:not(.animating) .logo-name {
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.7s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-link.animating .logo-name {
+    opacity: 0;
+}
+
+.logo-link.animating .logo-icon {
+  margin-left: -8px;
 }
 
 /* =========================================

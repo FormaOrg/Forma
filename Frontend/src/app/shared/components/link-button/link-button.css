@@ -1,0 +1,43 @@
+button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+    position: relative;
+    
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;    
+}
+
+.arrow {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    opacity: 0;
+    position: absolute;
+    right: 10px;
+    transform: translateX(5px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.text {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+button:hover .text {
+    transform: translateX(var(--txt-slide, -12px));
+}
+
+button:hover .arrow {
+    opacity: 1;
+    transform: translateX(var(--arrow-slide, 7px));
+}
+
+button:hover {
+    opacity: 0.95;
+}

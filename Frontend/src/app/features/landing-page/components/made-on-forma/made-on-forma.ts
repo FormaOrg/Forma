@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, computed, signal } from '@angular/core';
+import { LinkButton } from "../../../../shared/components/link-button/link-button";
 
 type ShowcaseItem = {
     image: string;
@@ -9,7 +10,7 @@ type ShowcaseItem = {
 @Component({
     selector: 'app-made-on-forma',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, LinkButton],
     templateUrl: './made-on-forma.html',
     styleUrl: './made-on-forma.css'
 })

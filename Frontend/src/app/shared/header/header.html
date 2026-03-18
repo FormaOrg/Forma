@@ -105,10 +105,20 @@
 <header class="site-header" [class.site-header--hidden]="isHidden()">
   <div class="header-inner">
     <div class="header-logo">
-      <a href="/" aria-label="Forma home" class="logo-link">
-        <img src="assets/Landing Page/FormaLogo.svg" alt="Forma Logo" />
-      </a>
+        <a href="/" aria-label="Forma home" class="logo-link">
+            <span class="logo-word-container">
+                <span class="logo-word">{{ currentWord }}</span>
+            </span>
+            <div class="logo-icon">
+              <img src="assets/Logo/part1.svg" alt="Forma Logo"/>
+              <img src="assets/Logo/part2.svg" alt="Forma Logo"/>
+              <img src="assets/Logo/part3.svg" alt="Forma Logo"/>
+              <img src="assets/Logo/dot.svg" alt="Forma Logo"/>
+            </div>
+            <span class="logo-name">Forma</span>
+        </a>
     </div>
+
 
     <nav aria-label="Primary navigation" class="primary-nav">
       @for (item of navItems(); track item.label) {
