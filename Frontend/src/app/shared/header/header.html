@@ -1,108 +1,4 @@
-<!--<header class="site-header">
-  <div class="header-inner">
-    <div class="header-logo">
-      <a href="/" aria-label="Forma home" class="logo-link">
-        <img src="assets\Landing Page\FormaLogo.svg" alt="Forma Logo" />
-      </a>
-    </div>
-
-    
-    <nav aria-label="Primary navigation" class="primary-nav">
-      @for (item of navItems(); track item.label) {
-        <div class="nav-item" [class.has-menu]="item.hasDropdown">
-          <a href="#" class="nav-link">
-            <span>{{ item.label }}</span>
-
-            @if (item.hasDropdown) {
-              <svg
-                class="nav-chevron"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  d="M6 9L12 15L18 9"
-                  stroke="currentColor"
-                  stroke-width="2.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            }
-          </a>
-
-          @if (item.hasDropdown) {
-            <div class="nav-dropdown">
-              <div class="dropdown-grid">
-                <a href="#" class="dropdown-link">
-                  <strong>Overview</strong>
-                  <span>Quick introduction to {{ item.label }}</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Features</strong>
-                  <span>Explore the main capabilities</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Use cases</strong>
-                  <span>See practical workflows and examples</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Documentation</strong>
-                  <span>Read guides and setup instructions</span>
-                </a>
-              </div>
-            </div>
-          }
-        </div>
-      }
-    </nav>
-
-    <div class="header-actions">
-      <a href="#" aria-label="Language or region" class="icon-link lang-link">
-        <svg
-          class="icon-globe"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7" />
-          <path d="M3.5 12H20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-          <path
-            d="M12 3.5C14.5 5.9 15.9 8.88 15.9 12C15.9 15.12 14.5 18.1 12 20.5C9.5 18.1 8.1 15.12 8.1 12C8.1 8.88 9.5 5.9 12 3.5Z"
-            stroke="currentColor"
-            stroke-width="1.7"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </a>
-
-      <span class="divider" aria-hidden="true"></span>
-
-      <a href="#" class="login-link">Login</a>
-      <a href="#" class="btn-try">Try for free</a>
-
-      <button type="button" aria-label="Open menu" class="menu-toggle">
-        <svg
-          class="icon-menu"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path d="M4 7H20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-          <path d="M4 12H20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-          <path d="M4 17H20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-        </svg>
-      </button>
-    </div>
-  </div>
-</header>!-->
-<header class="site-header" [class.site-header--hidden]="isHidden()">
+<header class="site-header" [class.site-header--hidden]="isHidden() && !isLanguageOpen()">
   <div class="header-inner">
     <div class="header-logo">
         <a href="/" aria-label="Forma home" class="logo-link">
@@ -123,7 +19,7 @@
     <nav aria-label="Primary navigation" class="primary-nav">
       @for (item of navItems(); track item.label) {
         <div class="nav-item" [class.has-menu]="item.hasDropdown">
-          <a href="#" class="nav-link">
+          <a routerLink="/{{item.url}}" class="nav-link">
             <span>{{ item.label }}</span>
 
             @if (item.hasDropdown) {
@@ -175,7 +71,13 @@
     </nav>
 
     <div class="header-actions">
-      <a href="#" aria-label="Language or region" class="icon-link lang-link">
+      <button
+        type="button"
+        aria-label="Language or region"
+        class="icon-link lang-link"
+        [class.is-active]="isLanguageOpen()"
+        (click)="toggleLanguageMenu()"
+      >
         <svg
           class="icon-globe"
           viewBox="0 0 24 24"
@@ -192,7 +94,7 @@
             stroke-linejoin="round"
           />
         </svg>
-      </a>
+      </button>
 
       <span class="divider" aria-hidden="true"></span>
 
@@ -214,4 +116,64 @@
       </button>
     </div>
   </div>
+
+  @if (isLanguageOpen()) {
+    <div class="language-overlay" (click)="closeLanguageMenu()">
+      <div class="language-panel" (click)="$event.stopPropagation()">
+        <div class="language-panel__top">
+          <div class="language-panel__eyebrow">Language</div>
+
+          <button
+            type="button"
+            class="language-close"
+            aria-label="Close language menu"
+            (click)="closeLanguageMenu()"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="language-panel__content">
+          <h2 class="language-panel__title">Choose your language</h2>
+          <p class="language-panel__subtitle">
+            Select your preferred language for browsing Forma.
+          </p>
+
+          <div class="language-list" role="list">
+            @for (language of languages(); track language.code) {
+              <button
+                type="button"
+                class="language-card"
+                [class.is-selected]="selectedLanguage().code === language.code"
+                [attr.dir]="language.dir || 'ltr'"
+                (click)="selectLanguage(language)"
+              >
+                <div class="language-card__main">
+                  <span class="language-card__label">{{ language.label }}</span>
+                  <span class="language-card__native">{{ language.nativeLabel }}</span>
+                </div>
+
+                <span class="language-card__check" aria-hidden="true">
+                  @if (selectedLanguage().code === language.code) {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M5 12.5L9.2 16.7L19 7"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  }
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </header>

@@ -1,45 +1,31 @@
-/*import { Component, signal } from '@angular/core';
-
-type NavItem = {
-  label: string;
-  hasDropdown?: boolean;
-};
-
-@Component({
-  selector: 'app-header',
-  imports: [],
-  templateUrl: './header.html',
-  styleUrl: './header.css',
-})
-
-export class Header {
-  readonly navItems = signal<NavItem[]>([
-    { label: 'Product', hasDropdown: true },
-    { label: 'Templates', hasDropdown: true },
-    { label: 'Support', hasDropdown: true },
-    { label: 'Pricing' }
-  ]);
-}*/
-
 import { Component, HostListener, signal } from '@angular/core';
+import { RouterLink } from "@angular/router";
 
 type NavItem = {
   label: string;
   hasDropdown?: boolean;
+  url:string;
+};
+
+type LanguageOption = {
+  code: string;
+  label: string;
+  nativeLabel: string;
+  dir?: 'ltr' | 'rtl';
 };
 
 @Component({
   selector: 'app-header',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header {
   readonly navItems = signal<NavItem[]>([
-    { label: 'Product', hasDropdown: true },
-    { label: 'Templates', hasDropdown: true },
-    { label: 'Support', hasDropdown: true },
-    { label: 'Pricing' }
+    { label: 'Product', hasDropdown: true, url: "#"},
+    { label: 'Templates', hasDropdown: true, url: "#" },
+    { label: 'Support', hasDropdown: true, url: "#" },
+    { label: 'Pricing', url: "pricing" }
   ]);
 
   readonly isHidden = signal(false);
@@ -50,6 +36,19 @@ export class Header {
   private wordIndex = 0;
   private animationInterval: any;
   private logoEl: HTMLElement | null = null;
+  readonly isLanguageOpen = signal(false);
+  readonly selectedLanguage = signal<LanguageOption>({
+    code: 'en',
+    label: 'English',
+    nativeLabel: 'English',
+    dir: 'ltr'
+  });
+
+  readonly languages = signal<LanguageOption[]>([
+    { code: 'en', label: 'English', nativeLabel: 'English', dir: 'ltr' },
+    { code: 'ar', label: 'Arabic', nativeLabel: 'العربية', dir: 'rtl' },
+    { code: 'fr', label: 'French', nativeLabel: 'Français', dir: 'ltr' }
+  ]);
 
   private lastScrollY = 0;
   private readonly scrollThreshold = 8;
@@ -89,6 +88,10 @@ export class Header {
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
+    if (this.isLanguageOpen()) {
+      return;
+    }
+
     const currentScrollY = window.scrollY || 0;
 
     if (currentScrollY <= 40) {
@@ -111,5 +114,39 @@ export class Header {
 
       this.lastScrollY = currentScrollY;
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeLanguageMenu();
+  }
+
+  toggleLanguageMenu(): void {
+    const willOpen = !this.isLanguageOpen();
+    this.isLanguageOpen.set(willOpen);
+
+    if (willOpen) {
+      this.isHidden.set(false);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  closeLanguageMenu(): void {
+    if (!this.isLanguageOpen()) {
+      return;
+    }
+
+    this.isLanguageOpen.set(false);
+    document.body.style.overflow = '';
+  }
+
+  selectLanguage(language: LanguageOption): void {
+    this.selectedLanguage.set(language);
+    this.closeLanguageMenu();
+
+    // later you can hook this into actual i18n switching
+    console.log('Selected language:', language.code);
   }
 }

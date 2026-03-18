@@ -1,0 +1,76 @@
+<section class="hero-section">
+    <div class="top">
+        <h2 class="title">Flexible pricing, Limitless <span>creation</span></h2>
+        <p class="subtitle">Choose the perfect plan that scales with your business. Flexible options for teams of all sizes.</p>
+    </div>
+
+
+    <div class="pricing-container">
+        <div class="glow"></div>
+
+        <h2 class="pricing-title">Find the right plan for you</h2>
+
+        <div
+            class="billing-toggle"
+            [attr.data-mode]="billingMode()"
+            aria-label="Billing period switch"
+        >
+            <div class="billing-toggle__pill"></div>
+
+            <button
+                type="button"
+                class="billing-toggle__option"
+                [class.is-active]="billingMode() === 'monthly'"
+                (click)="setBillingMode('monthly')"
+            >
+                Monthly
+            </button>
+
+            <button
+                type="button"
+                class="billing-toggle__option"
+                [class.is-active]="billingMode() === 'yearly'"
+                (click)="setBillingMode('yearly')"
+            >
+                Yearly <span>(save {{ savePercent() }}%)</span>
+            </button>
+        </div>
+
+        <div class="pricing-cards">
+            @for (plan of plans(); track plan.name) {
+                <article class="pricing-card" [class.pricing-card--popular]="plan.popular">
+                    @if (plan.popular) {
+                        <div class="pricing-card__badge">Most Popular</div>
+                    }
+
+                    <div class="pricing-card__top">
+                        <h3 class="pricing-card__name">{{ plan.name }}</h3>
+                        <p class="pricing-card__description">{{ plan.description }}</p>
+
+                        <div class="pricing-card__price-row">
+                            <span class="pricing-card__price">{{ getDisplayedPrice(plan) }}DT</span>
+                            <span class="pricing-card__period">/ month</span>
+                        </div>
+
+                        <a
+                            href="#"
+                            class="pricing-card__button"
+                            [class.pricing-card__button--popular]="plan.popular"
+                        >
+                            {{ plan.cta }}
+                        </a>
+                    </div>
+
+                    <ul class="pricing-card__features">
+                        @for (feature of plan.features; track feature) {
+                            <li>
+                                <span class="pricing-card__check">✓</span>
+                                <span>{{ feature }}</span>
+                            </li>
+                        }
+                    </ul>
+                </article>
+            }
+        </div>
+    </div>
+</section>
