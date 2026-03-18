@@ -29,6 +29,7 @@ section {
 }
 
 .btn-text {
+    
     transition: transform 0.3s ease;
     display: inline-block;
 }
@@ -39,6 +40,9 @@ section {
 
 .btn {
     display: flex;
+    background-color: black;
+    border-radius: 25px;
+    color: white;
     align-items: center;
     justify-content: center;
     gap: 0;
