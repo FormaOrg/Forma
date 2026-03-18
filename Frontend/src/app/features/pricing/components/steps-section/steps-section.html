@@ -1,0 +1,29 @@
+<section class="steps-section">
+  <div class="steps-section__inner">
+    <div class="steps-section__left">
+      <p class="steps-section__title">
+        Build your site in
+        <br />
+        5 simple steps
+      </p>
+
+      <button class="btn">
+        <span class="btn-text">Start for Free</span>
+        <img class="btn-arrow" src="assets\Landing Page\Hero Section\arrow-right.svg" alt="">
+      </button>
+    </div>
+
+    <div class="steps-section__right">
+      @for (step of steps(); track step.number) {
+        <div class="step-row">
+          <div class="step-row__number">{{ step.number }}</div>
+
+          <p class="step-row__text">
+            <strong>{{ step.strong }}</strong>
+            {{ ' ' + step.rest }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
