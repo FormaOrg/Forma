@@ -1,0 +1,114 @@
+:host {
+    display: block;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    max-width: 2000px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.builder-help-deck {
+    position: relative;
+    background: #f3f3f3;
+    border-bottom-left-radius: 100px;
+    border-bottom-right-radius: 100px;
+    overflow: hidden;
+}
+
+.builder-help-deck__inner {
+    width: 100%;
+    margin: 0 auto;
+    padding: 200px 125px 140px;
+}
+
+.builder-help-deck__title {
+    margin: 0 0 40px;
+    color: #111111;
+    font-size: 6rem;
+    line-height: 1.04;
+    font-weight: 400;
+}
+
+.builder-help-deck__list {
+    border-top: 1px solid #9e9e9e;
+}
+
+.faq-item {
+    border-bottom: 1px solid #9e9e9e;
+}
+
+.faq-item__trigger {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 35px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    text-align: left;
+    cursor: pointer;
+    color: #111111;
+}
+
+.faq-item__question {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-weight: 400;
+}
+
+.faq-item__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: transform 0.28s ease;
+}
+
+.faq-item--open .faq-item__icon {
+    transform: rotate(180deg);
+}
+
+.faq-item__content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.32s ease;
+}
+
+.faq-item__content--open {
+    grid-template-rows: 1fr;
+}
+
+.faq-item__content-inner {
+    overflow: hidden;
+}
+
+.faq-item__content-inner p {
+    margin: 0;
+    padding: 0 0 22px;
+    max-width: 700px;
+    color: #2e2e2e;
+    font-size: 1.2rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+    :host { position: relative; top: auto; }
+
+    .builder-help-deck {
+        border-bottom-left-radius: 32px;
+        border-bottom-right-radius: 32px;
+    }
+
+    .builder-help-deck__inner { padding: 56px 20px 100px; }
+    .faq-item__trigger { padding: 18px 0; }
+    .faq-item__content-inner p { padding-bottom: 18px; font-size: 1rem; }
+}
+
+@media (max-width: 560px) {
+    .builder-help-deck__title { margin-bottom: 20px; }
+    .faq-item__question { max-width: 85%; }
+    .faq-item__icon { width: 20px; height: 20px; }
+}
