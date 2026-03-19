@@ -1,10 +1,75 @@
 :host {
-    display: block;
-    
+  display: block;
 }
 
 main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+}
+
+/* normal flow sections */
+app-header,
+app-forma-process-showcase,
+app-forma-overview,
+app-manual-design-section,
+app-template-section,
+app-customizer-section,
+app-steps-section2,
+app-parallax-section,
+app-product-help-deck,
+app-product-cta-wave,
+app-footer {
+  width: 100%;
+}
+
+app-forma-overview {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+app-manual-design-section {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+app-template-section {
+  position: relative;
+  z-index: 30;
+}
+
+app-customizer-section {
+  position: relative;
+  z-index: 35;
+}
+
+app-steps-section2 {
+  position: relative;
+  z-index: 36;
+}
+
+app-parallax-section {
+  position: relative;
+  z-index: 37;
+}
+
+/* FAQ must be ABOVE the CTA */
+app-product-help-deck {
+  position: relative;
+  z-index: 50;
+}
+
+/* CTA sits BEHIND FAQ */
+app-product-cta-wave {
+  position: relative;
+  z-index: 40;
+}
+
+/* Footer should come above CTA after it */
+app-footer {
+  position: relative;
+  z-index: 60;
 }

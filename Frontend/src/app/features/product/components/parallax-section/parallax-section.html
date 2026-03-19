@@ -1,0 +1,63 @@
+<section class="parallax-wrap">
+  <div class="parallax-stage" #parallaxStage>
+    <div class="parallax-box">
+      <div class="parallax-inner">
+        <div class="intro">
+          <span class="eyebrow">Visual storytelling</span>
+          <h2>Build sections that react to scroll</h2>
+          <p>
+            Create layered layouts, smooth motion, and immersive landing pages directly inside your
+            website builder.
+          </p>
+        </div>
+
+        <nav class="top-nav">
+          <a href="#">Templates</a>
+          <a href="#">Sections</a>
+          <a href="#">Effects</a>
+          <a href="#">Contact</a>
+        </nav>
+
+        <div class="hero-copy" [style.transform]="'translate3d(-50%, ' + titleY + 'px, 0)'">
+          <h1>
+            Design<br />
+            in Motion
+          </h1>
+
+          <div class="roles">
+            <span>SCROLL-BASED<br />SECTIONS</span>
+            <span>LAYERED<br />VISUAL SYSTEMS</span>
+          </div>
+        </div>
+
+        <div
+          class="shape image image-one"
+          [style.transform]="'translate3d(0,' + imageOneY + 'px,0)'"
+        >
+          <img src="assets/images/parallax1.avif" alt="" />
+        </div>
+
+        <div
+          class="shape image image-two"
+          [style.transform]="'translate3d(0,' + imageOneY + 'px,0)'"
+        >
+          <img src="assets/images/parallax2.avif" alt="" />
+        </div>
+
+        <div
+          class="shape image image-three"
+          [style.transform]="'translate3d(0,' + imageOneY + 'px,0)'"
+        >
+          <img src="assets/images/parallax4.avif" alt="" />
+        </div>
+
+        <div
+          class="shape image image-four"
+          [style.transform]="'translate3d(0,' + imageOneY + 'px,0)'"
+        >
+          <img src="assets/images/parallax3.avif" alt="" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,357 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.customizer-section {
+  width: 100%;
+  background: #efefef;
+  padding: 140px 32px 36px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  color: #111;
+}
+
+.top-content {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+.heading-wrap p {
+  margin: 0;
+  font-size: clamp(54px, 7vw, 108px);
+  line-height: 0.92;
+  font-weight: 300;
+  max-width: 860px;
+}
+
+.intro-wrap {
+  padding-top: 14px;
+  max-width: 520px;
+  justify-self: end;
+}
+
+.intro-wrap p {
+  margin: 0 0 26px;
+  font-size: clamp(18px, 1.55vw, 28px);
+  line-height: 1.35;
+  color: #1d1d1d;
+}
+
+.cta-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 28px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+}
+
+.builder-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.left-controls {
+  display: flex;
+}
+
+.control-card {
+  width: 100%;
+  background: linear-gradient(180deg, #dfe5ef 0%, #d8e0ec 100%);
+  border-radius: 28px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #3d73ff;
+}
+
+.control-card h2 {
+  margin: 0 0 12px;
+  font-size: 42px;
+  font-weight: 400;
+  color: #356df5;
+}
+
+.theme-description {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4a5f86;
+  max-width: 280px;
+}
+
+.theme-dots {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.theme-dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 4px solid transparent;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.theme-dot:hover {
+  transform: scale(1.08);
+}
+
+.theme-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px #8cacff;
+}
+
+.preview-shell {
+  --hero-bg: #067000;
+  --hero-top: #98d182;
+  --surface-card: #f6f3ea;
+  --surface-soft: rgba(255, 255, 255, 0.16);
+  --surface-line: rgba(255, 255, 255, 0.22);
+  --text-main: #f7f7f2;
+  --text-dark: #1f314b;
+  --pill-bg: #f2efe2;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 720px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--hero-bg);
+  color: var(--text-main);
+  transition: background 0.28s ease, color 0.28s ease;
+}
+
+.shipping-bar {
+  height: 26px;
+  background: var(--hero-top);
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.preview-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 32px 12px;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.logo-circle {
+  filter: invert(1);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.cart-pill {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: var(--pill-bg);
+  color: #2d2d2d;
+  font-weight: 600;
+}
+
+.preview-main {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(520px, 1.15fr);
+  gap: 24px;
+  padding: 24px 32px 32px;
+  align-items: stretch;
+  min-height: calc(720px - 26px - 72px);
+}
+
+.preview-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand-name {
+  margin: 8px 0 16px;
+  font-size: clamp(72px, 8vw, 126px);
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+  font-weight: 800;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.brand-subtext {
+  margin: 0;
+  font-size: clamp(20px, 1.7vw, 26px);
+  line-height: 1.08;
+  max-width: 420px;
+}
+
+.shipping-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 18px;
+  margin-top: auto;
+}
+
+.globe {
+  width: 42px;
+  height: 42px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+}
+
+.visual-card {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 540px;
+  background: transparent; /* removes the framed card look */
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  padding: 0; /* important */
+  transition: transform 0.28s ease;
+}
+
+.theme-preview-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;      /* makes all images same visual dimensions */
+  object-position: center; /* keeps crop centered */
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  animation: imageReveal 0.45s ease;
+}
+.visual-tag {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-dark);
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.3;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.refresh {
+  animation: quickRefresh 0.38s ease;
+}
+
+@keyframes imageReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes quickRefresh {
+  0% {
+    opacity: 0.45;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1280px) {
+  .builder-grid {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+
+  .preview-main {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-copy {
+    gap: 24px;
+  }
+
+  .visual-card {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 920px) {
+  .customizer-section {
+    padding: 28px 18px 24px;
+  }
+
+  .top-content {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-wrap {
+    justify-self: start;
+    max-width: 680px;
+  }
+
+  .builder-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .preview-nav {
+    padding: 16px 18px 10px;
+  }
+
+  .preview-main {
+    padding: 18px;
+  }
+
+  .brand-name {
+    font-size: 68px;
+  }
+
+  .visual-card {
+    min-height: 360px;
+    padding: 18px;
+  }
+}
