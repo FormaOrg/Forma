@@ -1,6 +1,25 @@
 :host {
-    display: block;
-    
+    max-width: 2000px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+:host::before {
+    content: '';
+    position: absolute;
+    top: 250px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 1300px;
+    background: radial-gradient(ellipse at center, #c4b8ff 0%, #a89eff 30%, transparent 70%);
+    filter: blur(400px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
 }
 
 main {
