@@ -15,11 +15,31 @@
         </a>
     </div>
 
-
     <nav aria-label="Primary navigation" class="primary-nav">
       @for (item of navItems(); track item.label) {
-        <div class="nav-item" [class.has-menu]="item.hasDropdown">
-          <a routerLink="/{{item.url}}" class="nav-link">
+
+        <!--
+          The nav-item wrapper covers both the link and the dropdown panel.
+          mouseenter  → always opens (hover behaviour)
+          mouseleave  → always closes (hover behaviour)
+          click on the link → toggles open/closed (click behaviour)
+          This means:
+            - Hover in  → opens
+            - Click     → toggles (closes if open, opens if closed)
+            - Hover out → closes
+        -->
+        <div
+          class="nav-item"
+          [class.has-menu]="item.hasDropdown"
+          [class.is-open]="openItem() === item.label"
+          (mouseenter)="item.hasDropdown ? onNavItemEnter(item.label) : null"
+          (mouseleave)="item.hasDropdown ? onNavItemLeave(item.label) : null"
+        >
+          <a
+            routerLink="/{{item.url}}"
+            class="nav-link"
+            (click)="onNavLinkClick($event, item)"
+          >
             <span>{{ item.label }}</span>
 
             @if (item.hasDropdown) {
@@ -43,27 +63,53 @@
 
           @if (item.hasDropdown) {
             <div class="nav-dropdown">
-              <div class="dropdown-grid">
-                <a href="#" class="dropdown-link">
-                  <strong>Overview</strong>
-                  <span>Quick introduction to {{ item.label }}</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Features</strong>
-                  <span>Explore the main capabilities</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Use cases</strong>
-                  <span>See practical workflows and examples</span>
-                </a>
-
-                <a href="#" class="dropdown-link">
-                  <strong>Documentation</strong>
-                  <span>Read guides and setup instructions</span>
-                </a>
-              </div>
+                <div class="dropdown-grid" [class.dropdown-grid--with-card]="item.card">
+                  <div class="dropdown-inner">
+                    @for (col of item.columns || []; track col.heading; let i = $index) {
+                        <div class="dropdown-col" [style.--col-index]="i">
+                            <span class="dropdown-col-heading">{{ col.heading }}</span>
+                            @for (link of col.links; track link.title) {
+                                <a href="#" class="dropdown-col-link">
+                                    <span class="dropdown-col-link__icon"
+                                        [style.background]="col.bgColor || '#f0f0f0'"
+                                        [style.color]="col.color || '#444'">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path [attr.d]="link.icon"/>
+                                        </svg>
+                                    </span>
+                                    <span class="dropdown-col-link__text">
+                                        <strong>{{ link.title }}</strong>
+                                        <span>{{ link.description }}</span>
+                                    </span>
+                                </a>
+                            }
+                        </div>
+                        @if (!item.card) {
+                            <div class="dropdown-divider"></div>
+                        }
+                    }
+                    @if (item.card) {
+                      <div class="dropdown-card" [class]="'dropdown-card--' + (item.card.theme || 'green')" [style.--col-index]="(item.columns?.length || 0)">
+                          @if (item.card.theme === 'purple') {
+                              <div class="dropdown-card__badge">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                  New Feature
+                              </div>
+                          }
+                          <div class="dropdown-card__icon" [class]="'dropdown-card__icon--' + (item.card.theme || 'green')">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                  <path [attr.d]="item.card.icon"/>
+                              </svg>
+                          </div>
+                          <strong class="dropdown-card__title">{{ item.card.title }}</strong>
+                          <p class="dropdown-card__desc">{{ item.card.description }}</p>
+                          <a [href]="item.card.buttonUrl" class="dropdown-card__btn" [class]="'dropdown-card__btn--' + (item.card.theme || 'green')">
+                              {{ item.card.buttonText }}
+                          </a>
+                      </div>
+                    }
+                  </div>
+                </div>
             </div>
           }
         </div>

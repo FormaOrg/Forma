@@ -1,17 +1,41 @@
 import { Component, HostListener, signal } from '@angular/core';
 import { RouterLink } from "@angular/router";
 
-type NavItem = {
-  label: string;
-  hasDropdown?: boolean;
-  url:string;
-};
-
 type LanguageOption = {
   code: string;
   label: string;
   nativeLabel: string;
   dir?: 'ltr' | 'rtl';
+};
+
+type DropdownLink = {
+    icon: string;
+    title: string;
+    description: string;
+};
+
+type DropdownColumn = {
+    heading: string;
+    links: DropdownLink[];
+    color?: string;
+    bgColor?: string;
+};
+
+type DropdownCard = {
+    icon: string;
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonUrl: string;
+    theme?: 'green' | 'purple' | 'blue';
+};
+
+type NavItem = {
+    label: string;
+    hasDropdown?: boolean;
+    url: string;
+    columns?: DropdownColumn[];
+    card?: DropdownCard;
 };
 
 @Component({
@@ -22,13 +46,112 @@ type LanguageOption = {
 })
 export class Header {
   readonly navItems = signal<NavItem[]>([
-    { label: 'Product', hasDropdown: true, url: "#"},
-    { label: 'Templates', hasDropdown: true, url: "#" },
-    { label: 'Support', hasDropdown: true, url: "#" },
-    { label: 'Pricing', url: "pricing" }
+    {
+        label: 'Product',
+        hasDropdown: true,
+        url: '#',
+        columns: [
+            {
+                heading: 'Platform',
+                color: '#7c3aed', bgColor: '#f3f0ff',
+                links: [
+                    { icon: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z', title: 'Overview', description: 'Everything you need to build' },
+                    { icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', title: 'Features', description: 'Powerful tools at your fingertips' },
+                    { icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', title: 'Templates', description: 'Start with beautiful designs' },
+                ]
+            },
+            {
+                heading: 'Resources',
+                color: '#7c3aed', bgColor: '#f3f0ff',
+                links: [
+                    { icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Pricing', description: 'Plans for every team size' },
+                    { icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', title: 'How It Works', description: 'Get started in minutes' },
+                ]
+            }
+        ],
+        card: {
+            icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+            title: 'AI-Powered Builder',
+            description: 'Create stunning designs in seconds with our new AI tools. Generate layouts, content, and visuals automatically.',
+            buttonText: 'Learn more →',
+            buttonUrl: '#',
+            theme: "purple"
+        }
+    },
+    {
+        label: 'Templates',
+        hasDropdown: true,
+        url: '#',
+        columns: [
+            {
+                heading: 'By Category',
+                color: '#2563eb', bgColor: '#eff6ff',
+                links: [
+                    { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', title: 'Portfolio', description: 'Showcase your work' },
+                    { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', title: 'Business', description: 'Professional company sites' },
+                    { icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z', title: 'eCommerce', description: 'Sell products online' },
+                    { icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z', title: 'Blog', description: 'Share your stories' },
+                ]
+            },
+            {
+                heading: 'By Style',
+                color: '#2563eb', bgColor: '#eff6ff',
+                links: [
+                    { icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', title: 'Minimal', description: 'Clean and simple' },
+                    { icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01', title: 'Bold', description: 'Make a statement' },
+                    { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'Modern', description: 'Contemporary layouts' },
+                ]
+            }
+        ],
+        card: {
+            icon: 'M5 3l14 9-14 9V3z',
+            title: 'New Templates Weekly',
+            description: 'Fresh designs added every week. Find the perfect starting point for your next project.',
+            buttonText: 'Browse all',
+            buttonUrl: '#',
+            theme: "blue"
+        }
+    },
+    {
+        label: 'Support',
+        hasDropdown: true,
+        url: '#',
+        columns: [
+            {
+                heading: 'Get Help',
+                color: '#22c55e', bgColor: '#dcfce7',
+                links: [
+                    { icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', title: 'Help Center', description: 'Browse articles and guides' },
+                    { icon: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title: 'FAQs', description: 'Find quick answers' },
+                    { icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', title: 'Contact Us', description: 'Reach our support team' },
+                ]
+            },
+            {
+                heading: 'Resources',
+                color: '#22c55e', bgColor: '#dcfce7',
+                links: [
+                    { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', title: 'Community', description: 'Connect with other users' },
+                    { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'System Status', description: 'Check our uptime and performance' },
+                ]
+            }
+        ],
+        card: {
+          icon: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',
+          title: 'Talk to Our Team',
+          description: 'Get personalized help from our support experts. Available 24/7 for all your questions.',
+          buttonText: 'Start Chat',
+          buttonUrl: '#',
+          theme: "green"
+        }
+    },
+    { label: 'Pricing', url: 'pricing' }
   ]);
 
   readonly isHidden = signal(false);
+
+  // null = all closed | 'Product' etc = that item is open
+  readonly openItem = signal<string | null>(null);
+
   currentWord = 'Build.';
   isAnimating = false;
 
@@ -59,38 +182,51 @@ export class Header {
   }
 
   ngOnDestroy() {
-      clearInterval(this.animationInterval);
+    clearInterval(this.animationInterval);
   }
 
   startAnimation() {
-    this.animationInterval = setInterval(() => {
+    setTimeout(() => {
+      this.runCycle();
+      this.animationInterval = setInterval(() => {
         this.runCycle();
-    }, 6000); // 3s word + 3s forma = 6s per full cycle
+      }, 9000);
+    }, 6000);
   }
 
   runCycle() {
     if (!this.logoEl) return;
-
-    // show word for 3s
     this.currentWord = this.words[this.wordIndex];
     this.logoEl.classList.add('animating');
-
     setTimeout(() => {
-        // return to Forma for 3s
-        this.logoEl!.classList.remove('animating');
+      this.logoEl!.classList.remove('animating');
+      setTimeout(() => {
+        this.wordIndex = (this.wordIndex + 1) % this.words.length;
+      }, 400);
+    }, 3000);
+  }
 
-        // advance word index after returning
-        setTimeout(() => {
-            this.wordIndex = (this.wordIndex + 1) % this.words.length;
-        }, 400); // wait for fade out to finish
-    }, 3000); // word shows for 3s
+  // Mouse enters nav-item wrapper → open that dropdown
+  onNavItemEnter(label: string): void {
+    this.openItem.set(label);
+  }
+
+  // Mouse leaves the entire nav-item wrapper (link + dropdown panel together) → close
+  onNavItemLeave(label: string): void {
+    this.openItem.update(current => current === label ? null : current);
+  }
+
+  // Click on a dropdown nav link → toggle open/closed
+  // preventDefault stops routerLink navigation since these use url: '#'
+  onNavLinkClick(event: Event, item: NavItem): void {
+    if (!item.hasDropdown) return;
+    event.preventDefault();
+    this.openItem.update(current => current === item.label ? null : item.label);
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    if (this.isLanguageOpen()) {
-      return;
-    }
+    if (this.isLanguageOpen()) return;
 
     const currentScrollY = window.scrollY || 0;
 
@@ -102,29 +238,24 @@ export class Header {
 
     const scrollingDown = currentScrollY > this.lastScrollY;
     const scrollingUp = currentScrollY < this.lastScrollY;
-    const passedThreshold =
-      Math.abs(currentScrollY - this.lastScrollY) > this.scrollThreshold;
+    const passedThreshold = Math.abs(currentScrollY - this.lastScrollY) > this.scrollThreshold;
 
     if (passedThreshold) {
-      if (scrollingDown) {
-        this.isHidden.set(true);
-      } else if (scrollingUp) {
-        this.isHidden.set(false);
-      }
-
+      if (scrollingDown) this.isHidden.set(true);
+      else if (scrollingUp) this.isHidden.set(false);
       this.lastScrollY = currentScrollY;
     }
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    this.openItem.set(null);
     this.closeLanguageMenu();
   }
 
   toggleLanguageMenu(): void {
     const willOpen = !this.isLanguageOpen();
     this.isLanguageOpen.set(willOpen);
-
     if (willOpen) {
       this.isHidden.set(false);
       document.body.style.overflow = 'hidden';
@@ -134,10 +265,7 @@ export class Header {
   }
 
   closeLanguageMenu(): void {
-    if (!this.isLanguageOpen()) {
-      return;
-    }
-
+    if (!this.isLanguageOpen()) return;
     this.isLanguageOpen.set(false);
     document.body.style.overflow = '';
   }
@@ -145,8 +273,6 @@ export class Header {
   selectLanguage(language: LanguageOption): void {
     this.selectedLanguage.set(language);
     this.closeLanguageMenu();
-
-    // later you can hook this into actual i18n switching
     console.log('Selected language:', language.code);
   }
 }
