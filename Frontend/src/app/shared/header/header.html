@@ -69,7 +69,7 @@
                         <div class="dropdown-col" [style.--col-index]="i">
                             <span class="dropdown-col-heading">{{ col.heading }}</span>
                             @for (link of col.links; track link.title) {
-                                <a href="#" class="dropdown-col-link">
+                                <a [routerLink]="link.path" class="dropdown-col-link">
                                     <span class="dropdown-col-link__icon"
                                         [style.background]="col.bgColor || '#f0f0f0'"
                                         [style.color]="col.color || '#444'">

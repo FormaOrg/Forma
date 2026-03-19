@@ -1,0 +1,308 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================================
+   HERO
+   ========================================= */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 40px 0;
+  background: #ffffff;
+}
+
+.hero__title {
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 500;
+  color: #111111;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin: 0 0 32px;
+  margin-top: 150px;
+}
+
+/* =========================================
+   SEARCH BAR
+   ========================================= */
+
+.hero__search-wrap {
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 48px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1.5px solid #111111;
+  padding: 8px 4px 10px;
+  transition: border-color 0.2s ease;
+}
+
+.search-bar:hover {
+  border-color: #3b3bdb;
+}
+
+.search-bar:focus-within {
+  border-color: #3b3bdb;
+}
+
+.search-bar__icon {
+  width: 18px;
+  height: 18px;
+  color: #888888;
+  flex-shrink: 0;
+}
+
+.search-bar__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: #111111;
+  background: transparent;
+  font-family: inherit;
+}
+
+.search-bar__input::placeholder {
+  color: #aaaaaa;
+}
+
+/* ── Clear (x) button ──────────────────── */
+.search-bar__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #3b3bdb;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: border-color .1s ease;
+}
+
+.search-bar__clear:hover {
+  opacity: 0.7;
+  border-color: #3b3bdb;
+  
+}
+
+.search-bar__clear svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* =========================================
+   FILTER BAR
+   ========================================= */
+
+.filter-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 0 40px;
+  min-height: 56px;
+  gap: 24px;
+}
+
+.filter-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.filter-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================================
+   FILTER DROPDOWN (Type / Industry)
+   ========================================= */
+
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #333333;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.filter-dropdown__trigger:hover {
+  background-color: #f3f3f3;
+}
+
+.filter-dropdown__trigger.is-active {
+  color: #116dff;
+}
+
+.filter-dropdown__chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.filter-dropdown.is-open .filter-dropdown__chevron {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 50;
+  animation: menuFadeIn 0.15s ease;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c8c8e8 transparent;
+}
+
+.filter-dropdown__menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.filter-dropdown__menu::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+
+.filter-dropdown__menu::-webkit-scrollbar-thumb {
+  background-color: #c8c8e8;
+  border-radius: 999px;
+}
+
+.filter-dropdown__menu::-webkit-scrollbar-thumb:hover {
+  background-color: #3b3bdb;
+}
+
+.filter-dropdown__menu--right {
+  left: auto;
+  right: 0;
+}
+
+.filter-dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #333333;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.filter-dropdown__item:hover {
+  background-color: #f5f5f5;
+}
+
+.filter-dropdown__item.is-selected {
+  color: #116dff;
+  font-weight: 600;
+}
+
+/* =========================================
+   CATEGORY TABS
+   ========================================= */
+
+.filter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #555555;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  color: #111111;
+  background-color: #f3f3f3;
+}
+
+.filter-tab.is-active {
+  color: #116dff;
+  font-weight: 600;
+}
+
+/* =========================================
+   ANIMATION
+   ========================================= */
+
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 48px 20px 0;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 20px;
+    gap: 12px;
+    min-height: auto;
+  }
+
+  .filter-bar__right {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}

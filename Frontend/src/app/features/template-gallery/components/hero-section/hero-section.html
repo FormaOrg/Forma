@@ -1,0 +1,141 @@
+<div class="hero" (click)="closeAllDropdowns()">
+  <!-- Title -->
+  <h1 class="hero__title">Pick the Website Template You Love</h1>
+
+  <!-- Search bar -->
+  <div class="hero__search-wrap">
+    <div class="search-bar" [class.has-value]="localQuery">
+      <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input
+        class="search-bar__input"
+        type="text"
+        placeholder="Search all templates..."
+        [(ngModel)]="localQuery"
+        (ngModelChange)="onInputChange($event)"
+      />
+      @if (localQuery) {
+        <button class="search-bar__clear" (click)="clearSearch()" aria-label="Clear search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar" (click)="$event.stopPropagation()">
+
+    <!-- Left side: Type + Industry dropdowns -->
+    <div class="filter-bar__left">
+
+      <!-- Type dropdown -->
+      <div class="filter-dropdown" [class.is-open]="typeDropdownOpen()">
+        <button
+          class="filter-dropdown__trigger"
+          [class.is-active]="activeFilters.type !== null"
+          (click)="toggleTypeDropdown()"
+        >
+          {{ activeFilters.type ?? 'Type' }}
+          <svg class="filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        @if (typeDropdownOpen()) {
+          <div class="filter-dropdown__menu">
+            <button class="filter-dropdown__item" [class.is-selected]="activeFilters.type === null" (click)="setType(null)">
+              All Types
+            </button>
+            @for (option of typeOptions; track option) {
+              <button
+                class="filter-dropdown__item"
+                [class.is-selected]="activeFilters.type === option"
+                (click)="setType(option)"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Industry dropdown -->
+      <div class="filter-dropdown" [class.is-open]="industryDropdownOpen()">
+        <button
+          class="filter-dropdown__trigger"
+          [class.is-active]="activeFilters.industry !== null"
+          (click)="toggleIndustryDropdown()"
+        >
+          {{ activeFilters.industry ?? 'Industry' }}
+          <svg class="filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        @if (industryDropdownOpen()) {
+          <div class="filter-dropdown__menu">
+            <button class="filter-dropdown__item" [class.is-selected]="activeFilters.industry === null" (click)="setIndustry(null)">
+              All Industries
+            </button>
+            @for (option of industryOptions; track option) {
+              <button
+                class="filter-dropdown__item"
+                [class.is-selected]="activeFilters.industry === option"
+                (click)="setIndustry(option)"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right side: category tabs + Collections dropdown -->
+    <div class="filter-bar__right">
+      <button
+        class="filter-tab"
+        [class.is-active]="activeFilters.category === 'all'"
+        (click)="setCategory('all')"
+      >
+        All Templates
+      </button>
+
+      <button
+        class="filter-tab"
+        [class.is-active]="activeFilters.category === 'blank'"
+        (click)="setCategory('blank')"
+      >
+        Blank Templates
+      </button>
+
+      <!-- Collections dropdown -->
+      <div class="filter-dropdown" [class.is-open]="collectionsDropdownOpen()">
+        <button
+          class="filter-tab"
+          [class.is-active]="activeFilters.category === 'collections'"
+          (click)="toggleCollectionsDropdown()"
+        >
+          Collections
+          <svg class="filter-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        @if (collectionsDropdownOpen()) {
+          <div class="filter-dropdown__menu filter-dropdown__menu--right">
+            <button class="filter-dropdown__item" (click)="setCategory('collections'); closeAllDropdowns()">Holiday Season</button>
+            <button class="filter-dropdown__item" (click)="setCategory('collections'); closeAllDropdowns()">New Year</button>
+            <button class="filter-dropdown__item" (click)="setCategory('collections'); closeAllDropdowns()">Small Business</button>
+            <button class="filter-dropdown__item" (click)="setCategory('collections'); closeAllDropdowns()">Creative Portfolios</button>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>
