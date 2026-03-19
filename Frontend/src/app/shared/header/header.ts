@@ -22,8 +22,8 @@ type LanguageOption = {
 })
 export class Header {
   readonly navItems = signal<NavItem[]>([
-    { label: 'Product', hasDropdown: true, url: "#"},
-    { label: 'Templates', hasDropdown: true, url: "#" },
+    { label: 'Product', hasDropdown: true, url: "product"},
+    { label: 'Solutions', hasDropdown: true, url: "#" },
     { label: 'Support', hasDropdown: true, url: "#" },
     { label: 'Pricing', url: "pricing" }
   ]);
