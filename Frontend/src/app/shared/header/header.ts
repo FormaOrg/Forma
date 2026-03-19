@@ -50,7 +50,7 @@ export class Header {
     {
         label: 'Product',
         hasDropdown: true,
-        url: '#',
+        url: 'product',
         columns: [
             {
                 heading: 'Platform',

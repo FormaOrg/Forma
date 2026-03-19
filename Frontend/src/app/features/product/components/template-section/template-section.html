@@ -1,0 +1,50 @@
+<section class="template-section">
+  <div class="template-section__inner">
+    <div class="template-section__top">
+      <div class="template-section__copy">
+        <h2 class="template-section__title">
+          Or pick the
+          <br />
+          perfect template
+        </h2>
+      </div>
+
+      <div class="template-section__aside">
+        <p class="template-section__text">
+          Start with a beautiful foundation and make it yours. Explore layouts
+          crafted for portfolios, brands, studios, and modern businesses — all
+          ready to customize in Forma.
+        </p>
+
+        <a href="#" class="template-section__cta">
+          Browse Templates
+        </a>
+      </div>
+    </div>
+
+    <div class="template-showcase__slider" #slider>
+      @for (template of templates; track template.image) {
+        <article class="template-card">
+          <div class="template-card__image-wrap">
+            <img
+              [src]="template.image"
+              [alt]="template.category"
+              class="template-card__image"
+            />
+
+            <div class="template-card__overlay"></div>
+
+            <a href="#" class="template-card__view-btn">View</a>
+          </div>
+
+          <div>
+            <a href="#" class="template-card__category-link">
+              <span>{{ template.category }}</span>
+              <span class="template-card__category-arrow">→</span>
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

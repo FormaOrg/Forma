@@ -1,0 +1,71 @@
+<nav class="pagination" aria-label="Page navigation">
+
+  <!-- First page « — flipped >> svg -->
+  <button
+    class="pagination__btn pagination__btn--nav pagination__btn--flipped"
+    [class.is-disabled]="isFirst"
+    [disabled]="isFirst"
+    (click)="goTo(1)"
+    aria-label="First page"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.2 9" xml:space="preserve" fill="currentColor" width="1em" height="1em">
+      <path d="M.6 9 0 8.3l3.7-3.8L0 .6.6 0 5 4.5zM7.8 9l-.6-.7 3.7-3.8L7.2.6l.6-.6 4.4 4.5z"/>
+    </svg>
+  </button>
+
+  <!-- Previous page < — flipped > svg -->
+  <button
+    class="pagination__btn pagination__btn--nav pagination__btn--flipped"
+    [class.is-disabled]="isFirst"
+    [disabled]="isFirst"
+    (click)="goTo(currentPage - 1)"
+    aria-label="Previous page"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 14" xml:space="preserve" fill="currentColor" width="1em" height="1em">
+      <path d="m.7 14-.7-.6L5.7 7 0 .7.7 0 7 7z"/>
+    </svg>
+  </button>
+
+  <!-- Page numbers + ellipsis -->
+  @for (item of pages; track $index) {
+    @if (item.type === 'page') {
+      <button
+        class="pagination__btn pagination__btn--page"
+        [class.is-active]="item.value === currentPage"
+        (click)="goTo(item.value)"
+        [attr.aria-current]="item.value === currentPage ? 'page' : null"
+      >
+        {{ item.value }}
+      </button>
+    } @else {
+      <span class="pagination__ellipsis">…</span>
+    }
+  }
+
+  <!-- Next page > -->
+  <button
+    class="pagination__btn pagination__btn--nav"
+    [class.is-disabled]="isLast"
+    [disabled]="isLast"
+    (click)="goTo(currentPage + 1)"
+    aria-label="Next page"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 14" xml:space="preserve" fill="currentColor" width="1em" height="1em">
+      <path d="m.7 14-.7-.6L5.7 7 0 .7.7 0 7 7z"/>
+    </svg>
+  </button>
+
+  <!-- Last page >> -->
+  <button
+    class="pagination__btn pagination__btn--nav"
+    [class.is-disabled]="isLast"
+    [disabled]="isLast"
+    (click)="goTo(totalPages)"
+    aria-label="Last page"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.2 9" xml:space="preserve" fill="currentColor" width="1em" height="1em">
+      <path d="M.6 9 0 8.3l3.7-3.8L0 .6.6 0 5 4.5zM7.8 9l-.6-.7 3.7-3.8L7.2.6l.6-.6 4.4 4.5z"/>
+    </svg>
+  </button>
+
+</nav>

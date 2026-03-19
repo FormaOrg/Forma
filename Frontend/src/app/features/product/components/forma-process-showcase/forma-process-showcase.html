@@ -1,0 +1,162 @@
+<section class="forma-process" #showcase>
+  <div class="forma-process__sticky">
+    <div class="forma-process__hero">
+      <!-- <span class="forma-process__eyebrow">From scratch to final form</span> -->
+
+      <h1 class="forma-process__title">
+        Watch an idea take <span>shape.</span> 
+      </h1>
+
+      <p class="forma-process__subtitle">
+        The way Forma turns early ideas into something refined, expressive, and ready to publish.
+      </p>
+    </div>
+
+    <div class="forma-canvas" [ngStyle]="canvasStyles()">
+      <div class="forma-grid"></div>
+
+      <!-- <div class="forma-stage-labels">
+        <span [class.is-active]="progress() < 0.25">Draft</span>
+        <span [class.is-active]="progress() >= 0.25 && progress() < 0.6">Structure</span>
+        <span [class.is-active]="progress() >= 0.6">Final Form</span>
+      </div> -->
+
+      <div class="mockup mockup--left">
+        <div class="editor-outline">
+          <span class="handle handle--tl"></span>
+          <span class="handle handle--tr"></span>
+          <span class="handle handle--bl"></span>
+          <span class="handle handle--br"></span>
+        </div>
+
+        <div class="draft-layer">
+          <div class="draft-topbar">
+            <span class="draft-pill"></span>
+            <span class="draft-pill short"></span>
+          </div>
+
+          <div class="draft-image draft-image--pear"></div>
+          <div class="draft-lines">
+            <span></span>
+            <span></span>
+            <span class="short"></span>
+          </div>
+        </div>
+
+        <div class="final-layer final-card final-card--left">
+          <div class="final-nav">
+            <a href="#">about</a>
+            <a href="#">gallery</a>
+            <a href="#">contact</a>
+          </div>
+
+          <div class="final-left-image"></div>
+        </div>
+      </div>
+
+      <div class="mockup mockup--center">
+        <div class="editor-outline editor-outline--center">
+          <span class="handle handle--tl"></span>
+          <span class="handle handle--tm"></span>
+          <span class="handle handle--tr"></span>
+          <span class="handle handle--ml"></span>
+          <span class="handle handle--mr"></span>
+          <span class="handle handle--bl"></span>
+          <span class="handle handle--bm"></span>
+          <span class="handle handle--br"></span>
+        </div>
+
+        <div class="draft-layer">
+          <div class="draft-center-top">
+            <span class="draft-logo"></span>
+            <div class="draft-mini-nav">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="draft-title-box">
+            <div class="draft-title"></div>
+            <div class="draft-subtitle"></div>
+          </div>
+
+          <div class="draft-center-content">
+            <div class="draft-photo draft-photo--hands"></div>
+            <div class="draft-photo draft-photo--portrait"></div>
+          </div>
+
+          <div class="draft-swatches">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="final-layer final-card final-card--center">
+          <div class="final-center-top">
+            <div class="final-brand-mark">m.</div>
+            <div class="final-center-nav">
+              <a href="#">about</a>
+              <a href="#">gallery</a>
+              <a href="#">contact</a>
+              <a href="#">blog</a>
+            </div>
+          </div>
+
+          <div class="final-brand-lockup">
+            <h2>mirellam</h2>
+            <p>CERAMIC STUDIO</p>
+          </div>
+
+          <div class="final-center-grid">
+            <div class="final-center-image final-center-image--hands"></div>
+            <div class="final-center-image final-center-image--portrait"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup mockup--right">
+        <div class="editor-outline">
+          <span class="handle handle--tl"></span>
+          <span class="handle handle--tr"></span>
+          <span class="handle handle--bl"></span>
+          <span class="handle handle--br"></span>
+        </div>
+
+        <div class="draft-layer">
+          <div class="draft-right-card">
+            <div class="draft-right-shape"></div>
+            <div class="draft-mug"></div>
+            <div class="draft-play"></div>
+          </div>
+        </div>
+
+        <div class="final-layer final-card final-card--right">
+          <div class="final-right-top">
+            <div class="final-brand-mark">m.</div>
+            <span class="final-menu-lines"></span>
+          </div>
+
+          <div class="final-product-card">
+            <div class="final-product-shape"></div>
+            <div class="final-product-mug"></div>
+          </div>
+
+          <div class="final-product-meta">
+            <span>BLUE VASE</span>
+            <div class="final-product-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="floating-chip floating-chip--tag">Draft mode</div>
+    </div>
+  </div>
+</section>

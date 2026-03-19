@@ -1,0 +1,84 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 48px 0 64px;
+}
+
+/* ── Base button ─────────────────────────────── */
+.pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  border: none;
+  font-family: inherit;
+  font-size: 1.4em;
+  color: #111111;
+  cursor: pointer;
+  border-radius: 6px;
+  user-select: none;
+}
+
+.pagination__btn:hover:not(.is-disabled):not(.is-active) {
+  color: #3b3bdb;
+}
+
+/* ── Page number buttons ─────────────────────── */
+.pagination__btn--page {
+  color: #111111;
+}
+
+/* ── Active page ─────────────────────────────── */
+.pagination__btn.is-active {
+  color: #3b3bdb;
+  font-weight: 700;
+  cursor: default;
+}
+
+/* ── Nav buttons ─────────────────────────────── */
+.pagination__btn--nav {
+  color: #111111;
+  min-width: 44px;
+  padding: 0 10px;
+}
+
+.pagination__btn--nav svg {
+  display: block;
+  width: 0.7em;
+  height: 0.7em;
+  flex-shrink: 0;
+  margin-bottom: 0.13em;
+}
+
+/* Flip « and < horizontally */
+.pagination__btn--flipped svg {
+  transform: scaleX(-1);
+}
+
+/* Disabled = same purple as active page */
+.pagination__btn--nav.is-disabled {
+  color: #3b3bdb;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Ellipsis ────────────────────────────────── */
+.pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  font-size: 1.4em;
+  color: #111111;
+  user-select: none;
+}

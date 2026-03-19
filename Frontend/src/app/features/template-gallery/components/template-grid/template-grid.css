@@ -1,0 +1,324 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================================
+   SECTION WRAPPER
+   ========================================= */
+
+.grid-section {
+  padding: 48px 40px 0;
+  background-color: #f7f7f7;
+  min-height: 60vh;
+}
+
+/* =========================================
+   HEADER ROW
+   ========================================= */
+
+.grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.grid-header__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* =========================================
+   SORT DROPDOWN
+   ========================================= */
+
+.sort-dropdown {
+  position: relative;
+}
+
+.sort-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #555555;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  font-family: inherit;
+}
+
+.sort-dropdown__trigger:hover {
+  background-color: #eeeeee;
+}
+
+.sort-dropdown__value {
+  font-weight: 600;
+  color: #111111;
+}
+
+.sort-dropdown__chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+}
+
+.sort-dropdown.is-open .sort-dropdown__chevron {
+  transform: rotate(180deg);
+}
+
+.sort-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  z-index: 50;
+  animation: menuFadeIn 0.15s ease;
+
+  /* ── Scrollable when content overflows ── */
+  max-height: 280px;
+  overflow-y: auto;
+
+  /* ── Custom scrollbar — Firefox ── */
+  scrollbar-width: thin;
+  scrollbar-color: #c8c8e8 transparent;
+}
+
+/* ── Custom scrollbar — WebKit (Chrome, Safari, Edge) ── */
+.sort-dropdown__menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sort-dropdown__menu::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+
+.sort-dropdown__menu::-webkit-scrollbar-thumb {
+  background-color: #c8c8e8;
+  border-radius: 999px;
+}
+
+.sort-dropdown__menu::-webkit-scrollbar-thumb:hover {
+  background-color: #3b3bdb;
+}
+
+.sort-dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #333333;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+  font-family: inherit;
+}
+
+.sort-dropdown__item:hover {
+  background-color: #f5f5f5;
+}
+
+.sort-dropdown__item.is-selected {
+  color: #116dff;
+  font-weight: 600;
+}
+
+/* =========================================
+   TEMPLATE GRID
+   ========================================= */
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+@media (max-width: 1024px) {
+  .template-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .template-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================
+   TEMPLATE CARD
+   ========================================= */
+
+.template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.template-card__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #e0e0e0;
+}
+
+.template-card__dots {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  display: flex;
+  gap: 5px;
+  z-index: 2;
+}
+
+.template-card__dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(180, 180, 200, 0.7);
+}
+
+.template-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.template-card:hover .template-card__img {
+  transform: scale(1.03);
+}
+
+.template-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.template-card:hover .template-card__overlay {
+  opacity: 1;
+}
+
+.template-card__btn {
+  padding: 11px 28px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.template-card__btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.template-card__btn--primary {
+  background: #116dff;
+  color: #ffffff;
+  border: none;
+}
+
+.template-card__btn--secondary {
+  background: #ffffff;
+  color: #111111;
+  border: none;
+}
+
+.template-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.template-card__name {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #111111;
+}
+
+.template-card__badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #2b2b2b;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+
+.grid-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+}
+
+.grid-empty svg {
+  width: 48px;
+  height: 48px;
+  color: #cccccc;
+}
+
+.grid-empty p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #444444;
+  margin: 0;
+}
+
+.grid-empty span {
+  font-size: 0.9rem;
+  color: #888888;
+}
+
+/* =========================================
+   ANIMATION
+   ========================================= */
+
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 768px) {
+  .grid-section { padding: 32px 20px 0; }
+}

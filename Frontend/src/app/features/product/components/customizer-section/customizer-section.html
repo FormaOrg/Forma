@@ -1,0 +1,112 @@
+<section class="customizer-section">
+  <div class="top-content">
+    <div class="heading-wrap">
+      <p>Customize every detail of your site</p>
+    </div>
+
+    <div class="intro-wrap">
+      <p>
+        From colors and typography to the overall mood of your page, shape a visual identity that
+        feels intentional and refined.
+      </p>
+
+      <button
+        class="cta-btn"
+        [ngStyle]="{
+          background: hovering ? themes[activeTheme].buttonHover : themes[activeTheme].buttonBg,
+          color: themes[activeTheme].buttonText,
+        }"
+        (mouseenter)="hovering = true"
+        (mouseleave)="hovering = false"
+      >
+        Get Started
+      </button>
+    </div>
+  </div>
+
+  <div class="builder-grid">
+    <aside class="left-controls">
+      <div class="control-card">
+        <span class="control-label">THEME</span>
+        <h2>{{ themes[activeTheme].name }}</h2>
+
+        <p class="theme-description">
+          {{ themes[activeTheme].description }}
+        </p>
+
+        <div class="theme-dots">
+          <button
+            *ngFor="let theme of themes; let i = index"
+            class="theme-dot"
+            [class.active]="i === activeTheme"
+            [style.background]="theme.dot"
+            (click)="setTheme(i)"
+            [attr.aria-label]="'Select ' + theme.name + ' theme'"
+          ></button>
+        </div>
+      </div>
+    </aside>
+
+    <div
+      class="preview-shell"
+      [ngStyle]="{
+        '--hero-bg': themes[activeTheme].heroBg,
+        '--hero-top': themes[activeTheme].heroTop,
+        '--surface-card': themes[activeTheme].surfaceCard,
+        '--surface-soft': themes[activeTheme].surfaceSoft,
+        '--surface-line': themes[activeTheme].surfaceLine,
+        '--text-main': themes[activeTheme].text,
+        '--text-dark': themes[activeTheme].ink,
+        '--pill-bg': themes[activeTheme].pillBg,
+      }"
+    >
+      <div class="shipping-bar">FREE WORLDWIDE SHIPPING FOR ORDERS OVER 200USD</div>
+
+      <div class="preview-nav">
+        <div class="nav-left">
+          <div class="logo-circle"><img src="assets/Landing Page/FormaLogo.svg" alt=""></div>
+          <a>SHOP</a>
+          <a>ABOUT</a>
+          <a>MISSION</a>
+        </div>
+
+        <div class="nav-right">
+          <a>LOG IN</a>
+          <span class="search-icon">⌕</span>
+          <button class="cart-pill">Cart 01</button>
+        </div>
+      </div>
+
+      <div class="preview-main">
+        <div class="preview-copy">
+          <div>
+            <h3 class="brand-name" [class.refresh]="animatePreview">
+              {{ themes[activeTheme].brand }}
+            </h3>
+
+            <p class="brand-subtext" [class.refresh]="animatePreview">
+              {{ themes[activeTheme].headline }}
+            </p>
+          </div>
+
+          <div class="shipping-row">
+            <div class="globe">◌</div>
+            <span>Worldwide Shipping</span>
+          </div>
+        </div>
+
+        <div class="visual-card" [class.refresh]="animatePreview">
+          <img
+            [src]="themes[activeTheme].image"
+            [alt]="themes[activeTheme].name + ' theme preview image'"
+            class="theme-preview-image"
+          />
+
+          <div class="visual-tag">
+            {{ themes[activeTheme].tag }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
