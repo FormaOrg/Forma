@@ -1,0 +1,220 @@
+:host {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.stages-section {
+  background: #f3f3f3;
+  padding: 120px 24px 140px;
+}
+
+.stages-section__intro {
+  max-width: 1300px;
+  margin: 0 auto 42px;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  gap: 52px;
+  align-items: start;
+}
+
+.stages-section__intro h2 {
+  margin: 0;
+  max-width: 620px;
+  font-size: clamp(2.8rem, 4.5vw, 4.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  font-weight: 500;
+  color: #000;
+}
+
+.stages-section__intro-side p {
+  margin: 0 0 20px;
+  max-width: 520px;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: #212121;
+}
+
+.stages-section__intro-side a {
+  color: #000;
+  font-size: 1rem;
+  font-weight: 500;
+  text-underline-offset: 4px;
+}
+
+.stages-stack {
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.stage-card {
+  position: sticky;
+  min-height: 560px;
+  border-radius: 34px;
+  overflow: hidden;
+  margin-bottom: 42px;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.02),
+    0 14px 40px rgba(0, 0, 0, 0.04);
+}
+
+.stage-card__inner {
+  min-height: 560px;
+  padding: 82px 42px 54px;
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.stage-card__label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: #000;
+  justify-self: center;
+  opacity: 0.95;
+}
+
+.stage-card__visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-svg {
+  width: 220px;
+  height: 220px;
+  overflow: visible;
+}
+
+/* ── Pixel icon parts ─────────────────────────────── */
+
+.icon-part {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.6);
+  transition:
+    opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon-part.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger each sibling slightly so they don't pop in simultaneously */
+.icon-part:nth-child(1) { transition-delay: 0ms;   }
+.icon-part:nth-child(2) { transition-delay: 55ms;  }
+.icon-part:nth-child(3) { transition-delay: 110ms; }
+.icon-part:nth-child(4) { transition-delay: 165ms; }
+.icon-part:nth-child(5) { transition-delay: 220ms; }
+.icon-part:nth-child(6) { transition-delay: 275ms; }
+
+/* ── Card content ─────────────────────────────────── */
+
+.stage-card__content {
+  max-width: 470px;
+}
+
+.stage-card__content h3 {
+  margin: 0 0 24px;
+  font-size: clamp(2.7rem, 4vw, 4.1rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  font-weight: 700;
+  color: #000;
+}
+
+.stage-card__content h3 span {
+  display: block;
+}
+
+.stage-card__content p {
+  margin: 0 0 30px;
+  max-width: 430px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #111;
+}
+
+.stage-card__content button {
+  min-width: 160px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1.5px solid #000;
+  background: transparent;
+  color: #000;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.stage-card__content button:hover {
+  background: #000;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ── Responsive ───────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .stage-card__inner {
+    grid-template-columns: 70px 1fr 1fr;
+    gap: 24px;
+    padding: 70px 28px 42px;
+  }
+
+  .icon-svg {
+    width: 180px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 900px) {
+  .stages-section__intro {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .stage-card {
+    position: relative;
+    top: auto !important;
+  }
+
+  .stage-card__inner {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 30px 22px 30px;
+  }
+
+  .stage-card__label {
+    writing-mode: horizontal-tb;
+    transform: none;
+    justify-self: start;
+  }
+
+  .stage-card__visual {
+    justify-content: flex-start;
+  }
+
+  .icon-svg {
+    width: 140px;
+    height: 140px;
+  }
+
+  .stage-card__content h3 {
+    font-size: 2.4rem;
+  }
+}

@@ -1,0 +1,237 @@
+<section class="stages-section">
+  <div class="stages-section__intro">
+    <h2>{{ introTitle }}</h2>
+
+    <div class="stages-section__intro-side">
+      <p>{{ introText }}</p>
+      <a href="#">Start Learning</a>
+    </div>
+  </div>
+
+  <div class="stages-stack">
+    <article
+      #stageCard
+      class="stage-card"
+      *ngFor="let card of cards; let i = index"
+      [style.background]="card.bg"
+      [style.top.px]="110 + i * 34"
+      [style.zIndex]="10 + i"
+    >
+      <div class="stage-card__inner">
+        <div class="stage-card__label">{{ card.label }}</div>
+
+        <div class="stage-card__visual">
+          <!-- CREATE: plus / add symbol -->
+          <svg
+            *ngIf="card.iconType === 'create'"
+            class="icon-svg"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <!-- vertical top -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 0, card.parts)"
+              x="38"
+              y="6"
+              width="24"
+              height="24"
+              rx="6"
+              fill="black"
+            />
+            <!-- vertical middle -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 1, card.parts)"
+              x="38"
+              y="34"
+              width="24"
+              height="24"
+              rx="6"
+              fill="black"
+            />
+            <!-- vertical bottom -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 2, card.parts)"
+              x="38"
+              y="62"
+              width="24"
+              height="24"
+              rx="6"
+              fill="black"
+            />
+            <!-- horizontal left -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 3, card.parts)"
+              x="6"
+              y="34"
+              width="28"
+              height="24"
+              rx="6"
+              fill="black"
+            />
+            <!-- horizontal right -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 4, card.parts)"
+              x="66"
+              y="34"
+              width="28"
+              height="24"
+              rx="6"
+              fill="black"
+            />
+          </svg>
+
+          <!-- MANAGE: overlapping grid -->
+          <svg
+            *ngIf="card.iconType === 'manage'"
+            class="icon-svg"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <!-- top-left -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 0, card.parts)"
+              x="8"
+              y="8"
+              width="36"
+              height="36"
+              rx="8"
+              fill="black"
+            />
+            <!-- top-right -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 1, card.parts)"
+              x="56"
+              y="8"
+              width="36"
+              height="36"
+              rx="8"
+              fill="black"
+            />
+            <!-- center overlap -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 2, card.parts)"
+              x="32"
+              y="32"
+              width="36"
+              height="36"
+              rx="8"
+              fill="black"
+            />
+            <!-- bottom-left -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 3, card.parts)"
+              x="8"
+              y="56"
+              width="36"
+              height="36"
+              rx="8"
+              fill="black"
+            />
+            <!-- bottom-right -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 4, card.parts)"
+              x="56"
+              y="56"
+              width="36"
+              height="36"
+              rx="8"
+              fill="black"
+            />
+            <!-- center cutout (always on top, matches card bg) -->
+            <rect x="38" y="38" width="24" height="24" rx="6" [attr.fill]="card.bg" />
+          </svg>
+
+          <!-- GROW: diagonal staircase arrow (up-right) -->
+          <svg *ngIf="card.iconType === 'grow'" class="icon-svg" viewBox="0 0 100 100" fill="none">
+            <!-- arrowhead horizontal bar -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 0, card.parts)"
+              x="57"
+              y="4"
+              width="35"
+              height="14"
+              rx="5"
+              fill="black"
+            />
+            <!-- arrowhead vertical bar -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 1, card.parts)"
+              x="78"
+              y="8"
+              width="14"
+              height="30"
+              rx="5"
+              fill="black"
+            />
+            <!-- diagonal step 1 -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 2, card.parts)"
+              x="52"
+              y="22"
+              width="22"
+              height="22"
+              rx="6"
+              fill="black"
+            />
+            <!-- diagonal step 2 -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 3, card.parts)"
+              x="32"
+              y="42"
+              width="22"
+              height="22"
+              rx="6"
+              fill="black"
+            />
+            <!-- diagonal step 3 -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 4, card.parts)"
+              x="12"
+              y="62"
+              width="22"
+              height="22"
+              rx="6"
+              fill="black"
+            />
+            <!-- base bar -->
+            <rect
+              class="icon-part"
+              [class.visible]="isPartVisible(card.progress, 5, card.parts)"
+              x="-5"
+              y="86"
+              width="56"
+              height="14"
+              rx="5"
+              fill="black"
+            />
+          </svg>
+        </div>
+
+        <div class="stage-card__content">
+          <h3>
+            <span *ngFor="let line of getTitleLines(card.title)">{{ line }}</span>
+          </h3>
+
+          <p>{{ card.description }}</p>
+
+          <button type="button">Explore Courses</button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

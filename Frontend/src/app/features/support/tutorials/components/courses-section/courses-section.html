@@ -1,0 +1,77 @@
+<section class="courses-section">
+  <div class="courses-section__header">
+    <h2 class="courses-section__title">
+      {{ heading }}
+    </h2>
+
+    <a href="#" class="courses-section__more">Show Me More</a>
+  </div>
+
+  <div class="courses-section__layout">
+    <!-- Large left card -->
+    <article class="course-card course-card--large">
+      <div class="course-card__image-wrap course-card__image-wrap--large">
+        <img
+          [src]="largeCard.image"
+          [alt]="largeCard.imageAlt"
+          class="course-card__image"
+        />
+      </div>
+
+      <div class="course-card__content">
+        <h3 class="course-card__title" [innerHTML]="largeCard.title.replace('\n', '<br />')"></h3>
+
+        <p class="course-card__description">
+          {{ largeCard.description }}
+        </p>
+
+        <div class="course-card__footer">
+          <div class="course-card__meta">
+            <span>{{ largeCard.lessons }}</span>
+            <span class="divider">|</span>
+            <span>{{ largeCard.duration }}</span>
+          </div>
+
+          <a href="#" class="course-card__cta">
+            {{ largeCard.cta }} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Right stacked cards -->
+    <div class="courses-section__side">
+      <article class="course-card course-card--small" *ngFor="let card of sideCards">
+        <div class="course-card__row">
+          <div class="course-card__image-wrap course-card__image-wrap--small">
+            <img
+              [src]="card.image"
+              [alt]="card.imageAlt"
+              class="course-card__image"
+            />
+          </div>
+
+          <div class="course-card__body">
+            <h3 class="course-card__title" [innerHTML]="card.title.replace('\n', '<br />')"></h3>
+
+            <p class="course-card__description">
+              {{ card.description }}
+            </p>
+
+            <div class="course-card__footer">
+              <div class="course-card__meta">
+                <span>{{ card.lessons }}</span>
+                <span class="divider">|</span>
+                <span>{{ card.duration }}</span>
+              </div>
+
+              <a href="#" class="course-card__cta">
+                {{ card.cta }} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

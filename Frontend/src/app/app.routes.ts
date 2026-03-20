@@ -4,6 +4,7 @@ import { Pricing } from './features/pricing/pricing';
 import { TemplateGallery } from './features/template-gallery/template-gallery';
 import { PortfolioShowcase } from './features/portfolio-showcase/portfolio-showcase';
 import { Product } from './features/product/product';
+import { Tutorials } from './features/support/tutorials/tutorials';
 
 
 
@@ -12,5 +13,6 @@ export const routes: Routes = [
     {path:"pricing", component:Pricing},
     {path:"templates", component:TemplateGallery},
     {path:"portfolio-website", component:PortfolioShowcase},
-    {path:"product", component:Product}
+    {path:"product", component:Product},
+    {path:"tutorials", component:Tutorials}
 ];

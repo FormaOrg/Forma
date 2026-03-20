@@ -1,0 +1,30 @@
+<section
+  class="tutorials-hero"
+  [style.--x.%]="mouseX"
+  [style.--y.%]="mouseY"
+>
+  <div class="tutorials-hero__glow"></div>
+  <div class="tutorials-hero__noise"></div>
+
+  <div class="tutorials-hero__content">
+
+    <h1>
+      You know what you want to accomplish.
+      <span>Now learn how.</span>
+    </h1>
+
+    <p>
+      Explore step-by-step guides, practical walkthroughs, and clear resources
+      designed to help you move faster with confidence.
+    </p>
+
+    <div class="tutorials-hero__actions">
+        <link-button
+            [bgColor]="'#2F6B3F'"
+            [txtColor]="'white'"
+            [theme]="'white'"
+            [content]="'Get Started'"
+        ></link-button>
+    </div>
+  </div>
+</section>

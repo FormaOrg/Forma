@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.tutorials-hero {
+  --x: 50%;
+  --y: 50%;
+
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  padding: 56px;
+  margin: 130px 20px 100px;
+  border-radius: 56px;
+  isolation: isolate;
+  background:
+    linear-gradient(135deg, rgba(212, 247, 223, 0.88) 0%, rgba(241, 250, 244, 0.82) 55%, rgba(255, 255, 255, 0.74) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 30px 80px rgba(22, 88, 48, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.tutorials-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at var(--x) var(--y),
+      rgba(60, 220, 120, 0.30) 0%,
+      rgba(60, 220, 120, 0.16) 16%,
+      rgba(60, 220, 120, 0.06) 28%,
+      transparent 42%
+    );
+  transition: background-position 0.08s linear;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tutorials-hero::after {
+  content: '';
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  top: -120px;
+  right: -80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61, 233, 119, 0.22), transparent 68%);
+  filter: blur(20px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tutorials-hero__glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  left: -100px;
+  bottom: -120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(80, 255, 146, 0.20), transparent 70%);
+  filter: blur(18px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tutorials-hero__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tutorials-hero__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tutorials-hero h1 {
+  margin: 0;
+  color: #101914;
+  font-size: clamp(2.6rem, 5vw, 8.8rem);
+  line-height: 0.98;
+  max-width: 1100px;
+}
+
+.tutorials-hero h1 span {
+  display: block;
+  margin-top: 8px;
+  color: #2a5c3e;
+}
+
+.tutorials-hero p {
+  margin: 24px 0 0;
+  max-width: 640px;
+  color: #5a6d61;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.tutorials-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+
+
+@media (max-width: 768px) {
+  .tutorials-hero {
+    min-height: auto;
+    padding: 32px 22px;
+    border-radius: 26px;
+  }
+
+  .tutorials-hero h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .tutorials-hero__actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
