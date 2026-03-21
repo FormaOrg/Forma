@@ -1,0 +1,35 @@
+<section class="faq-categories">
+  <div class="faq-categories__inner">
+    <p class="faq-categories__eyebrow">Browse</p>
+    <h2 class="faq-categories__title">Browse by category</h2>
+    <p class="faq-categories__intro">
+      Explore help topics by area so you can get to the right answer faster.
+    </p>
+
+    <div class="faq-categories__grid">
+      @for (category of categories(); track category.title) {
+        <article class="category-card">
+          <div class="category-card__top">
+            <span class="category-card__icon" aria-hidden="true">
+              {{ category.icon }}
+            </span>
+
+            <span class="category-card__count">
+              {{ category.articles }} articles
+            </span>
+          </div>
+
+          <div class="category-card__body">
+            <h3>{{ category.title }}</h3>
+            <p>{{ category.description }}</p>
+          </div>
+
+          <div class="category-card__footer">
+            <span>Explore category</span>
+            <span class="category-card__arrow" aria-hidden="true">↗</span>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

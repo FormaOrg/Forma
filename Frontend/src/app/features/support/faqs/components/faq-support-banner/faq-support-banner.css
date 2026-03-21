@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.faq-support-banner {
+  padding: 80px 125px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.faq-support-banner__inner {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 64px;
+  border-radius: 40px;
+  overflow: hidden;
+}
+
+
+/* content */
+.faq-support-banner__content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+}
+
+.faq-support-banner__eyebrow {
+  margin: 0 0 14px;
+  color: #198b4a;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.faq-support-banner h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 7.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #111111;
+}
+
+.faq-support-banner__text {
+  margin: 18px 0 0;
+  font-size: 1.1rem;
+  color: #3b3b3b;
+  line-height: 1.5;
+  max-width: 520px;
+}
+
+/* buttons */
+.faq-support-banner__actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  height: 50px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* primary */
+.btn--primary {
+  background: #111111;
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ghost */
+.btn--ghost {
+  background: rgba(255, 255, 255, 0.7);
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.btn--ghost:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .faq-support-banner {
+    padding: 60px 40px;
+  }
+
+  .faq-support-banner__inner {
+    padding: 40px 32px;
+    border-radius: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .faq-support-banner {
+    padding: 40px 20px;
+  }
+
+  .faq-support-banner__inner {
+    padding: 32px 24px;
+  }
+
+  .faq-support-banner__actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

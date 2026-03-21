@@ -5,6 +5,7 @@ import { TemplateGallery } from './features/template-gallery/template-gallery';
 import { PortfolioShowcase } from './features/portfolio-showcase/portfolio-showcase';
 import { Product } from './features/product/product';
 import { Tutorials } from './features/support/tutorials/tutorials';
+import { Faqs } from './features/support/faqs/faqs';
 
 
 
@@ -14,5 +15,6 @@ export const routes: Routes = [
     {path:"templates", component:TemplateGallery},
     {path:"portfolio-website", component:PortfolioShowcase},
     {path:"product", component:Product},
-    {path:"tutorials", component:Tutorials}
+    {path:"tutorials", component:Tutorials},
+    {path:"faqs", component:Faqs}
 ];

@@ -1,0 +1,43 @@
+<section class="builder-help-deck">
+  <div class="builder-help-deck__inner">
+    <p class="builder-help-deck__eyebrow">FAQs</p>
+    <p class="builder-help-deck__title">Popular questions</p>
+
+    <div class="builder-help-deck__list">
+      @for (item of faqs(); track item.question; let i = $index) {
+        <article class="faq-item" [class.faq-item--open]="isOpen(i)">
+          <button
+            type="button"
+            class="faq-item__trigger"
+            (click)="toggleItem(i)"
+            [attr.aria-expanded]="isOpen(i)"
+          >
+            <span class="faq-item__question">{{ item.question }}</span>
+
+            <svg
+              class="faq-item__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 9L12 15L18 9"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+
+          <div class="faq-item__content" [class.faq-item__content--open]="isOpen(i)">
+            <div class="faq-item__content-inner">
+              <p>{{ item.answer }}</p>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

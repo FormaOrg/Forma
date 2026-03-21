@@ -1,0 +1,95 @@
+<section class="faq-detail-layout">
+  <div class="faq-detail-layout__inner">
+
+    <!-- SIDEBAR -->
+    <aside class="faq-sidebar">
+      <div class="faq-sidebar__sticky">
+        <p class="faq-sidebar__eyebrow">On this page</p>
+        <h2 class="faq-sidebar__title">Detailed FAQ</h2>
+        <p class="faq-sidebar__intro">
+          Browse each section and jump directly to the answers you need.
+        </p>
+
+        <nav class="faq-sidebar__nav" aria-label="FAQ categories">
+          @for (group of groups(); track group.id; let i = $index) {
+            <button
+              type="button"
+              class="faq-sidebar__link"
+              [class.faq-sidebar__link--active]="activeIndex() === i"
+              (click)="selectCard(i)"
+            >
+              <span
+                class="faq-sidebar__dot"
+                [class]="'faq-sidebar__dot--' + group.colorClass"
+              ></span>
+              <span>{{ group.title }}</span>
+            </button>
+          }
+        </nav>
+      </div>
+    </aside>
+
+    <!-- CARD DECK -->
+    <div class="faq-deck" aria-live="polite">
+      <div class="faq-deck__stage">
+        @for (group of groups(); track group.id; let i = $index) {
+          <div
+            #faqSection
+            class="faq-card"
+            [id]="group.id"
+            [attr.data-index]="i"
+            [class]="getDeckClass(i)"
+            [style.--card-color]="getCardColor(group.colorClass)"
+          >
+            <!-- Peeking label (visible when card is behind) -->
+            <div class="faq-card__peek-label">{{ group.title }}</div>
+
+            <!-- Full card body -->
+            <div class="faq-card__body">
+              <div class="faq-group__header">
+                <span class="faq-group__pill">{{ group.title }}</span>
+                <h3>{{ group.title }}</h3>
+                <p>{{ group.intro }}</p>
+              </div>
+
+              <div class="faq-group__items">
+                @for (item of group.questions; track item.question; let qi = $index) {
+                  <article
+                    class="faq-accordion"
+                    [class.faq-accordion--open]="isOpen(group.id, qi)"
+                  >
+                    <button
+                      type="button"
+                      class="faq-accordion__trigger"
+                      (click)="toggleItem(group.id, qi)"
+                      [attr.aria-expanded]="isOpen(group.id, qi)"
+                    >
+                      <span class="faq-accordion__question">{{ item.question }}</span>
+                      <span class="faq-accordion__icon" aria-hidden="true">
+                        <span class="faq-accordion__line faq-accordion__line--horizontal"></span>
+                        <span
+                          class="faq-accordion__line faq-accordion__line--vertical"
+                          [class.faq-accordion__line--hidden]="isOpen(group.id, qi)"
+                        ></span>
+                      </span>
+                    </button>
+
+                    <div
+                      class="faq-accordion__content"
+                      [class.faq-accordion__content--open]="isOpen(group.id, qi)"
+                    >
+                      <div class="faq-accordion__content-inner">
+                        <p>{{ item.answer }}</p>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,45 @@
+<section class="faq-hero">
+  <div class="faq-hero__shell">
+    <div class="faq-hero__content">
+      <div class="faq-hero__text">
+        <h1>
+          Answers, without
+          <span>the digging.</span>
+        </h1>
+
+        <p>
+          Search common questions, explore support topics, and find the right answer faster — all in
+          one clean place.
+        </p>
+      </div>
+
+      <div class="faq-hero__panel">
+        <div class="faq-search">
+          <span class="faq-search__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M21 21L16.65 16.65M10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5C18 14.6421 14.6421 18 10.5 18Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search billing, domains, bookings, templates..."
+          />
+        </div>
+
+        <div class="faq-hero__chips">
+          <button class="faq-chip" type="button" *ngFor="let category of categories">
+            {{ category }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

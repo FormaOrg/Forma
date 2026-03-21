@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 
 @Component({
   selector: 'link-button',
@@ -19,4 +19,6 @@ export class LinkButton {
   @Input() padding: string = "10px 30px";
   @Input() txtSlide: string = "-12px";
   @Input() arrowSlide: string = "-7px";
+  @Input() border: string = "none";
+  @Input() arrowFilter: string = "none";
 }
