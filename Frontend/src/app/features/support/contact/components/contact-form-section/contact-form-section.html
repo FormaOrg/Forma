@@ -1,0 +1,61 @@
+<section class="contact-form-section" id="contact-form">
+  <div class="contact-form-section__container">
+    <div class="contact-form-card">
+      <div class="contact-form-card__header">
+        <span class="contact-form-card__eyebrow">Get in touch</span>
+        <h2 class="contact-form-card__title">Send us a message</h2>
+        <p class="contact-form-card__subtitle">
+          Tell us a bit about what you need, and we’ll get back to you as soon as possible.
+        </p>
+      </div>
+
+      <form class="contact-form" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input id="name" type="text" formControlName="name" placeholder="Your name" />
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="subject">Subject <span>(optional)</span></label>
+          <input
+            id="subject"
+            type="text"
+            formControlName="subject"
+            placeholder="How can we help?"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="message">Message</label>
+          <textarea
+            id="message"
+            rows="6"
+            formControlName="message"
+            placeholder="Write your message here..."
+          ></textarea>
+        </div>
+
+        <button class="submit-btn" type="submit" [disabled]="contactForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+        </button>
+
+        @if (submitted && !errorMessage) {
+          <p class="form-status success">Your message has been prepared successfully.</p>
+        }
+
+        @if (errorMessage) {
+          <p class="form-status error">
+            {{ errorMessage }}
+          </p>
+        }
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,155 @@
+:host {
+  display: block;
+}
+
+.social-cta-section {
+  width: 100%;
+  background: #ffffff;
+}
+
+/* Top section */
+.social-block {
+  background: #ffffff;
+  padding: 100px 20px 140px;
+}
+
+.social-block__container {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.social-block__title {
+  margin: 0 0 34px;
+  font-size: 3rem;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.02em;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid #9f9f9f;
+  background: transparent;
+}
+
+.social-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  text-decoration: none;
+  color: #000000;
+  background: transparent;
+  transition: 
+    background-color 0.25s ease, 
+    color 0.25s ease,
+    transform 0.15s ease;
+}
+
+.social-item svg {
+  width: 42px;
+  height: 42px;
+  fill: currentColor;
+  transition: fill 0.25s ease;
+}
+
+/* ✨ Hover effect (Wix style) */
+.social-item:hover {
+  background: #196ef5;
+  color: #ffffff;
+}
+
+/* Optional subtle lift */
+.social-item:hover {
+  transform: translateY(-2px);
+}
+
+/* Bottom section */
+.cta-banner {
+  background: #196ef5;
+  padding: 110px 20px 120px;
+}
+
+.cta-banner__container {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cta-banner__title {
+  margin: 0;
+  color: #f4efe7;
+  font-size: clamp(2.4rem, 5vw, 4.35rem);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.cta-banner__button {
+  margin-top: 42px;
+  min-width: 120px;
+  height: 46px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 999px;
+  background: #f4efe7;
+  color: #196ef5;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+
+@media (max-width: 900px) {
+  .social-block {
+    padding: 72px 20px 96px;
+  }
+
+  .social-block__title {
+    font-size: 2.4rem;
+  }
+
+  .social-item {
+    min-height: 110px;
+  }
+
+  .cta-banner {
+    padding: 84px 20px 92px;
+  }
+}
+
+@media (max-width: 640px) {
+  .social-block__title {
+    font-size: 2rem;
+    margin-bottom: 24px;
+  }
+
+  .social-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .social-item:nth-child(3),
+  .social-item:nth-child(5) {
+    border-left: none;
+  }
+
+  .social-item:nth-child(n + 3) {
+    border-top: 1px solid #9f9f9f;
+  }
+
+  .social-item {
+    min-height: 96px;
+  }
+
+  .social-item svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cta-banner__title {
+    font-size: 2.1rem;
+  }
+}

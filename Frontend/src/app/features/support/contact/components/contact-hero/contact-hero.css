@@ -1,0 +1,130 @@
+:host {
+  display: block;
+}
+
+.contact-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 100px 20px 80px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top left, rgba(126, 87, 255, 0.12), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(67, 233, 123, 0.1), transparent 30%),
+    linear-gradient(180deg, #fcfcff 0%, #f7f9fc 100%);
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gradient-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.6;
+}
+
+.orb-1 {
+  width: 240px;
+  height: 240px;
+  top: 40px;
+  left: -60px;
+  background: rgba(121, 82, 255, 0.18);
+}
+
+.orb-2 {
+  width: 980px;
+  height: 980px;
+  right: -80px;
+  bottom: 10px;
+  background: rgba(0, 194, 168, 0.15);
+}
+
+.contact-hero__container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.contact-hero__content {
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.contact-hero__title {
+  margin: 0 0 18px;
+  font-size: clamp(2.5rem, 5vw, 9.8rem);
+  line-height: 1.05;
+  font-weight: 400;
+  text-align: center;
+  color: #101828;
+}
+
+.contact-hero__subtitle {
+  margin: 0;
+  max-width: 780px;
+  text-align: center;
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: #5f6b7a;
+}
+
+.contact-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+link-button {
+    margin-top: 40px;
+}
+
+
+@media (max-width: 900px) {
+  .contact-hero {
+    padding: 84px 20px 64px;
+  }
+
+  .contact-hero__container {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .contact-hero__card {
+    justify-self: start;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-hero__title {
+    font-size: 2.5rem;
+  }
+
+  .contact-hero__subtitle {
+    font-size: 1rem;
+  }
+
+  .contact-hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+}

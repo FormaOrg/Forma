@@ -6,6 +6,7 @@ import { PortfolioShowcase } from './features/portfolio-showcase/portfolio-showc
 import { Product } from './features/product/product';
 import { Tutorials } from './features/support/tutorials/tutorials';
 import { Faqs } from './features/support/faqs/faqs';
+import { Contact } from './features/support/contact/contact';
 
 
 
@@ -16,5 +17,6 @@ export const routes: Routes = [
     {path:"portfolio-website", component:PortfolioShowcase},
     {path:"product", component:Product},
     {path:"tutorials", component:Tutorials},
-    {path:"faqs", component:Faqs}
+    {path:"faqs", component:Faqs},
+    {path:"contact", component:Contact}
 ];
