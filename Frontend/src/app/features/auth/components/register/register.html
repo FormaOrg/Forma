@@ -1,168 +1,205 @@
-<!-- register.component.html -->
-<div class="login-page">
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
 
-  <div class="login-card">
+<div class="login-header">
+  <h2>Get Started</h2>
+  <p>Create your account to start building with Forma</p>
+</div>
 
-    <!-- LEFT: dark inner panel -->
-    <div class="login-card-left">
-      <div class="left-tagline">Turn structure into experience.</div>
-      <div class="left-bottom">
-        <h2>Build Everything You Want</h2>
-        <p>Shape ideas into flexible, high-performance websites — your way.</p>
+<div class="success-message" *ngIf="successMessage">
+  <span class="icon-check"></span>
+  {{ successMessage }}
+</div>
+
+<form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+
+  <div class="name-row">
+    <div class="input-form">
+      <label for="firstName">First name</label>
+      <div class="input-box" [class.invalid]="firstNameRef.invalid && (firstNameRef.touched || f.submitted)">
+        <input
+          type="text"
+          id="firstName"
+          name="firstName"
+          [(ngModel)]="model.firstName"
+          #firstNameRef="ngModel"
+          placeholder="First name"
+          required
+          minlength="2"
+          [disabled]="isLoading">
+      </div>
+      <div class="error" [class.visible]="firstNameRef.invalid && (firstNameRef.touched || f.submitted)">
+        <span *ngIf="firstNameRef.errors?.['required']">Required</span>
+        <span *ngIf="firstNameRef.errors?.['minlength']">Min 2 chars</span>
+        <span *ngIf="!(firstNameRef.invalid && (firstNameRef.touched || f.submitted))">&nbsp;</span>
       </div>
     </div>
 
-    <!-- RIGHT: white form panel -->
-    <div class="login-card-right">
-
-      <div class="logo-section">
-        <div class="logo-icon">
-          <img src="assets/images/forma-icon.svg" alt="Forma logo">
-        </div>
-        <h1 class="logo">Forma</h1>
+    <div class="input-form">
+      <label for="lastName">Last name</label>
+      <div class="input-box" [class.invalid]="lastNameRef.invalid && (lastNameRef.touched || f.submitted)">
+        <input
+          type="text"
+          id="lastName"
+          name="lastName"
+          [(ngModel)]="model.lastName"
+          #lastNameRef="ngModel"
+          placeholder="Last name"
+          required
+          minlength="2"
+          [disabled]="isLoading">
       </div>
-
-      <div class="login-header">
-        <h2>Get Started Now</h2>
-        <p>Create your account to start building with Forma</p>
+      <div class="error" [class.visible]="lastNameRef.invalid && (lastNameRef.touched || f.submitted)">
+        <span *ngIf="lastNameRef.errors?.['required']">Required</span>
+        <span *ngIf="lastNameRef.errors?.['minlength']">Min 2 chars</span>
+        <span *ngIf="!(lastNameRef.invalid && (lastNameRef.touched || f.submitted))">&nbsp;</span>
       </div>
-
-      <!-- Success message -->
-      <div class="success-message" *ngIf="successMessage">
-        <span class="icon-check"></span>
-        {{ successMessage }}
-      </div>
-
-      <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
-
-        <!-- First name + Last name -->
-        <div style="display:flex; gap:10px;">
-          <div class="input-form" style="flex:1">
-            <label for="firstName">First name</label>
-            <div class="input-box" [class.invalid]="firstNameRef.invalid && (firstNameRef.touched || f.submitted)">
-              <input type="text" id="firstName" name="firstName" [(ngModel)]="model.firstName"
-                #firstNameRef="ngModel" placeholder="First name" required minlength="2" [disabled]="isLoading">
-            </div>
-            <div class="error" *ngIf="firstNameRef.invalid && (firstNameRef.touched || f.submitted)">
-              <span *ngIf="firstNameRef.errors?.['required']">Required</span>
-              <span *ngIf="firstNameRef.errors?.['minlength']">Min 2 chars</span>
-            </div>
-          </div>
-
-          <div class="input-form" style="flex:1">
-            <label for="lastName">Last name</label>
-            <div class="input-box" [class.invalid]="lastNameRef.invalid && (lastNameRef.touched || f.submitted)">
-              <input type="text" id="lastName" name="lastName" [(ngModel)]="model.lastName"
-                #lastNameRef="ngModel" placeholder="Last name" required minlength="2" [disabled]="isLoading">
-            </div>
-            <div class="error" *ngIf="lastNameRef.invalid && (lastNameRef.touched || f.submitted)">
-              <span *ngIf="lastNameRef.errors?.['required']">Required</span>
-              <span *ngIf="lastNameRef.errors?.['minlength']">Min 2 chars</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="input-form">
-          <label for="email">Email</label>
-          <div class="input-box" [class.invalid]="emailRef.invalid && (emailRef.touched || f.submitted)">
-            <input type="email" id="email" name="email" [(ngModel)]="model.email"
-              #emailRef="ngModel" placeholder="Enter your email address" required email [disabled]="isLoading">
-          </div>
-          <div class="error" *ngIf="emailRef.invalid && (emailRef.touched || f.submitted)">
-            <span *ngIf="emailRef.errors?.['required']">Email is required</span>
-            <span *ngIf="emailRef.errors?.['email']">Invalid email format</span>
-          </div>
-        </div>
-
-        <!-- Phone (optional) -->
-        <div class="input-form">
-          <label for="phone">Phone <span style="opacity:.45;font-size:.85em">(optional)</span></label>
-          <div class="input-box">
-            <input type="tel" id="phone" name="phone" [(ngModel)]="model.phone"
-              placeholder="+216 XX XXX XXX" [disabled]="isLoading">
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="input-form">
-          <label for="password">Password</label>
-          <div class="input-box" [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
-            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
-              [(ngModel)]="model.password" #passwordRef="ngModel" placeholder="Create a strong password"
-              required minlength="6" [disabled]="isLoading">
-            <span [class]="showPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
-              (click)="showPassword = !showPassword"></span>
-          </div>
-          <div class="password-strength" *ngIf="model.password.length > 0">
-            <div class="strength-bar">
-              <div class="strength-fill"
-                [class.weak]="getPasswordStrength() === 'weak'"
-                [class.medium]="getPasswordStrength() === 'medium'"
-                [class.strong]="getPasswordStrength() === 'strong'">
-              </div>
-            </div>
-            <span class="strength-text" [ngClass]="getPasswordStrength()">
-              {{ getPasswordStrength() === 'weak' ? 'Weak' :
-                 getPasswordStrength() === 'medium' ? 'Medium' : 'Strong' }}
-            </span>
-          </div>
-          <div class="error" *ngIf="passwordRef.invalid && (passwordRef.touched || f.submitted)">
-            <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
-            <span *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters</span>
-          </div>
-        </div>
-
-        <!-- Confirm password -->
-        <div class="input-form">
-          <label for="confirmPassword">Confirm password</label>
-          <div class="input-box" [class.invalid]="checkPasswordMismatch() && (confirmRef.touched || f.submitted)">
-            <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
-              name="confirmPassword" [(ngModel)]="model.confirmPassword" #confirmRef="ngModel"
-              placeholder="Confirm your password" required minlength="6" [disabled]="isLoading">
-            <span [class]="showConfirmPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
-              (click)="showConfirmPassword = !showConfirmPassword"></span>
-          </div>
-          <div class="error" *ngIf="checkPasswordMismatch() && (confirmRef.touched || f.submitted)">
-            Passwords do not match
-          </div>
-        </div>
-
-        <!-- Terms -->
-        <div class="terms-checkbox">
-          <label class="checkbox-label">
-            <input type="checkbox" name="agreeTerms" [(ngModel)]="agreeTerms" [disabled]="isLoading">
-            <span>I agree to the <a href="#" class="link">Terms</a> and <a href="#" class="link">Privacy Policy</a></span>
-          </label>
-          <div class="error" *ngIf="!agreeTerms && f.submitted">
-            You must accept the terms to continue
-          </div>
-        </div>
-
-        <div class="error" *ngIf="error" style="margin-bottom:12px;text-align:center;">{{ error }}</div>
-
-        <button type="submit" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Create Account</span>
-          <span *ngIf="isLoading" class="loading-spinner"></span>
-          <span *ngIf="isLoading">Creating account...</span>
-        </button>
-
-        <div class="alternative">
-          <div class="social-buttons">
-            <button type="button" class="social-btn" title="Sign Up with Google" (click)="signupWithGoogle()">
-              <span class="icon icon-google"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="signup-link">
-          Already have an account? <a routerLink="/login"><strong>Sign in</strong></a>
-        </div>
-
-      </form>
-
     </div>
-
   </div>
 
-</div>
+  <div class="input-form">
+    <label for="email">Email</label>
+    <div class="input-box" [class.invalid]="emailRef.invalid && (emailRef.touched || f.submitted)">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="model.email"
+        #emailRef="ngModel"
+        placeholder="Enter your email"
+        required
+        email
+        [disabled]="isLoading">
+    </div>
+    <div class="error" [class.visible]="emailRef.invalid && (emailRef.touched || f.submitted)">
+      <span *ngIf="emailRef.errors?.['required']">Email is required</span>
+      <span *ngIf="emailRef.errors?.['email']">Invalid email format</span>
+      <span *ngIf="!(emailRef.invalid && (emailRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="input-form">
+    <label for="phone">Phone <span class="optional">(optional)</span></label>
+    <div class="input-box">
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        [(ngModel)]="model.phone"
+        placeholder="+216 XX XXX XXX"
+        [disabled]="isLoading">
+    </div>
+    <div class="error">
+      <span>&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="input-form">
+    <label for="password">Password</label>
+    <div class="input-box" [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        id="password"
+        name="password"
+        [(ngModel)]="model.password"
+        #passwordRef="ngModel"
+        placeholder="Create a strong password"
+        required
+        minlength="6"
+        [disabled]="isLoading">
+      <span
+        [class]="showPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+        (click)="showPassword = !showPassword"></span>
+    </div>
+
+    <div class="password-strength" *ngIf="model.password.length > 0">
+      <div class="strength-bar">
+        <div
+          class="strength-fill"
+          [class.weak]="getPasswordStrength() === 'weak'"
+          [class.medium]="getPasswordStrength() === 'medium'"
+          [class.strong]="getPasswordStrength() === 'strong'">
+        </div>
+      </div>
+      <span class="strength-text" [ngClass]="getPasswordStrength()">
+        {{ getPasswordStrength() === 'weak' ? 'Weak' :
+           getPasswordStrength() === 'medium' ? 'Medium' : 'Strong' }}
+      </span>
+    </div>
+
+    <div class="error" [class.visible]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+      <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+      <span *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters</span>
+      <span *ngIf="!(passwordRef.invalid && (passwordRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="input-form">
+    <label for="confirmPassword">Confirm password</label>
+    <div class="input-box" [class.invalid]="checkPasswordMismatch() && (confirmRef.touched || f.submitted)">
+      <input
+        [type]="showConfirmPassword ? 'text' : 'password'"
+        id="confirmPassword"
+        name="confirmPassword"
+        [(ngModel)]="model.confirmPassword"
+        #confirmRef="ngModel"
+        placeholder="Confirm your password"
+        required
+        minlength="6"
+        [disabled]="isLoading">
+      <span
+        [class]="showConfirmPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+        (click)="showConfirmPassword = !showConfirmPassword"></span>
+    </div>
+    <div class="error" [class.visible]="checkPasswordMismatch() && (confirmRef.touched || f.submitted)">
+      <span *ngIf="checkPasswordMismatch() && (confirmRef.touched || f.submitted)">Passwords do not match</span>
+      <span *ngIf="!(checkPasswordMismatch() && (confirmRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="terms-checkbox">
+    <label class="checkbox-label">
+      <input type="checkbox" name="agreeTerms" [(ngModel)]="agreeTerms" [disabled]="isLoading">
+      <span>
+        I agree to the <a href="#" class="link">Terms</a> and
+        <a href="#" class="link">Privacy Policy</a>
+      </span>
+    </label>
+    <div class="error" [class.visible]="!agreeTerms && f.submitted">
+      <span *ngIf="!agreeTerms && f.submitted">You must accept the terms to continue</span>
+      <span *ngIf="agreeTerms || !f.submitted">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="form-error-slot">
+    <div class="error" [class.visible]="!!error">
+      {{ error || ' ' }}
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="isLoading">
+    <span *ngIf="!isLoading">Create Account</span>
+    <span *ngIf="isLoading" class="loading-spinner"></span>
+    <span *ngIf="isLoading">Creating account...</span>
+  </button>
+
+  <div class="alternative">
+    <div class="social-buttons">
+      <button
+        type="button"
+        class="social-btn"
+        title="Sign Up with Google"
+        (click)="signupWithGoogle()">
+        <span class="icon icon-google"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="signup-link">
+    Already have an account?
+    <a routerLink="/login"><strong>Sign in</strong></a>
+  </div>
+</form>
