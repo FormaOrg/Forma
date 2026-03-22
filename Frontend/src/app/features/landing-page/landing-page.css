@@ -1,5 +1,6 @@
 :host {
     display: block;
+    
 }
 
 main {
@@ -7,3 +8,5 @@ main {
     flex-direction: column;
     align-items: center;
 }
+
+

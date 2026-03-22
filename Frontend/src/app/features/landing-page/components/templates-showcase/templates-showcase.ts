@@ -1,7 +1,6 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { LinkButton } from "../../../../shared/components/link-button/link-button";
 
 type TemplateItem = {
     category: string,
@@ -12,11 +11,10 @@ type TemplateItem = {
     selector: 'app-templates-showcase',
     standalone: true,
     imports: [
-    CommonModule,
-    LinkButton
-],
+        CommonModule
+    ],
     templateUrl: './templates-showcase.html',
-    styleUrls: ['./templates-showcase.css']
+    styleUrl: './templates-showcase.css'
 })
 export class TemplatesShowcase {
     @ViewChild('slider', {static: false})

@@ -47,6 +47,28 @@
     line-height: 1.2;
 }
 
+.made-on-forma__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55px;
+    width: 190px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: #101585;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 400;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.made-on-forma__button:hover {
+    opacity: 0.95;
+}
+
 .made-on-forma__gallery {
     display: flex;
     flex-direction: column;

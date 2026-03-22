@@ -1,5 +1,4 @@
 :host {
-    max-width: 2000px;
     width: 100%;
     display: block;
 }
@@ -13,6 +12,7 @@
     flex-direction: column;
     width: 100%;
     padding: 60px 0 40px;
+    
     overflow: hidden;
 }
 
@@ -46,7 +46,6 @@
     font-size: 1.3em;
     width: 100%;
     line-height: 1.4;
-    margin-bottom: 20px;
 }
 
 .templates-showcase_intro_right button {
@@ -62,42 +61,7 @@
     cursor: pointer;
     transition:
         opacity 0.2s ease;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    overflow: hidden;
-    padding: 10px 30px;
-    position: relative;
 }
-
-.btn-arrow {
-    display: inline-block;
-    width: 25px;
-    height: 25px;
-    opacity: 0;
-    position: absolute;
-    right: 10px;
-    transform: translateX(5px); /* starts far right */
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    flex-shrink: 0;
-}
-
-.btn-text {
-    transition: transform 0.3s ease;
-    display: inline-block;
-}
-
-.btn.purple:hover .btn-text {
-    transform: translateX(-10px); /* slides left */
-}
-
-.templates-showcase_intro_right button:hover .btn-arrow {
-    opacity: 1;
-    transform: translateX(-5px);
-}
-
 
 .templates-showcase_intro_right button:hover {
     opacity: 0.95;
