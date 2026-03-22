@@ -5,10 +5,13 @@ import { HeroSection } from "./components/hero-section/hero-section";
 import { TemplatesSection } from './components/templates-section/templates-section';
 import { StepsSection } from "./components/steps-section/steps-section";
 import { StepsDisplaySection } from "./components/steps-display-section/steps-display-section";
+import { MarketingSection } from "./components/marketing-section/marketing-section";
+import { DomainSection } from "./components/domain-section/domain-section";
+import { RevenueSection } from "./components/revenue-section/revenue-section";
 
 @Component({
   selector: 'app-portfolio-showcase',
-  imports: [Header, Footer, HeroSection, TemplatesSection, StepsSection, StepsDisplaySection],
+  imports: [Header, Footer, HeroSection, TemplatesSection, StepsSection, StepsDisplaySection, MarketingSection, DomainSection, RevenueSection],
   templateUrl: './portfolio-showcase.html',
   styleUrl: './portfolio-showcase.css',
 })
