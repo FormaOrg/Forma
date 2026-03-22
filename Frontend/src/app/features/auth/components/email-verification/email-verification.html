@@ -1,94 +1,80 @@
-<!-- email-verification.component.html -->
-<div class="verify-page">
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
 
-  <div class="verify-card">
+<!-- LOADING STATE -->
+<div class="verification-content centered-state" *ngIf="loading">
+  <div class="icon-container centered">
+    <div class="loading-spinner large"></div>
+  </div>
+  <h2 class="title">Verifying Your Email</h2>
+  <p class="subtitle">Please wait while we verify your account...</p>
+</div>
 
-    <!-- LEFT: dark panel -->
-    <div class="verify-card-left">
-      <div class="left-tagline">Turn structure into experience.</div>
-      <div class="left-bottom">
-        <h2>Build Everything You Want</h2>
-        <p>Shape ideas into flexible, high-performance websites — your way.</p>
-      </div>
-    </div>
-
-    <!-- RIGHT: white content panel -->
-    <div class="verify-card-right">
-
-      <div class="logo-section">
-        <div class="logo-icon">
-          <img src="assets/images/forma-icon.svg" alt="Forma logo">
-        </div>
-        <h1 class="logo">Forma</h1>
-      </div>
-
-      <!-- ── LOADING STATE ── -->
-      <div class="verification-content" *ngIf="loading">
-        <div class="icon-container">
-          <div class="loading-spinner large"></div>
-        </div>
-        <h2 class="title">Verifying Your Email</h2>
-        <p class="subtitle">Please wait while we verify your account...</p>
-      </div>
-
-      <!-- ── SUCCESS STATE ── -->
-      <div class="verification-content" *ngIf="!loading && success">
-        <div class="icon-container">
-          <svg class="state-icon success-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-          </svg>
-        </div>
-        <h2 class="title">Email Verified!</h2>
-        <p class="subtitle">{{ message }}</p>
-        <p class="redirect-info">Redirecting to login in a few seconds...</p>
-        <div class="action-buttons">
-          <button class="btn btn-primary" (click)="goToLogin()">Go to Login</button>
-        </div>
-      </div>
-
-      <!-- ── ERROR STATE ── -->
-      <div class="verification-content" *ngIf="!loading && !success">
-        <div class="icon-container">
-          <svg class="state-icon error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle class="error-circle" cx="26" cy="26" r="25" fill="none"/>
-            <path class="error-cross" fill="none" d="M16 16 36 36 M36 16 16 36"/>
-          </svg>
-        </div>
-        <h2 class="title">Verification Failed</h2>
-        <p class="subtitle">{{ message }}</p>
-
-        <div class="resend-section" *ngIf="canResend">
-          <p class="resend-text">Your link may have expired. We can send a new one.</p>
-
-          <div class="success-message" *ngIf="resendSuccess">
-            <span class="icon-check">✓</span> {{ resendSuccess }}
-          </div>
-          <div class="error-message" *ngIf="resendError">
-            <span class="icon-error">✗</span> {{ resendError }}
-          </div>
-
-          <button
-            class="btn btn-secondary"
-            (click)="resendVerification()"
-            [disabled]="isResending">
-            <span *ngIf="isResending" class="loading-spinner small"></span>
-            {{ isResending ? 'Sending...' : 'Resend Verification Email' }}
-          </button>
-        </div>
-
-        <div class="action-buttons">
-          <button class="btn btn-outline" (click)="goToRegister()">Register Again</button>
-          <button class="btn btn-primary" (click)="goToLogin()">Back to Login</button>
-        </div>
-      </div>
-
-      <div class="help-text">
-        Need help? <a href="/contact">Contact Support</a>
-      </div>
-
-    </div>
-
+<!-- SUCCESS STATE -->
+<div class="verification-content centered-state" *ngIf="!loading && success">
+  <div class="icon-container centered">
+    <svg class="state-icon success-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+      <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    </svg>
   </div>
 
+  <h2 class="title">Email Verified!</h2>
+  <p class="subtitle">{{ message }}</p>
+  <p class="redirect-info">Redirecting to login in a few seconds...</p>
+
+  <div class="action-buttons single-action">
+    <button class="btn btn-primary" (click)="goToLogin()">Go to Login</button>
+  </div>
+</div>
+
+<!-- ERROR STATE -->
+<div class="verification-content centered-state" *ngIf="!loading && !success">
+  <div class="icon-container centered">
+    <svg class="state-icon error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="error-circle" cx="26" cy="26" r="25" fill="none"/>
+      <path class="error-cross" fill="none" d="M16 16 36 36 M36 16 16 36"/>
+    </svg>
+  </div>
+
+  <h2 class="title">Verification Failed</h2>
+  <p class="subtitle">{{ message }}</p>
+
+  <div class="resend-section" *ngIf="canResend">
+    <p class="resend-text">Your link may have expired. We can send a new one.</p>
+
+    <div class="message-slot">
+      <div class="success-message" [class.visible]="!!resendSuccess">
+        <span class="icon-check">✓</span>
+        <span>{{ resendSuccess || ' ' }}</span>
+      </div>
+    </div>
+
+    <div class="message-slot">
+      <div class="error-message" [class.visible]="!!resendError">
+        <span class="icon-error">✗</span>
+        <span>{{ resendError || ' ' }}</span>
+      </div>
+    </div>
+
+    <button
+      class="btn btn-secondary"
+      (click)="resendVerification()"
+      [disabled]="isResending">
+      <span *ngIf="isResending" class="loading-spinner small"></span>
+      {{ isResending ? 'Sending...' : 'Resend Verification Email' }}
+    </button>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-outline" (click)="goToRegister()">Register Again</button>
+    <button class="btn btn-primary" (click)="goToLogin()">Back to Login</button>
+  </div>
+</div>
+
+<div class="help-text">
+  Need help? <a href="/contact">Contact Support</a>
 </div>

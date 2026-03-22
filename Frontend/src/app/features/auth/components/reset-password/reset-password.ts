@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
   templateUrl: './reset-password.html',
   styleUrls: ['./reset-password.scss'],
-  imports: [FormsModule, RouterModule, NgIf]
+  imports: [FormsModule, RouterModule, CommonModule]
 })
 export class ResetPasswordComponent implements OnInit {
   token: string = '';
