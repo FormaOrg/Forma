@@ -1,0 +1,37 @@
+<section class="steps-section">
+  <div class="steps-section__inner">
+    <div class="steps-section__left">
+      <p class="steps-section__title">
+        How to make a
+        portfolio website
+      </p>
+
+        <div class="steps-section__btn">
+            <p class="steps-section__subtitle">Use our portfolio maker to create and publish your work in a few easy steps. </p>
+
+            <div class="btn-container">
+                <link-button
+                    [bgColor]="'#dff994'"
+                    [txtColor]="'black'"
+                    [theme]="'black'"
+                    [content]="'Get Started'"
+                />
+                <a href="/templates" class="btn-link">Explore templates →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="steps-section__right">
+      @for (step of steps(); track step.number) {
+        <div class="step-row">
+          <div class="step-row__number">{{ step.number }}</div>
+
+          <p class="step-row__text">
+            <strong>{{ step.strong }}</strong>
+            {{ ' ' + step.rest }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

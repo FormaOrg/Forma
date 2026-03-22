@@ -1,0 +1,36 @@
+<section class="revenue-section">
+
+  <!-- Header -->
+  <div class="revenue-section__header">
+    <h2 class="revenue-section__title">Tap into new<br>revenue streams</h2>
+    <div class="revenue-section__cta">
+      <p class="revenue-section__subtitle">
+        Add business functionality as you go to earn more money from your portfolio.
+      </p>
+      <link-button
+        [bgColor]="'#111111'"
+        [txtColor]="'#ffffff'"
+        [theme]="'white'"
+        [content]="'Get Started'"
+      ></link-button>
+    </div>
+  </div>
+
+  <!-- Sliding cards strip -->
+  <div class="revenue-strip-wrap">
+    <div class="revenue-strip" [style.transform]="stripTransform()">
+      @for (card of cards; track card.title) {
+        <div class="revenue-card" [style.background-color]="card.bgColor">
+          <div class="revenue-card__content">
+            <h3 class="revenue-card__title" [style.color]="card.textColor">{{ card.title }}</h3>
+            <p class="revenue-card__desc" [style.color]="card.descColor">{{ card.description }}</p>
+          </div>
+          <div class="revenue-card__image">
+            <img [src]="card.image" [alt]="card.title" loading="lazy" />
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</section>

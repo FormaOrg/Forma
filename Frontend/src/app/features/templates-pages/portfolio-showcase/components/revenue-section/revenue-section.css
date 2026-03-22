@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================================
+   SECTION
+   ========================================= */
+
+.revenue-section {
+  background-color: #ffffff;
+  padding: 100px 80px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.revenue-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.revenue-section__title {
+  font-size: clamp(2.6rem, 4.5vw, 4rem);
+  font-weight: 400;
+  color: #111111;
+  line-height: 1.1;
+  margin: 0;
+  flex: 1;
+}
+
+.revenue-section__cta {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 8px;
+}
+
+.revenue-section__subtitle {
+  font-size: 1rem;
+  color: #555555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.revenue-section__cta link-button {
+  display: contents;
+}
+
+/* =========================================
+   STRIP WRAPPER — clips overflow and sets height
+   ========================================= */
+
+.revenue-strip-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================================
+   STRIP — wider than viewport, slides left
+   ========================================= */
+
+.revenue-strip {
+  display: flex;
+  gap: 20px;
+  will-change: transform;
+  /* No CSS transition — driven frame-by-frame by scroll signal */
+}
+
+/* =========================================
+   INDIVIDUAL CARD
+   ========================================= */
+
+.revenue-card {
+  flex: 0 0 380px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  min-height: 520px;
+}
+
+.revenue-card__content {
+  padding: 36px 36px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.revenue-card__title {
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.revenue-card__desc {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.revenue-card__image {
+  flex: 1;
+  padding: 0 24px 24px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.revenue-card__image img {
+  display: block;
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+  max-height: 280px;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1024px) {
+  .revenue-section {
+    padding: 72px 40px 80px;
+  }
+
+  .revenue-section__header {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .revenue-section__cta {
+    flex: unset;
+    width: 100%;
+  }
+
+  /* On smaller screens disable scroll animation — show all cards in a grid */
+  .revenue-strip {
+    flex-wrap: wrap;
+    transform: none !important;
+  }
+
+  .revenue-card {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+@media (max-width: 600px) {
+  .revenue-section {
+    padding: 48px 24px 64px;
+  }
+
+  .revenue-card {
+    flex: 0 0 100%;
+  }
+}

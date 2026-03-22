@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+git statusimport { Component } from '@angular/core';
 
 @Component({
   selector: 'faq-section',
@@ -21,5 +21,5 @@ export class FaqSection {
         clickedItem.classList.add('active');
         clickedItem.querySelector('.chevron')!.classList.add('rotated');
     }
-}
+  }
 }
