@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, computed, ElementRef, HostListener, NgZone, OnDestroy, signal, ViewChild } from '@angular/core';
-import { LinkButton } from "../../../../shared/components/link-button/link-button";
+import { LinkButton } from "../../../../../shared/components/link-button/link-button";
 
 @Component({
   selector: 'app-hero-section',

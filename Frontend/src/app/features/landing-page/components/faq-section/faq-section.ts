@@ -21,5 +21,5 @@ export class FaqSection {
         clickedItem.classList.add('active');
         clickedItem.querySelector('.chevron')!.classList.add('rotated');
     }
-}
+  }
 }
