@@ -1,0 +1,123 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.made-on-forma {
+    width: 100%;
+    overflow: hidden;
+    padding: 36px 0 40px;
+    background: #CDCFFF;
+}
+
+.made-on-forma__intro {
+    display: flex;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 0 150px;
+    margin-top: 30px;
+    margin-bottom: 130px;
+}
+
+.made-on-forma__left {
+    max-width: fit-content;
+}
+
+.made-on-forma__left p {
+    margin: 0;
+    color: #101585;
+    font-size: 4.7rem;
+    line-height: 1.1;
+    font-weight: 300;
+    max-width: 700px;
+}
+
+.made-on-forma__right {
+    max-width: 600px;
+    padding-top: 20px;
+}
+
+.made-on-forma__right p {
+    margin: 0 0 30px;
+    color: #101585;
+    font-size: 1.3rem;
+    line-height: 1.4;
+}
+
+.made-on-forma__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: hidden;
+}
+
+.made-on-forma__track {
+    display: flex;
+    gap: 30px;
+    width: max-content;
+    will-change: transform;
+    transition: transform 0.08s linear;
+}
+
+.made-on-forma__card {
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.made-on-forma__card img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.made-on-forma__card--top {
+    height: 336px;
+}
+
+.made-on-forma__card--bottom {
+    height: 336px;
+}
+
+@media (max-width: 1024px) {
+    .made-on-forma__intro {
+        padding: 0 28px;
+        gap: 30px;
+    }
+
+    .made-on-forma__left p {
+        font-size: 3.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .made-on-forma {
+        padding-top: 28px;
+    }
+
+    .made-on-forma__intro {
+        flex-direction: column;
+        padding: 0 20px;
+        margin-bottom: 24px;
+    }
+
+    .made-on-forma__right {
+        max-width: 100%;
+        padding-top: 0;
+    }
+
+    .made-on-forma__left p {
+        font-size: 2.5rem;
+    }
+
+    .made-on-forma__card--top,
+    .made-on-forma__card--bottom {
+        width: 210px;
+        height: 118px;
+    }
+}
