@@ -1,0 +1,18 @@
+<section class="portfolio-types">
+    <div class="portfolio-types__inner">
+        <h2 class="portfolio-types__title">Looking to build a specific<br>type of portfolio?</h2>
+        <div class="portfolio-types__tags">
+            @for (tag of tags(); track tag.label) {
+                <link-button
+                    [bgColor]="'transparent'"
+                    [txtColor]="'#ffffff'"
+                    [theme]="'white'"
+                    [content]="tag.label"
+                    [routerLink]="tag.url"
+                    class="portfolio-types__tag"
+                    [width]="tag.width  "
+                ></link-button>
+            }
+        </div>
+    </div>
+</section>
