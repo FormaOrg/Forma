@@ -8,10 +8,14 @@ import { StepsDisplaySection } from "./components/steps-display-section/steps-di
 import { MarketingSection } from "./components/marketing-section/marketing-section";
 import { DomainSection } from "./components/domain-section/domain-section";
 import { RevenueSection } from "./components/revenue-section/revenue-section";
+import { ExamplesSection } from "./components/examples-section/examples-section";
+import { FaqSection } from './components/faq-section/faq-section';
+import { TypesSection } from "./components/types-section/types-section";
+import { CtaSection } from "./components/cta-section/cta-section";
 
 @Component({
   selector: 'app-portfolio-showcase',
-  imports: [Header, Footer, HeroSection, TemplatesSection, StepsSection, StepsDisplaySection, MarketingSection, DomainSection, RevenueSection],
+  imports: [Header, Footer, HeroSection, TemplatesSection, StepsSection, StepsDisplaySection, MarketingSection, DomainSection, RevenueSection, ExamplesSection, FaqSection, TypesSection, CtaSection],
   templateUrl: './portfolio-showcase.html',
   styleUrl: './portfolio-showcase.css',
 })

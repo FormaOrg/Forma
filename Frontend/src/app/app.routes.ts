@@ -10,7 +10,7 @@ import { Tutorials } from './features/support/tutorials/tutorials';
 import { Faqs } from './features/support/faqs/faqs';
 import { Contact } from './features/support/contact/contact';
 
-import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
+// import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/components/login/login';
 import { RegisterComponent } from './features/auth/components/register/register';
 import { EmailVerificationComponent } from './features/auth/components/email-verification/email-verification';
@@ -28,18 +28,18 @@ export const routes: Routes = [
   { path: 'faqs', component: Faqs },
   { path: 'contact', component: Contact },
 
-  {
-    path: '',
-    component: AuthLayout,
-    children: [
-      { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
-      { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
-      { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
-      { path: 'verify-email', component: EmailVerificationComponent },
-      { path: 'verify-email-required', component: EmailVerificationRequiredComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
-    ]
-  },
+  // {
+  //   path: '',
+  //   component: AuthLayout,
+  //   children: [
+  //     { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
+  //     { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
+  //     { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
+  //     { path: 'verify-email', component: EmailVerificationComponent },
+  //     { path: 'verify-email-required', component: EmailVerificationRequiredComponent },
+  //     { path: 'reset-password', component: ResetPasswordComponent }
+  //   ]
+  // },
 
   { path: '**', redirectTo: '' }
 ];
