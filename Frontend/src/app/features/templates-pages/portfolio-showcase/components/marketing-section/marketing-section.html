@@ -7,10 +7,11 @@
       <p class="marketing-section__subtitle">
         Grow your audience using built-in marketing tools designed to boost visibility for your portfolio website.
       </p>
+
       <link-button
         [bgColor]="'#ffffff'"
-        [txtColor]="'#0d3d36'"
-        [theme]="'dark'"
+        [txtColor]="'#000'"
+        [theme]="'black'"
         [content]="'Get Started'"
       ></link-button>
     </div>
@@ -24,7 +25,6 @@
       #rowEl
     >
 
-      <!-- Description card slides top → bottom as --progress goes 0 → 1 -->
       <div class="marketing-card-wrap">
         <div
           class="marketing-card"
@@ -35,7 +35,6 @@
         </div>
       </div>
 
-      <!-- Single image -->
       <div class="marketing-image">
         <img [src]="row.image" [alt]="row.title" loading="lazy" />
       </div>

@@ -26,7 +26,7 @@
 }
 
 .marketing-section__title {
-  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  font-size: 4.5em;
   font-weight: 400;
   color: #ffffff;
   line-height: 1.15;
@@ -35,16 +35,16 @@
 }
 
 .marketing-section__cta {
-  flex: 0 0 380px;
+  flex: 0 0 550px;
   display: flex;
   flex-direction: column;
   gap: 28px;
 }
 
 .marketing-section__subtitle {
-  font-size: 1rem;
-  color: #a8c8bf;
-  line-height: 1.6;
+  font-size: 1.2em;
+  color: #fff;
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -72,7 +72,7 @@
 }
 
 /* =========================================
-   CARD WRAPPER — defines the slide track
+   CARD WRAPPER
    ========================================= */
 
 .marketing-card-wrap {
@@ -83,13 +83,12 @@
 }
 
 /* =========================================
-   DESCRIPTION CARD — fixed height, slides via --progress
-   --track must equal row height minus card height exactly
+   DESCRIPTION CARD
    ========================================= */
 
 .marketing-card {
-  --row-height: 550px;   /* keep in sync with .marketing-row height */
-  --card-height: 260px;
+  --row-height: 550px;
+  --card-height: 400px;
   --track: calc(var(--row-height) - var(--card-height));
 
   position: absolute;
@@ -102,7 +101,7 @@
 
   background-color: #ccf0a0;
   border-radius: 20px;
-  padding: 32px 36px;
+  padding: 50px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -110,18 +109,20 @@
 }
 
 .marketing-card__title {
-  font-size: clamp(1.3rem, 2vw, 1.7rem);
-  font-weight: 600;
-  color: #0d3d36;
+  font-size: 2em;
+  font-weight: 500;
+  color: #014051;
   line-height: 1.25;
   margin: 0;
+  max-width: 300px;
 }
 
 .marketing-card__desc {
-  font-size: 0.9rem;
-  color: #2a5a4a;
+  font-size: 1.2em;
+  color: #014051;
   line-height: 1.65;
   margin: 0;
+  max-width: 650px;
 }
 
 /* =========================================

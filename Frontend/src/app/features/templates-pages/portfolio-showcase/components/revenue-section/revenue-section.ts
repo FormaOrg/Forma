@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, computed } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LinkButton } from '../../../../../shared/components/link-button/link-button';
 
@@ -10,7 +10,31 @@ import { LinkButton } from '../../../../../shared/components/link-button/link-bu
   styleUrl: './revenue-section.css',
 })
 export class RevenueSection {
+  @ViewChild('scrollContainer') containerEl!: ElementRef<HTMLElement>;
+  @ViewChild('strip')           stripEl!:     ElementRef<HTMLElement>;
+ 
   private readonly scrollY = signal(0);
+  private maxShift = 0;
+ 
+  readonly stripTransform = computed(() => {
+    const sy = this.scrollY(); // read signal so computed re-runs on every scroll
+    if (!this.maxShift || !this.containerEl) return 'translate3d(0, 0, 0)';
+ 
+    const container = this.containerEl.nativeElement;
+    const rect      = container.getBoundingClientRect();
+    const viewH     = window.innerHeight;
+ 
+    // scrollRange = containerHeight - viewH = the scroll room we added for animation
+    const scrollRange = container.offsetHeight - viewH;
+ 
+    // How far we've scrolled into the sticky zone
+    // rect.top is 0 when container top is at viewport top (stuck)
+    // progress = 0 at start of sticky, 1 at end
+    const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+ 
+    const x = this.maxShift * progress;
+    return `translate3d(-${x}px, 0, 0)`;
+  });
 
   readonly cards = [
     {
@@ -19,7 +43,7 @@ export class RevenueSection {
       bgColor: '#8B3A2A',
       textColor: '#ffffff',
       descColor: '#f0c9be',
-      image: 'assets/portfolio/revenue/sell.jpg',
+      image: 'assets/Portfolio Website Gallery/Revenue/1.jpg',
     },
     {
       title: 'Offer services',
@@ -27,7 +51,7 @@ export class RevenueSection {
       bgColor: '#ccf0a0',
       textColor: '#0d3d36',
       descColor: '#2a5a4a',
-      image: 'assets/portfolio/revenue/services.jpg',
+      image: 'assets/Portfolio Website Gallery/Revenue/2.jpg',
     },
     {
       title: 'Start a blog',
@@ -35,7 +59,7 @@ export class RevenueSection {
       bgColor: '#c5c5f5',
       textColor: '#1a1a4a',
       descColor: '#3a3a7a',
-      image: 'assets/portfolio/revenue/blog.jpg',
+      image: 'assets/Portfolio Website Gallery/Revenue/3.jpg',
     },
     {
       title: 'Host events',
@@ -43,28 +67,45 @@ export class RevenueSection {
       bgColor: '#f5f0a0',
       textColor: '#2a2000',
       descColor: '#5a4a00',
-      image: 'assets/portfolio/revenue/events.jpg',
+      image: 'assets/Portfolio Website Gallery/Revenue/4.jpg',
     },
   ];
 
-  // The strip slides from its initial offset (cards start off-screen right)
-  // to 0 as scroll progresses through the section's trigger window
-  readonly stripTransform = computed(() => {
-    const sy = this.scrollY();
-    const triggerStart = 2600;  // adjust to where this section sits on your page
-    const triggerEnd   = 3800;
-    const raw = (sy - triggerStart) / (triggerEnd - triggerStart);
-    const progress = Math.min(1, Math.max(0, raw));
-
-    // Maximum shift: enough to reveal all 4 cards
-    // Each card is ~380px + 20px gap = 400px, so total overhang ≈ 1200px for 4 cards
-    const maxShift = 900;
-    const shift = maxShift * progress;
-    return `translateX(-${shift}px)`;
-  });
-
+  ngAfterViewInit(): void {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.measure();
+      });
+    });
+  }
+ 
+  private measure(): void {
+    const container = this.containerEl?.nativeElement;
+    const strip     = this.stripEl?.nativeElement;
+    if (!container || !strip) return;
+ 
+    // maxShift = how far the strip needs to travel
+    // Use section inner width (container width - 160px padding)
+    const innerWidth = container.clientWidth - 160;
+    this.maxShift = Math.max(0, strip.scrollWidth - innerWidth);
+ 
+    // Set container height = section natural height + scroll room for full animation
+    // scroll room = maxShift / 0.5 — controls animation speed (higher divisor = slower)
+    const sectionHeight = container.querySelector('.revenue-section')!
+      ? (container.querySelector('.revenue-section') as HTMLElement).offsetHeight
+      : 800;
+ 
+    container.style.setProperty('--scroll-room', `${this.maxShift / 0.5}px`);
+    container.style.height = `${sectionHeight + this.maxShift / 0.5}px`;
+  }
+ 
   @HostListener('window:scroll')
   onWindowScroll(): void {
     this.scrollY.set(window.scrollY || 0);
+  }
+ 
+  @HostListener('window:resize')
+  onResize(): void {
+    this.measure();
   }
 }
