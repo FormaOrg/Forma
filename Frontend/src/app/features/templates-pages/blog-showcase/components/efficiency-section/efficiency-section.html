@@ -1,0 +1,60 @@
+<section class="efficiency-section">
+
+  <h2 class="efficiency-section__title">Run your blog more efficiently</h2>
+
+  <div class="efficiency-section__stage">
+
+    @for (item of items(); track item.id; let i = $index) {
+
+      <!-- Vertical tab column -->
+      <div
+        class="efficiency-col"
+        [class.efficiency-col--active]="activeIndex() === i"
+        (click)="setActive(i)"
+      >
+        <div class="efficiency-col__tab">
+          <span class="efficiency-col__num">{{ i + 1 < 10 ? '0' + (i + 1) : (i + 1) }}</span>
+          <span class="efficiency-col__label">{{ item.title }}</span>
+          <img class="efficiency-col__arrow" src="assets/Blog Showcase/Features/arrow-right.svg"/>
+        </div>
+      </div>
+
+      <!-- Expanded content panel — width driven by activeIndex, content by visibleIndex -->
+      <div
+        class="efficiency-panel"
+        [class.efficiency-panel--active]="activeIndex() === i"
+      >
+        <div class="efficiency-panel__inner">
+          <div
+            class="efficiency-panel__text"
+            [class.efficiency-panel__text--visible]="visibleIndex() === i"
+          >
+            <span class="efficiency-panel__tag">FEATURED</span>
+            <h3 class="efficiency-panel__heading">{{ item.title }}</h3>
+            <div class="flx-spc-btw">
+                <p class="efficiency-panel__desc">{{ item.description }}</p>
+                <div class="efficiency-panel__cta">
+                <link-button
+                    [bgColor]="'#fff'"
+                    [txtColor]="'black'"
+                    [theme]="'black'"
+                    [content]="item.cta"
+                ></link-button>
+                </div>
+            </div>
+          </div>
+          <div
+            class="efficiency-panel__media"
+            [class.efficiency-panel__media--visible]="visibleIndex() === i"
+            [style.background]="item.bg"
+          >
+            <img [src]="item.image" [alt]="item.title" class="efficiency-panel__img" />
+          </div>
+        </div>
+      </div>
+
+    }
+
+  </div>
+
+</section>
