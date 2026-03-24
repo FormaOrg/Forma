@@ -17,12 +17,14 @@ import { EmailVerificationComponent } from './features/auth/components/email-ver
 import { EmailVerificationRequiredComponent } from './features/auth/components/email-verification-required/email-verification-required';
 import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password';
+import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-showcase';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
   { path: 'pricing', component: Pricing },
   { path: 'templates', component: TemplateGallery },
   { path: 'portfolio-website', component: PortfolioShowcase },
+  { path: 'blog-website', component: BlogShowcase },
   { path: 'product', component: Product },
   { path: 'tutorials', component: Tutorials },
   { path: 'faqs', component: Faqs },

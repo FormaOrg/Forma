@@ -2,6 +2,7 @@
     display: block;
     max-width: 2000px;
     width: 100%;
+    overflow: hidden;
 }
 
 .faq-section {
