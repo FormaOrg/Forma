@@ -1,16 +1,22 @@
-<section class="feature-highlight">
+<section
+  class="feature-highlight"
+  [style.--cycle-duration]="cycleDuration + 'ms'"
+>
   <div class="feature-highlight__inner">
-
     <!-- Left: image panel -->
-    <div class="feature-highlight__media" [style.backgroundColor]="activeFeature().bgColor">
+    <div
+      class="feature-highlight__media"
+      [style.backgroundColor]="activeFeature().bgColor"
+    >
       <img
         class="feature-highlight__img"
+        [class.feature-highlight__img--fading]="isImageFading()"
         [src]="activeFeature().image"
         [alt]="activeFeature().title"
       />
     </div>
 
-    <!-- Right: title + feature list -->
+    <!-- Right: content (same as before) -->
     <div class="feature-highlight__content">
       <h2 class="feature-highlight__title">{{ title }}</h2>
 
@@ -25,7 +31,9 @@
               <h3 class="feature-item__title">{{ feature.title }}</h3>
             </div>
             <p class="feature-item__desc">{{ feature.description }}</p>
-            <div class="feature-item__line"></div>
+            <div class="feature-item__line">
+              <div class="feature-item__line-fill"></div>
+            </div>
           </div>
         }
       </div>
@@ -39,6 +47,5 @@
         ></link-button>
       </div>
     </div>
-
   </div>
 </section>

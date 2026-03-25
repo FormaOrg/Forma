@@ -1,0 +1,56 @@
+<section class="templates-section">
+
+  <!-- Top row: title/description left, buttons right -->
+  <div class="templates-section__top">
+    <div class="templates-section__intro">
+      <h2 class="templates-section__title">eCommerce website <br>templates built for success</h2>
+    </div>
+
+    <div class="templates-section__cta">
+      <p class="templates-section__desc">
+        Choose from 100+ free customizable templates built with everything you need.
+      </p>
+      <div class="templates-section__actions">
+        <link-button
+                [bgColor]="'#015293'"
+                [txtColor]="'white'"
+                [theme]="'white'"
+                [content]="'Get Started'"
+        ></link-button>
+        <a href="/templates" class="btn-link">Explore templates →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category tabs -->
+  <nav class="category-nav" aria-label="Blog categories">
+    @for (cat of categories(); track cat.label; let last = $last) {
+      <button
+        class="category-nav__item"
+        [class.is-active]="activeCategory() === cat.label"
+        (click)="selectCategory(cat.label)"
+      >
+        {{ cat.label }}
+      </button>
+      @if (!last) {
+        <span class="category-nav__divider" aria-hidden="true">|</span>
+      }
+    }
+  </nav>
+
+  <!-- Template cards -->
+  <div class="templates-grid">
+    @for (template of activeTemplates; track template.alt; let i = $index) {
+      <div class="template-card">
+        <a [href]="template.link">
+            <img
+                [src]="template.image"
+                [alt]="template.alt"
+                loading="lazy"
+            />
+        </a>
+      </div>
+    }
+  </div>
+
+</section>

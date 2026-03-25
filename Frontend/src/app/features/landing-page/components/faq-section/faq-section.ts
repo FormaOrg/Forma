@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'faq-section',
+  selector: 'app-landing-page-faq-section',
   imports: [],
   templateUrl: './faq-section.html',
   styleUrl: './faq-section.css',

@@ -17,17 +17,6 @@
 
     <nav aria-label="Primary navigation" class="primary-nav">
       @for (item of navItems(); track item.label) {
-
-        <!--
-          The nav-item wrapper covers both the link and the dropdown panel.
-          mouseenter  → always opens (hover behaviour)
-          mouseleave  → always closes (hover behaviour)
-          click on the link → toggles open/closed (click behaviour)
-          This means:
-            - Hover in  → opens
-            - Click     → toggles (closes if open, opens if closed)
-            - Hover out → closes
-        -->
         <div
           class="nav-item"
           [class.has-menu]="item.hasDropdown"
@@ -35,14 +24,12 @@
           (mouseenter)="item.hasDropdown ? onNavItemEnter(item.label) : null"
           (mouseleave)="item.hasDropdown ? onNavItemLeave(item.label) : null"
         >
-          <a
-            routerLink="/{{item.url}}"
-            class="nav-link"
-            (click)="onNavLinkClick($event, item)"
-          >
-            <span>{{ item.label }}</span>
-
-            @if (item.hasDropdown) {
+          @if (item.hasDropdown) {
+            <a
+              class="nav-link"
+              (click)="onNavLinkClick($event, item)"
+            >
+              <span>{{ item.label }}</span>
               <svg
                 class="nav-chevron"
                 viewBox="0 0 24 24"
@@ -58,8 +45,13 @@
                   stroke-linejoin="round"
                 />
               </svg>
-            }
-          </a>
+            </a>
+          }
+          @else {
+            <a class="nav-link" routerLink="/{{item.url}}">
+              <span>{{ item.label }}</span>
+            </a>
+          }
 
           @if (item.hasDropdown) {
             <div class="nav-dropdown">
@@ -69,19 +61,39 @@
                         <div class="dropdown-col" [style.--col-index]="i">
                             <span class="dropdown-col-heading">{{ col.heading }}</span>
                             @for (link of col.links; track link.title) {
-                                <a [routerLink]="link.path" class="dropdown-col-link">
+                                @if (link.sectionId) {
+                                  <button
+                                    type="button"
+                                    class="dropdown-col-link dropdown-col-link--button"
+                                    (click)="onDropdownSectionClick(link.sectionId)"
+                                  >
                                     <span class="dropdown-col-link__icon"
-                                        [style.background]="col.bgColor || '#f0f0f0'"
-                                        [style.color]="col.color || '#444'">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                            <path [attr.d]="link.icon"/>
-                                        </svg>
+                                      [style.background]="col.bgColor || '#f0f0f0'"
+                                      [style.color]="col.color || '#444'">
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path [attr.d]="link.icon"/>
+                                      </svg>
                                     </span>
                                     <span class="dropdown-col-link__text">
-                                        <strong>{{ link.title }}</strong>
-                                        <span>{{ link.description }}</span>
+                                      <strong>{{ link.title }}</strong>
+                                      <span>{{ link.description }}</span>
                                     </span>
-                                </a>
+                                  </button>
+                                } @else {
+                                  <a [routerLink]="link.path" class="dropdown-col-link">
+                                    <span class="dropdown-col-link__icon"
+                                      [style.background]="col.bgColor || '#f0f0f0'"
+                                      [style.color]="col.color || '#444'">
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path [attr.d]="link.icon"/>
+                                      </svg>
+                                    </span>
+                                    <span class="dropdown-col-link__text">
+                                      <strong>{{ link.title }}</strong>
+                                      <span>{{ link.description }}</span>
+                                    </span>
+                                  </a>
+                                }
                             }
                         </div>
                         @if (!item.card) {
@@ -162,64 +174,44 @@
       </button>
     </div>
   </div>
+</header>
 
-  @if (isLanguageOpen()) {
-    <div class="language-overlay" (click)="closeLanguageMenu()">
-      <div class="language-panel" (click)="$event.stopPropagation()">
-        <div class="language-panel__top">
-          <div class="language-panel__eyebrow">Language</div>
+<!-- =====================================================
+     LANGUAGE OVERLAY — outside <header> so it covers
+     the entire page with position:fixed
+     ===================================================== -->
+@if (isLanguageOpen()) {
+  <div class="language-overlay" (click)="closeLanguageMenu()">
+    <div class="language-panel" (click)="$event.stopPropagation()">
 
-          <button
-            type="button"
-            class="language-close"
-            aria-label="Close language menu"
-            (click)="closeLanguageMenu()"
-          >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-          </button>
-        </div>
+      <button
+        type="button"
+        class="language-close"
+        aria-label="Close language menu"
+        (click)="closeLanguageMenu()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
 
-        <div class="language-panel__content">
-          <h2 class="language-panel__title">Choose your language</h2>
-          <p class="language-panel__subtitle">
-            Select your preferred language for browsing Forma.
-          </p>
-
-          <div class="language-list" role="list">
-            @for (language of languages(); track language.code) {
-              <button
-                type="button"
-                class="language-card"
-                [class.is-selected]="selectedLanguage().code === language.code"
-                [attr.dir]="language.dir || 'ltr'"
-                (click)="selectLanguage(language)"
-              >
-                <div class="language-card__main">
-                  <span class="language-card__label">{{ language.label }}</span>
-                  <span class="language-card__native">{{ language.nativeLabel }}</span>
-                </div>
-
-                <span class="language-card__check" aria-hidden="true">
-                  @if (selectedLanguage().code === language.code) {
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M5 12.5L9.2 16.7L19 7"
-                        stroke="currentColor"
-                        stroke-width="2.2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  }
-                </span>
-              </button>
-            }
-          </div>
+      <div class="language-panel__content">
+        <div class="language-list" role="list">
+          @for (language of languages(); track language.code) {
+            <button
+              type="button"
+              class="language-card"
+              [class.is-selected]="selectedLanguage().code === language.code"
+              [attr.dir]="language.dir || 'ltr'"
+              (click)="selectLanguage(language)"
+            >
+              <span class="language-card__label">{{ language.label }}</span>
+            </button>
+          }
         </div>
       </div>
+
     </div>
-  }
-</header>
+  </div>
+}

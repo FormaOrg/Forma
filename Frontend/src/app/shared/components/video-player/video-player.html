@@ -1,0 +1,51 @@
+<div
+  class="video-player"
+  [class.video-player--hovered]="isHovered()"
+  [class.video-player--playing]="isPlaying()"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  (click)="togglePlay()"
+>
+
+  <!-- Video element -->
+  <video
+    #videoEl
+    class="video-player__video"
+    [src]="src"
+    [poster]="poster"
+    [loop]="loop"
+    [muted]="true"
+    playsinline
+    (ended)="onVideoEnded()"
+  ></video>
+
+  <!-- Center play/pause button -->
+  <div class="video-player__center-btn" [class.video-player__center-btn--visible]="showCenterBtn()">
+    <div class="video-player__center-btn-inner">
+      @if (!isPlaying()) {
+        <!-- Play icon -->
+        <img src="assets/shared/video-player/play.svg" alt="Play" class="video-player__icon" />
+      } @else {
+        <!-- Pause icon -->
+        <img src="assets/shared/video-player/pause.svg" alt="Pause" class="video-player__icon" />
+      }
+    </div>
+  </div>
+
+  <!-- Bottom controls bar — only visible on hover -->
+  <div class="video-player__controls">
+    <!-- Mute/unmute button (bottom right) -->
+    <button
+      class="video-player__mute-btn"
+      (click)="toggleMute($event)"
+      [attr.aria-label]="isMuted() ? 'Unmute' : 'Mute'"
+    >
+      @if (isMuted()) {
+        <img src="assets/shared/video-player/mute.svg" alt="Unmute" class="video-player__icon" />
+      } @else {
+        <img src="assets/shared/video-player/unmute.svg" alt="Mute" class="video-player__icon" />
+      }
+    </button>
+  </div>
+
+</div>

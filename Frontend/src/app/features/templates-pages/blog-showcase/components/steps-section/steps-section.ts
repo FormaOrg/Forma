@@ -9,7 +9,7 @@ type StepItem = {
 
 
 @Component({
-  selector: 'app-steps-section',
+  selector: 'app-blog-steps-section',
   imports: [LinkButton],
   templateUrl: './steps-section.html',
   styleUrl: './steps-section.css',

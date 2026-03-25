@@ -7,7 +7,7 @@ type FaqItem = {
 };
 
 @Component({
-    selector: 'app-builder-help-deck',
+    selector: 'app-landing-page-builder-help-deck',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './builder-help-deck.html',

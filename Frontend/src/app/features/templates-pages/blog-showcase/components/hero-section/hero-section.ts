@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { LinkButton } from '../../../../../shared/components/link-button/link-button';
 
 @Component({
-  selector: 'hero-section',
+  selector: 'app-blog-hero-section',
   imports: [LinkButton],
   templateUrl: './hero-section.html',
   styleUrl: './hero-section.css',

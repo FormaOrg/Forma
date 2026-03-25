@@ -18,6 +18,7 @@ import { EmailVerificationRequiredComponent } from './features/auth/components/e
 import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password';
 import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-showcase';
+import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'templates', component: TemplateGallery },
   { path: 'portfolio-website', component: PortfolioShowcase },
   { path: 'blog-website', component: BlogShowcase },
+  { path: 'ecommerce-website', component: EcommerceShowcase },
   { path: 'product', component: Product },
   { path: 'tutorials', component: Tutorials },
   { path: 'faqs', component: Faqs },

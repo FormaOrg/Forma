@@ -11,7 +11,7 @@ type EfficiencyItem = {
 };
 
 @Component({
-  selector: 'app-efficiency-section',
+  selector: 'app-blog-efficiency-section',
   imports: [LinkButton],
   templateUrl: './efficiency-section.html',
   styleUrl: './efficiency-section.css',

@@ -8,7 +8,7 @@ type ShowcaseItem = {
 };
 
 @Component({
-    selector: 'app-made-on-forma',
+    selector: 'app-landing-page-made-on-forma',
     standalone: true,
     imports: [CommonModule, LinkButton],
     templateUrl: './made-on-forma.html',
