@@ -6,7 +6,7 @@ interface FaqItem {
 }
 
 @Component({
-  selector: 'app-popular-questions',
+  selector: 'app-faq-popular-questions',
   standalone: true,
   templateUrl: './popular-questions.html',
   styleUrls: ['./popular-questions.css']

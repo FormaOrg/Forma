@@ -7,7 +7,7 @@ type FaqItem = {
  
 
 @Component({
-  selector: 'app-faq-section',
+  selector: 'app-blog-faq-section',
   imports: [],
   templateUrl: './faq-section.html',
   styleUrl: './faq-section.css',

@@ -139,7 +139,6 @@ const MOCK_TEMPLATES: TemplateItem[] = [
   { id: 10, name: 'Music Artist',                image: 'assets/Templates Gallery/Mock Templates/10.jpg', type: 'Business',     industry: 'Music',              category: 'all' },
   { id: 11, name: 'Health & Wellness',           image: 'assets/Templates Gallery/Mock Templates/11.jpg', type: 'Business',     industry: 'Health',             category: 'all' },
   { id: 12, name: 'Travel Blog',                 image: 'assets/Templates Gallery/Mock Templates/12.jpg', type: 'Blog',         industry: 'Travel',             category: 'all' },
-  
 ];
 
 @Component({

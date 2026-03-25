@@ -9,7 +9,7 @@ type TemplateItem = {
 }
 
 @Component({
-    selector: 'app-templates-showcase',
+    selector: 'app-landing-page-templates-showcase',
     standalone: true,
     imports: [
     CommonModule,

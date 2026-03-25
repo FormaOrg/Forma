@@ -15,6 +15,7 @@
     transform 0.32s ease,
     opacity 0.32s ease;
   opacity: 1;
+  user-select: none;
 }
 
 .site-header--hidden {
@@ -41,7 +42,6 @@
     overflow: visible;
 }
 
-/* Expand header when any dropdown is open — driven by .is-open only, no :hover */
 .header-inner:has(.nav-item.is-open) {
   min-height: 260px;
   border-radius: 36px;
@@ -172,6 +172,7 @@
     align-items: stretch;
     padding-bottom: 12px;
     margin-bottom: -12px;
+    cursor: pointer;
 }
 
 .nav-link {
@@ -194,12 +195,10 @@
     opacity 0.25s ease;
 }
 
-/* Nav link active state — only .is-open, no :hover on nav-item */
 .nav-item.is-open .nav-link {
   background-color: #dfdede;
 }
 
-/* Keep the link itself still reacting to direct hover for feel */
 .nav-link:hover {
   background-color: #dfdede;
 }
@@ -223,8 +222,6 @@
 
 /* =========================================
    DROPDOWN PANEL
-   — Visibility is 100% controlled by .is-open
-   — CSS :hover does NOT open/close the dropdown
    ========================================= */
 
 .nav-dropdown {
@@ -242,7 +239,6 @@
         visibility 0.28s ease;
 }
 
-/* ONLY .is-open shows the dropdown — no :hover rule here */
 .nav-item.has-menu.is-open .nav-dropdown {
     opacity: 1;
     visibility: visible;
@@ -319,6 +315,15 @@
     text-decoration: none;
     color: #111111;
     transition: background-color 0.2s ease;
+}
+
+.dropdown-col-link--button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .dropdown-col-link:hover {
@@ -500,7 +505,6 @@
     margin-bottom: 4px;
 }
 
-/* Spring animation for columns/card — only on .is-open */
 .dropdown-col,
 .dropdown-card {
     opacity: 0;
@@ -519,38 +523,6 @@
 
 .dropdown-card__btn:hover {
     opacity: 0.85;
-}
-
-.dropdown-link {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px;
-  border-radius: 18px;
-  background: #ffffff;
-  text-decoration: none;
-  color: #111111;
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.dropdown-link strong {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.dropdown-link span {
-  font-size: 13px;
-  line-height: 1.45;
-  color: #5f5b66;
-}
-
-.dropdown-link:hover {
-  background-color: #f0eef5;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(17, 17, 17, 0.06);
 }
 
 /* =========================================
@@ -632,167 +604,133 @@
 .icon-menu { width: 22px; height: 22px; }
 
 /* =========================================
-   LANGUAGE OVERLAY
+   LANGUAGE OVERLAY — minimal full-screen
    ========================================= */
 
 .language-overlay {
   position: fixed;
   inset: 0;
-  z-index: 120;
-  background: rgba(17, 17, 17, 0.08);
-  backdrop-filter: blur(6px);
+  z-index: 200;
+  background: #ffffff;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  animation: languageOverlayFade 0.25s ease;
+  align-items: center;
+  justify-content: center;
+  animation: languageOverlayFade 0.2s ease;
 }
 
 .language-panel {
   width: 100%;
-  min-height: 100vh;
-  background: #ffffff;
-  color: #111111;
-  display: flex;
-  flex-direction: column;
-  animation: languagePanelSlide 0.32s ease;
-}
-
-.language-panel__top {
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 28px 36px 0;
+  justify-content: center;
+  position: relative;
 }
 
-.language-panel__eyebrow {
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #5f5b66;
-}
-
+/* X close button — top right */
 .language-close {
-  width: 48px;
-  height: 48px;
+  position: fixed;
+  top: 32px;
+  right: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
-  background: #f3f3f5;
-  border-radius: 999px;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #111111;
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+  transition: opacity 0.2s ease;
+  z-index: 10;
 }
 
 .language-close:hover {
-  background: #e9e9ee;
-  transform: scale(1.02);
+  opacity: 0.5;
 }
 
 .language-close svg {
-  width: 20px;
-  height: 20px;
+  width: 35px;
+  height: 35px;
   display: block;
+}
+
+/* Hide elements we don't need */
+.language-panel__top {
+  display: none;
 }
 
 .language-panel__content {
   width: 100%;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 56px 32px 72px;
+  max-width: 720px;
+  padding: 0 32px;
 }
 
-.language-panel__title {
-  margin: 0;
-  font-size: clamp(2.2rem, 5vw, 4.5rem);
-  line-height: 1.02;
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-
+.language-panel__title,
 .language-panel__subtitle {
-  margin: 18px 0 0;
-  max-width: 620px;
-  font-size: 1.1rem;
-  line-height: 1.5;
-  color: #5f5b66;
+  display: none;
 }
 
+/* 3-column grid of plain text links */
 .language-list {
-  margin-top: 44px;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin: 0;
 }
 
 .language-card {
   width: 100%;
-  padding: 24px 24px;
-  border: 1px solid #e4e2e8;
-  border-radius: 24px;
-  background: #ffffff;
+  padding: 18px 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+  justify-content: flex-start;
+  gap: 0;
   text-align: left;
   cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: none;
+  box-shadow: none;
 }
 
 .language-card:hover {
-  border-color: #cfc8ff;
-  background: #faf9ff;
-  transform: translateY(-1px);
-  box-shadow: 0 10px 28px rgba(17, 17, 17, 0.05);
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
 }
 
-.language-card.is-selected {
-  border-color: #6f63ff;
-  background: #f7f6ff;
+.language-card.is-selected .language-card__label {
+  color: #7a6bff;
 }
 
+/* Show only the label — hide native label and checkmark */
 .language-card__main {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 }
 
 .language-card__label {
   font-size: 1.2rem;
-  line-height: 1.2;
-  font-weight: 600;
+  font-weight: 400;
   color: #111111;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+}
+
+.language-card__label:hover {
+  color: #7a6bff;
 }
 
 .language-card__native {
-  font-size: 0.98rem;
-  line-height: 1.35;
-  color: #5f5b66;
+  display: none;
 }
 
 .language-card__check {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-  color: #6f63ff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.language-card__check svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  display: none;
 }
 
 .lang-link {
@@ -807,11 +745,6 @@
 @keyframes languageOverlayFade {
   from { opacity: 0; }
   to   { opacity: 1; }
-}
-
-@keyframes languagePanelSlide {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================
@@ -840,10 +773,23 @@
   .menu-toggle {
     display: inline-flex;
   }
+
+  .language-close {
+    top: 20px;
+    right: 20px;
+  }
+
+  .language-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 560px) {
   .btn-try { display: none; }
+
+  .language-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 900px) and (min-width: 561px) {

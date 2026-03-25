@@ -1,0 +1,158 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   WRAPPER
+   ========================================= */
+
+.video-player {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+
+  /* Aspect ratio — change to suit your video */
+  aspect-ratio: 16 / 9;
+}
+
+/* =========================================
+   VIDEO ELEMENT
+   ========================================= */
+
+.video-player__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* =========================================
+   CENTER PLAY / PAUSE BUTTON
+   ========================================= */
+
+.video-player__center-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.video-player__center-btn--visible {
+  opacity: 1;
+}
+
+.video-player__center-btn-inner {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.video-player:hover .video-player__center-btn-inner {
+  transform: scale(1.08);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================
+   BOTTOM CONTROLS BAR
+   ========================================= */
+
+.video-player__controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 20px 20px;
+
+  /* Gradient fade so controls don't clash with the video */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 100%);
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  /* Hidden by default, shown on hover */
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.video-player--hovered .video-player__controls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* =========================================
+   MUTE BUTTON
+   ========================================= */
+
+.video-player__mute-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.video-player__mute-btn[aria-label="Unmute"] img {
+    transform: translateX(1px);
+}
+
+
+.video-player__mute-btn[aria-label="Mute"] img {
+    transform: translateX(-1px);
+}
+
+.video-player__mute-btn:hover {
+  background: rgba(0, 0, 0, 0.65);
+  transform: scale(1.1);
+}
+
+/* =========================================
+   ICONS
+   ========================================= */
+
+.video-player__icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* makes SVG white */
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.video-player__mute-btn .video-player__icon {
+  width: 18px;
+  height: 18px;
+}

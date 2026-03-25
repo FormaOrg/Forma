@@ -9,8 +9,8 @@ type ShowcaseItem = {
 @Component({
   selector: 'app-examples-section',
   imports: [LinkButton],
-  templateUrl: './Examples-section.html',
-  styleUrl: './Examples-section.css',
+  templateUrl: './examples-section.html',
+  styleUrl: './examples-section.css',
 })
 export class ExamplesSection {
   private readonly scrollY = signal(0);

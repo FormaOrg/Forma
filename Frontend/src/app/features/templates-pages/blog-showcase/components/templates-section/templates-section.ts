@@ -13,7 +13,7 @@ type Category = {
 };
 
 @Component({
-  selector: 'app-templates-section',
+  selector: 'app-blog-templates-section',
   imports: [LinkButton],
   templateUrl: './templates-section.html',
   styleUrl: './templates-section.css',
