@@ -1,6 +1,6 @@
 <section class="builder-help-deck">
     <div class="builder-help-deck__inner">
-        <p class="builder-help-deck__title">Website builder FAQ</p>
+        <p class="builder-help-deck__title">{{ 'landing.builderHelpDeck.title' | t }}</p>
 
         <div class="builder-help-deck__list">
             @for (item of faqs(); track item.question; let i = $index) {
@@ -11,7 +11,7 @@
                         (click)="toggleItem(i)"
                         [attr.aria-expanded]="isOpen(i)"
                     >
-                        <span class="faq-item__question">{{ item.question }}</span>
+                        <span class="faq-item__question">{{ item.question | t }}</span>
 
                         <svg
                             class="faq-item__icon"
@@ -32,7 +32,7 @@
 
                     <div class="faq-item__content" [class.faq-item__content--open]="isOpen(i)">
                         <div class="faq-item__content-inner">
-                            <p>{{ item.answer }}</p>
+                            <p>{{ item.answer | t }}</p>
                         </div>
                     </div>
                 </article>
