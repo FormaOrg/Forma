@@ -1,20 +1,19 @@
 <section class="made-on-forma">
     <div class="made-on-forma__intro">
         <div class="made-on-forma__left">
-            <p>Made on Forma</p>
+            <p>{{ 'landing.madeOnForma.label' | t }}</p>
         </div>
 
         <div class="made-on-forma__right">
             <p>
-                Over 100 sites are launched with our website builder every day. Dive into our top picks to find your
-                inspiration.
+                {{ 'landing.madeOnForma.body' | t }}
             </p>
 
             <link-button
                 [bgColor]="'#101585'"
                 [txtColor]="'white'"
                 [theme]="'white'"
-                [content]="'Explore Sites'"
+                [content]="'landing.madeOnForma.cta' | t"
                 [width]="'190px'"
                 [padding]="'0 16px'"
                 [fontWeight]="'400'"
@@ -26,7 +25,7 @@
         <div class="made-on-forma__track made-on-forma__track--top" [style.transform]="topTransform()">
             @for (item of topRow(); track item.image) {
                 <article class="made-on-forma__card made-on-forma__card--top">
-                    <img [src]="item.image" [alt]="item.alt" />
+                    <img [src]="item.image" [alt]="item.altKey | t" />
                 </article>
             }
 
@@ -35,7 +34,7 @@
         <div class="made-on-forma__track made-on-forma__track--bottom" [style.transform]="bottomTransform()">
             @for (item of bottomRow(); track item.image) {
                 <article class="made-on-forma__card made-on-forma__card--bottom">
-                    <img [src]="item.image" [alt]="item.alt" />
+                    <img [src]="item.image" [alt]="item.altKey | t" />
                 </article>
             }
 

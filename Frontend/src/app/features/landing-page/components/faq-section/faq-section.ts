@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-landing-page-faq-section',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './faq-section.html',
   styleUrl: './faq-section.css',
 })

@@ -1,11 +1,16 @@
 <section>
-    <h2 class="title">Make your website official with your own domain name</h2>
+    <h2 class="title">{{ 'landing.domain.title' | t }}</h2>
     <div class="search-bar">
-        <input type="text" placeholder="Type the domain you want" size="20">
+        <input type="text" [placeholder]="'landing.domain.placeholder' | t" size="20">
         <button class="btn">
-            Search
+            {{ 'landing.domain.search' | t }}
             <img src="assets\Landing Page\Domain Section\arrow-right.svg">
         </button>
     </div>
-    <p>Get a <u>custom domain</u> free for one year with the initial purchase of an annual <u>Premium plan</u>.</p>
+    <p>
+        {{ 'landing.domain.note.prefix' | t }}
+        <u>{{ 'landing.domain.note.customDomain' | t }}</u>
+        {{ 'landing.domain.note.middle' | t }}
+        <u>{{ 'landing.domain.note.premiumPlan' | t }}</u>{{ 'landing.domain.note.suffix' | t }}
+    </p>
 </section>
