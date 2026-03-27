@@ -8,16 +8,16 @@
 
     <div class="vision-cta-wave__content">
         <h2 class="vision-cta-wave__title">
-            Your vision. Your goals.
+            {{ 'landing.vision.titleLine1' | t }}
             <br />
-            Your website.
+            {{ 'landing.vision.titleLine2' | t }}
         </h2>
 
         <link-button
             [bgColor]="'#f4e44a'"
             [txtColor]="'#111111'"
             [theme]="'black'"
-            [content]="'Get Started'"
+            [content]="'landing.cta.getStarted' | t"
             [width]="'205px'"
             [height]="'62px'"
             [fontSize]="'1.15rem'"
