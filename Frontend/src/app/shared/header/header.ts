@@ -1,5 +1,6 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, effect, signal } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
+import { I18nService } from '../../features/landing-page/i18n/i18n.service';
 
 type LanguageOption = {
   code: string;
@@ -47,7 +48,19 @@ type NavItem = {
   styleUrl: './header.css',
 })
 export class Header {
-  constructor(private router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly i18n: I18nService,
+  ) {
+    // Keep the overlay selection in sync with the active app language.
+    effect(() => {
+      const lang = this.i18n.lang();
+      this.selectedLanguage.set(lang === 'fr'
+        ? { code: 'fr', label: 'Français', nativeLabel: 'Français', dir: 'ltr' }
+        : { code: 'en', label: 'English', nativeLabel: 'English', dir: 'ltr' }
+      );
+    });
+  }
 
   readonly navItems = signal<NavItem[]>([
     {
@@ -168,27 +181,9 @@ export class Header {
   });
 
   readonly languages = signal<LanguageOption[]>([
-    { code: 'en',    label: 'English',          nativeLabel: 'English',          dir: 'ltr' },
-    { code: 'pl',    label: 'Polski',           nativeLabel: 'Polski',           dir: 'ltr' },
-    { code: 'da',    label: 'Dansk',            nativeLabel: 'Dansk',            dir: 'ltr' },
-    { code: 'de',    label: 'Deutsch',          nativeLabel: 'Deutsch',          dir: 'ltr' },
-    { code: 'pt',    label: 'Português',        nativeLabel: 'Português',        dir: 'ltr' },
-    { code: 'cs',    label: 'Čeština',          nativeLabel: 'Čeština',          dir: 'ltr' },
-    { code: 'es',    label: 'Español',          nativeLabel: 'Español',          dir: 'ltr' },
-    { code: 'ru',    label: 'Русский',          nativeLabel: 'Русский',          dir: 'ltr' },
-    { code: 'ar',    label: 'العربية',          nativeLabel: 'العربية',          dir: 'ltr' },
-    { code: 'fr',    label: 'Français',         nativeLabel: 'Français',         dir: 'ltr' },
-    { code: 'sv',    label: 'Svenska',          nativeLabel: 'Svenska',          dir: 'ltr' },
-    { code: 'uk',    label: 'Українська',       nativeLabel: 'Українська',       dir: 'ltr' },
-    { code: 'it',    label: 'Italiano',         nativeLabel: 'Italiano',         dir: 'ltr' },
-    { code: 'ja',    label: '日本語',           nativeLabel: '日本語',           dir: 'ltr' },
-    { code: 'zh-tw', label: '繁體中文',         nativeLabel: '繁體中文',         dir: 'ltr' },
-    { code: 'nl',    label: 'Nederlands',       nativeLabel: 'Nederlands',       dir: 'ltr' },
-    { code: 'ko',    label: '한국어',           nativeLabel: '한국어',           dir: 'ltr' },
-    { code: 'vi',    label: 'Tiếng Việt',       nativeLabel: 'Tiếng Việt',       dir: 'ltr' },
-    { code: 'no',    label: 'Norsk',            nativeLabel: 'Norsk',            dir: 'ltr' },
-    { code: 'tr',    label: 'Türkçe',           nativeLabel: 'Türkçe',           dir: 'ltr' },
-    { code: 'id',    label: 'Bahasa Indonesia', nativeLabel: 'Bahasa Indonesia', dir: 'ltr' },
+    // Only support English + French for now.
+    { code: 'en', label: 'English', nativeLabel: 'English', dir: 'ltr' },
+    { code: 'fr', label: 'Français', nativeLabel: 'Français', dir: 'ltr' },
   ]);
 
   private lastScrollY = 0;
@@ -285,9 +280,17 @@ export class Header {
   }
 
   selectLanguage(language: LanguageOption): void {
-    this.selectedLanguage.set(language);
+    const nextLang = language.code === 'fr' ? 'fr' : 'en';
+    // Update app language (async fetch happens inside I18nService).
+    void this.i18n.setLang(nextLang);
+    // Optimistically update overlay selection (i18n.lang() will also sync it).
+    this.selectedLanguage.set({
+      code: nextLang,
+      label: nextLang === 'fr' ? 'Français' : 'English',
+      nativeLabel: nextLang === 'fr' ? 'Français' : 'English',
+      dir: 'ltr'
+    });
     this.closeLanguageMenu();
-    console.log('Selected language:', language.code);
   }
 
   private scrollToSection(sectionId: string): void {
