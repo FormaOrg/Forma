@@ -13,7 +13,7 @@
   background: #ffffff;
   border: 1px solid #d7d7d7;
   border-radius: 18px;
-  padding: 18px 22px 16px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -24,12 +24,12 @@
 .data-card__top {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
 }
 
 .data-card__icon {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   background: #f3f3f3;
   display: inline-flex;
@@ -37,6 +37,7 @@
   justify-content: center;
   color: #111111;
   flex-shrink: 0;
+  padding: 7px;
 }
 
 .data-card__icon :deep(svg),
@@ -47,7 +48,7 @@
 
 .data-card__title {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: 1.2rem;
   line-height: 1.2;
   font-weight: 500;
   color: #111111;
@@ -61,7 +62,7 @@
 
 .data-card__value {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.7rem;
   line-height: 1;
   font-weight: 700;
   color: #111111;
