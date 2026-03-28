@@ -31,7 +31,30 @@
   margin-top: 14px;
   font-size: 1.2rem;
   font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
+.account-snap__plan-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #7468ff;
+  filter: drop-shadow(0 0 3px rgba(116, 104, 255, 0.35));
+}
+
+.account-snap__plan-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
 
 .account-snap__meta {
   font-size: 0.9rem;
