@@ -1,0 +1,42 @@
+<section
+  class="dashboard-control"
+  [style.--cycle-duration]="cycleDuration + 'ms'"
+>
+  <div class="dashboard-control__inner">
+    <div class="dashboard-control__top">
+      <div class="dashboard-control__intro">
+        <h2 class="dashboard-control__title">{{ sectionTitle }}</h2>
+
+        <link-button
+          [bgColor]="'#ffffff'"
+          [txtColor]="'#111111'"
+          [theme]="'black'"
+          [content]="'Set Up Your Store'"
+          [width]="'230px'"
+        ></link-button>
+      </div>
+
+      <div class="dashboard-control__features">
+        @for (feature of features(); track feature.title; let i = $index) {
+          <article
+            class="control-feature"
+            [class.control-feature--active]="activeIndex() === i"
+            (mouseenter)="setActive(i)"
+          >
+            <h3 class="control-feature__title">{{ feature.title }}</h3>
+            <p class="control-feature__desc">{{ feature.description }}</p>
+          </article>
+        }
+      </div>
+    </div>
+
+    <div class="dashboard-control__preview">
+      <img
+        [src]="activeFeature().image"
+        [alt]="activeFeature().imageAlt"
+        class="dashboard-control__preview-img"
+        [class.dashboard-control__preview-img--fading]="isImageFading()"
+      />
+    </div>
+  </div>
+</section>

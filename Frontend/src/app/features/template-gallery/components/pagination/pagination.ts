@@ -5,7 +5,7 @@ export type PageItem =
   | { type: 'ellipsis' };
 
 @Component({
-  selector: 'app-pagination',
+  selector: 'app-template-pagination',
   templateUrl: './pagination.html',
   styleUrl: './pagination.css',
 })

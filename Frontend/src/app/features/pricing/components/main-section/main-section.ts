@@ -13,7 +13,7 @@ type Plan = {
 };
 
 @Component({
-  selector: 'app-main-section',
+  selector: 'app-pricing-main-section',
   imports: [],
   templateUrl: './main-section.html',
   styleUrl: './main-section.css',

@@ -1,0 +1,97 @@
+<aside class="sidebar" [class.sidebar--collapsed]="collapsed">
+  <div class="sidebar__brand">
+    <div class="sidebar__mark" aria-hidden="true">
+      <img src="assets/Logo/FormaLogoOnly.svg" alt="" width="28" height="28" />
+    </div>
+    <span class="sidebar__wordmark">Forma</span>
+  </div>
+
+  <nav class="sidebar__body" aria-label="Main">
+    @for (section of sections; track trackSectionId($index, section)) {
+      @if (!$first) {
+        <div class="sidebar__separator" aria-hidden="true"></div>
+      }
+
+      <div class="sidebar__section-label">
+        <span class="sidebar__section-label-text">{{ section.label }}</span>
+      </div>
+
+      <ul class="sidebar__list" role="list">
+        @for (item of section.items; track trackItemLabel($index, item)) {
+          <li class="sidebar__item" [class.sidebar__item--open]="item.hasDropdown && item.expanded">
+            @if (!item.hasDropdown) {
+              <a
+                class="sidebar__row"
+                [routerLink]="item.route!"
+                routerLinkActive="sidebar__row--active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [class.sidebar__row--collapsed]="collapsed"
+              >
+                <span class="sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="sidebar__label">{{ item.label }}</span>
+                <span class="sidebar__row-pad" aria-hidden="true"></span>
+              </a>
+            } @else {
+              <button
+                type="button"
+                class="sidebar__row sidebar__row--trigger"
+                [class.sidebar__row--active]="isParentActive(item)"
+                [class.sidebar__row--collapsed]="collapsed"
+                (click)="toggleDropdown(item)"
+                [attr.aria-expanded]="item.expanded"
+              >
+                <span class="sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="sidebar__label">{{ item.label }}</span>
+                <span class="sidebar__chevron" [class.sidebar__chevron--open]="item.expanded" aria-hidden="true">
+                  <app-icon name="chevron-down" [size]="16" />
+                </span>
+              </button>
+
+              <div class="sidebar__sub" [class.sidebar__sub--open]="item.expanded && !collapsed">
+                <div class="sidebar__sub-inner">
+                  <ul class="sidebar__sub-list" role="list">
+                    @for (child of item.children!; track trackChildRoute($index, child)) {
+                      <li>
+                        <a
+                          class="sidebar__sub-link"
+                          [routerLink]="navPath(child)"
+                          [queryParams]="navQuery(child)"
+                          [class.sidebar__sub-link--active]="isChildActive(child)"
+                        >
+                          {{ child.label }}
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </nav>
+
+  <div class="sidebar__footer">
+    <div class="sidebar__separator" aria-hidden="true"></div>
+    @for (item of footerItems; track trackItemLabel($index, item)) {
+      <a
+        class="sidebar__row sidebar__row--footer"
+        [routerLink]="item.route!"
+        routerLinkActive="sidebar__row--active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [class.sidebar__row--collapsed]="collapsed"
+      >
+        <span class="sidebar__icon">
+          <app-icon [name]="item.icon" [size]="iconSize" />
+        </span>
+        <span class="sidebar__label">{{ item.label }}</span>
+        <span class="sidebar__row-pad" aria-hidden="true"></span>
+      </a>
+    }
+  </div>
+</aside>

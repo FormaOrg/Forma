@@ -1,0 +1,38 @@
+<section class="steps-section">
+  <div class="steps-section__inner">
+    <div class="steps-section__left">
+      <p class="steps-section__title">
+        How to create
+        a blog for free
+      </p>
+
+        <div class="steps-section__btn">
+            <p class="steps-section__subtitle">Follow these 5 steps to start building your blog today.</p>
+
+            <div class="btn-container">
+                <link-button
+                    [bgColor]="'#dff994'"
+                    [txtColor]="'black'"
+                    [theme]="'black'"
+                    [content]="'Start Blogging'"
+                    [width]="'200px'"
+                />
+                <a href="/templates" class="btn-link">Explore templates →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="steps-section__right">
+      @for (step of steps(); track step.number) {
+        <div class="step-row">
+          <div class="step-row__number">{{ step.number }}</div>
+
+          <p class="step-row__text">
+            <strong>{{ step.strong }}</strong>
+            {{ ' ' + step.rest }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

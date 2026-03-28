@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  APP_INITIALIZER,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection
 } from '@angular/core';
@@ -12,6 +13,7 @@ import {
 
 import { routes } from './app.routes';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { I18nService } from './features/landing-page/i18n/i18n.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +34,12 @@ export const appConfig: ApplicationConfig = {
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,
       multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: (i18n: I18nService) => () => i18n.init(),
+      deps: [I18nService]
     }
   ]
 };

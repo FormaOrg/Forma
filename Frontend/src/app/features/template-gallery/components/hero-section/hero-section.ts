@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActiveFilters } from '../../template-gallery';
 
 @Component({
-  selector: 'app-hero-section',
+  selector: 'app-template-hero-section',
   imports: [FormsModule],
   templateUrl: './hero-section.html',
   styleUrl: './hero-section.css',

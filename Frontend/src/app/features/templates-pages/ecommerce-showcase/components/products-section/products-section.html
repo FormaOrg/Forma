@@ -1,0 +1,56 @@
+<section class="products-section">
+
+  <!-- Left: image -->
+  <div class="products-section__left">
+    <img
+      [src]="items()[openIndex()].image"
+      alt="Product preview"
+      class="products-section__img"
+    />
+  </div>
+
+  <!-- Right: title + accordion -->
+  <div class="products-section__right">
+    <h2 class="products-section__title">Sell your own products,<br>or find products to sell</h2>
+
+    <div class="faq-list">
+      @for (item of items(); track item.question; let i = $index) {
+        <article class="faq-item" [class.faq-item--open]="isOpen(i)">
+          <button
+            type="button"
+            class="faq-item__trigger"
+            (click)="toggleItem(i)"
+            [attr.aria-expanded]="isOpen(i)"
+          >
+            <span class="faq-item__question">{{ item.question }}</span>
+            <svg
+              class="faq-item__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <line class="faq-item__icon-v" x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-item__content" [class.faq-item__content--open]="isOpen(i)">
+            <div class="faq-item__content-inner">
+              <p>{{ item.answer }}</p>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <div class="products-section__cta">
+      <link-button
+        [bgColor]="'#111111'"
+        [txtColor]="'#ffffff'"
+        [theme]="'white'"
+        [content]="'Start Selling'"
+        [width]="'200px'"
+      ></link-button>
+    </div>
+  </div>
+
+</section>

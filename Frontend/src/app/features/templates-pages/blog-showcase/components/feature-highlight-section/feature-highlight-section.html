@@ -1,0 +1,51 @@
+<section
+  class="feature-highlight"
+  [style.--cycle-duration]="cycleDuration + 'ms'"
+>
+  <div class="feature-highlight__inner">
+    <!-- Left: image panel -->
+    <div
+      class="feature-highlight__media"
+      [style.backgroundColor]="activeFeature().bgColor"
+    >
+      <img
+        class="feature-highlight__img"
+        [class.feature-highlight__img--fading]="isImageFading()"
+        [src]="activeFeature().image"
+        [alt]="activeFeature().title"
+      />
+    </div>
+
+    <!-- Right: content (same as before) -->
+    <div class="feature-highlight__content">
+      <h2 class="feature-highlight__title">{{ title }}</h2>
+
+      <div class="feature-highlight__list">
+        @for (feature of features(); track feature.title; let i = $index) {
+          <div
+            class="feature-item"
+            [class.feature-item--active]="activeIndex() === i"
+            (mouseenter)="setActive(i)"
+          >
+            <div class="feature-item__header">
+              <h3 class="feature-item__title">{{ feature.title }}</h3>
+            </div>
+            <p class="feature-item__desc">{{ feature.description }}</p>
+            <div class="feature-item__line">
+              <div class="feature-item__line-fill"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="feature-highlight__actions">
+        <link-button
+          [bgColor]="'#111111'"
+          [txtColor]="'#ffffff'"
+          [theme]="'white'"
+          [content]="'Get Started'"
+        ></link-button>
+      </div>
+    </div>
+  </div>
+</section>

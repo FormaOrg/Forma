@@ -19,7 +19,7 @@ export class StepsSection {
     {
       number: '01',
       strong: 'Choose a starting point.',
-      rest: 'Find a template you love, or start with AI to create your digital portfolio. Wix offers free portfolio templates you can customize and make your own. ',
+      rest: 'Find a template you love, or start with AI to create your digital portfolio. Forma offers free portfolio templates you can customize and make your own. ',
     },
     {
       number: '02',

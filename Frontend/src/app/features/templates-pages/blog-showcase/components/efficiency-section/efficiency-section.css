@@ -1,0 +1,316 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.efficiency-section {
+  background: #014051;
+  padding: 120px;
+  width: 100%;
+}
+
+.efficiency-section__title {
+  color: #ffffff;
+  font-size: 4.3em;
+  font-weight: 300;
+  margin: 0 0 80px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.efficiency-section__stage {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 620px;
+}
+
+/* =========================================
+   VERTICAL TAB COLUMN
+   ========================================= */
+
+.efficiency-col {
+  flex: 0 0 72px;
+  width: 72px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.25s ease;
+}
+
+.efficiency-col:first-child {
+  border-left: none;
+}
+
+.efficiency-col--active {
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.efficiency-col__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  padding: 24px 0 20px;
+  height: 100%;
+}
+
+.efficiency-col__num {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.06em;
+  transition: color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.efficiency-col--active .efficiency-col__num,
+.efficiency-col:hover .efficiency-col__num {
+  color: #fff;
+}
+
+.efficiency-col__label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: color 0.25s ease, font-weight 0.25s ease, opacity 0.3s ease;
+  flex-shrink: 0;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.efficiency-col:hover .efficiency-col__label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.efficiency-col--active .efficiency-col__label {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.efficiency-col__arrow {
+  color: #ffffff;
+  width: 25px;
+  transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  pointer-events: none;
+  position: absolute;
+  top: calc(24px + 1rem + 25px);
+  left: 50%;
+  translate: -50% 0;
+}
+
+.efficiency-col--active .efficiency-col__arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* =========================================
+   PANEL — width controlled by activeIndex
+   ========================================= */
+
+.efficiency-panel {
+  flex: 0;
+  width: 0;
+  overflow: hidden;
+  transition: flex 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.efficiency-panel--active {
+  flex: 1;
+}
+
+.efficiency-panel__inner {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 600px;
+}
+
+/* =========================================
+   TEXT — visibility controlled by visibleIndex
+   ========================================= */
+
+.efficiency-panel__text {
+  padding: 24px 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* default: hidden */
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* visible class applied after panel expands */
+.efficiency-panel__text--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.efficiency-panel__tag {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.efficiency-panel__heading {
+  margin: 0;
+  font-size: 3.5em;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.efficiency-panel__desc {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+  line-height: 1.65;
+  max-width: 380px;
+}
+
+.efficiency-panel__cta {
+  margin-top: 8px;
+  display: flex;
+}
+
+.efficiency-panel__cta link-button {
+  display: contents;
+}
+
+.flx-spc-btw {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+/* =========================================
+   IMAGE — visibility controlled by visibleIndex
+   ========================================= */
+
+.efficiency-panel__media {
+  overflow: hidden;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+
+  border-radius: 20px;
+  margin-right: 50px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* 🔥 New design */
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  /* subtle glow to blend with section */
+  box-shadow:
+    inset 0 0 40px rgba(255, 255, 255, 0.05),
+    0 10px 40px rgba(0, 0, 0, 0.25);
+
+  backdrop-filter: blur(6px);
+}
+
+.efficiency-panel__media--visible {
+  opacity: 1;
+}
+
+.efficiency-panel__img {
+  display: block;
+  width: 80%;
+  object-fit: contain;
+
+  /* 🔥 subtle lift */
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+
+  /* optional: tiny animation */
+  transition: transform 0.4s ease;
+}
+
+.efficiency-panel__media--visible .efficiency-panel__img {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 900px) {
+  .efficiency-section__stage {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .efficiency-col {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 60px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    flex-direction: row;
+  }
+
+  .efficiency-col__tab {
+    flex-direction: row;
+    padding: 0 24px;
+    gap: 16px;
+    height: 60px;
+  }
+
+  .efficiency-col__label {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 0.9rem;
+  }
+
+  .efficiency-col__arrow {
+    position: static;
+    translate: none;
+    top: auto;
+    left: auto;
+  }
+
+  .efficiency-panel {
+    flex: 0;
+    width: 100%;
+    max-height: 0;
+    transition: max-height 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .efficiency-panel--active {
+    flex: 0;
+    max-height: 600px;
+  }
+
+  .efficiency-panel__inner {
+    min-width: unset;
+    grid-template-columns: 1fr;
+  }
+
+  .efficiency-panel__media {
+    height: 260px;
+  }
+}

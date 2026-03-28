@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, computed, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, HostListener, signal, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LinkButton } from '../../../../../shared/components/link-button/link-button';
 
@@ -20,10 +20,6 @@ export class MarketingSection implements AfterViewInit {
   @ViewChildren('rowEl') rowElements!: QueryList<ElementRef<HTMLElement>>;
 
   private readonly scrollY = signal(0);
-
-  // Stores the absolute top position of each row on the page
-  // Populated after view init and recalculated on scroll
-  private rowTops: number[] = [];
 
   readonly rows: MarketingRow[] = [
     {
@@ -47,45 +43,42 @@ export class MarketingSection implements AfterViewInit {
   ];
 
   ngAfterViewInit(): void {
-    this.measureRows();
-  }
-
-  private measureRows(): void {
-    this.rowTops = this.rowElements.map(el => {
-      // Absolute top = scrollY at this moment + getBoundingClientRect().top
-      return window.scrollY + el.nativeElement.getBoundingClientRect().top;
-    });
+    // Trigger an initial read so computed values are correct on load
+    this.scrollY.set(window.scrollY || 0);
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
     this.scrollY.set(window.scrollY || 0);
-    // Re-measure on first few scrolls in case layout shifted after load
-    if (this.rowTops.length === 0) {
-      this.measureRows();
-    }
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    this.measureRows();
+    this.scrollY.set(window.scrollY || 0);
   }
 
-  // Progress: 0 when card is at top, 1 when card reaches bottom
-  // Animation window: starts when the top of the row hits 80% of the viewport,
-  // ends 400px later (enough scroll to feel smooth but not too slow)
   cardProgress(i: number): number {
-    if (!this.rowTops[i]) return 0;
+    // Read the signal so Angular re-evaluates on scroll
+    const _sy = this.scrollY();
 
-    const rowTop = this.rowTops[i];
+    const els = this.rowElements?.toArray();
+    if (!els?.[i]) return 0;
+
+    const rect = els[i].nativeElement.getBoundingClientRect();
     const viewH = window.innerHeight;
-    const animWindow = 400;
+    const rowH = rect.height; // 550px
 
-    // Start when the row's top edge is at 80% down the viewport
-    const triggerStart = rowTop - viewH * 0.5;
-    const triggerEnd = triggerStart + animWindow;
+    // rowCenter = distance from viewport top to the vertical center of this row
+    const rowCenter = rect.top + rowH / 2;
 
-    const raw = (this.scrollY() - triggerStart) / (triggerEnd - triggerStart);
+    // Animation starts when the row center reaches the bottom of the viewport,
+    // ends when it reaches the top — i.e. the row has fully crossed the screen.
+    // We want the card to START sliding when the row is centered (rowCenter = viewH/2),
+    // and FINISH when the row center is 20% from the top.
+    const animStart = viewH * 0.75;  // row center is 75% down → begin
+    const animEnd   = viewH * 0.25;  // row center is 25% down → finish
+
+    const raw = (animStart - rowCenter) / (animStart - animEnd);
     return Math.min(1, Math.max(0, raw));
   }
 }

@@ -1,6 +1,18 @@
 :host {
   display: block;
   width: 100%;
+  position: relative;
+}
+
+:host::before {
+  content: '';
+  position: absolute;
+  top: -1500px;
+  left: 0;
+  right: 0;
+  height: 1500px;
+  background: linear-gradient(to bottom, transparent, #ddeeff);
+  pointer-events: none;
 }
 
 /* =========================================

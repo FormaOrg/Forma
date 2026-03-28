@@ -1,0 +1,322 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   SECTION
+   ========================================= */
+
+.storefront-section {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  align-items: center;
+  gap: 80px;
+  padding: 120px 84px;
+  width: 100%;
+}
+
+/* =========================================
+   LEFT — TEXT
+   ========================================= */
+
+.storefront-section__left {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.storefront-section__title {
+  margin: 0;
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 400;
+  color: #111111;
+  line-height: 1.1;
+}
+
+.storefront-section__desc {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #444444;
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+.storefront-section__left link-button {
+  display: contents;
+}
+
+/* =========================================
+   RIGHT — EDITOR MOCKUP
+   ========================================= */
+
+.storefront-section__right {
+  display: flex;
+  justify-content: center;
+}
+
+.editor-mockup {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #acbfd5;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 50px 75px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* =========================================
+   TOOLBAR
+   ========================================= */
+
+.editor-toolbar {
+  background: #ffffff;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 0 14px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editor-toolbar__left,
+.editor-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-toolbar__page-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #333;
+  cursor: default;
+}
+
+.editor-toolbar__page-label {
+  color: #888;
+}
+
+.editor-toolbar__page-name {
+  font-weight: 500;
+}
+
+.editor-toolbar__chevron {
+  width: 10px;
+  height: 6px;
+  color: #888;
+}
+
+.editor-toolbar__divider {
+  width: 1px;
+  height: 18px;
+  background: #e0e0e0;
+  margin: 0 2px;
+}
+
+.editor-toolbar__devices {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editor-toolbar__device {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #aaa;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.editor-toolbar__device svg {
+  width: 16px;
+  height: 16px;
+}
+
+.editor-toolbar__device--active {
+  background: #f0f0f0;
+  color: #111;
+}
+
+.editor-toolbar__device:hover:not(.editor-toolbar__device--active) {
+  background: #f5f5f5;
+  color: #555;
+}
+
+.editor-toolbar__history {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editor-toolbar__hist-btn,
+.editor-toolbar__zoom-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #aaa;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.editor-toolbar__hist-btn svg,
+.editor-toolbar__zoom-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.editor-toolbar__hist-btn:hover,
+.editor-toolbar__zoom-btn:hover {
+  background: #f5f5f5;
+  color: #555;
+}
+
+.editor-toolbar__tools {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #555;
+  cursor: default;
+}
+
+.editor-toolbar__tools svg {
+  width: 14px;
+  height: 14px;
+  color: #888;
+}
+
+.editor-toolbar__publish-btn {
+  padding: 5px 14px;
+  border: none;
+  background: #111111;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.editor-toolbar__publish-btn:hover {
+  opacity: 0.85;
+}
+
+/* =========================================
+   CANVAS — auto-scrolling preview
+   ========================================= */
+
+.editor-canvas {
+  background: #c6d3e2;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;     /* clips the image as it scrolls */
+  height: 460px;
+  flex-shrink: 0;
+  padding: 20px;
+}
+
+/* Clickable wrapper — cursor changes on hover */
+.editor-canvas__page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Image: will-change so browser composites it on the GPU */
+.editor-canvas__img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 10px;
+  will-change: transform;
+  user-select: none;
+  pointer-events: none; /* clicks go through to the wrapper */
+}
+
+/* Paused overlay badge */
+.editor-canvas__pause-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Dim overlay when paused */
+.editor-canvas__page--paused::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1100px) {
+  .storefront-section {
+    grid-template-columns: 1fr;
+    padding: 80px 40px;
+    gap: 48px;
+  }
+
+  .storefront-section__desc {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .storefront-section {
+    padding: 60px 20px;
+  }
+
+  .storefront-section__title {
+    font-size: 2.4rem;
+  }
+
+  .editor-canvas {
+    height: 300px;
+  }
+}

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 type FaqItem = {
     question: string;
@@ -7,33 +8,33 @@ type FaqItem = {
 };
 
 @Component({
-    selector: 'app-builder-help-deck',
+    selector: 'app-landing-page-builder-help-deck',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslatePipe],
     templateUrl: './builder-help-deck.html',
     styleUrl: './builder-help-deck.css'
 })
 export class BuilderHelpDeck {
     readonly faqs = signal<FaqItem[]>([
         {
-            question: 'Is it easy to build a website',
-            answer: 'No. Forma is built for everyone — from beginners to professionals — with an intuitive drag-and-drop interface.'
+            question: 'landing.builderHelpDeck.items.easy.question',
+            answer: 'landing.builderHelpDeck.items.easy.answer'
         },
         {
-            question: 'Can I customize templates completely?',
-            answer: 'Yes. You can fully customize layouts, fonts, colors, images, sections, and content to match your brand and style.'
+            question: 'landing.builderHelpDeck.items.customize.question',
+            answer: 'landing.builderHelpDeck.items.customize.answer'
         },
         {
-            question: 'Are the websites built with Forma responsive?',
-            answer: 'Yes. Every website is designed to adapt smoothly across desktop, tablet, and mobile devices.'
+            question: 'landing.builderHelpDeck.items.responsive.question',
+            answer: 'landing.builderHelpDeck.items.responsive.answer'
         },
         {
-            question: 'Can I publish my website instantly?',
-            answer: 'Yes. Once your content is ready, you can publish your website in just a few clicks.'
+            question: 'landing.builderHelpDeck.items.publish.question',
+            answer: 'landing.builderHelpDeck.items.publish.answer'
         },
         {
-            question: 'Does Forma offer AI features?',
-            answer: 'Not yet — Forma is currently focused on delivering a powerful and intuitive website-building experience. AI features are planned for the future to help streamline content creation and design workflows.'
+            question: 'landing.builderHelpDeck.items.ai.question',
+            answer: 'landing.builderHelpDeck.items.ai.answer'
         }
     ]);
 

@@ -4,10 +4,25 @@
 }
 
 /* =========================================
-   SECTION
+   SCROLL CONTAINER
+   — Height is set dynamically by TS
+   — Gives scroll room for the sticky animation
+   ========================================= */
+
+.revenue-scroll-container {
+  position: relative;
+  width: 100%;
+  /* height set by measure() in TS */
+}
+
+/* =========================================
+   STICKY SECTION
+   — Sticks to top while container scrolls
    ========================================= */
 
 .revenue-section {
+  position: sticky;
+  top: 0;
   background-color: #ffffff;
   padding: 100px 80px 120px;
   display: flex;
@@ -17,10 +32,6 @@
   width: 100%;
   overflow: hidden;
 }
-
-/* =========================================
-   HEADER
-   ========================================= */
 
 .revenue-section__header {
   display: flex;
@@ -58,23 +69,19 @@
 }
 
 /* =========================================
-   STRIP WRAPPER — clips overflow and sets height
+   STRIP WRAPPER
    ========================================= */
 
 .revenue-strip-wrap {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
-
-/* =========================================
-   STRIP — wider than viewport, slides left
-   ========================================= */
 
 .revenue-strip {
   display: flex;
   gap: 20px;
+  width: max-content;
   will-change: transform;
-  /* No CSS transition — driven frame-by-frame by scroll signal */
 }
 
 /* =========================================
@@ -82,13 +89,14 @@
    ========================================= */
 
 .revenue-card {
-  flex: 0 0 380px;
+  width: 500px;
+  flex-shrink: 0;
   border-radius: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  min-height: 520px;
+  min-height: 600px;
 }
 
 .revenue-card__content {
@@ -115,12 +123,12 @@
   flex: 1;
   padding: 0 24px 24px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
 }
 
 .revenue-card__image img {
   display: block;
-  width: 100%;
   border-radius: 16px;
   object-fit: cover;
   max-height: 280px;
@@ -128,11 +136,16 @@
 }
 
 /* =========================================
-   RESPONSIVE
+   RESPONSIVE — disable sticky on mobile
    ========================================= */
 
 @media (max-width: 1024px) {
+  .revenue-scroll-container {
+    height: auto !important;
+  }
+
   .revenue-section {
+    position: static;
     padding: 72px 40px 80px;
   }
 
@@ -146,14 +159,14 @@
     width: 100%;
   }
 
-  /* On smaller screens disable scroll animation — show all cards in a grid */
   .revenue-strip {
+    width: 100%;
     flex-wrap: wrap;
     transform: none !important;
   }
 
   .revenue-card {
-    flex: 0 0 calc(50% - 10px);
+    width: calc(50% - 10px);
   }
 }
 
@@ -163,6 +176,6 @@
   }
 
   .revenue-card {
-    flex: 0 0 100%;
+    width: 100%;
   }
 }

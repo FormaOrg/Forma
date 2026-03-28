@@ -1,0 +1,26 @@
+<section>
+    <div class="top">
+        <h2 class="title">Build an <span>e-Commerce Website</span> and start selling</h2>
+        <p class="subtitle">Get everything you need to build, run and scale your business without limits.</p>
+        <link-button
+                [bgColor]="'#7566ff'"
+                [txtColor]="'white'"
+                [theme]="'white'"
+                [content]="'Build Your Store'"
+                [width]="'230px'"
+        ></link-button>
+    </div>
+
+    <div class="bottom-wrap" #wrapEl>
+        <div
+            class="bottom"
+            [style.padding-left.px]="bottomTransform().padding"
+            [style.padding-right.px]="bottomTransform().padding"
+        >
+            <app-video-player
+                [src]="'assets/Ecommerce Showcase/hero.mp4'"
+                [loop]="true"
+            />
+        </div>
+    </div>
+</section>

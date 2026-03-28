@@ -1,5 +1,6 @@
-import { Component, HostListener, signal } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Component, HostListener, effect, signal } from '@angular/core';
+import { Router, RouterLink } from "@angular/router";
+import { I18nService } from '../../features/landing-page/i18n/i18n.service';
 
 type LanguageOption = {
   code: string;
@@ -13,6 +14,7 @@ type DropdownLink = {
     title: string;
     description: string;
     path: string;
+    sectionId?: string;
 };
 
 type DropdownColumn = {
@@ -34,9 +36,9 @@ type DropdownCard = {
 type NavItem = {
     label: string;
     hasDropdown?: boolean;
-    url: string;
     columns?: DropdownColumn[];
     card?: DropdownCard;
+    url?: string;
 };
 
 @Component({
@@ -46,19 +48,32 @@ type NavItem = {
   styleUrl: './header.css',
 })
 export class Header {
+  constructor(
+    private readonly router: Router,
+    private readonly i18n: I18nService,
+  ) {
+    // Keep the overlay selection in sync with the active app language.
+    effect(() => {
+      const lang = this.i18n.lang();
+      this.selectedLanguage.set(lang === 'fr'
+        ? { code: 'fr', label: 'Français', nativeLabel: 'Français', dir: 'ltr' }
+        : { code: 'en', label: 'English', nativeLabel: 'English', dir: 'ltr' }
+      );
+    });
+  }
+
   readonly navItems = signal<NavItem[]>([
     {
         label: 'Product',
         hasDropdown: true,
-        url: 'product',
         columns: [
             {
                 heading: 'Platform',
                 color: '#7c3aed', bgColor: '#f3f0ff',
                 links: [
-                    { icon: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z', title: 'Overview', description: 'Everything you need to build', path: '/' },
-                    { icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', title: 'Features', description: 'Powerful tools at your fingertips', path: '/' },
-                    { icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', title: 'Templates', description: 'Start with beautiful designs', path: '/templates' },
+                    { icon: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z', title: 'Overview', description: 'Everything you need to build', path: '/product', sectionId: 'overview' },
+                    { icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', title: 'Features', description: 'Powerful tools at your fingertips', path: '/product/#features', sectionId: "features" },
+                    { icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', title: 'Templates', description: 'Start with beautiful designs', path: '/product', sectionId: 'templates' },
                 ]
             },
             {
@@ -83,16 +98,14 @@ export class Header {
     {
         label: 'Templates',
         hasDropdown: true,
-        url: '#',
         columns: [
             {
                 heading: 'By Category',
                 color: '#2563eb', bgColor: '#eff6ff',
                 links: [
                     { icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', title: 'Portfolio', description: 'Showcase your work', path: '/portfolio-website' },
-                    { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', title: 'Business', description: 'Professional company sites', path: '/' },
-                    { icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z', title: 'eCommerce', description: 'Sell products online', path: '/' },
-                    { icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z', title: 'Blog', description: 'Share your stories', path: '/' },
+                    { icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z', title: 'eCommerce', description: 'Sell products online', path: '/ecommerce-website' },
+                    { icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z', title: 'Blog', description: 'Share your stories', path: '/blog-website' },
                 ]
             },
             {
@@ -110,14 +123,13 @@ export class Header {
             title: 'New Templates Weekly',
             description: 'Fresh designs added every week. Find the perfect starting point for your next project.',
             buttonText: 'Browse all',
-            buttonUrl: '#',
+            buttonUrl: '/templates',
             theme: "blue"
         }
     },
     {
         label: 'Support',
         hasDropdown: true,
-        url: '#',
         columns: [
             {
                 heading: 'Get Help',
@@ -169,9 +181,9 @@ export class Header {
   });
 
   readonly languages = signal<LanguageOption[]>([
+    // Only support English + French for now.
     { code: 'en', label: 'English', nativeLabel: 'English', dir: 'ltr' },
-    { code: 'ar', label: 'Arabic', nativeLabel: 'العربية', dir: 'rtl' },
-    { code: 'fr', label: 'French', nativeLabel: 'Français', dir: 'ltr' }
+    { code: 'fr', label: 'Français', nativeLabel: 'Français', dir: 'ltr' },
   ]);
 
   private lastScrollY = 0;
@@ -268,8 +280,43 @@ export class Header {
   }
 
   selectLanguage(language: LanguageOption): void {
-    this.selectedLanguage.set(language);
+    const nextLang = language.code === 'fr' ? 'fr' : 'en';
+    // Update app language (async fetch happens inside I18nService).
+    void this.i18n.setLang(nextLang);
+    // Optimistically update overlay selection (i18n.lang() will also sync it).
+    this.selectedLanguage.set({
+      code: nextLang,
+      label: nextLang === 'fr' ? 'Français' : 'English',
+      nativeLabel: nextLang === 'fr' ? 'Français' : 'English',
+      dir: 'ltr'
+    });
     this.closeLanguageMenu();
-    console.log('Selected language:', language.code);
   }
+
+  private scrollToSection(sectionId: string): void {
+  const el = document.getElementById(sectionId);
+  if (!el) return;
+
+  const targetY = el.getBoundingClientRect().top + window.scrollY;
+
+  window.scrollTo({
+    top: targetY,
+    behavior: 'smooth',
+  });
+}
+
+onDropdownSectionClick(sectionId: string): void {
+  this.openItem.set(null);
+
+  const isOnProduct = this.router.url.split('?')[0].split('#')[0] === '/product';
+
+  if (isOnProduct) {
+    requestAnimationFrame(() => this.scrollToSection(sectionId));
+    return;
+  }
+
+  this.router.navigate(['/product']).then(() => {
+    setTimeout(() => this.scrollToSection(sectionId), 80);
+  });
+}
 }
