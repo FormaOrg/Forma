@@ -10,7 +10,6 @@ import { Tutorials } from './features/support/tutorials/tutorials';
 import { Faqs } from './features/support/faqs/faqs';
 import { Contact } from './features/support/contact/contact';
 
-// import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/components/login/login';
 import { RegisterComponent } from './features/auth/components/register/register';
 import { EmailVerificationComponent } from './features/auth/components/email-verification/email-verification';
@@ -21,8 +20,9 @@ import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-show
 import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
 import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 
-
-
+import { Dashboard } from './features/app/dashboard/dashboard';
+import { Home } from './features/app/dashboard/pages/home/home';
+import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -36,6 +36,8 @@ export const routes: Routes = [
   { path: 'faqs', component: Faqs },
   { path: 'contact', component: Contact },
 
+  { path: 'dashboard', redirectTo: '/app/home', pathMatch: 'full' },
+
   {
     path: '',
     component: AuthLayout,
@@ -48,7 +50,21 @@ export const routes: Routes = [
       { path: 'reset-password', component: ResetPasswordComponent }
     ]
   },
-  
+
+  {
+    path: 'app',
+    component: Dashboard,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      { path: 'home', component: Home, data: { title: 'Home' } },
+      { path: 'projects', component: DashboardStub, data: { title: 'Projects' } },
+      { path: 'templates', component: DashboardStub, data: { title: 'Templates' } },
+      { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
+      { path: 'billing', component: DashboardStub, data: { title: 'Billing' } },
+      { path: 'settings', component: DashboardStub, data: { title: 'Settings' } }
+    ]
+  },
 
   { path: '**', redirectTo: '' }
 ];
+// their code

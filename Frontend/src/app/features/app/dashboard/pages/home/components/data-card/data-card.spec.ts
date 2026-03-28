@@ -1,20 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
 
-import { SideBar } from './side-bar';
+import { DataCard } from './data-card';
 
-describe('SideBar', () => {
-  let component: SideBar;
-  let fixture: ComponentFixture<SideBar>;
+describe('DataCard', () => {
+  let component: DataCard;
+  let fixture: ComponentFixture<DataCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SideBar],
-      providers: [provideRouter([])]
+      imports: [DataCard]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SideBar);
+    fixture = TestBed.createComponent(DataCard);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

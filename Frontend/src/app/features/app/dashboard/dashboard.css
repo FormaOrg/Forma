@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.dashboard-shell {
+  --shell-header-h: 56px;
+  --shell-sidebar-expanded: 260px;
+  --shell-sidebar-collapsed: 72px;
+  --shell-border: rgba(0, 0, 0, 0.08);
+  --shell-bg: #f7f7f8;
+  --shell-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --shell-dur: 240ms;
+
+  position: relative;
+  min-height: 100vh;
+  height: 100vh;
+  background: var(--shell-bg);
+}
+
+/* Continuous rule under header row across sidebar + main */
+.dashboard-shell::before {
+  content: '';
+  position: fixed;
+  top: var(--shell-header-h);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--shell-border);
+  z-index: 50;
+  pointer-events: none;
+}
+
+.dashboard-main {
+  margin-left: var(--shell-sidebar-expanded);
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--shell-bg);
+  transition: margin-left var(--shell-dur) var(--shell-ease);
+}
+
+.dashboard-shell.sidebar-collapsed .dashboard-main {
+  margin-left: var(--shell-sidebar-collapsed);
+}
+
+.dashboard-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+  background: #fafafa;
+}
