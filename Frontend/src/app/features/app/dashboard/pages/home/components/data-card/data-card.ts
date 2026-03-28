@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-data-card',
@@ -7,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './data-card.css',
 })
 export class DataCard {
-
+  @Input() icon = '';
+  @Input() title = '';
+  @Input() value = '';
+  @Input() description = '';
 }

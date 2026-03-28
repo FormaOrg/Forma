@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GreatingSection } from './greating-section';
+import { GreetingSection } from './greeting-section';
 
-describe('GreatingSection', () => {
-  let component: GreatingSection;
-  let fixture: ComponentFixture<GreatingSection>;
+describe('GreetingSection', () => {
+  let component: GreetingSection;
+  let fixture: ComponentFixture<GreetingSection>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GreatingSection]
+      imports: [GreetingSection]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GreatingSection);
+    fixture = TestBed.createComponent(GreetingSection);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
