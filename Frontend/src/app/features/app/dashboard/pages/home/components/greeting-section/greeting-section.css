@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.greeting-section {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d7d7d7;
+  border-radius: 18px;
+  padding: 32px 22px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.greeting-section__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.greeting-section__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.greeting-section__title {
+  margin: 0;
+  font-size: 3rem;
+  line-height: 1.05;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.03em;
+}
+
+.greeting-section__title span {
+  color: #6f6af8;
+}
+
+.greeting-section__subtitle {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: #8a8a8a;
+  line-height: 1.4;
+}
+
+.greeting-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.greeting-section__actions link-button {
+  display: contents;
+}
+
+@media (max-width: 900px) {
+  .greeting-section__content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .greeting-section__title {
+    font-size: 2.2rem;
+  }
+
+  .greeting-section__actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .greeting-section {
+    padding: 24px 18px;
+  }
+
+  .greeting-section__title {
+    font-size: 1.9rem;
+  }
+
+  .greeting-section__subtitle {
+    font-size: 0.95rem;
+  }
+}

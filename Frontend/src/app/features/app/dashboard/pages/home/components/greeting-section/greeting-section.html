@@ -1,0 +1,34 @@
+<section class="greeting-section">
+  <div class="greeting-section__content">
+    <div class="greeting-section__text">
+      <h1 class="greeting-section__title">
+        Welcome Back <span>{{ userName }}</span>.
+      </h1>
+      <p class="greeting-section__subtitle">Let's create something amazing today.</p>
+    </div>
+
+    <div class="greeting-section__actions">
+      <link-button
+        [bgColor]="'#ffffff'"
+        [txtColor]="'#111111'"
+        [theme]="'black'"
+        [content]="'Import site'"
+        [width]="'140px'"
+        [height]="'46px'"
+        [fontSize]="'0.95rem'"
+        [fontWeight]="'500'"
+      ></link-button>
+
+      <link-button
+        [bgColor]="'#7468ff'"
+        [txtColor]="'#ffffff'"
+        [theme]="'white'"
+        [content]="'Create new site'"
+        [width]="'170px'"
+        [height]="'46px'"
+        [fontSize]="'0.95rem'"
+        [fontWeight]="'500'"
+      ></link-button>
+    </div>
+  </div>
+</section>
