@@ -1,0 +1,45 @@
+<section class="home-page">
+  <app-greeting-section
+    [userName]="'Ismail'"
+  ></app-greeting-section>
+
+  <div class="home-page__stats">
+    <app-data-card
+      [icon]="globeIcon"
+      [title]="'Sites created'"
+      [value]="'12'"
+      [description]="'+2 this month'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="checkIcon"
+      [title]="'Published Sites'"
+      [value]="'8'"
+      [description]="'66% of total'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="draftIcon"
+      [title]="'Draft Sites'"
+      [value]="'4'"
+      [description]="'Ready to publish'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="clockIcon"
+      [title]="'Last Activity'"
+      [value]="'2 hours ago'"
+      [description]="'Portfolio site edited'"
+    ></app-data-card>
+  </div>
+
+  <div class="home-page__bottom">
+    <div class="home-page__bottom-main">
+      <app-recent-projects></app-recent-projects>
+    </div>
+
+    <div class="home-page__bottom-side">
+      <app-recent-activity/>
+    </div>
+  </div>
+</section>

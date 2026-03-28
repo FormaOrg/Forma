@@ -1,0 +1,259 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.recent-projects {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d9d9df;
+  border-radius: 22px;
+  padding: 30px;
+  box-shadow: 0 1px 2px rgba(28, 28, 29, 0.04);
+}
+
+.recent-projects__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ececf2;
+}
+
+.recent-projects__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recent-projects__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.8rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.recent-projects__subtitle {
+  margin: 0;
+  color: #8a8f98;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.recent-projects__view-all {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #7468ff;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+
+.recent-projects__view-all:hover {
+  opacity: 0.92;
+}
+
+.recent-projects__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.project-row {
+  min-height: 96px;
+  border: 1px solid #ececf2;
+  border-radius: 18px;
+  background: #fbfbfd;
+  padding: 18px 18px 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.project-row:hover {
+  background: #f6f6fb;
+  border-color: #e3e3ee;
+}
+
+.project-row__left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-row__main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.project-row__name {
+  margin: 0;
+  color: #111111;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.project-row__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.project-row__status--published {
+  background: #dff5e7;
+  color: #4f8f66;
+}
+
+.project-row__status--draft {
+  background: #f6efbf;
+  color: #9a8740;
+}
+
+.project-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #8e939c;
+  font-size: 0.96rem;
+  line-height: 1.4;
+}
+
+.project-row__domain {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.project-row__domain-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.project-row__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c6cad1;
+  flex-shrink: 0;
+}
+
+.project-row__updated {
+  white-space: nowrap;
+}
+
+.project-row__right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-row__chevron {
+  width: 20px;
+  height: 20px;
+  color: #a0a5b1;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.project-row:hover .project-row__chevron {
+  transform: translateX(2px);
+  opacity: 0.9;
+}
+
+.recent-projects__title-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.recent-projects__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f3f3f3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #111111;
+  flex-shrink: 0;
+  padding: 7px;
+}
+
+@media (max-width: 900px) {
+  .recent-projects {
+    padding: 18px;
+  }
+
+  .recent-projects__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .project-row {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .project-row__right {
+    align-self: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .recent-projects__title {
+    font-size: 1.6rem;
+  }
+
+  .project-row {
+    padding: 16px;
+  }
+
+  .project-row__main {
+    flex-wrap: wrap;
+  }
+
+  .project-row__name {
+    font-size: 1.05rem;
+  }
+
+  .project-row__meta {
+    font-size: 0.9rem;
+  }
+}
