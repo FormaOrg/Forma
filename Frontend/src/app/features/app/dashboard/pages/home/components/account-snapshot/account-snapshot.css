@@ -1,0 +1,39 @@
+.account-snap {
+  background: #fff;
+  border: 1px solid #d9d9df;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.account-snap__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ececf2;
+}
+
+.account-snap__title {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.account-snap__link {
+  background: #7468ff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.account-snap__plan {
+  margin-top: 14px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.account-snap__meta {
+  font-size: 0.9rem;
+  color: #8a8a8a;
+}

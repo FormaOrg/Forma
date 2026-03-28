@@ -3,10 +3,13 @@ import { GreetingSection } from './components/greeting-section/greeting-section'
 import { DataCard } from "./components/data-card/data-card";
 import { RecentProjects } from "./components/recent-projects/recent-projects";
 import { RecentActivity } from "./components/recent-activity/recent-activity";
+import { AccountSnapshot } from './components/account-snapshot/account-snapshot';
+import { SetupProgress } from './components/setup-progress/setup-progress';
+import { RecentTemplates } from './components/recent-templates/recent-templates';
 
 @Component({
   selector: 'app-home',
-  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity],
+  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

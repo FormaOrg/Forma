@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DataCard } from './data-card';
+import { RecentTemplates } from './recent-templates';
 
-describe('DataCard', () => {
-  let component: DataCard;
-  let fixture: ComponentFixture<DataCard>;
+describe('RecentTemplates', () => {
+  let component: RecentTemplates;
+  let fixture: ComponentFixture<RecentTemplates>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DataCard]
+      imports: [RecentTemplates]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DataCard);
+    fixture = TestBed.createComponent(RecentTemplates);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
