@@ -21,6 +21,9 @@ import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-show
 import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
 import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 
+
+
+
 export const routes: Routes = [
   { path: '', component: LandingPage },
   { path: 'pricing', component: Pricing },
@@ -45,6 +48,7 @@ export const routes: Routes = [
       { path: 'reset-password', component: ResetPasswordComponent }
     ]
   },
+  
 
   { path: '**', redirectTo: '' }
 ];
