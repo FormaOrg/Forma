@@ -8,8 +8,9 @@
     </div>
 
     <div class="greeting-section__actions">
-      <button type="button" class="greeting-btn greeting-btn--import">
-        <svg
+      <button class="greeting-btn greeting-btn--import-fancy">
+        <span class="greeting-btn__icon">
+          <svg
           class="greeting-btn__icon"
           viewBox="0 0 24 24"
           fill="none"
@@ -38,31 +39,35 @@
             stroke-linejoin="round"
           />
         </svg>
+        </span>
+
         <span>Import site</span>
       </button>
 
-      <button type="button" class="greeting-btn greeting-btn--create">
-        <svg
-          class="greeting-btn__icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 5V19"
-            stroke="currentColor"
-            stroke-width="2.4"
-            stroke-linecap="round"
-          />
-          <path
-            d="M5 12H19"
-            stroke="currentColor"
-            stroke-width="2.4"
-            stroke-linecap="round"
-          />
-        </svg>
-        <span>Create New Site</span>
+      <button class="greeting-btn greeting-btn--create-animated">
+        <span class="greeting-btn__icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 5V19"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M5 12H19"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+
+        <span class="greeting-btn__text">New Site</span>
       </button>
     </div>
   </div>

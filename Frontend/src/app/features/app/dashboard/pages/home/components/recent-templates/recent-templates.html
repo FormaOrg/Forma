@@ -1,0 +1,39 @@
+<section class="recent-templates">
+  <header class="recent-templates__header">
+    <div class="recent-templates__intro">
+      <h2 class="recent-templates__title">Templates</h2>
+      <p class="recent-templates__subtitle">Jump back into a layout you have used recently.</p>
+    </div>
+
+    <a routerLink="/app/templates" class="recent-templates__link">Browse</a>
+  </header>
+
+  <ul class="recent-templates__list" role="list">
+    @for (t of templates(); track trackBy($index, t)) {
+      <li>
+        <a class="tpl-row" [routerLink]="t.route">
+          <div class="tpl-row__preview">
+            <img [src]="t.image" [alt]="t.name" class="tpl-row__img" />
+          </div>
+
+          <div class="tpl-row__body">
+            <span class="tpl-row__name">{{ t.name }}</span>
+            <span class="tpl-row__hint">{{ t.hint }}</span>
+          </div>
+
+          <span class="tpl-row__chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 6L15 12L9 18"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

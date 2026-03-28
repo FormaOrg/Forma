@@ -1,7 +1,5 @@
 <section class="home-page">
-  <app-greeting-section
-    [userName]="'Ismail'"
-  ></app-greeting-section>
+  <app-greeting-section [userName]="'Ismail'"></app-greeting-section>
 
   <div class="home-page__stats">
     <app-data-card
@@ -33,13 +31,16 @@
     ></app-data-card>
   </div>
 
-  <div class="home-page__bottom">
-    <div class="home-page__bottom-main">
+  <div class="home-page__grid">
+    <div class="home-page__main">
       <app-recent-projects></app-recent-projects>
+      <app-recent-templates></app-recent-templates>
     </div>
 
-    <div class="home-page__bottom-side">
-      <app-recent-activity/>
-    </div>
+    <aside class="home-page__aside">
+      <app-recent-activity></app-recent-activity>
+      <app-account-snapshot></app-account-snapshot>
+      <app-setup-progress></app-setup-progress>
+    </aside>
   </div>
 </section>

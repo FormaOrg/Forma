@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RecentProjects } from './recent-projects';
+import { AccountSnapshot } from './account-snapshot';
 
-describe('RecentProjects', () => {
-  let component: RecentProjects;
-  let fixture: ComponentFixture<RecentProjects>;
+describe('AccountSnapshot', () => {
+  let component: AccountSnapshot;
+  let fixture: ComponentFixture<AccountSnapshot>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RecentProjects]
+      imports: [AccountSnapshot]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RecentProjects);
+    fixture = TestBed.createComponent(AccountSnapshot);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
