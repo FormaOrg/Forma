@@ -10,7 +10,6 @@ import { Tutorials } from './features/support/tutorials/tutorials';
 import { Faqs } from './features/support/faqs/faqs';
 import { Contact } from './features/support/contact/contact';
 
-// import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/components/login/login';
 import { RegisterComponent } from './features/auth/components/register/register';
 import { EmailVerificationComponent } from './features/auth/components/email-verification/email-verification';
@@ -20,6 +19,10 @@ import { ResetPasswordComponent } from './features/auth/components/reset-passwor
 import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-showcase';
 import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
 import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
+
+import { Home } from './features/app/dashboard/pages/home/home';
+// import { Templates } from './features/dashboard/pages/templates/templates';
+// import { Projects } from './features/dashboard/pages/projects/projects';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -32,6 +35,16 @@ export const routes: Routes = [
   { path: 'tutorials', component: Tutorials },
   { path: 'faqs', component: Faqs },
   { path: 'contact', component: Contact },
+
+  {
+    path: 'app',
+    children: [
+      { path: 'dashboard', component: Home },
+      // { path: 'templates', component: Templates },
+      // { path: 'projects', component: Projects },
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' }
+    ]
+  },
 
   {
     path: '',
