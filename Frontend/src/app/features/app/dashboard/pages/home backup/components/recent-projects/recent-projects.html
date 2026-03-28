@@ -1,0 +1,113 @@
+<section class="recent-projects">
+  <div class="recent-projects__header">
+    <div class="recent-projects__heading">
+  <div class="recent-projects__title-row">
+    <div class="recent-projects__icon">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="9"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
+        <path
+          d="M12 7V12L15 14.5"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+
+    <h2 class="recent-projects__title">Recent Projects</h2>
+  </div>
+</div>
+
+    <a routerLink="/app/projects" class="recent-projects__view-all">
+      View all
+    </a>
+  </div>
+
+  <div class="recent-projects__list">
+    @for (project of projects(); track trackByName($index, project)) {
+      <a class="project-row" [routerLink]="project.route">
+        <div class="project-row__left">
+          <div class="project-row__main">
+            <h3 class="project-row__name">{{ project.name }}</h3>
+
+            <span
+              class="project-row__status"
+              [class.project-row__status--published]="project.status === 'published'"
+              [class.project-row__status--draft]="project.status === 'draft'"
+            >
+              {{ project.status === 'published' ? 'Published' : 'Draft' }}
+            </span>
+          </div>
+
+          <div class="project-row__meta">
+            <span class="project-row__domain">
+              <svg
+                class="project-row__domain-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14 5H19V10"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 14L19 5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M19 14V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5H10"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              {{ project.domain }}
+            </span>
+
+            <span class="project-row__dot"></span>
+
+            <span class="project-row__updated">{{ project.updatedAt }}</span>
+          </div>
+        </div>
+
+        <div class="project-row__right" aria-hidden="true">
+          <svg
+            class="project-row__chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 6L15 12L9 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+      </a>
+    }
+  </div>
+</section>
