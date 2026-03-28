@@ -3,185 +3,138 @@
   width: 100%;
 }
 
-* {
-  box-sizing: border-box;
+.greeting {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px 16px;
 }
 
-.greeting-section {
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid #d7d7d7;
-  border-radius: 18px;
-  padding: 50px 30px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.greeting-section__content {
+.greeting__main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 16px;
 }
 
-.greeting-section__text {
+.greeting__text {
   display: flex;
   flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 
-.greeting-section__title {
+.greeting__eyebrow {
   margin: 0;
-  font-size: 3rem;
-  line-height: 1.05;
-  font-weight: 700;
-  color: #111111;
-  letter-spacing: -0.03em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.2;
 }
 
-.greeting-section__title span {
-  color: #6f6af8;
+.greeting__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #000;
+  line-height: 1.28;
 }
 
-.greeting-section__subtitle {
-  margin: 8px 0 0;
-  font-size: 1rem;
-  color: #8a8a8a;
-  line-height: 1.4;
+.greeting__name {
+  font-weight: 600;
 }
 
-.greeting-section__actions {
+.greeting__subtitle {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(0, 0, 0, 0.5);
+  max-width: 26rem;
+}
+
+.greeting__actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.greeting-btn {
-  min-height: 50px;
-  border-radius: 999px;
-  padding: 0 15px;
+.greeting__btn {
+  height: 32px;
+  padding: 0 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  border: none;
-  font-size: .95rem;
+  gap: 6px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
   white-space: nowrap;
-  
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.greeting-btn:hover {
-  opacity: 0.9;
-}
-
-.greeting-btn__icon {
-  width: 26px;
-  height: 26px;
+.greeting__btn-icon {
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
-.greeting-btn--import {
-  background: #ffffff;
-  color: #111111;
-  border: 4px solid #7468ff;
-
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  color: #111;
-
-  transition: color 0.2s ease;
+.greeting__btn--secondary {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: rgba(0, 0, 0, 0.78);
 }
 
-.greeting-btn--import::before {
-  content: '';
-  position: absolute;
-
-  /* 🔥 change this */
-  inset: -4px;
-
-  background: #7468ff;
-  z-index: -1;
-
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
-
-  border-radius: inherit;
+.greeting__btn--secondary:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.03);
+  color: #000;
 }
 
-.greeting-btn--import:hover::before {
-  transform: scaleX(1);
+.greeting__btn--primary {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
 }
 
-.greeting-btn--import:hover {
-  color: #ffffff;
+.greeting__btn--primary:hover {
+  background: #000;
+  border-color: #000;
 }
 
-.greeting-btn--create {
-  background: #7468ff;
-  color: #ffffff;
-  border: 4px solid #7468ff;
-}
-
-@media (max-width: 1100px) {
-  .greeting-section__content {
+@media (max-width: 900px) {
+  .greeting__main {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .greeting-section__actions {
+  .greeting__actions {
     width: 100%;
     flex-wrap: wrap;
   }
-
-  .greeting-btn--import,
-  .greeting-btn--create {
-    min-width: unset;
-  }
 }
 
-@media (max-width: 900px) {
-  .greeting-section__title {
-    font-size: 2.2rem;
+@media (max-width: 480px) {
+  .greeting {
+    padding: 12px 14px;
   }
 
-  .greeting-btn {
-    min-height: 62px;
-    font-size: 1rem;
-    padding: 0 24px;
-  }
-}
-
-@media (max-width: 560px) {
-  .greeting-section {
-    padding: 24px 18px;
+  .greeting__title {
+    font-size: 1.0625rem;
   }
 
-  .greeting-section__title {
-    font-size: 1.9rem;
-  }
-
-  .greeting-section__subtitle {
-    font-size: 0.95rem;
-  }
-
-  .greeting-section__actions {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .greeting-btn {
-    width: 100%;
+  .greeting__btn {
+    flex: 1;
+    min-width: 0;
     justify-content: center;
   }
 }

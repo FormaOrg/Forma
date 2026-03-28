@@ -1,45 +1,32 @@
 <section class="home-page">
-  <app-greeting-section
-    [userName]="'Ismail'"
-  ></app-greeting-section>
+  <app-greeting-section [userName]="'Ismail'"></app-greeting-section>
+
+  <nav class="home-page__toolbar" aria-label="Shortcuts">
+    @for (link of quickLinks(); track link.path) {
+      <a [routerLink]="link.path" class="home-page__toolbar-link">{{ link.label }}</a>
+    }
+  </nav>
 
   <div class="home-page__stats">
-    <app-data-card
-      [icon]="globeIcon"
-      [title]="'Sites created'"
-      [value]="'12'"
-      [description]="'+2 this month'"
-    ></app-data-card>
-
-    <app-data-card
-      [icon]="checkIcon"
-      [title]="'Published Sites'"
-      [value]="'8'"
-      [description]="'66% of total'"
-    ></app-data-card>
-
-    <app-data-card
-      [icon]="draftIcon"
-      [title]="'Draft Sites'"
-      [value]="'4'"
-      [description]="'Ready to publish'"
-    ></app-data-card>
-
-    <app-data-card
-      [icon]="clockIcon"
-      [title]="'Last Activity'"
-      [value]="'2 hours ago'"
-      [description]="'Portfolio site edited'"
-    ></app-data-card>
+    @for (card of statCards(); track card.id) {
+      <app-data-card
+        [icon]="iconFor(card.iconKey)"
+        [title]="card.title"
+        [value]="card.value"
+        [description]="card.description"
+      ></app-data-card>
+    }
   </div>
 
-  <div class="home-page__bottom">
-    <div class="home-page__bottom-main">
+  <div class="home-page__grid">
+    <div class="home-page__main">
       <app-recent-projects></app-recent-projects>
+      <app-recent-templates></app-recent-templates>
     </div>
-
-    <div class="home-page__bottom-side">
-      <app-recent-activity/>
-    </div>
+    <aside class="home-page__aside" aria-label="Overview">
+      <app-recent-activity />
+      <app-account-snapshot></app-account-snapshot>
+      <app-setup-progress></app-setup-progress>
+    </aside>
   </div>
 </section>

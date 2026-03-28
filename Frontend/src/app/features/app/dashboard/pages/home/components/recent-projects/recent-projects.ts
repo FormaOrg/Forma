@@ -17,7 +17,7 @@ type RecentProject = {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './recent-projects.html',
-  styleUrl: './recent-projects.css',
+  styleUrl: './recent-projects.css'
 })
 export class RecentProjects {
   readonly projects = signal<RecentProject[]>([
@@ -26,36 +26,29 @@ export class RecentProjects {
       domain: 'portfolio.forma.com',
       updatedAt: 'Edited 2 hours ago',
       status: 'published',
-      route: '/app/projects/portfolio-website',
+      route: '/app/projects/portfolio-website'
     },
     {
       name: 'E-commerce Store',
       domain: 'shop.forma.com',
-      updatedAt: 'Edited 2 hours ago',
+      updatedAt: 'Edited yesterday',
       status: 'draft',
-      route: '/app/projects/ecommerce-store',
+      route: '/app/projects/ecommerce-store'
     },
     {
       name: 'Landing Page',
       domain: 'landing.forma.com',
-      updatedAt: 'Edited 2 hours ago',
+      updatedAt: 'Edited 3 days ago',
       status: 'published',
-      route: '/app/projects/landing-page',
+      route: '/app/projects/landing-page'
     },
     {
       name: 'Blog Platform',
       domain: 'blog.forma.com',
-      updatedAt: 'Edited 2 hours ago',
+      updatedAt: 'Edited last week',
       status: 'draft',
-      route: '/app/projects/blog-platform',
-    },
-    {
-      name: 'Agency Website',
-      domain: 'agency.forma.com',
-      updatedAt: 'Edited 2 hours ago',
-      status: 'published',
-      route: '/app/projects/agency-website',
-    },
+      route: '/app/projects/blog-platform'
+    }
   ]);
 
   trackByName = (_: number, project: RecentProject): string => project.name;
