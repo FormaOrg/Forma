@@ -14,40 +14,30 @@ type RecentActivityItem = {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './recent-activity.html',
-  styleUrl: './recent-activity.css',
+  styleUrl: './recent-activity.css'
 })
 export class RecentActivity {
   readonly activities = signal<RecentActivityItem[]>([
     {
       title: 'Portfolio Website edited',
       time: '2 hours ago',
-      type: 'edited',
+      type: 'edited'
     },
     {
       title: 'Landing Page published',
       time: '3 days ago',
-      type: 'published',
+      type: 'published'
     },
     {
       title: 'E-commerce Store created',
       time: '5 days ago',
-      type: 'created',
+      type: 'created'
     },
     {
       title: 'Blog Platform edited',
-      time: '5 days ago',
-      type: 'edited',
-    },
-    {
-      title: 'Agency Website published',
-      time: '1 week ago',
-      type: 'published',
-    },
-    {
-      title: 'Portfolio Website created',
-      time: '2 weeks ago',
-      type: 'created',
-    },
+      time: '6 days ago',
+      type: 'edited'
+    }
   ]);
 
   trackByIndex = (index: number): number => index;
