@@ -14,14 +14,14 @@
   border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-  padding: 24px;
+  padding: 22px;
 }
 
 .recent-activity__heading {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #ececf2;
 }
 
@@ -47,7 +47,7 @@
 .recent-activity__title {
   margin: 0;
   color: #111111;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -64,7 +64,7 @@
   padding: 20px 0 0 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .activity-item {
@@ -130,7 +130,7 @@
 .activity-item__title {
   margin: 0;
   color: #111111;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   line-height: 1.35;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -139,7 +139,7 @@
 .activity-item__time {
   margin: 0;
   color: #8a8f98;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   line-height: 1.35;
 }
 
