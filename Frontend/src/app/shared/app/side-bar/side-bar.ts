@@ -70,12 +70,6 @@ export class SideBar implements OnChanges {
       label: 'Account',
       items: [
         {
-          label: 'Profile',
-          icon: 'user',
-          route: '/app/profile',
-          hasDropdown: false
-        },
-        {
           label: 'Billing',
           icon: 'credit-card',
           route: '/app/billing',

@@ -92,10 +92,18 @@ export class AppHeader {
   private readPageTitle(): string {
     let route = this.router.routerState.snapshot.root;
     let title = 'Home';
+    let fullPath = '';
     while (route.firstChild) {
       route = route.firstChild;
+      if (route.routeConfig && route.routeConfig.path) {
+        fullPath += '/' + route.routeConfig.path;
+      }
       const t = route.data['title'] as string | undefined;
       if (t) title = t;
+    }
+    // If the route is under /app/settings, always show 'Settings' as the main header title
+    if (fullPath.startsWith('/app/settings')) {
+      return 'Settings';
     }
     return title;
   }

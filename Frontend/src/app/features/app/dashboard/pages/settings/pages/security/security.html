@@ -1,0 +1,319 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">Security</h1>
+    <p class="profile-subtitle">Manage your password, authentication, and recovery options</p>
+  </div>
+
+  <form [formGroup]="securityForm" class="profile-form">
+    <!-- Change Password Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Change Password</h2>
+      <div class="section-content">
+          <div class="form-group">
+            <label for="currentPassword" class="form-label">Current Password *</label>
+            <div class="input-box" [class.invalid]="isFieldInvalid('currentPassword')">
+              <input
+                [type]="showCurrentPassword ? 'text' : 'password'"
+                id="currentPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('currentPassword')"
+                formControlName="currentPassword"
+                placeholder="Enter current password"
+              />
+              <span
+                [class]="showCurrentPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showCurrentPassword = !showCurrentPassword"></span>
+            </div>
+            @if (isFieldInvalid('currentPassword')) {
+              <span class="form-error">{{ getFieldError('currentPassword') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="newPassword" class="form-label">New Password *</label>
+            <div class="input-box" [class.invalid]="isFieldInvalid('newPassword')">
+              <input
+                [type]="showNewPassword ? 'text' : 'password'"
+                id="newPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('newPassword')"
+                formControlName="newPassword"
+                placeholder="Enter new password"
+              />
+              <span
+                [class]="showNewPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showNewPassword = !showNewPassword"></span>
+            </div>
+            @if (isFieldInvalid('newPassword')) {
+              <span class="form-error">{{ getFieldError('newPassword') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">Confirm New Password *</label>
+            <div class="input-box" [class.invalid]="isFieldInvalid('confirmPassword')">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('confirmPassword')"
+                formControlName="confirmPassword"
+                placeholder="Confirm new password"
+              />
+              <span
+                [class]="showConfirmPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showConfirmPassword = !showConfirmPassword"></span>
+            </div>
+            @if (isFieldInvalid('confirmPassword')) {
+              <span class="form-error">{{ getFieldError('confirmPassword') }}</span>
+            }
+          </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onChangePassword()" [disabled]="securityForm.invalid || isSavingPassword">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingPassword) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingPassword ? 'Changing...' : 'Change' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verify Logins by Email Section -->
+    <div class="profile-section">
+      <h2 class="section-title">2-step verification</h2>
+      <div class="section-content verify-login-row">
+        <div class="verify-login-left">
+          <span class="verify-login-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <rect width="20" height="14" x="2" y="5" rx="3" fill="#fff" stroke="#222" stroke-width="1.5"/>
+              <path d="M4 7l8 6 8-6" stroke="#222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="verify-login-label">Verify logins by email</span>
+        </div>
+        <button type="button" class="verify-login-btn" [class.enabled]="is2FAEnabled" (click)="openVerifyEmailModal()">
+          {{ is2FAEnabled ? 'Disable' : 'Enable' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Confirm Email Modal -->
+    @if (showVerifyEmailModal) {
+      <div class="modal-overlay" (click)="closeVerifyEmailModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">Confirm your email</h2>
+            <button type="button" class="modal-close" (click)="closeVerifyEmailModal()" aria-label="Close">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+          <div class="modal-body">
+            <div class="modal-description">
+              To enable, first confirm your email so we know it's you.<br>
+              We'll send a code to <b>{{ userEmail }}</b> for you to enter here.
+            </div>
+          </div>
+          <div class="modal-footer" style="align-items: center;">
+            <a href="#" style="margin-right:auto;color:#2563eb;text-decoration:underline;font-size:15px;font-weight:500;" (click)="goToChangeEmail($event)">Change Account Email</a>
+            <button type="button" class="btn btn-secondary" (click)="closeVerifyEmailModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="sendVerifyEmailCode()">Send Code</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Security Questions Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Security Questions</h2>
+      <div class="section-content">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="question1" class="form-label">Question 1 *</label>
+            <select
+              id="question1"
+              class="form-input security-question-select"
+              [class.form-input--error]="isFieldInvalid('question1')"
+              formControlName="question1"
+            >
+              <option value="" disabled selected>Select a question</option>
+              @for (q of filteredQuestions1; track q) {
+                <option [value]="q">{{ q }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('question1')) {
+              <span class="form-error">{{ getFieldError('question1') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="answer1" class="form-label">Answer 1 *</label>
+            <input
+              id="answer1"
+              type="text"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('answer1')"
+              formControlName="answer1"
+              placeholder="Enter your answer"
+            />
+            @if (isFieldInvalid('answer1')) {
+              <span class="form-error">{{ getFieldError('answer1') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="question2" class="form-label">Question 2 *</label>
+            <select
+              id="question2"
+              class="form-input security-question-select"
+              [class.form-input--error]="isFieldInvalid('question2')"
+              formControlName="question2"
+            >
+              <option value="" disabled selected>Select a question</option>
+              @for (q of filteredQuestions2; track q) {
+                <option [value]="q">{{ q }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('question2')) {
+              <span class="form-error">{{ getFieldError('question2') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="answer2" class="form-label">Answer 2 *</label>
+            <input
+              id="answer2"
+              type="text"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('answer2')"
+              formControlName="answer2"
+              placeholder="Enter your answer"
+            />
+            @if (isFieldInvalid('answer2')) {
+              <span class="form-error">{{ getFieldError('answer2') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onSaveSecurityQuestions()" [disabled]="!securityQuestionsValid || isSavingQuestions">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingQuestions) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingQuestions ? 'Saving...' : 'Save' }}</span>
+          </button>
+
+          @if (showVerifyQuestionsModal) {
+            <div class="modal-overlay" (click)="closeVerifyQuestionsModal()">
+              <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                  <h2 class="modal-title">Confirm your identity</h2>
+                  <button type="button" class="modal-close" (click)="closeVerifyQuestionsModal()" aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <form class="modal-body pdb" (submit)="$event.preventDefault(); confirmVerifyQuestionsPassword();">
+                  <div class="form-group">
+                    <label for="verifyQuestionsPassword">Enter your password to confirm</label>
+                    <input
+                      id="verifyQuestionsPassword"
+                      type="password"
+                      class="form-input"
+                      [(ngModel)]="verifyQuestionsPassword"
+                      name="verifyQuestionsPassword"
+                      autocomplete="current-password"
+                      required
+                    />
+                    @if (verifyQuestionsError) {
+                      <span class="form-error">{{ verifyQuestionsError }}</span>
+                    }
+                  </div>
+                </form>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" (click)="closeVerifyQuestionsModal()">Cancel</button>
+                  <button type="button" class="btn btn-primary" (click)="confirmVerifyQuestionsPassword()">Confirm</button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Recovery Options Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Account Recovery Options</h2>
+      <div class="section-content">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="recoveryEmail" class="form-label">Recovery Email</label>
+            <input
+              id="recoveryEmail"
+              type="email"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('recoveryEmail')"
+              formControlName="recoveryEmail"
+              placeholder="Enter recovery email"
+            />
+            @if (isFieldInvalid('recoveryEmail')) {
+              <span class="form-error">{{ getFieldError('recoveryEmail') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="recoveryPhone" class="form-label">Recovery Phone</label>
+            <input
+              id="recoveryPhone"
+              type="tel"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('recoveryPhone')"
+              formControlName="recoveryPhone"
+              placeholder="Enter recovery phone"
+            />
+            @if (isFieldInvalid('recoveryPhone')) {
+              <span class="form-error">{{ getFieldError('recoveryPhone') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onSaveRecoveryOptions()" [disabled]="!recoveryOptionsValid || isSavingRecovery">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingRecovery) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingRecovery ? 'Saving...' : 'Save' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

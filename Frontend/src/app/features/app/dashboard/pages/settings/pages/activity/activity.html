@@ -1,0 +1,322 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">Activity</h1>
+    <p class="profile-subtitle">Monitor your account's login activity and active sessions</p>
+  </div>
+
+  <!-- Active Sessions Section -->
+  <div class="profile-section">
+    <div class="section-header">
+      <h2 class="section-title">Active Sessions</h2>
+      @if (activeSessions.length > 1) {
+        <button type="button" class="btn btn-secondary btn-sm" (click)="signOutAllOtherSessions()" [disabled]="isSigningOutAll">
+          {{ isSigningOutAll ? 'Signing out...' : 'Sign out all other sessions' }}
+        </button>
+      }
+    </div>
+    <div class="section-content">
+      @if (activeSessions.length === 0) {
+        <div class="empty-state">
+          <p>No active sessions</p>
+        </div>
+      } @else {
+        <div class="sessions-list">
+          @for (session of activeSessions; track session.id) {
+            <div class="session-card" [class.current]="session.isCurrent">
+              <div class="session-header">
+                <div class="session-info">
+                  <div class="device-icon" [class]="'device-' + session.deviceType.toLowerCase()">
+                    @if (session.deviceType === 'Desktop') {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M8 19h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M10 19v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M14 19v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    } @else if (session.deviceType === 'Mobile') {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="2" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    }
+                  </div>
+                  <div class="device-details">
+                    <h3 class="device-name">
+                      {{ session.deviceName }}
+                      @if (session.isCurrent) {
+                        <span class="badge badge-current">Current</span>
+                      }
+                    </h3>
+                    <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
+                  </div>
+                </div>
+                @if (!session.isCurrent) {
+                  <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
+                    Sign out
+                  </button>
+                }
+              </div>
+              <div class="session-details">
+                <div class="detail-item">
+                  <span class="detail-label">Location:</span>
+                  <span class="detail-value">{{ session.location }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">IP Address:</span>
+                  <span class="detail-value">{{ session.ipAddress }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Last Active:</span>
+                  <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="section-footer">
+          <button type="button" class="btn btn-secondary" (click)="openSessionsModal()">
+            See More
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Sessions Modal -->
+  @if (showSessionsModal) {
+    <div class="modal-overlay" (click)="closeSessionsModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">All Active Sessions</h2>
+          <button type="button" class="modal-close" (click)="closeSessionsModal()" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="modal-filters">
+            <div class="filter-group">
+              <label class="filter-label">Device Type</label>
+              <select [(ngModel)]="sessionsFilterDeviceType" class="filter-select">
+                <option value="all">All Devices</option>
+                <option value="Desktop">Desktop</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Tablet">Tablet</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetSessionFilters()">Reset Filters</button>
+          </div>
+          <!-- Sessions List -->
+          @if (filteredSessions.length === 0) {
+            <div class="empty-state">
+              <p>No sessions match your filters</p>
+            </div>
+          } @else {
+            <div class="sessions-list modal-sessions-list">
+              @for (session of filteredSessions; track session.id) {
+                <div class="session-card" [class.current]="session.isCurrent">
+                  <div class="session-header">
+                    <div class="session-info">
+                      <div class="device-icon" [class]="'device-' + session.deviceType.toLowerCase()">
+                        @if (session.deviceType === 'Desktop') {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M8 19h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M10 19v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M14 19v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        } @else if (session.deviceType === 'Mobile') {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        } @else {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="2" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        }
+                      </div>
+                      <div class="device-details">
+                        <h3 class="device-name">
+                          {{ session.deviceName }}
+                          @if (session.isCurrent) {
+                            <span class="badge badge-current">Current</span>
+                          }
+                        </h3>
+                        <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
+                      </div>
+                    </div>
+                    @if (!session.isCurrent) {
+                      <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
+                        Sign out
+                      </button>
+                    }
+                  </div>
+                  <div class="session-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Location:</span>
+                      <span class="detail-value">{{ session.location }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">IP Address:</span>
+                      <span class="detail-value">{{ session.ipAddress }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Last Active:</span>
+                      <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Login History Section -->
+  <div class="profile-section">
+    <h2 class="section-title">Login History</h2>
+    <div class="section-content">
+      @if (loginHistory.length === 0) {
+        <div class="empty-state">
+          <p>No login history available</p>
+        </div>
+      } @else {
+        <div class="login-history-list">
+          @for (login of loginHistory.slice(0, 5); track login.id) {
+            <div class="login-record" [class]="'status-' + login.status">
+              <div class="login-status-icon">
+                @if (login.status === 'success') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                } @else {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                }
+              </div>
+              <div class="login-info">
+                <div class="login-header">
+                  <div>
+                    <h4 class="login-device">{{ login.deviceName }}</h4>
+                    <p class="login-meta">{{ login.browser }} • {{ login.os }}</p>
+                  </div>
+                  <div class="login-time">
+                    <span class="login-date">{{ formatDate(login.timestamp) }}</span>
+                  </div>
+                </div>
+                <div class="login-details">
+                  <span class="login-detail">{{ login.location }}</span>
+                  <span class="login-detail">IP: {{ login.ipAddress }}</span>
+                  @if (login.status === 'failed' && login.failureReason) {
+                    <span class="login-detail login-failure">{{ login.failureReason }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="section-footer">
+          <button type="button" class="btn btn-secondary" (click)="openLoginHistoryModal()">
+            See More
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Login History Modal -->
+  @if (showLoginHistoryModal) {
+    <div class="modal-overlay" (click)="closeLoginHistoryModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Login History</h2>
+          <button type="button" class="modal-close" (click)="closeLoginHistoryModal()" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="modal-filters">
+            <div class="filter-group">
+              <label class="filter-label">Status</label>
+              <select [(ngModel)]="loginFilterStatus" class="filter-select">
+                <option value="all">All</option>
+                <option value="success">Successful</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Date Range</label>
+              <select [(ngModel)]="loginFilterDateRange" class="filter-select">
+                <option value="all">All Time</option>
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+                <option value="90days">Last 90 Days</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetLoginFilters()">Reset Filters</button>
+          </div>
+          <!-- Login History List -->
+          @if (filteredLoginHistory.length === 0) {
+            <div class="empty-state">
+              <p>No login records match your filters</p>
+            </div>
+          } @else {
+            <div class="login-history-list modal-login-history-list">
+              @for (login of filteredLoginHistory; track login.id) {
+                <div class="login-record" [class]="'status-' + login.status">
+                  <div class="login-status-icon">
+                    @if (login.status === 'success') {
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    }
+                  </div>
+                  <div class="login-info">
+                    <div class="login-header">
+                      <div>
+                        <h4 class="login-device">{{ login.deviceName }}</h4>
+                        <p class="login-meta">{{ login.browser }} • {{ login.os }}</p>
+                      </div>
+                      <div class="login-time">
+                        <span class="login-date">{{ formatDate(login.timestamp) }}</span>
+                      </div>
+                    </div>
+                    <div class="login-details">
+                      <span class="login-detail">{{ login.location }}</span>
+                      <span class="login-detail">IP: {{ login.ipAddress }}</span>
+                      @if (login.status === 'failed' && login.failureReason) {
+                        <span class="login-detail login-failure">{{ login.failureReason }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
