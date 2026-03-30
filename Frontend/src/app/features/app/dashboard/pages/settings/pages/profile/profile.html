@@ -1,0 +1,402 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">Profile</h1>
+    <p class="profile-subtitle">Manage your personal information and preferences</p>
+  </div>
+
+  <form [formGroup]="profileForm" class="profile-form">
+    <!-- Avatar Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Profile Picture</h2>
+      <div class="section-content">
+        <div class="avatar-section">
+          <div class="avatar-preview">
+            @if (avatarPreview) {
+              <img [src]="avatarPreview" alt="Avatar preview" class="avatar-image" />
+            } @else {
+              <div class="avatar-placeholder">
+                <app-icon name="user" [size]="48" />
+              </div>
+            }
+          </div>
+          <div class="avatar-actions">
+            <label class="upload-button">
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onAvatarChange($event)"
+                hidden
+              />
+              Upload Photo
+            </label>
+            @if (avatarPreview) {
+              <button type="button" class="remove-button" (click)="removeAvatar()">
+                Remove
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="profile-section" id="personal-info-section">
+      <h2 class="section-title">Personal Information</h2>
+      <div class="section-content">
+
+      <!-- Name Fields (Two Columns) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name *</label>
+          <input
+            id="firstName"
+            type="text"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('firstName')"
+            formControlName="firstName"
+            placeholder="John"
+          />
+          @if (isFieldInvalid('firstName')) {
+            <span class="form-error">{{ getFieldError('firstName') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name *</label>
+          <input
+            id="lastName"
+            type="text"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('lastName')"
+            formControlName="lastName"
+            placeholder="Doe"
+          />
+          @if (isFieldInvalid('lastName')) {
+            <span class="form-error">{{ getFieldError('lastName') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Account Email</label>
+        <div class="email-field-wrapper">
+          <input
+            id="email"
+            type="email"
+            class="form-input form-input--disabled"
+            formControlName="email"
+            readonly
+          />
+          <button
+            type="button"
+            class="email-edit-btn"
+            title="Edit email address"
+            (click)="openEmailModal()"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Email Change Modal -->
+      @if (showEmailModal) {
+        <div class="modal-overlay" (click)="closeEmailModal()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">Change account email</h2>
+              <button type="button" class="modal-close" (click)="closeEmailModal()" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <form [formGroup]="emailChangeForm" class="modal-body">
+              <div class="form-group">
+                @if (showResetPasswordMsg) {
+                  <div class="reset-password-msg success">
+                    <span>{{ resetPasswordMsg }}</span>
+                    <button type="button" class="msg-close-btn" (click)="showResetPasswordMsg = false" aria-label="Close">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+                <label for="currentPassword">Enter your account password</label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('password')"
+                  formControlName="password"
+                  placeholder="Enter your password"
+                />
+                @if (isFieldInvalid('password')) {
+                  <span class="form-error">{{ getFieldError('password') }}</span>
+                }
+                <div class="forgot-password-link">
+                  <a href="#" (click)="$event.preventDefault(); forgotPassword()">Forgot Password?</a>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="newEmail">Enter new account email</label>
+                <input
+                  id="newEmail"
+                  type="email"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('newEmail')"
+                  formControlName="newEmail"
+                  placeholder="Enter new email"
+                />
+                @if (isFieldInvalid('newEmail')) {
+                  <span class="form-error">{{ getFieldError('newEmail') }}</span>
+                }
+              </div>
+              <div class="form-group">
+                <label for="confirmEmail">Confirm new account email</label>
+                <input
+                  id="confirmEmail"
+                  type="email"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('confirmEmail')"
+                  formControlName="confirmEmail"
+                  placeholder="Confirm new email"
+                />
+                @if (isFieldInvalid('confirmEmail')) {
+                  <span class="form-error">{{ getFieldError('confirmEmail') }}</span>
+                }
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="confirmEmailChange()" [disabled]="emailChangeForm.invalid">Next</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Email Code Confirmation Modal -->
+      @if (showEmailCodeModal) {
+        <div class="modal-overlay" (click)="showEmailCodeModal = false">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">Check your email</h2>
+              <button type="button" class="modal-close" (click)="cancelEmailCode()" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <form [formGroup]="emailCodeForm" class="modal-body">
+              <div class="modal-description">
+                To finish changing your email, please enter the 6-digit code we sent to <b>{{ emailToConfirm }}</b>
+              </div>
+              <div class="form-group">
+                <input
+                  id="code"
+                  type="text"
+                  maxlength="6"
+                  class="form-input"
+                  [class.form-input--error]="emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)"
+                  formControlName="code"
+                  placeholder="e.g., 123456"
+                />
+                @if (emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)) {
+                  <span class="form-error">Invalid code</span>
+                }
+              </div>
+              <div class="resend-code-link">
+                <a href="#" (click)="$event.preventDefault();">Resend Code</a>
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="cancelEmailCode()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="submitEmailCode()" [disabled]="emailCodeForm.invalid">Submit</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Cancel Confirmation Modal -->
+      @if (showCancelConfirmModal) {
+        <div class="modal-overlay" (click)="closeCancelConfirmModal()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">Cancel your changes?</h2>
+              <button type="button" class="modal-close" (click)="closeCancelConfirmModal()" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="modal-description">
+                Your changes won’t be saved and you’ll continue using <b>{{ profileForm.get('email')?.value }}</b> to log in.
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary-red" (click)="closeCancelConfirmModal()">Back</button>
+              <button type="button" class="btn btn-danger" (click)="confirmCancelChange()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="username" class="form-label">Username *</label>
+        <input
+          id="username"
+          type="text"
+          class="form-input"
+          [class.form-input--error]="isFieldInvalid('username')"
+          formControlName="username"
+          placeholder="johndoe"
+        />
+        @if (isFieldInvalid('username')) {
+          <span class="form-error">{{ getFieldError('username') }}</span>
+        }
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input
+          id="phone"
+          type="tel"
+          class="form-input"
+          [class.form-input--error]="isFieldInvalid('phone')"
+          formControlName="phone"
+          placeholder="+1 (555) 000-0000"
+        />
+        @if (isFieldInvalid('phone')) {
+          <span class="form-error">{{ getFieldError('phone') }}</span>
+        }
+      </div>
+      </div>
+    </div>
+
+    <!-- Location & Timezone Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Location & Preferences</h2>
+      <div class="section-content">
+        <div class="form-group">
+          <label for="country" class="form-label">Country *</label>
+          <select
+            id="country"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('country')"
+            formControlName="country"
+          >
+            <option value="" disabled>Select a country</option>
+            @for (country of countries; track country) {
+              <option [value]="country">{{ country }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('country')) {
+            <span class="form-error">{{ getFieldError('country') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="website" class="form-label">Website / Portfolio</label>
+          <input
+            id="website"
+            type="url"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('website')"
+            formControlName="website"
+            placeholder="https://yoursite.com"
+          />
+          @if (isFieldInvalid('website')) {
+            <span class="form-error">{{ getFieldError('website') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Logins Section -->
+    <div class="profile-section">
+      <h2 class="section-title">Social logins</h2>
+      <div class="section-content">
+        <div class="social-logins">
+        @for (platform of socialMediaPlatforms; track platform.id) {
+          <div class="social-login-item">
+            <div class="social-login-content">
+              <div class="social-login-icon">
+                @if (platform.id === 'google') {
+                  <img src="assets/app/settings/profile/google.svg" alt="Google" class="social-icon" />
+                }
+                @else if (platform.id === 'facebook') {
+                  <img src="assets/app/settings/profile/facebook.svg" alt="Facebook" class="social-icon" />
+                }
+              </div>
+              <div class="social-login-info">
+                <h3 class="social-login-title">{{ platform.label }}</h3>
+                <p class="social-login-status" [class.connected]="platform.status === 'connected'" [class.disconnected]="platform.status === 'disconnected'">
+                  @if (platform.status === 'connected') {
+                    <span>Skander Boughnimi</span>
+                  } @else {
+                    <span>Disabled</span>
+                  }
+                </p>
+              </div>
+            </div>
+            <button type="button" class="social-login-action" [class.disconnect]="platform.status === 'connected'" [class.connect]="platform.status === 'disconnected'">
+              @if (platform.status === 'connected') {
+                <span>Disable</span>
+              } @else {
+                <span>Enable</span>
+              }
+            </button>
+          </div>
+        }
+      </div>
+      <p class="social-login-note">* If you disable social logins, you'll still be able to log in using your Forma email and password.</p>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-save"
+        [class.is-loading]="isSaving"
+        (click)="onSave()"
+        [disabled]="profileForm.invalid || isSaving"
+      >
+        <div class="svg-wrapper-1">
+          <div class="svg-wrapper">
+            @if (isSaving) {
+              <svg viewBox="25 25 50 50" class="icon icon-loading">
+                <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+              </svg>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                class="icon icon-save"
+              >
+                <path
+                  d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            }
+          </div>
+        </div>
+        <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

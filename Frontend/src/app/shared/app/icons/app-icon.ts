@@ -14,7 +14,10 @@ export type AppIconName =
   | 'search'
   | 'log-out'
   | 'sparkles'
-  | 'panel-left';
+  | 'panel-left'
+  | 'shield'
+  | 'history'
+  | 'arrow-left';
 
 @Component({
   selector: 'app-icon',
@@ -97,6 +100,17 @@ export type AppIconName =
           <path d="M9.9 4.2 12 2l2.1 2.2L16 6l-1.9 1.9L12 12l-2.1-4.1L8 6z" />
           <path d="M4.5 13.5 6 12l1.5 1.5L9 15l-1.5 1.5L6 18l-1.5-1.5L3 15z" />
           <path d="m14.5 16.5 1-1 1 1-1 1-1-1z" />
+        }
+        @case ('shield') {
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        }
+        @case ('history') {
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 6v6l4 2" />
+        }
+        @case ('arrow-left') {
+          <path d="m12 19-7-7 7-7" />
+          <path d="M19 12H5" />
         }
       }
     </svg>

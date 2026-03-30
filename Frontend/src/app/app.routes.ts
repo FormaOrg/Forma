@@ -23,6 +23,11 @@ import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 import { Dashboard } from './features/app/dashboard/dashboard';
 import { Home } from './features/app/dashboard/pages/home/home';
 import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
+import { Settings } from './features/app/dashboard/pages/settings/settings';
+import { SettingsProfile } from './features/app/dashboard/pages/settings/pages/profile/profile';
+import { SettingsSecurity } from './features/app/dashboard/pages/settings/pages/security/security';
+import { SettingsPreferences } from './features/app/dashboard/pages/settings/pages/preferences/preferences';
+import { SettingsActivity } from './features/app/dashboard/pages/settings/pages/activity/activity';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -61,7 +66,18 @@ export const routes: Routes = [
       { path: 'templates', component: DashboardStub, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
       { path: 'billing', component: DashboardStub, data: { title: 'Billing' } },
-      { path: 'settings', component: DashboardStub, data: { title: 'Settings' } }
+      {
+        path: 'settings',
+        component: Settings,
+        data: { title: 'Settings' },
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'profile' },
+          { path: 'profile', component: SettingsProfile, data: { title: 'Profile' } },
+          { path: 'security', component: SettingsSecurity, data: { title: 'Security' } },
+          { path: 'preferences', component: SettingsPreferences, data: { title: 'Preferences' } },
+          { path: 'activity', component: SettingsActivity, data: { title: 'Activity' } }
+        ]
+      }
     ]
   },
 
