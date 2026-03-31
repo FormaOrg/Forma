@@ -5,11 +5,52 @@
 .profile-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0;
+  padding: 18px 16px 40px;
+}
+
+.profile-header-sentinel {
+  position: relative;
+  width: 100%;
+  height: 1px;
 }
 
 .profile-header {
-  margin-bottom: 40px;
+  margin: 0 0 40px;
+  padding: 0 4px;
+  position: relative;
+  z-index: 25;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 0;
+  backdrop-filter: blur(0);
+  transform: translateY(0);
+  will-change: transform, opacity;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    backdrop-filter 180ms ease,
+    padding 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+}
+
+.profile-header--stuck {
+  position: fixed;
+  margin: 0;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+  transform: translateY(0);
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.profile-header-placeholder {
+  width: 100%;
 }
 
 .profile-title {
@@ -26,33 +67,40 @@
 }
 
 .profile-section {
-  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
 }
 
 .section-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
 }
 
 .section-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(11, 11, 18, 0.82);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin: 0;
 }
 
-.section-title:not(.section-header .section-title) {
-  margin-bottom: 20px;
+.section-header--simple {
+  justify-content: flex-start;
 }
 
 .section-content {
   background-color: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.11);
+  border-radius: 18px;
   overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(17, 24, 39, 0.02),
+    0 4px 12px rgba(11, 11, 18, 0.035);
 }
 
 .section-footer {
@@ -526,10 +574,6 @@
 @media (max-width: 640px) {
   .profile-header {
     padding: 0 16px;
-  }
-
-  .profile-section {
-    margin-bottom: 32px;
   }
 
   .section-header,

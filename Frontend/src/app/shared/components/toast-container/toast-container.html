@@ -1,0 +1,54 @@
+<div class="toast-stack" aria-live="polite" aria-atomic="false">
+  @for (toast of toastService.toasts(); track trackByToastId($index, toast)) {
+    <article
+      class="toast-card"
+      [class]="'toast-card toast-card--' + toast.type"
+      [class.toast-card--closing]="toast.isClosing"
+      role="status"
+    >
+      <div class="toast-icon" aria-hidden="true">
+        @switch (toast.type) {
+          @case ('success') {
+            <svg viewBox="0 0 24 24">
+              <path d="M20 7L9 18L4 13" />
+            </svg>
+          }
+          @case ('warning') {
+            <svg viewBox="0 0 24 24">
+              <path d="M12 4L21 20H3L12 4Z" />
+              <path d="M12 9V13" />
+              <circle cx="12" cy="17" r="1" />
+            </svg>
+          }
+          @case ('error') {
+            <svg viewBox="0 0 24 24">
+              <path d="M18 6L6 18" />
+              <path d="M6 6L18 18" />
+            </svg>
+          }
+          @default {
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 10V16" />
+              <circle cx="12" cy="7.5" r="1" />
+            </svg>
+          }
+        }
+      </div>
+
+      <p class="toast-message">{{ toast.message }}</p>
+
+      <button
+        type="button"
+        class="toast-close"
+        (click)="dismiss(toast.id)"
+        aria-label="Close notification"
+      >
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M6 6L14 14" />
+          <path d="M14 6L6 14" />
+        </svg>
+      </button>
+    </article>
+  }
+</div>

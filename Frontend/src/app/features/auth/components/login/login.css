@@ -63,6 +63,18 @@
   animation: fadeIn 0.3s ease;
 }
 
+.login-verification-banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #eef6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -82,12 +94,29 @@
   margin-top: 1px;
 }
 
+.login-verification-banner-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #2563eb;
+  margin-top: 2px;
+}
+
 .unverified-banner-icon svg {
   width: 100%;
   height: 100%;
 }
 
+.login-verification-banner-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 .unverified-banner-body {
+  flex: 1;
+}
+
+.login-verification-banner-body {
   flex: 1;
 }
 
@@ -98,11 +127,99 @@
   margin-bottom: 3px;
 }
 
+.login-verification-title {
+  font-size: 0.82em;
+  font-weight: 700;
+  color: #1d4ed8;
+  margin-bottom: 4px;
+}
+
 .unverified-banner-sub {
   font-size: 0.76em;
   color: #78350f;
   line-height: 1.5;
   margin-bottom: 10px;
+}
+
+.login-verification-sub {
+  font-size: 0.76em;
+  color: #1e3a8a;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.verification-inline-form {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.verification-code-input {
+  flex: 1;
+}
+
+.verification-code-input input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #bfdbfe;
+  background: #ffffff;
+  font-size: 13.5px;
+  color: #0f172a;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.verification-code-input input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.verify-login-btn {
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78em;
+  font-weight: 600;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.verify-login-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.verify-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cancel-verification-btn {
+  border: none;
+  background: transparent;
+  color: #1d4ed8;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.76em;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cancel-verification-btn:hover {
+  color: #1e3a8a;
 }
 
 .resend-success {
@@ -406,5 +523,13 @@ button[type="submit"]:disabled {
   .remember-forgot {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .verification-inline-form {
+    flex-direction: column;
+  }
+
+  .verify-login-btn {
+    min-height: 42px;
   }
 }

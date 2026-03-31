@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { GuestGuard } from './core/guards/guest.guard';
+import { AuthGuard } from './core/guards/auth.guard';
+import { RootRedirectGuard } from './core/guards/root-redirect.guard';
 
 import { LandingPage } from './features/landing-page/landing-page';
 import { Pricing } from './features/pricing/pricing';
@@ -15,6 +17,7 @@ import { RegisterComponent } from './features/auth/components/register/register'
 import { EmailVerificationComponent } from './features/auth/components/email-verification/email-verification';
 import { EmailVerificationRequiredComponent } from './features/auth/components/email-verification-required/email-verification-required';
 import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password';
+import { LoginVerificationComponent } from './features/auth/components/login-verification/login-verification';
 import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password';
 import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-showcase';
 import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
@@ -30,7 +33,7 @@ import { SettingsPreferences } from './features/app/dashboard/pages/settings/pag
 import { SettingsActivity } from './features/app/dashboard/pages/settings/pages/activity/activity';
 
 export const routes: Routes = [
-  { path: '', component: LandingPage },
+  { path: '', component: LandingPage, canActivate: [RootRedirectGuard] },
   { path: 'pricing', component: Pricing },
   { path: 'templates', component: TemplateGallery },
   { path: 'portfolio-website', component: PortfolioShowcase },
@@ -48,6 +51,7 @@ export const routes: Routes = [
     component: AuthLayout,
     children: [
       { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
+      { path: 'login-verification', component: LoginVerificationComponent, canActivate: [GuestGuard] },
       { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
       { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
       { path: 'verify-email', component: EmailVerificationComponent },
@@ -59,6 +63,8 @@ export const routes: Routes = [
   {
     path: 'app',
     component: Dashboard,
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: 'home', component: Home, data: { title: 'Home' } },

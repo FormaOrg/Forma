@@ -7,15 +7,19 @@ import tn.forma.users.model.Role;
 import tn.forma.users.model.User;
 import tn.forma.users.repository.UserRepository;
 import tn.forma.users.security.UserDetailsServiceImpl;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsServiceImpl userDetailsService;
     private final EmailService emailService;
+    private final ActivityService activityService;
 
     // ── Register ───────────────────────────────────────────
 
@@ -78,36 +83,87 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        // Authenticate — throws if credentials are wrong
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        User existingUser = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+            activityService.recordFailedLogin(
+                    request.getEmail(),
+                    ex instanceof BadCredentialsException ? "Incorrect password" : "Authentication failed",
+                    existingUser
+            );
+            throw ex;
+        }
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!user.isEmailVerified()) {
+            activityService.recordFailedLogin(request.getEmail(), "Email not verified", user);
             throw new RuntimeException("Please verify your email before logging in");
         }
 
         if (!user.isActive()) {
+            activityService.recordFailedLogin(request.getEmail(), "Account disabled", user);
             throw new RuntimeException("Account is disabled");
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String accessToken  = jwtService.generateAccessToken(userDetails, user.getId());
-        String refreshToken = jwtService.generateRefreshToken(userDetails, user.getId());
+        if (user.isLoginVerificationEnabled()) {
+            issueLoginVerificationChallenge(user);
 
-        log.info("User logged in: {}", user.getEmail());
+            return AuthResponse.builder()
+                    .user(mapToUserDto(user))
+                    .requiresLoginVerification(true)
+                    .loginVerificationToken(
+                            jwtService.generateLoginVerificationToken(
+                                    user.getEmail(),
+                                    user.getId(),
+                                    request.isRememberMe()
+                            )
+                    )
+                    .message("We sent a 6-digit verification code to your email.")
+                    .build();
+        }
 
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .user(mapToUserDto(user))
-                .build();
+        return createAuthenticatedResponse(user, request.isRememberMe());
+    }
+
+    @Transactional
+    public AuthResponse verifyLogin(LoginVerificationRequest request) {
+        User user = getUserFromLoginVerificationToken(request.getToken());
+
+        if (!user.isLoginVerificationEnabled()) {
+            throw new RuntimeException("Login verification is not enabled for this account");
+        }
+
+        if (!user.isLoginVerificationCodeValid()) {
+            throw new RuntimeException("Login verification code has expired");
+        }
+
+        if (!request.getCode().equals(user.getLoginVerificationCode())) {
+            throw new RuntimeException("Invalid login verification code");
+        }
+
+        clearLoginVerificationCode(user);
+        return createAuthenticatedResponse(user, jwtService.extractRememberMe(request.getToken()));
+    }
+
+    @Transactional
+    public MessageResponse resendLoginVerification(String verificationToken) {
+        User user = getUserFromLoginVerificationToken(verificationToken);
+
+        if (!user.isLoginVerificationEnabled()) {
+            throw new RuntimeException("Login verification is not enabled for this account");
+        }
+
+        issueLoginVerificationChallenge(user);
+        return new MessageResponse("A new login verification code has been sent to your email.");
     }
 
     // ── Refresh token ──────────────────────────────────────
@@ -118,17 +174,23 @@ public class AuthService {
         }
 
         String email = jwtService.extractEmail(refreshToken);
+        String sessionId = jwtService.extractSessionId(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
+        if (!activityService.isSessionActive(sessionId)) {
+            throw new RuntimeException("Session has been signed out");
+        }
+
         if (!jwtService.isTokenValid(refreshToken, userDetails)) {
             throw new RuntimeException("Refresh token expired");
         }
 
-        String newAccessToken  = jwtService.generateAccessToken(userDetails, user.getId());
-        String newRefreshToken = jwtService.generateRefreshToken(userDetails, user.getId());
+        boolean rememberMe = jwtService.extractRememberMe(refreshToken);
+        String newAccessToken  = jwtService.generateAccessToken(userDetails, user.getId(), rememberMe, sessionId);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails, user.getId(), rememberMe, sessionId);
 
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
@@ -221,8 +283,71 @@ public class AuthService {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .country(user.getCountry())
+                .website(user.getWebsite())
                 .role(user.getRole().name())
+                .isActive(user.isActive())
                 .emailVerified(user.isEmailVerified())
+                .createdAt(Objects.toString(user.getCreatedAt(), null))
+                .updatedAt(Objects.toString(user.getUpdatedAt(), null))
                 .build();
+    }
+
+    private AuthResponse createAuthenticatedResponse(User user, boolean rememberMe) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        String sessionId = activityService.createAuthenticatedSession(user, rememberMe);
+        String accessToken = jwtService.generateAccessToken(userDetails, user.getId(), rememberMe, sessionId);
+        String refreshToken = jwtService.generateRefreshToken(userDetails, user.getId(), rememberMe, sessionId);
+
+        clearLoginVerificationCode(user);
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("User logged in: {}", user.getEmail());
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .user(mapToUserDto(user))
+                .requiresLoginVerification(false)
+                .build();
+    }
+
+    private User getUserFromLoginVerificationToken(String token) {
+        if (!jwtService.isLoginVerificationToken(token)) {
+            throw new RuntimeException("Invalid login verification token");
+        }
+
+        String email = jwtService.extractEmail(token);
+        Long userId = jwtService.extractUserId(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!Objects.equals(user.getId(), userId)) {
+            throw new RuntimeException("Invalid login verification token");
+        }
+
+        return user;
+    }
+
+    private void issueLoginVerificationChallenge(User user) {
+        String code = generateSixDigitCode();
+        user.setLoginVerificationCode(code);
+        user.setLoginVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+
+        emailService.sendLoginAccessCode(user.getEmail(), user.getFirstName(), code);
+        log.info("Login verification challenge issued for {}", user.getEmail());
+    }
+
+    private void clearLoginVerificationCode(User user) {
+        user.setLoginVerificationCode(null);
+        user.setLoginVerificationCodeExpiry(null);
+    }
+
+    private String generateSixDigitCode() {
+        return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1_000_000));
     }
 }

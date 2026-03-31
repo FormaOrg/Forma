@@ -2,38 +2,48 @@
 import { Injectable } from '@angular/core';
 import {
   CanActivate,
+  CanActivateChild,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-  Router
+  Router,
+  UrlTree
 } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate, CanActivateChild {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+    return this.checkAccess(state.url);
+  }
 
-    // 1. Not logged in → send to login, preserve returnUrl
+  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+    return this.checkAccess(state.url);
+  }
+
+  private checkAccess(returnUrl: string): Observable<boolean | UrlTree> {
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login'], {
-        queryParams: { returnUrl: state.url }
-      });
-      return false;
+      return of(this.router.createUrlTree(['/login'], {
+        queryParams: { returnUrl }
+      }));
     }
 
     const user = this.authService.currentUserValue;
 
-    // 2. Logged in but email not verified → send to verify-email-required
     if (user && !user.emailVerified) {
-      this.router.navigate(['/verify-email-required'], {
-        queryParams: { returnUrl: state.url }
-      });
-      return false;
+      return of(this.router.createUrlTree(['/verify-email-required'], {
+        queryParams: { returnUrl }
+      }));
     }
 
-    // 3. All good
-    return true;
+    return this.authService.validateCurrentSession().pipe(
+      map((isValid) => isValid
+        ? true
+        : this.router.createUrlTree(['/login'], { queryParams: { returnUrl } }))
+    );
   }
 }

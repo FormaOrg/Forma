@@ -1,141 +1,114 @@
-// profile.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {
+  ActivitySession,
+  AuthResponse,
+  ChangePasswordRequest,
+  ConfirmLoginVerificationChangeRequest,
+  ConfirmEmailChangeRequest,
+  LoginRecord,
+  RequestLoginVerificationChangeRequest,
+  RequestEmailChangeRequest,
+  SensitiveActionVerificationResponse,
+  SecuritySettingsResponse,
+  UpdateRecoveryOptionsRequest,
+  UpdateProfileRequest
+  ,
+  UpdateSecurityQuestionsRequest,
+  VerifySensitiveActionRequest
+} from '../models/user.model';
 
 export interface UserProfileResponse {
-  userId: number;
-  username: string;
+  id: number;
+  firstName: string;
+  lastName: string;
+  username?: string;
   email: string;
-  displayName?: string;
+  phone?: string;
+  country?: string;
+  website?: string;
   role: string;
   isActive: boolean;
   emailVerified: boolean;
-  memberSince: string;
+  createdAt?: string;
+  updatedAt?: string;
   lastLogin?: string;
-  
-  avatarUrl?: string;
-  coverImageUrl?: string;
-  bio?: string;
-  occupation?: string;
-  location?: string;
-  
-  website?: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
-  twitterUrl?: string;
-  
-  totalArticleViews: number;
-  totalArticlesPublished: number;
-  profileViews: number;
-  
-  recentArticles?: ArticleSummary[];
-}
-
-export interface ArticleSummary {
-  id: number;
-  title: string;
-  coverImageUrl?: string;
-  category?: string;
-  viewCount: number;
-  status: string;
-  createdAt: string;
-}
-
-export interface UserStatsResponse {
-  userId: number;
-  username: string;
-  totalArticles: number;
-  publishedArticles: number;
-  draftArticles: number;
-  totalArticleViews: number;
-  averageViewsPerArticle: number;
-  profileViews: number;
-  lastArticleCreated?: string;
-  lastLogin?: string;
-  memberSince: string;
-  mostViewedArticle?: PopularArticle;
-}
-
-export interface PopularArticle {
-  id: number;
-  title: string;
-  category: string;
-  viewCount: number;
-  createdAt: string;
-}
-
-export interface UpdateProfileRequest {
-  username?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  coverImageUrl?: string;
-  bio?: string;
-  occupation?: string;
-  location?: string;
-  website?: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
-  twitterUrl?: string;
-}
-
-export interface AuditLogResponse {
-  id: number;
-  username: string;
-  actionType: string;
-  description: string;
-  ipAddress: string;
-  userAgent: string;
-  resourceType?: string;
-  resourceId?: number;
-  success: boolean;
-  errorMessage?: string;
-  createdAt: string;
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
-  private apiUrl = 'http://localhost:8081/api/profile';
-  private auditUrl = 'http://localhost:8081/api/audit';
+  private apiUrl = 'http://localhost:8081/api/users';
 
   constructor(private http: HttpClient) {}
 
-  getMyProfile(includeArticles: boolean = true): Observable<UserProfileResponse> {
-    const params = new HttpParams().set('includeArticles', includeArticles.toString());
-    return this.http.get<UserProfileResponse>(`${this.apiUrl}/me`, { params });
-  }
-
-  getUserProfile(username: string, includeArticles: boolean = true): Observable<UserProfileResponse> {
-    const params = new HttpParams().set('includeArticles', includeArticles.toString());
-    return this.http.get<UserProfileResponse>(`${this.apiUrl}/${username}`, { params });
+  getMyProfile(): Observable<UserProfileResponse> {
+    return this.http.get<UserProfileResponse>(`${this.apiUrl}/me`);
   }
 
   updateMyProfile(request: UpdateProfileRequest): Observable<UserProfileResponse> {
     return this.http.put<UserProfileResponse>(`${this.apiUrl}/me`, request);
   }
 
-  getMyStats(): Observable<UserStatsResponse> {
-    return this.http.get<UserStatsResponse>(`${this.apiUrl}/me/stats`);
+  changeMyPassword(request: ChangePasswordRequest): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.apiUrl}/me/password`, request);
   }
 
-  getUserStats(username: string): Observable<UserStatsResponse> {
-    return this.http.get<UserStatsResponse>(`${this.apiUrl}/${username}/stats`);
+  getMySecuritySettings(): Observable<SecuritySettingsResponse> {
+    return this.http.get<SecuritySettingsResponse>(`${this.apiUrl}/me/security`);
   }
 
-  getMyAuditLogs(page: number = 0, size: number = 10): Observable<PageResponse<AuditLogResponse>> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-    return this.http.get<PageResponse<AuditLogResponse>>(`${this.auditUrl}/me`, { params });
+  verifySensitiveSecurityAction(request: VerifySensitiveActionRequest): Observable<SensitiveActionVerificationResponse> {
+    return this.http.post<SensitiveActionVerificationResponse>(`${this.apiUrl}/me/security/verify`, request);
+  }
+
+  updateMySecurityQuestions(request: UpdateSecurityQuestionsRequest): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/me/security-questions`, request);
+  }
+
+  updateMyRecoveryOptions(request: UpdateRecoveryOptionsRequest): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/me/recovery-options`, request);
+  }
+
+  getMyActiveSessions(): Observable<ActivitySession[]> {
+    return this.http.get<ActivitySession[]>(`${this.apiUrl}/me/activity/sessions`);
+  }
+
+  getMyLoginHistory(): Observable<LoginRecord[]> {
+    return this.http.get<LoginRecord[]>(`${this.apiUrl}/me/activity/login-history`);
+  }
+
+  signOutMySession(sessionId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/me/activity/sessions/${sessionId}`);
+  }
+
+  signOutAllOtherSessions(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/activity/sessions/sign-out-others`, {});
+  }
+
+  requestLoginVerificationChange(request: RequestLoginVerificationChangeRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/login-verification/request`, request);
+  }
+
+  confirmLoginVerificationChange(request: ConfirmLoginVerificationChangeRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/login-verification/confirm`, request);
+  }
+
+  disableLoginVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/login-verification/disable`, {});
+  }
+
+  requestEmailChange(request: RequestEmailChangeRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/email-change`, request);
+  }
+
+  confirmEmailChange(request: ConfirmEmailChangeRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/me/email-change/confirm`, request);
+  }
+
+  resendEmailChangeCode(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/me/email-change/resend`, {});
   }
 }

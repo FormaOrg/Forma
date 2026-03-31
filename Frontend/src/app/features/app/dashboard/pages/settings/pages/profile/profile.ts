@@ -1,8 +1,20 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppIcon } from '../../../../../../../shared/app/icons/app-icon';
+import { finalize } from 'rxjs';
+import { AuthService } from '../../../../../../../core/services/auth.service';
+import { ProfileService, UserProfileResponse } from '../../../../../../../core/services/profile.service';
+import { ToastService } from '../../../../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-settings-profile',
@@ -11,14 +23,40 @@ import { AppIcon } from '../../../../../../../shared/app/icons/app-icon';
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
-export class SettingsProfile implements OnInit {
+export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
+  private profileService = inject(ProfileService);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
+
+  @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;
+  @ViewChild('profileContainer', { static: true }) profileContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('profileHeader', { static: true }) profileHeader?: ElementRef<HTMLDivElement>;
 
   profileForm!: FormGroup;
   avatarPreview: string | ArrayBuffer | null = null;
   isSaving = false;
-  userEmail = 'iskanderboughnimi@gmail.com';
+  isLoadingProfile = false;
+  isSubmittingEmailChange = false;
+  isConfirmingEmailChange = false;
+  userEmail = '';
+  profileError = '';
+  profileSuccess = '';
+  emailChangeError = '';
+  emailChangeSuccess = '';
+  emailCodeError = '';
+  initialProfileValue: Record<string, string> | null = null;
+  isHeaderSticky = false;
+  headerStickyTop = 0;
+  headerStickyLeft = 0;
+  headerStickyWidth = 0;
+  headerPlaceholderHeight = 0;
+  private scrollRoot?: HTMLElement;
+  private stickyRafId: number | null = null;
+  private readonly stickyThreshold = 12;
+  private readonly handleStickyScroll = () => this.scheduleStickyUpdate();
+  private readonly handleStickyResize = () => this.scheduleStickyUpdate();
 
   readonly socialMediaPlatforms = [
     { id: 'google', label: 'Google Account', status: 'connected' },
@@ -83,6 +121,7 @@ export class SettingsProfile implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.loadProfile();
     this.route.queryParamMap.subscribe(params => {
       if (params.get('changeEmail')) {
         setTimeout(() => {
@@ -106,6 +145,64 @@ export class SettingsProfile implements OnInit {
       country: ['', Validators.required],
       website: ['', [Validators.pattern(/^(https?:\/\/)?.*/)]]
     });
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.headerSentinel?.nativeElement) {
+      return;
+    }
+
+    this.scrollRoot = this.findScrollParent(this.headerSentinel.nativeElement);
+    this.scrollRoot?.addEventListener('scroll', this.handleStickyScroll, { passive: true });
+    window.addEventListener('resize', this.handleStickyResize);
+    setTimeout(() => this.scheduleStickyUpdate());
+  }
+
+  ngOnDestroy(): void {
+    this.scrollRoot?.removeEventListener('scroll', this.handleStickyScroll);
+    window.removeEventListener('resize', this.handleStickyResize);
+    if (this.stickyRafId !== null) {
+      cancelAnimationFrame(this.stickyRafId);
+    }
+  }
+
+  private loadProfile(): void {
+    this.isLoadingProfile = true;
+    this.profileError = '';
+
+    this.profileService.getMyProfile()
+      .pipe(finalize(() => this.isLoadingProfile = false))
+      .subscribe({
+        next: profile => this.applyProfile(profile),
+        error: error => {
+          this.profileError = error?.error?.message ?? 'Failed to load your profile.';
+        }
+      });
+  }
+
+  private applyProfile(profile: UserProfileResponse): void {
+    this.userEmail = profile.email;
+    this.profileForm.patchValue({
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+      email: profile.email ?? '',
+      username: profile.username ?? '',
+      phone: profile.phone ?? '',
+      country: profile.country ?? '',
+      website: profile.website ?? ''
+    });
+    this.initialProfileValue = this.getNormalizedProfileFormValue();
+  }
+
+  get hasProfileChanges(): boolean {
+    if (!this.initialProfileValue) {
+      return false;
+    }
+
+    const currentValue = this.getNormalizedProfileFormValue();
+    return Object.keys(this.initialProfileValue).some(
+      key => currentValue[key] !== this.initialProfileValue?.[key]
+    );
   }
 
   private initEmailChangeForm(): void {
@@ -135,21 +232,47 @@ export class SettingsProfile implements OnInit {
 
   onSave(): void {
     if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
       return;
     }
 
     this.isSaving = true;
-    // Simulate API call
-    setTimeout(() => {
-      this.isSaving = false;
-      console.log('Profile saved:', this.profileForm.getRawValue());
-      // Call toast notification service here
-    }, 1500);
+    this.profileError = '';
+    this.profileSuccess = '';
+
+    const { firstName, lastName, username, phone, country, website } = this.profileForm.getRawValue();
+    this.profileService.updateMyProfile({
+      firstName: this.normalizeRequiredText(firstName),
+      lastName: this.normalizeRequiredText(lastName),
+      username: this.normalizeOptionalText(username),
+      phone: this.normalizeOptionalText(phone),
+      country: this.normalizeOptionalText(country),
+      website: this.normalizeOptionalText(website)
+    })
+      .pipe(finalize(() => this.isSaving = false))
+      .subscribe({
+        next: profile => {
+          this.applyProfile(profile);
+          this.profileSuccess = 'Profile updated successfully.';
+          this.toastService.success('Your profile has been updated.');
+        },
+        error: error => {
+          this.profileError = error?.error?.message ?? 'Failed to update your profile.';
+          this.toastService.error(this.profileError);
+        }
+      });
   }
 
   onCancel(): void {
-    this.profileForm.reset();
+    if (this.initialProfileValue) {
+      this.profileForm.reset({
+        ...this.initialProfileValue,
+        email: this.userEmail
+      });
+    }
     this.avatarPreview = null;
+    this.profileError = '';
+    this.profileSuccess = '';
   }
 
   removeAvatar(): void {
@@ -157,15 +280,17 @@ export class SettingsProfile implements OnInit {
   }
 
   getFieldError(fieldName: string): string | null {
-    const field = this.profileForm.get(fieldName);
+    const field = this.profileForm.get(fieldName) ?? this.emailChangeForm?.get(fieldName);
     if (field?.hasError('required')) return 'This field is required';
     if (field?.hasError('minlength')) return `Minimum ${field.getError('minlength').requiredLength} characters`;
+    if (field?.hasError('email')) return 'Invalid email';
     if (field?.hasError('pattern')) return 'Invalid format';
+    if (fieldName === 'confirmEmail' && this.emailChangeForm?.hasError('emailsMismatch')) return 'Emails do not match';
     return null;
   }
 
   isFieldInvalid(fieldName: string): boolean {
-    const field = this.profileForm.get(fieldName);
+    const field = this.profileForm.get(fieldName) ?? this.emailChangeForm?.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
@@ -175,25 +300,56 @@ export class SettingsProfile implements OnInit {
     this.showResetPasswordMsg = false;
     this.showEmailCodeModal = false;
     this.showCancelConfirmModal = false;
+    this.emailChangeError = '';
+    this.emailChangeSuccess = '';
   }
 
   closeEmailModal() {
     this.showEmailModal = false;
     this.showResetPasswordMsg = false;
+    this.emailChangeError = '';
+    this.emailChangeSuccess = '';
   }
 
   forgotPassword() {
-    this.showResetPasswordMsg = true;
-    this.resetPasswordMsg = 'Reset password instructions were sent to your email.';
+    this.authService.forgotPassword(this.userEmail).subscribe({
+      next: response => {
+        this.showResetPasswordMsg = true;
+        this.resetPasswordMsg = response.message;
+        this.toastService.info(response.message);
+      },
+      error: error => {
+        this.showResetPasswordMsg = true;
+        this.resetPasswordMsg = error?.error?.message ?? 'Failed to send reset password email.';
+        this.toastService.error(this.resetPasswordMsg);
+      }
+    });
   }
 
   confirmEmailChange() {
     if (this.emailChangeForm.valid) {
-      // Simulate API call and open code modal
-      this.emailToConfirm = this.emailChangeForm.value.newEmail;
-      this.showEmailModal = false;
-      this.initEmailCodeForm();
-      this.showEmailCodeModal = true;
+      this.isSubmittingEmailChange = true;
+      this.emailChangeError = '';
+
+      this.profileService.requestEmailChange({
+        currentPassword: this.normalizeRequiredText(this.emailChangeForm.value.password),
+        newEmail: this.normalizeRequiredText(this.emailChangeForm.value.newEmail).toLowerCase()
+      })
+        .pipe(finalize(() => this.isSubmittingEmailChange = false))
+        .subscribe({
+          next: response => {
+            this.emailChangeSuccess = response.message;
+            this.emailToConfirm = this.emailChangeForm.value.newEmail;
+            this.showEmailModal = false;
+            this.initEmailCodeForm();
+            this.showEmailCodeModal = true;
+            this.toastService.info(response.message);
+          },
+          error: error => {
+            this.emailChangeError = error?.error?.message ?? 'Failed to start email change.';
+            this.toastService.error(this.emailChangeError);
+          }
+        });
     } else {
       this.emailChangeForm.markAllAsTouched();
     }
@@ -208,12 +364,55 @@ export class SettingsProfile implements OnInit {
 
   submitEmailCode() {
     if (this.emailCodeForm.valid) {
-      // Simulate code validation
-      this.showEmailCodeModal = false;
-      // Success logic here
+      this.isConfirmingEmailChange = true;
+      this.emailCodeError = '';
+      this.profileService.confirmEmailChange({ code: this.emailCodeForm.value.code })
+        .pipe(finalize(() => this.isConfirmingEmailChange = false))
+        .subscribe({
+          next: response => {
+            this.authService.applyAuthResponse(response);
+            this.showEmailCodeModal = false;
+            this.userEmail = response.user.email;
+            this.applyProfile({
+              id: response.user.id,
+              firstName: response.user.firstName,
+              lastName: response.user.lastName,
+              username: response.user.username,
+              email: response.user.email,
+              phone: response.user.phone,
+              country: response.user.country,
+              website: response.user.website,
+              role: response.user.role,
+              isActive: response.user.isActive ?? true,
+              emailVerified: response.user.emailVerified ?? true,
+              createdAt: response.user.createdAt,
+              updatedAt: response.user.updatedAt
+            });
+            this.profileSuccess = 'Email updated successfully.';
+            this.toastService.success('Your account email has been updated.');
+          },
+          error: error => {
+            this.emailCodeError = error?.error?.message ?? 'Invalid verification code.';
+            this.toastService.error(this.emailCodeError);
+          }
+        });
     } else {
       this.emailCodeForm.markAllAsTouched();
     }
+  }
+
+  resendEmailCode() {
+    this.emailCodeError = '';
+    this.profileService.resendEmailChangeCode().subscribe({
+      next: response => {
+        this.emailChangeSuccess = response.message;
+        this.toastService.info(response.message);
+      },
+      error: error => {
+        this.emailCodeError = error?.error?.message ?? 'Failed to resend the verification code.';
+        this.toastService.error(this.emailCodeError);
+      }
+    });
   }
 
   cancelEmailCode() {
@@ -228,6 +427,85 @@ export class SettingsProfile implements OnInit {
     this.showCancelConfirmModal = false;
     this.showEmailCodeModal = false;
     this.showEmailModal = false;
-    // Reset all forms if needed
+    this.emailCodeError = '';
+    this.emailChangeError = '';
+  }
+
+  private normalizeOptionalText(value: string | null | undefined): string | undefined {
+    if (value == null) return undefined;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : undefined;
+  }
+
+  private normalizeRequiredText(value: string | null | undefined): string {
+    return (value ?? '').trim();
+  }
+
+  private getNormalizedProfileFormValue(): Record<string, string> {
+    const { firstName, lastName, username, phone, country, website } = this.profileForm.getRawValue();
+
+    return {
+      firstName: this.normalizeRequiredText(firstName),
+      lastName: this.normalizeRequiredText(lastName),
+      username: this.normalizeOptionalText(username) ?? '',
+      phone: this.normalizeOptionalText(phone) ?? '',
+      country: this.normalizeOptionalText(country) ?? '',
+      website: this.normalizeOptionalText(website) ?? ''
+    };
+  }
+
+  private updateStickyHeader(): void {
+    if (!this.scrollRoot || !this.headerSentinel?.nativeElement || !this.profileContainer?.nativeElement || !this.profileHeader?.nativeElement) {
+      return;
+    }
+
+    const rootRect = this.scrollRoot.getBoundingClientRect();
+    const sentinelRect = this.headerSentinel.nativeElement.getBoundingClientRect();
+    const containerRect = this.profileContainer.nativeElement.getBoundingClientRect();
+    const offset = sentinelRect.top - rootRect.top;
+    const shouldStick = this.isHeaderSticky
+      ? offset <= this.stickyThreshold
+      : offset <= -this.stickyThreshold;
+
+    this.isHeaderSticky = shouldStick;
+
+    if (!shouldStick) {
+      this.headerPlaceholderHeight = 0;
+      return;
+    }
+
+    this.headerStickyTop = rootRect.top + 10;
+    this.headerStickyLeft = containerRect.left + 8;
+    this.headerStickyWidth = Math.max(containerRect.width - 16, 0);
+    this.headerPlaceholderHeight = this.profileHeader.nativeElement.offsetHeight;
+  }
+
+  private scheduleStickyUpdate(): void {
+    if (this.stickyRafId !== null) {
+      return;
+    }
+
+    this.stickyRafId = requestAnimationFrame(() => {
+      this.stickyRafId = null;
+      this.updateStickyHeader();
+    });
+  }
+
+  private findScrollParent(element: HTMLElement): HTMLElement | undefined {
+    let current = element.parentElement;
+
+    while (current) {
+      const style = window.getComputedStyle(current);
+      const overflowY = style.overflowY;
+      const isScrollable = (overflowY === 'auto' || overflowY === 'scroll') && current.scrollHeight > current.clientHeight;
+
+      if (isScrollable) {
+        return current;
+      }
+
+      current = current.parentElement;
+    }
+
+    return undefined;
   }
 }

@@ -27,6 +27,18 @@ public class JwtService {
     @Value("${application.jwt.refresh-expiration}")
     private long refreshTokenExpiration;
 
+    @Value("${application.jwt.remember-expiration}")
+    private long rememberAccessTokenExpiration;
+
+    @Value("${application.jwt.remember-refresh-expiration}")
+    private long rememberRefreshTokenExpiration;
+
+    @Value("${application.jwt.expiration}")
+    private long loginVerificationTokenExpiration;
+
+    @Value("${application.jwt.expiration}")
+    private long sensitiveActionTokenExpiration;
+
     // ── Extract claims ─────────────────────────────────────
 
     public String extractEmail(String token) {
@@ -37,8 +49,17 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
 
+    public String extractSessionId(String token) {
+        return extractClaim(token, claims -> claims.get("sessionId", String.class));
+    }
+
     public String extractTokenType(String token) {
         return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    public boolean extractRememberMe(String token) {
+        Boolean rememberMe = extractClaim(token, claims -> claims.get("rememberMe", Boolean.class));
+        return Boolean.TRUE.equals(rememberMe);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -48,17 +69,58 @@ public class JwtService {
     // ── Generate tokens ────────────────────────────────────
 
     public String generateAccessToken(UserDetails userDetails, Long userId) {
+        return generateAccessToken(userDetails, userId, false, null);
+    }
+
+    public String generateAccessToken(UserDetails userDetails, Long userId, boolean rememberMe) {
+        return generateAccessToken(userDetails, userId, rememberMe, null);
+    }
+
+    public String generateAccessToken(UserDetails userDetails, Long userId, boolean rememberMe, String sessionId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("type", "access");
-        return buildToken(claims, userDetails.getUsername(), accessTokenExpiration);
+        claims.put("rememberMe", rememberMe);
+        if (sessionId != null) {
+            claims.put("sessionId", sessionId);
+        }
+        long expiration = rememberMe ? rememberAccessTokenExpiration : accessTokenExpiration;
+        return buildToken(claims, userDetails.getUsername(), expiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails, Long userId) {
+        return generateRefreshToken(userDetails, userId, false, null);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails, Long userId, boolean rememberMe) {
+        return generateRefreshToken(userDetails, userId, rememberMe, null);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails, Long userId, boolean rememberMe, String sessionId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("type", "refresh");
-        return buildToken(claims, userDetails.getUsername(), refreshTokenExpiration);
+        claims.put("rememberMe", rememberMe);
+        if (sessionId != null) {
+            claims.put("sessionId", sessionId);
+        }
+        long expiration = rememberMe ? rememberRefreshTokenExpiration : refreshTokenExpiration;
+        return buildToken(claims, userDetails.getUsername(), expiration);
+    }
+
+    public String generateLoginVerificationToken(String email, Long userId, boolean rememberMe) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("type", "login_verification");
+        claims.put("rememberMe", rememberMe);
+        return buildToken(claims, email, loginVerificationTokenExpiration);
+    }
+
+    public String generateSensitiveActionToken(String email, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("type", "sensitive_action");
+        return buildToken(claims, email, sensitiveActionTokenExpiration);
     }
 
     // ── Validate tokens ────────────────────────────────────
@@ -74,6 +136,14 @@ public class JwtService {
 
     public boolean isRefreshToken(String token) {
         return "refresh".equals(extractTokenType(token));
+    }
+
+    public boolean isLoginVerificationToken(String token) {
+        return "login_verification".equals(extractTokenType(token));
+    }
+
+    public boolean isSensitiveActionToken(String token) {
+        return "sensitive_action".equals(extractTokenType(token));
     }
 
     public boolean isTokenExpired(String token) {

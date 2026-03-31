@@ -1,31 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface ActiveSession {
-  id: string;
-  deviceName: string;
-  deviceType: 'Desktop' | 'Mobile' | 'Tablet';
-  browser: string;
-  os: string;
-  location: string;
-  ipAddress: string;
-  lastActive: Date;
-  isCurrent: boolean;
-}
-
-interface LoginRecord {
-  id: string;
-  timestamp: Date;
-  deviceName: string;
-  deviceType: 'Desktop' | 'Mobile' | 'Tablet';
-  browser: string;
-  os: string;
-  location: string;
-  ipAddress: string;
-  status: 'success' | 'failed';
-  failureReason?: string;
-}
+import { ActivitySession, LoginRecord } from '../../../../../../../core/models/user.model';
+import { ProfileService } from '../../../../../../../core/services/profile.service';
+import { ToastService } from '../../../../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-settings-activity',
@@ -34,10 +12,26 @@ interface LoginRecord {
   templateUrl: './activity.html',
   styleUrl: './activity.css'
 })
-export class SettingsActivity implements OnInit {
-  activeSessions: ActiveSession[] = [];
+export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;
+  @ViewChild('profileContainer', { static: true }) profileContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('profileHeader', { static: true }) profileHeader?: ElementRef<HTMLDivElement>;
+
+  activeSessions: ActivitySession[] = [];
   loginHistory: LoginRecord[] = [];
   isSigningOutAll = false;
+  isLoadingSessions = false;
+  isLoadingLoginHistory = false;
+  isHeaderSticky = false;
+  headerStickyTop = 0;
+  headerStickyLeft = 0;
+  headerStickyWidth = 0;
+  headerPlaceholderHeight = 0;
+  private scrollRoot?: HTMLElement;
+  private stickyRafId: number | null = null;
+  private readonly stickyThreshold = 12;
+  private readonly handleStickyScroll = () => this.scheduleStickyUpdate();
+  private readonly handleStickyResize = () => this.scheduleStickyUpdate();
 
   // Modal states
   showSessionsModal = false;
@@ -50,7 +44,12 @@ export class SettingsActivity implements OnInit {
   loginFilterStatus: 'all' | 'success' | 'failed' = 'all';
   loginFilterDateRange: 'all' | '7days' | '30days' | '90days' = 'all';
 
-  get filteredSessions(): ActiveSession[] {
+  constructor(
+    private profileService: ProfileService,
+    private toastService: ToastService
+  ) {}
+
+  get filteredSessions(): ActivitySession[] {
     return this.activeSessions.filter(session => {
       if (this.sessionsFilterDeviceType !== 'all' && session.deviceType !== this.sessionsFilterDeviceType) {
         return false;
@@ -70,7 +69,7 @@ export class SettingsActivity implements OnInit {
       if (this.loginFilterDateRange !== 'all') {
         const daysAgo = this.loginFilterDateRange === '7days' ? 7 : this.loginFilterDateRange === '30days' ? 30 : 90;
         const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 3600000);
-        if (login.timestamp < cutoffDate) {
+        if (new Date(login.timestamp) < cutoffDate) {
           return false;
         }
       }
@@ -83,122 +82,84 @@ export class SettingsActivity implements OnInit {
     this.loadLoginHistory();
   }
 
+  ngAfterViewInit(): void {
+    if (!this.headerSentinel?.nativeElement) {
+      return;
+    }
+
+    this.scrollRoot = this.findScrollParent(this.headerSentinel.nativeElement);
+    this.scrollRoot?.addEventListener('scroll', this.handleStickyScroll, { passive: true });
+    window.addEventListener('resize', this.handleStickyResize);
+    setTimeout(() => this.scheduleStickyUpdate());
+  }
+
+  ngOnDestroy(): void {
+    this.scrollRoot?.removeEventListener('scroll', this.handleStickyScroll);
+    window.removeEventListener('resize', this.handleStickyResize);
+    if (this.stickyRafId !== null) {
+      cancelAnimationFrame(this.stickyRafId);
+    }
+  }
+
   private loadActiveSessions(): void {
-    // Mock data for active sessions
-    this.activeSessions = [
-      {
-        id: '1',
-        deviceName: 'Chrome on Windows',
-        deviceType: 'Desktop',
-        browser: 'Chrome 123.0',
-        os: 'Windows 11',
-        location: 'Tunis, Tunisia',
-        ipAddress: '192.168.1.100',
-        lastActive: new Date(Date.now() - 5 * 60000), // 5 minutes ago
-        isCurrent: true
+    this.isLoadingSessions = true;
+    this.profileService.getMyActiveSessions().subscribe({
+      next: (sessions) => {
+        this.activeSessions = this.normalizeCurrentSession(sessions);
+        this.isLoadingSessions = false;
       },
-      {
-        id: '2',
-        deviceName: 'Safari on iPhone',
-        deviceType: 'Mobile',
-        browser: 'Safari 17.2',
-        os: 'iOS 17',
-        location: 'Sousse, Tunisia',
-        ipAddress: '203.0.113.45',
-        lastActive: new Date(Date.now() - 2 * 3600000), // 2 hours ago
-        isCurrent: false
-      },
-      {
-        id: '3',
-        deviceName: 'Firefox on Ubuntu',
-        deviceType: 'Desktop',
-        browser: 'Firefox 123.0',
-        os: 'Ubuntu 22.04',
-        location: 'Paris, France',
-        ipAddress: '198.51.100.78',
-        lastActive: new Date(Date.now() - 48 * 3600000), // 2 days ago
-        isCurrent: false
+      error: (err) => {
+        this.isLoadingSessions = false;
+        this.toastService.error(err?.error?.message ?? 'Failed to load active sessions.');
       }
-    ];
+    });
   }
 
   private loadLoginHistory(): void {
-    // Mock data for login history
-    this.loginHistory = [
-      {
-        id: '1',
-        timestamp: new Date(Date.now() - 5 * 60000),
-        deviceName: 'Chrome on Windows',
-        deviceType: 'Desktop',
-        browser: 'Chrome 123.0',
-        os: 'Windows 11',
-        location: 'Tunis, Tunisia',
-        ipAddress: '192.168.1.100',
-        status: 'success'
+    this.isLoadingLoginHistory = true;
+    this.profileService.getMyLoginHistory().subscribe({
+      next: (history) => {
+        this.loginHistory = history;
+        this.isLoadingLoginHistory = false;
       },
-      {
-        id: '2',
-        timestamp: new Date(Date.now() - 2.5 * 3600000),
-        deviceName: 'Safari on iPhone',
-        deviceType: 'Mobile',
-        browser: 'Safari 17.2',
-        os: 'iOS 17',
-        location: 'Sousse, Tunisia',
-        ipAddress: '203.0.113.45',
-        status: 'success'
-      },
-      {
-        id: '3',
-        timestamp: new Date(Date.now() - 5 * 3600000),
-        deviceName: 'Unknown Device',
-        deviceType: 'Desktop',
-        browser: 'Chrome 123.0',
-        os: 'Windows 11',
-        location: 'Cairo, Egypt',
-        ipAddress: '198.51.100.200',
-        status: 'failed',
-        failureReason: 'Incorrect password'
-      },
-      {
-        id: '4',
-        timestamp: new Date(Date.now() - 24 * 3600000),
-        deviceName: 'Firefox on Ubuntu',
-        deviceType: 'Desktop',
-        browser: 'Firefox 123.0',
-        os: 'Ubuntu 22.04',
-        location: 'Paris, France',
-        ipAddress: '198.51.100.78',
-        status: 'success'
-      },
-      {
-        id: '5',
-        timestamp: new Date(Date.now() - 48 * 3600000),
-        deviceName: 'Chrome on Windows',
-        deviceType: 'Desktop',
-        browser: 'Chrome 123.0',
-        os: 'Windows 11',
-        location: 'Tunis, Tunisia',
-        ipAddress: '192.168.1.100',
-        status: 'success'
+      error: (err) => {
+        this.isLoadingLoginHistory = false;
+        this.toastService.error(err?.error?.message ?? 'Failed to load login history.');
       }
-    ];
+    });
   }
 
   signOutSession(sessionId: string): void {
-    this.activeSessions = this.activeSessions.filter(s => s.id !== sessionId);
+    this.profileService.signOutMySession(sessionId).subscribe({
+      next: (response) => {
+        this.activeSessions = this.activeSessions.filter(s => s.id !== sessionId);
+        this.toastService.success(response.message || 'Session signed out.');
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message ?? 'Failed to sign out that session.');
+      }
+    });
   }
 
   signOutAllOtherSessions(): void {
     this.isSigningOutAll = true;
-    setTimeout(() => {
-      this.activeSessions = this.activeSessions.filter(s => s.isCurrent);
-      this.isSigningOutAll = false;
-    }, 1200);
+    this.profileService.signOutAllOtherSessions().subscribe({
+      next: (response) => {
+        this.activeSessions = this.activeSessions.filter(s => s.isCurrent);
+        this.isSigningOutAll = false;
+        this.toastService.success(response.message || 'Other sessions signed out.');
+      },
+      error: (err) => {
+        this.isSigningOutAll = false;
+        this.toastService.error(err?.error?.message ?? 'Failed to sign out other sessions.');
+      }
+    });
   }
 
-  formatTimeAgo(date: Date): string {
+  formatTimeAgo(date: string): string {
+    const parsedDate = new Date(date);
     const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const seconds = Math.floor((now.getTime() - parsedDate.getTime()) / 1000);
 
     if (seconds < 60) return 'Just now';
     const minutes = Math.floor(seconds / 60);
@@ -209,7 +170,7 @@ export class SettingsActivity implements OnInit {
     return `${days}d ago`;
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: string): string {
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
       day: 'numeric',
@@ -217,7 +178,7 @@ export class SettingsActivity implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     };
-    return date.toLocaleDateString('en-US', options);
+    return new Date(date).toLocaleDateString('en-US', options);
   }
 
   openSessionsModal(): void {
@@ -243,5 +204,72 @@ export class SettingsActivity implements OnInit {
   resetLoginFilters(): void {
     this.loginFilterStatus = 'all';
     this.loginFilterDateRange = 'all';
+  }
+
+  private normalizeCurrentSession(sessions: ActivitySession[]): ActivitySession[] {
+    if (sessions.some(session => session.isCurrent)) {
+      return sessions;
+    }
+
+    if (sessions.length === 1) {
+      return [{ ...sessions[0], isCurrent: true }];
+    }
+
+    return sessions;
+  }
+
+  private scheduleStickyUpdate(): void {
+    if (this.stickyRafId !== null) {
+      return;
+    }
+
+    this.stickyRafId = requestAnimationFrame(() => {
+      this.stickyRafId = null;
+      this.updateStickyHeader();
+    });
+  }
+
+  private updateStickyHeader(): void {
+    if (!this.scrollRoot || !this.headerSentinel?.nativeElement || !this.profileContainer?.nativeElement || !this.profileHeader?.nativeElement) {
+      return;
+    }
+
+    const rootRect = this.scrollRoot.getBoundingClientRect();
+    const sentinelRect = this.headerSentinel.nativeElement.getBoundingClientRect();
+    const containerRect = this.profileContainer.nativeElement.getBoundingClientRect();
+    const offset = sentinelRect.top - rootRect.top;
+    const shouldStick = this.isHeaderSticky
+      ? offset <= this.stickyThreshold
+      : offset <= -this.stickyThreshold;
+
+    this.isHeaderSticky = shouldStick;
+
+    if (!shouldStick) {
+      this.headerPlaceholderHeight = 0;
+      return;
+    }
+
+    this.headerStickyTop = rootRect.top + 10;
+    this.headerStickyLeft = containerRect.left + 8;
+    this.headerStickyWidth = Math.max(containerRect.width - 16, 0);
+    this.headerPlaceholderHeight = this.profileHeader.nativeElement.offsetHeight;
+  }
+
+  private findScrollParent(element: HTMLElement): HTMLElement | undefined {
+    let current = element.parentElement;
+
+    while (current) {
+      const style = window.getComputedStyle(current);
+      const overflowY = style.overflowY;
+      const isScrollable = (overflowY === 'auto' || overflowY === 'scroll') && current.scrollHeight > current.clientHeight;
+
+      if (isScrollable) {
+        return current;
+      }
+
+      current = current.parentElement;
+    }
+
+    return undefined;
   }
 }

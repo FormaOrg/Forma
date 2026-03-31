@@ -1,8 +1,62 @@
-<div class="profile-container">
-  <div class="profile-header">
-    <h1 class="profile-title">Profile</h1>
-    <p class="profile-subtitle">Manage your personal information and preferences</p>
+<div #profileContainer class="profile-container">
+  <div #headerSentinel class="profile-header-sentinel" aria-hidden="true"></div>
+  <div
+    #profileHeader
+    class="profile-header"
+    [class.profile-header--stuck]="isHeaderSticky"
+    [style.top.px]="isHeaderSticky ? headerStickyTop : null"
+    [style.left.px]="isHeaderSticky ? headerStickyLeft : null"
+    [style.width.px]="isHeaderSticky ? headerStickyWidth : null"
+  >
+    <div class="profile-header__content">
+      <div class="profile-header__text">
+        <h1 class="profile-title">Profile</h1>
+        <p class="profile-subtitle">Manage your personal information and preferences</p>
+      </div>
+      <div class="profile-header__actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="isSaving"
+        >
+          Reset
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-save"
+          [class.is-loading]="isSaving"
+          (click)="onSave()"
+          [disabled]="profileForm.invalid || isSaving || isLoadingProfile || !hasProfileChanges"
+        >
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              @if (isSaving) {
+                <svg viewBox="25 25 50 50" class="icon icon-loading">
+                  <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                </svg>
+              } @else {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  class="icon icon-save"
+                >
+                  <path
+                    d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              }
+            </div>
+          </div>
+          <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
+  <div class="profile-header-placeholder" [style.height.px]="headerPlaceholderHeight" aria-hidden="true"></div>
 
   <form [formGroup]="profileForm" class="profile-form">
     <!-- Avatar Section -->
@@ -10,9 +64,20 @@
       <h2 class="section-title">Profile Picture</h2>
       <div class="section-content">
         <div class="avatar-section">
-          <div class="avatar-preview">
+          <div class="avatar-preview" [class.avatar-preview--has-image]="!!avatarPreview">
             @if (avatarPreview) {
               <img [src]="avatarPreview" alt="Avatar preview" class="avatar-image" />
+              <button
+                type="button"
+                class="avatar-remove-overlay"
+                (click)="removeAvatar()"
+                aria-label="Remove profile picture"
+                title="Remove photo"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 3.75h6m-8.25 3h10.5m-9.75 0 .75 11.25a1.5 1.5 0 0 0 1.5 1.5h4.5a1.5 1.5 0 0 0 1.5-1.5l.75-11.25m-6 3.75v5.25m3-5.25v5.25" />
+                </svg>
+              </button>
             } @else {
               <div class="avatar-placeholder">
                 <app-icon name="user" [size]="48" />
@@ -20,6 +85,10 @@
             }
           </div>
           <div class="avatar-actions">
+            <div class="avatar-meta">
+              <div class="avatar-meta__title">Upload a photo</div>
+              <div class="avatar-meta__hint">PNG, JPG up to 5MB. Square images look best.</div>
+            </div>
             <label class="upload-button">
               <input
                 type="file"
@@ -29,11 +98,6 @@
               />
               Upload Photo
             </label>
-            @if (avatarPreview) {
-              <button type="button" class="remove-button" (click)="removeAvatar()">
-                Remove
-              </button>
-            }
           </div>
         </div>
       </div>
@@ -79,7 +143,9 @@
 
       <!-- Email Field -->
       <div class="form-group">
-        <label for="email" class="form-label">Account Email</label>
+        <div class="form-label-row">
+          <label for="email" class="form-label">Account Email</label>
+        </div>
         <div class="email-field-wrapper">
           <input
             id="email"
@@ -170,7 +236,9 @@
             </form>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">Cancel</button>
-              <button type="button" class="btn btn-primary" (click)="confirmEmailChange()" [disabled]="emailChangeForm.invalid">Next</button>
+              <button type="button" class="btn btn-primary" (click)="confirmEmailChange()" [disabled]="emailChangeForm.invalid || isSubmittingEmailChange">
+                {{ isSubmittingEmailChange ? 'Sending...' : 'Next' }}
+              </button>
             </div>
           </div>
         </div>
@@ -207,12 +275,14 @@
                 }
               </div>
               <div class="resend-code-link">
-                <a href="#" (click)="$event.preventDefault();">Resend Code</a>
+                <a href="#" (click)="$event.preventDefault(); resendEmailCode()">Resend Code</a>
               </div>
             </form>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" (click)="cancelEmailCode()">Cancel</button>
-              <button type="button" class="btn btn-primary" (click)="submitEmailCode()" [disabled]="emailCodeForm.invalid">Submit</button>
+              <button type="button" class="btn btn-primary" (click)="submitEmailCode()" [disabled]="emailCodeForm.invalid || isConfirmingEmailChange">
+                {{ isConfirmingEmailChange ? 'Confirming...' : 'Submit' }}
+              </button>
             </div>
           </div>
         </div>
@@ -245,7 +315,9 @@
 
       <!-- Username Field -->
       <div class="form-group">
-        <label for="username" class="form-label">Username *</label>
+        <div class="form-label-row">
+          <label for="username" class="form-label">Username *</label>
+        </div>
         <input
           id="username"
           type="text"
@@ -261,7 +333,9 @@
 
       <!-- Phone Field -->
       <div class="form-group">
-        <label for="phone" class="form-label">Phone Number</label>
+        <div class="form-label-row">
+          <label for="phone" class="form-label">Phone Number</label>
+        </div>
         <input
           id="phone"
           type="tel"
@@ -282,7 +356,9 @@
       <h2 class="section-title">Location & Preferences</h2>
       <div class="section-content">
         <div class="form-group">
-          <label for="country" class="form-label">Country *</label>
+          <div class="form-label-row">
+            <label for="country" class="form-label">Country *</label>
+          </div>
           <select
             id="country"
             class="form-input"
@@ -300,7 +376,9 @@
         </div>
 
         <div class="form-group">
-          <label for="website" class="form-label">Website / Portfolio</label>
+          <div class="form-label-row">
+            <label for="website" class="form-label">Website / Portfolio</label>
+          </div>
           <input
             id="website"
             type="url"
@@ -320,83 +398,65 @@
     <div class="profile-section">
       <h2 class="section-title">Social logins</h2>
       <div class="section-content">
-        <div class="social-logins">
-        @for (platform of socialMediaPlatforms; track platform.id) {
-          <div class="social-login-item">
-            <div class="social-login-content">
-              <div class="social-login-icon">
-                @if (platform.id === 'google') {
-                  <img src="assets/app/settings/profile/google.svg" alt="Google" class="social-icon" />
-                }
-                @else if (platform.id === 'facebook') {
-                  <img src="assets/app/settings/profile/facebook.svg" alt="Facebook" class="social-icon" />
-                }
-              </div>
-              <div class="social-login-info">
-                <h3 class="social-login-title">{{ platform.label }}</h3>
-                <p class="social-login-status" [class.connected]="platform.status === 'connected'" [class.disconnected]="platform.status === 'disconnected'">
-                  @if (platform.status === 'connected') {
-                    <span>Skander Boughnimi</span>
-                  } @else {
-                    <span>Disabled</span>
+        <p class="social-logins-intro">
+          Link providers to sign in faster. You can always use your Forma email and password.
+        </p>
+        <div class="social-logins" role="list">
+          @for (platform of socialMediaPlatforms; track platform.id) {
+            <div class="social-login-row" role="listitem">
+              <div class="social-login-row__left">
+                <div class="social-login-row__icon" aria-hidden="true">
+                  @if (platform.id === 'google') {
+                    <img src="assets/app/settings/profile/google.svg" alt="" class="social-login-row__icon-img" />
+                  } @else if (platform.id === 'facebook') {
+                    <img src="assets/app/settings/profile/facebook.svg" alt="" class="social-login-row__icon-img" />
                   }
-                </p>
+                </div>
+                <div class="social-login-row__text">
+                  <div class="social-login-row__title-line">
+                    <span class="social-login-row__title">{{ platform.label }}</span>
+                    <span
+                      class="social-login-row__status"
+                      [class.social-login-row__status--on]="platform.status === 'connected'"
+                      [class.social-login-row__status--off]="platform.status === 'disconnected'"
+                    >
+                      @if (platform.status === 'connected') {
+                        Connected
+                      } @else {
+                        Not connected
+                      }
+                    </span>
+                  </div>
+                  <p class="social-login-row__meta">
+                    @if (platform.status === 'connected') {
+                      <span>Skander Boughnimi</span>
+                    } @else {
+                      <span>Not linked</span>
+                    }
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                class="social-login-row__btn"
+                [class.social-login-row__btn--disconnect]="platform.status === 'connected'"
+                [class.social-login-row__btn--connect]="platform.status === 'disconnected'"
+              >
+                @if (platform.status === 'connected') {
+                  Disable
+                } @else {
+                  Enable
+                }
+              </button>
             </div>
-            <button type="button" class="social-login-action" [class.disconnect]="platform.status === 'connected'" [class.connect]="platform.status === 'disconnected'">
-              @if (platform.status === 'connected') {
-                <span>Disable</span>
-              } @else {
-                <span>Enable</span>
-              }
-            </button>
-          </div>
-        }
-      </div>
-      <p class="social-login-note">* If you disable social logins, you'll still be able to log in using your Forma email and password.</p>
+          }
+        </div>
+        <p class="social-login-note">
+          If you disable social logins, you can still sign in with your Forma email and password.
+        </p>
       </div>
     </div>
 
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button
-        type="button"
-        class="btn btn-secondary"
-        (click)="onCancel()"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary btn-save"
-        [class.is-loading]="isSaving"
-        (click)="onSave()"
-        [disabled]="profileForm.invalid || isSaving"
-      >
-        <div class="svg-wrapper-1">
-          <div class="svg-wrapper">
-            @if (isSaving) {
-              <svg viewBox="25 25 50 50" class="icon icon-loading">
-                <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
-              </svg>
-            } @else {
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                class="icon icon-save"
-              >
-                <path
-                  d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            }
-          </div>
-        </div>
-        <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
-      </button>
-    </div>
+    <div class="form-actions-spacer" aria-hidden="true"></div>
   </form>
 </div>
