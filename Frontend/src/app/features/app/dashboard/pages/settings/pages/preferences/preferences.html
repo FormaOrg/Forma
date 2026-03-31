@@ -1,30 +1,46 @@
-<div class="preferences-container">
-  <div class="preferences-header">
-    <h1 class="preferences-title">Preferences</h1>
-    <p class="preferences-subtitle">Customize how Forma looks and behaves.</p>
+<div #profileContainer class="profile-container">
+  <div #headerSentinel class="profile-header-sentinel" aria-hidden="true"></div>
+  <div
+    #profileHeader
+    class="profile-header"
+    [class.profile-header--stuck]="isHeaderSticky"
+    [style.top.px]="isHeaderSticky ? headerStickyTop : null"
+    [style.left.px]="isHeaderSticky ? headerStickyLeft : null"
+    [style.width.px]="isHeaderSticky ? headerStickyWidth : null"
+  >
+    <div class="profile-header__text">
+      <h1 class="profile-title">Preferences</h1>
+      <p class="profile-subtitle">Customize how Forma looks and behaves.</p>
+    </div>
   </div>
+  <div class="profile-header-placeholder" [style.height.px]="headerPlaceholderHeight" aria-hidden="true"></div>
 
-  <form [formGroup]="preferencesForm" class="preferences-form">
-    <!-- APPEARANCE SECTION -->
-    <div class="preferences-section">
-
+  <form [formGroup]="preferencesForm" class="profile-form">
+    <div class="profile-section">
+      <h2 class="section-title">Appearance</h2>
       <div class="section-content">
+        <p class="section-intro">
+          Control the language and display mode Forma uses across your dashboard.
+        </p>
         <div class="form-group">
-            <label class="form-label">
-                <h2 class="section-title">Language</h2>
-                <p class="section-description">Choose your preferred language.</p>
-            </label>
+          <div class="form-label-row">
+            <label class="form-label" for="language">Language</label>
+          </div>
+          <p class="field-description">Choose your preferred language.</p>
           <select formControlName="language" class="form-select">
             @for (lang of languages; track lang.code) {
               <option [value]="lang.code">{{ lang.label }}</option>
             }
           </select>
         </div>
+
         <div class="subsection">
-            <label class="form-label">
-                <h2 class="section-title">Theme mode</h2>
-                <p class="section-description">Choose how Forma looks to you. Select a single theme, or sync with your system.</p>
-            </label>
+          <div class="form-label-row">
+            <label class="form-label">Theme mode</label>
+          </div>
+          <p class="field-description">
+            Choose how Forma looks to you. Select a single theme, or sync with your system.
+          </p>
           <div class="theme-grid">
             @for (theme of themes; track theme.id) {
               <label class="theme-card" [class.theme-card--selected]="preferencesForm.get('theme')?.value === theme.id">
@@ -44,57 +60,60 @@
           </div>
         </div>
 
-        
-        
       </div>
-      
+    </div>
+
+    <div class="profile-section">
+      <h2 class="section-title">Danger Zone</h2>
+      <div class="section-content danger-section">
+        <p class="section-intro">
+          Permanently delete your Forma account and data.
+        </p>
+        <div class="danger-content">
+          <div class="danger-main">
+            <div class="danger-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                <path fill-rule="evenodd" d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="danger-text">
+              <h3 class="danger-action-title">Request account deletion</h3>
+              <p class="danger-action-description">
+                Deleting your account is permanent and cannot be undone. Your data will be deleted within 30 days, but we may retain some metadata and logs for longer where required or permitted by law.
+              </p>
+              <div class="danger-points" aria-hidden="true">
+                <span class="danger-point">Projects removed</span>
+                <span class="danger-point">Templates removed</span>
+                <span class="danger-point">Access revoked</span>
+              </div>
+            </div>
+          </div>
+          <div class="danger-actions">
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="onDeleteAccount()"
+            >
+              Request to delete account
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </form>
 
-  <!-- DANGER ZONE -->
-  <div class="danger-zone">
-    <div class="danger-header">
-      <h2 class="danger-title">Danger zone</h2>
-      <p class="danger-description">Permanently delete your Forma account and data.</p>
-    </div>
-
-    <div class="danger-content">
-      <div class="danger-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-          <path fill-rule="evenodd" d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"></path>
-        </svg>
-      </div>
-      <div class="danger-text">
-        <h3 class="danger-action-title">Request for account deletion</h3>
-        <p class="danger-action-description">
-          Deleting your account is permanent and cannot be undone. Your data will be deleted within 30 days, but we may retain some metadata and logs for longer where required or permitted by law.
-        </p>
-        <button
-          type="button"
-          class="btn btn-danger"
-          (click)="onDeleteAccount()"
-        >
-          Request to delete account
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Delete Account Confirmation Modal -->
   @if (showDeleteModal) {
     <div class="modal-overlay" (click)="closeDeleteModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <div class="modal-header-text">
-            <h2 class="modal-title">Delete account</h2>
-            <p class="modal-subtitle">This action cannot be undone</p>
-          </div>
-          <button type="button" class="modal-close" (click)="closeDeleteModal()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6l12 12"></path>
+          <h2 class="modal-title">Delete account</h2>
+          <button type="button" class="modal-close" (click)="closeDeleteModal()" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </button>
         </div>
+        <div class="modal-divider"></div>
         <div class="modal-body">
           <p class="modal-description">
             Are you sure you want to delete your Forma account? This will permanently remove all your data, including templates, projects, and account information. This action cannot be undone.

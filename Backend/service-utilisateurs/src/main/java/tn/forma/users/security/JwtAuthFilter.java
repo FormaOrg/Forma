@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import tn.forma.users.service.JwtService;
+import tn.forma.users.service.ActivityService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final ActivityService activityService;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
@@ -39,12 +41,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = authHeader.substring(7);
 
         try {
+            if (!jwtService.isAccessToken(token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             final String email = jwtService.extractEmail(token);
+            final String sessionId = jwtService.extractSessionId(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                if (jwtService.isTokenValid(token, userDetails)) {
+                if (jwtService.isTokenValid(token, userDetails) && activityService.isSessionActive(sessionId)) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,
@@ -55,6 +63,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    activityService.touchSession(sessionId);
+                } else if (!activityService.isSessionActive(sessionId)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session has been signed out");
+                    return;
                 }
             }
         } catch (Exception e) {

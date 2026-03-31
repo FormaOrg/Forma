@@ -10,7 +10,6 @@
 </div>
 
 <form #f="ngForm" (ngSubmit)="onSubmit($event)" novalidate>
-
   <div class="unverified-banner" *ngIf="emailNotVerified">
     <div class="unverified-banner-icon">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -25,9 +24,6 @@
       <p class="unverified-banner-sub">
         Check your inbox for the verification link, or resend it below.
       </p>
-
-      <div class="resend-success" *ngIf="resendSuccess">✓ {{ resendSuccess }}</div>
-      <div class="resend-error" *ngIf="resendError">{{ resendError }}</div>
 
       <button
         type="button"
@@ -92,12 +88,6 @@
     </label>
 
     <a routerLink="/forgot-password" class="forgot-password">Forgot password</a>
-  </div>
-
-  <div class="form-error-slot" *ngIf="!emailNotVerified">
-    <div class="error form-error" [class.visible]="!!error">
-      {{ error || ' ' }}
-    </div>
   </div>
 
   <button type="submit" [disabled]="f.invalid">Sign In</button>

@@ -1,0 +1,61 @@
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
+
+<div class="header">
+  <h2 class="title">Check Your Email</h2>
+  <p class="subtitle">{{ message }}</p>
+  @if (email) {
+    <p class="helper-text">Code sent to <strong>{{ email }}</strong></p>
+  }
+</div>
+
+<form #f="ngForm" (ngSubmit)="confirmCode()" novalidate>
+  <div class="input-form">
+    <label for="code">Verification Code</label>
+    <div class="input-box" [class.invalid]="codeRef.invalid && (codeRef.touched || f.submitted)">
+      <input
+        type="text"
+        id="code"
+        name="code"
+        [(ngModel)]="code"
+        #codeRef="ngModel"
+        placeholder="Enter 6-digit code"
+        maxlength="6"
+        minlength="6"
+        inputmode="numeric"
+        required
+        [disabled]="isVerifying">
+    </div>
+
+    <div class="error" [class.visible]="codeRef.invalid && (codeRef.touched || f.submitted)">
+      <span *ngIf="codeRef.errors?.['required']">Verification code is required</span>
+      <span *ngIf="codeRef.errors?.['minlength'] || codeRef.errors?.['maxlength']">Enter the full 6-digit code</span>
+      <span *ngIf="!(codeRef.invalid && (codeRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="f.invalid || code.trim().length !== 6 || isVerifying">
+    <span *ngIf="!isVerifying">Verify Email Code</span>
+    <span *ngIf="isVerifying" class="loading">
+      <span class="spinner"></span>
+      Verifying...
+    </span>
+  </button>
+  
+  <div class="action-stack">
+    <button type="button" class="btn btn-secondary" (click)="resendCode()" [disabled]="isResending">
+      <span *ngIf="!isResending">Resend Code</span>
+      <span *ngIf="isResending" class="loading">
+        <span class="spinner spinner-dark"></span>
+        Sending...
+      </span>
+    </button>
+
+    <button type="button" class="btn btn-link" (click)="useAnotherAccount()">
+      Use another account
+    </button>
+  </div>
+</form>

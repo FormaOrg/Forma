@@ -26,6 +26,18 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @PostMapping("/login/verify")
+    public ResponseEntity<AuthResponse> verifyLogin(
+            @Valid @RequestBody LoginVerificationRequest request) {
+        return ResponseEntity.ok(authService.verifyLogin(request));
+    }
+
+    @PostMapping("/login-verification/resend")
+    public ResponseEntity<MessageResponse> resendLoginVerification(
+            @Valid @RequestBody LoginVerificationTokenRequest request) {
+        return ResponseEntity.ok(authService.resendLoginVerification(request.getToken()));
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(
             @RequestBody RefreshTokenRequest request) {

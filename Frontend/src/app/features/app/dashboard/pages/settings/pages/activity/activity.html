@@ -1,8 +1,17 @@
-<div class="profile-container">
-  <div class="profile-header">
+<div #profileContainer class="profile-container">
+  <div #headerSentinel class="profile-header-sentinel" aria-hidden="true"></div>
+  <div
+    #profileHeader
+    class="profile-header"
+    [class.profile-header--stuck]="isHeaderSticky"
+    [style.top.px]="isHeaderSticky ? headerStickyTop : null"
+    [style.left.px]="isHeaderSticky ? headerStickyLeft : null"
+    [style.width.px]="isHeaderSticky ? headerStickyWidth : null"
+  >
     <h1 class="profile-title">Activity</h1>
     <p class="profile-subtitle">Monitor your account's login activity and active sessions</p>
   </div>
+  <div class="profile-header-placeholder" [style.height.px]="headerPlaceholderHeight" aria-hidden="true"></div>
 
   <!-- Active Sessions Section -->
   <div class="profile-section">
@@ -186,7 +195,9 @@
 
   <!-- Login History Section -->
   <div class="profile-section">
-    <h2 class="section-title">Login History</h2>
+    <div class="section-header section-header--simple">
+      <h2 class="section-title">Login History</h2>
+    </div>
     <div class="section-content">
       @if (loginHistory.length === 0) {
         <div class="empty-state">

@@ -6,7 +6,7 @@ import {
   HttpInterceptor,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
@@ -28,6 +28,10 @@ export class JwtInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && !request.url.includes('/auth/')) {
           return this.handle401(request, next);
+        }
+        if (error.status === 403 && !request.url.includes('/auth/') && this.authService.isLoggedIn()) {
+          this.authService.logout();
+          return EMPTY;
         }
         return throwError(() => error);
       })
@@ -58,6 +62,9 @@ export class JwtInterceptor implements HttpInterceptor {
 
     return this.authService.refreshToken().pipe(
       switchMap(response => {
+        if (!response.accessToken) {
+          throw new Error('Refresh did not return a new access token');
+        }
         this.isRefreshing = false;
         this.refreshDone$.next(true);
         return next.handle(this.addToken(request, response.accessToken));
@@ -65,7 +72,7 @@ export class JwtInterceptor implements HttpInterceptor {
       catchError(error => {
         this.isRefreshing = false;
         this.authService.logout(); // refresh failed — force logout
-        return throwError(() => error);
+        return EMPTY;
       })
     );
   }

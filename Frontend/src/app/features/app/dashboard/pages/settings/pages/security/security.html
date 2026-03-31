@@ -1,14 +1,28 @@
-<div class="profile-container">
-  <div class="profile-header">
-    <h1 class="profile-title">Security</h1>
-    <p class="profile-subtitle">Manage your password, authentication, and recovery options</p>
+<div #profileContainer class="profile-container">
+  <div #headerSentinel class="profile-header-sentinel" aria-hidden="true"></div>
+  <div
+    #profileHeader
+    class="profile-header"
+    [class.profile-header--stuck]="isHeaderSticky"
+    [style.top.px]="isHeaderSticky ? headerStickyTop : null"
+    [style.left.px]="isHeaderSticky ? headerStickyLeft : null"
+    [style.width.px]="isHeaderSticky ? headerStickyWidth : null"
+  >
+    <div class="profile-header__text">
+      <h1 class="profile-title">Security</h1>
+      <p class="profile-subtitle">Password, sign-in verification, and account recovery</p>
+    </div>
   </div>
+  <div class="profile-header-placeholder" [style.height.px]="headerPlaceholderHeight" aria-hidden="true"></div>
 
   <form [formGroup]="securityForm" class="profile-form">
     <!-- Change Password Section -->
     <div class="profile-section">
-      <h2 class="section-title">Change Password</h2>
+      <h2 class="section-title">Change password</h2>
       <div class="section-content">
+        <p class="section-intro">
+          Use a strong password you don’t reuse on other sites.
+        </p>
           <div class="form-group">
             <label for="currentPassword" class="form-label">Current Password *</label>
             <div class="input-box" [class.invalid]="isFieldInvalid('currentPassword')">
@@ -28,9 +42,26 @@
               <span class="form-error">{{ getFieldError('currentPassword') }}</span>
             }
           </div>
-          <div class="form-group">
+          <div class="form-group password-group">
             <label for="newPassword" class="form-label">New Password *</label>
-            <div class="input-box" [class.invalid]="isFieldInvalid('newPassword')">
+            <div class="password-field-shell">
+              @if (showPasswordStrengthHint) {
+                <div class="password-strength-popover" aria-live="polite">
+                  <p class="password-strength-title">Must have at least 8 characters.</p>
+                  <div class="password-strength-bars" aria-hidden="true">
+                    @for (segmentActive of passwordStrengthSegments; track $index) {
+                      <span class="password-strength-bar" [class.is-active]="segmentActive"></span>
+                    }
+                  </div>
+                  <p class="password-strength-subtitle">It's better to have:</p>
+                  <ul class="password-strength-list">
+                    <li [class.is-met]="hasMixedCasePassword">Upper & lower case letters</li>
+                    <li [class.is-met]="hasPasswordSymbol">Symbols (#$&)</li>
+                    <li [class.is-met]="hasLongPassword">A longer password</li>
+                  </ul>
+                </div>
+              }
+              <div class="input-box" [class.invalid]="isFieldInvalid('newPassword')">
               <input
                 [type]="showNewPassword ? 'text' : 'password'"
                 id="newPassword"
@@ -38,10 +69,13 @@
                 [class.form-input--error]="isFieldInvalid('newPassword')"
                 formControlName="newPassword"
                 placeholder="Enter new password"
+                (focus)="onNewPasswordFocus()"
+                (blur)="onNewPasswordBlur()"
               />
               <span
                 [class]="showNewPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
                 (click)="showNewPassword = !showNewPassword"></span>
+              </div>
             </div>
             @if (isFieldInvalid('newPassword')) {
               <span class="form-error">{{ getFieldError('newPassword') }}</span>
@@ -67,7 +101,7 @@
             }
           </div>
         <div class="form-actions">
-          <button type="button" class="btn btn-primary btn-save" (click)="onChangePassword()" [disabled]="securityForm.invalid || isSavingPassword">
+          <button type="button" class="btn btn-primary btn-save" (click)="onChangePassword()" [disabled]="!passwordSectionValid || isSavingPassword">
             <div class="svg-wrapper-1">
               <div class="svg-wrapper">
                 @if (isSavingPassword) {
@@ -90,19 +124,27 @@
     <!-- Verify Logins by Email Section -->
     <div class="profile-section">
       <h2 class="section-title">2-step verification</h2>
-      <div class="section-content verify-login-row">
-        <div class="verify-login-left">
-          <span class="verify-login-icon">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-              <rect width="20" height="14" x="2" y="5" rx="3" fill="#fff" stroke="#222" stroke-width="1.5"/>
-              <path d="M4 7l8 6 8-6" stroke="#222" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="verify-login-label">Verify logins by email</span>
+      <div class="section-content">
+        <p class="section-intro">
+          When enabled, we’ll email you a code for unusual sign-ins. Your password is still required.
+        </p>
+        <div class="verify-login-row">
+          <div class="verify-login-left">
+            <span class="verify-login-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <rect width="20" height="14" x="2" y="5" rx="3" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="verify-login-copy">
+              <span class="verify-login-label">Email verification for new logins</span>
+              <span class="verify-login-hint">{{ is2FAEnabled ? 'Extra check is on' : 'Currently off' }}</span>
+            </div>
+          </div>
+          <button type="button" class="verify-login-btn" [class.verify-login-btn--off]="is2FAEnabled" (click)="openVerifyEmailModal()">
+            {{ is2FAEnabled ? 'Disable' : 'Enable' }}
+          </button>
         </div>
-        <button type="button" class="verify-login-btn" [class.enabled]="is2FAEnabled" (click)="openVerifyEmailModal()">
-          {{ is2FAEnabled ? 'Disable' : 'Enable' }}
-        </button>
       </div>
     </div>
 
@@ -118,17 +160,87 @@
               </svg>
             </button>
           </div>
-          <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+          <div class="modal-divider"></div>
           <div class="modal-body">
             <div class="modal-description">
               To enable, first confirm your email so we know it's you.<br>
               We'll send a code to <b>{{ userEmail }}</b> for you to enter here.
             </div>
           </div>
-          <div class="modal-footer" style="align-items: center;">
-            <a href="#" style="margin-right:auto;color:#2563eb;text-decoration:underline;font-size:15px;font-weight:500;" (click)="goToChangeEmail($event)">Change Account Email</a>
-            <button type="button" class="btn btn-secondary" (click)="closeVerifyEmailModal()">Cancel</button>
-            <button type="button" class="btn btn-primary" (click)="sendVerifyEmailCode()">Send Code</button>
+          <div class="modal-footer modal-footer--spread">
+            <a href="#" class="modal-inline-link" (click)="goToChangeEmail($event)">Change account email</a>
+            <div class="modal-footer__actions">
+              <button type="button" class="btn btn-secondary" (click)="closeVerifyEmailModal()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="sendVerifyEmailCode()" [disabled]="isRequestingLoginVerification">
+                {{ isRequestingLoginVerification ? 'Sending...' : 'Send code' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showDisableLoginVerificationModal) {
+      <div class="modal-overlay" (click)="closeDisableLoginVerificationModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">Disable 2-step verification?</h2>
+            <button type="button" class="modal-close" (click)="closeDisableLoginVerificationModal()" aria-label="Close">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-description">
+              New logins will stop asking for the extra email code. Your account will go back to password-only sign-in.
+            </div>
+          </div>
+          <div class="modal-footer modal-footer--actions-right">
+            <button type="button" class="btn btn-secondary" (click)="closeDisableLoginVerificationModal()">Cancel</button>
+            <button type="button" class="btn btn-danger" (click)="disableLoginVerification()" [disabled]="isConfirmingLoginVerification">
+              {{ isConfirmingLoginVerification ? 'Disabling...' : 'Disable' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showLoginVerificationCodeModal) {
+      <div class="modal-overlay" (click)="closeLoginVerificationCodeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">Check your email</h2>
+            <button type="button" class="modal-close" (click)="closeLoginVerificationCodeModal()" aria-label="Close">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" [formGroup]="loginVerificationCodeForm">
+            <div class="modal-description">
+              Enter the 6-digit code we sent to <b>{{ userEmail }}</b> to
+              {{ pendingLoginVerificationEnable ? 'enable' : 'disable' }} email verification for new logins.
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                maxlength="6"
+                class="form-input"
+                [class.form-input--error]="loginVerificationCodeForm.get('code')?.invalid && (loginVerificationCodeForm.get('code')?.dirty || loginVerificationCodeForm.get('code')?.touched)"
+                formControlName="code"
+                placeholder="e.g. 123456"
+              />
+              @if (loginVerificationCodeForm.get('code')?.invalid && (loginVerificationCodeForm.get('code')?.dirty || loginVerificationCodeForm.get('code')?.touched)) {
+                <span class="form-error">Verification code must be 6 digits</span>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeLoginVerificationCodeModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="submitLoginVerificationCode()" [disabled]="loginVerificationCodeForm.invalid || isConfirmingLoginVerification">
+              {{ isConfirmingLoginVerification ? 'Confirming...' : 'Confirm' }}
+            </button>
           </div>
         </div>
       </div>
@@ -136,8 +248,11 @@
 
     <!-- Security Questions Section -->
     <div class="profile-section">
-      <h2 class="section-title">Security Questions</h2>
+      <h2 class="section-title">Security questions</h2>
       <div class="section-content">
+        <p class="section-intro">
+          Used to verify it’s you if you get locked out. Pick questions only you can answer.
+        </p>
         <div class="form-row">
           <div class="form-group">
             <label for="question1" class="form-label">Question 1 *</label>
@@ -245,14 +360,13 @@
                       autocomplete="current-password"
                       required
                     />
-                    @if (verifyQuestionsError) {
-                      <span class="form-error">{{ verifyQuestionsError }}</span>
-                    }
                   </div>
                 </form>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" (click)="closeVerifyQuestionsModal()">Cancel</button>
-                  <button type="button" class="btn btn-primary" (click)="confirmVerifyQuestionsPassword()">Confirm</button>
+                  <button type="button" class="btn btn-primary" (click)="confirmVerifyQuestionsPassword()" [disabled]="isVerifyingSensitiveAction">
+                    {{ isVerifyingSensitiveAction ? 'Confirming...' : 'Confirm' }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -263,8 +377,11 @@
 
     <!-- Account Recovery Options Section -->
     <div class="profile-section">
-      <h2 class="section-title">Account Recovery Options</h2>
+      <h2 class="section-title">Account recovery</h2>
       <div class="section-content">
+        <p class="section-intro">
+          Add at least one backup contact so we can help you regain access.
+        </p>
         <div class="form-row">
           <div class="form-group">
             <label for="recoveryEmail" class="form-label">Recovery Email</label>
@@ -296,7 +413,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn btn-primary btn-save" (click)="onSaveRecoveryOptions()" [disabled]="!recoveryOptionsValid || isSavingRecovery">
+          <button type="button" class="btn btn-primary btn-save" (click)="onSaveRecoveryOptions()" [disabled]="!recoveryOptionsValid || !hasRecoveryOptionsChanges || isSavingRecovery">
             <div class="svg-wrapper-1">
               <div class="svg-wrapper">
                 @if (isSavingRecovery) {

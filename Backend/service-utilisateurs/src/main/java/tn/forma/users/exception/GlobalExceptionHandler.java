@@ -69,13 +69,15 @@ public class GlobalExceptionHandler {
         String message = ex.getMessage();
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        if (message != null) {
+            if (message != null) {
             if (message.contains("already exists")) {
                 status = HttpStatus.CONFLICT; // 409
             } else if (message.contains("not found")) {
                 status = HttpStatus.NOT_FOUND; // 404
             } else if (message.contains("expired")) {
                 status = HttpStatus.GONE; // 410
+            } else if (message.toLowerCase().contains("session")) {
+                status = HttpStatus.UNAUTHORIZED; // 401
             } else if (message.contains("disabled")) {
                 status = HttpStatus.FORBIDDEN; // 403
             }
