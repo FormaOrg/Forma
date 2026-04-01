@@ -15,6 +15,7 @@ public class UserDto {
     private String phone;
     private String country;
     private String website;
+    private String preferredLanguage;
     private String role;
     private boolean isActive;
     private boolean emailVerified;

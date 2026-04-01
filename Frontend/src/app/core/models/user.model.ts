@@ -27,6 +27,7 @@ export interface AuthUser {
   phone?: string;
   country?: string;
   website?: string;
+  preferredLanguage?: 'en' | 'fr';
   role: UserRole;
   emailVerified?: boolean;
   isActive?: boolean;
@@ -105,6 +106,10 @@ export interface UpdateProfileRequest {
   username?: string;
   country?: string;
   website?: string;
+}
+
+export interface UpdatePreferencesRequest {
+  preferredLanguage?: 'en' | 'fr';
 }
 
 export interface RequestEmailChangeRequest {

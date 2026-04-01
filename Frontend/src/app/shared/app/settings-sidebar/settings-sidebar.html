@@ -14,7 +14,7 @@
 
       @if (section.label) {
         <div class="settings-sidebar__section-label">
-          <span class="settings-sidebar__section-label-text">{{ section.label }}</span>
+          <span class="settings-sidebar__section-label-text">{{ section.label | t }}</span>
         </div>
       }
 
@@ -31,7 +31,7 @@
               <span class="settings-sidebar__icon">
                 <app-icon [name]="item.icon" [size]="iconSize" />
               </span>
-              <span class="settings-sidebar__label">{{ item.label }}</span>
+              <span class="settings-sidebar__label">{{ item.label | t }}</span>
             </a>
           </li>
         }

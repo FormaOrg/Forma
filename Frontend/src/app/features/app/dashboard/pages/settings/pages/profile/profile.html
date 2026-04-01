@@ -2,8 +2,8 @@
   <div class="profile-header">
     <div class="profile-header__content">
       <div class="profile-header__text">
-        <h1 class="profile-title">Profile</h1>
-        <p class="profile-subtitle">Manage your personal information and preferences</p>
+        <h1 class="profile-title">{{ 'settings.profile.title' | t }}</h1>
+        <p class="profile-subtitle">{{ 'settings.profile.subtitle' | t }}</p>
       </div>
       <div class="profile-header__actions">
         <button
@@ -12,7 +12,7 @@
           (click)="onCancel()"
           [disabled]="isSaving"
         >
-          Reset
+          {{ 'common.reset' | t }}
         </button>
         <button
           type="button"
@@ -43,7 +43,7 @@
               }
             </div>
           </div>
-          <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+          <span>{{ isSaving ? ('common.saving' | t) : ('common.saveChanges' | t) }}</span>
         </button>
       </div>
     </div>
@@ -52,7 +52,7 @@
   <form [formGroup]="profileForm" class="profile-form">
     <!-- Avatar Section -->
     <div class="profile-section">
-      <h2 class="section-title">Profile Picture</h2>
+      <h2 class="section-title">{{ 'settings.profile.picture.title' | t }}</h2>
       <div class="section-content">
         <div class="avatar-section">
           <div class="avatar-preview" [class.avatar-preview--has-image]="!!avatarPreview">
@@ -62,8 +62,8 @@
                 type="button"
                 class="avatar-remove-overlay"
                 (click)="removeAvatar()"
-                aria-label="Remove profile picture"
-                title="Remove photo"
+                [attr.aria-label]="'settings.profile.picture.remove' | t"
+                [attr.title]="'settings.profile.picture.remove' | t"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M9 3.75h6m-8.25 3h10.5m-9.75 0 .75 11.25a1.5 1.5 0 0 0 1.5 1.5h4.5a1.5 1.5 0 0 0 1.5-1.5l.75-11.25m-6 3.75v5.25m3-5.25v5.25" />
@@ -77,8 +77,8 @@
           </div>
           <div class="avatar-actions">
             <div class="avatar-meta">
-              <div class="avatar-meta__title">Upload a photo</div>
-              <div class="avatar-meta__hint">PNG, JPG up to 5MB. Square images look best.</div>
+              <div class="avatar-meta__title">{{ 'settings.profile.picture.uploadTitle' | t }}</div>
+              <div class="avatar-meta__hint">{{ 'settings.profile.picture.hint' | t }}</div>
             </div>
             <label class="upload-button">
               <input
@@ -87,7 +87,7 @@
                 (change)="onAvatarChange($event)"
                 hidden
               />
-              Upload Photo
+              {{ 'settings.profile.picture.button' | t }}
             </label>
           </div>
         </div>
@@ -96,20 +96,20 @@
 
     <!-- Personal Information Section -->
     <div class="profile-section" id="personal-info-section">
-      <h2 class="section-title">Personal Information</h2>
+      <h2 class="section-title">{{ 'settings.profile.personal.title' | t }}</h2>
       <div class="section-content">
 
       <!-- Name Fields (Two Columns) -->
       <div class="form-row">
         <div class="form-group">
-          <label for="firstName" class="form-label">First Name *</label>
+          <label for="firstName" class="form-label">{{ 'settings.profile.fields.firstName' | t }} *</label>
           <input
             id="firstName"
             type="text"
             class="form-input"
             [class.form-input--error]="isFieldInvalid('firstName')"
             formControlName="firstName"
-            placeholder="John"
+            [placeholder]="'settings.profile.placeholders.firstName' | t"
           />
           @if (isFieldInvalid('firstName')) {
             <span class="form-error">{{ getFieldError('firstName') }}</span>
@@ -117,14 +117,14 @@
         </div>
 
         <div class="form-group">
-          <label for="lastName" class="form-label">Last Name *</label>
+          <label for="lastName" class="form-label">{{ 'settings.profile.fields.lastName' | t }} *</label>
           <input
             id="lastName"
             type="text"
             class="form-input"
             [class.form-input--error]="isFieldInvalid('lastName')"
             formControlName="lastName"
-            placeholder="Doe"
+            [placeholder]="'settings.profile.placeholders.lastName' | t"
           />
           @if (isFieldInvalid('lastName')) {
             <span class="form-error">{{ getFieldError('lastName') }}</span>
@@ -135,7 +135,7 @@
       <!-- Email Field -->
       <div class="form-group">
         <div class="form-label-row">
-          <label for="email" class="form-label">Account Email</label>
+          <label for="email" class="form-label">{{ 'settings.profile.fields.email' | t }}</label>
         </div>
         <div class="email-field-wrapper">
           <input
@@ -148,10 +148,10 @@
           <button
             type="button"
             class="email-edit-btn"
-            title="Edit email address"
+            [attr.title]="'settings.profile.email.edit' | t"
             (click)="openEmailModal()"
           >
-            Edit
+            {{ 'common.edit' | t }}
           </button>
         </div>
       </div>
@@ -161,8 +161,8 @@
         <div class="modal-overlay" (click)="closeEmailModal()">
           <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-              <h2 class="modal-title">Change account email</h2>
-              <button type="button" class="modal-close" (click)="closeEmailModal()" aria-label="Close">
+              <h2 class="modal-title">{{ 'settings.profile.email.modalTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="closeEmailModal()" [attr.aria-label]="'common.close' | t">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -180,45 +180,45 @@
                     </button>
                   </div>
                 }
-                <label for="currentPassword">Enter your account password</label>
+                <label for="currentPassword">{{ 'settings.profile.email.currentPassword' | t }}</label>
                 <input
                   id="currentPassword"
                   type="password"
                   class="form-input"
                   [class.form-input--error]="isFieldInvalid('password')"
                   formControlName="password"
-                  placeholder="Enter your password"
+                  [placeholder]="'settings.profile.email.currentPasswordPlaceholder' | t"
                 />
                 @if (isFieldInvalid('password')) {
                   <span class="form-error">{{ getFieldError('password') }}</span>
                 }
                 <div class="forgot-password-link">
-                  <a href="#" (click)="$event.preventDefault(); forgotPassword()">Forgot Password?</a>
+                  <a href="#" (click)="$event.preventDefault(); forgotPassword()">{{ 'auth.login.forgot' | t }}</a>
                 </div>
               </div>
               <div class="form-group">
-                <label for="newEmail">Enter new account email</label>
+                <label for="newEmail">{{ 'settings.profile.email.newEmail' | t }}</label>
                 <input
                   id="newEmail"
                   type="email"
                   class="form-input"
                   [class.form-input--error]="isFieldInvalid('newEmail')"
                   formControlName="newEmail"
-                  placeholder="Enter new email"
+                  [placeholder]="'settings.profile.email.newEmailPlaceholder' | t"
                 />
                 @if (isFieldInvalid('newEmail')) {
                   <span class="form-error">{{ getFieldError('newEmail') }}</span>
                 }
               </div>
               <div class="form-group">
-                <label for="confirmEmail">Confirm new account email</label>
+                <label for="confirmEmail">{{ 'settings.profile.email.confirmEmail' | t }}</label>
                 <input
                   id="confirmEmail"
                   type="email"
                   class="form-input"
                   [class.form-input--error]="isFieldInvalid('confirmEmail')"
                   formControlName="confirmEmail"
-                  placeholder="Confirm new email"
+                  [placeholder]="'settings.profile.email.confirmEmailPlaceholder' | t"
                 />
                 @if (isFieldInvalid('confirmEmail')) {
                   <span class="form-error">{{ getFieldError('confirmEmail') }}</span>
@@ -226,9 +226,9 @@
               </div>
             </form>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">Cancel</button>
+              <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">{{ 'common.cancel' | t }}</button>
               <button type="button" class="btn btn-primary" (click)="confirmEmailChange()" [disabled]="emailChangeForm.invalid || isSubmittingEmailChange">
-                {{ isSubmittingEmailChange ? 'Sending...' : 'Next' }}
+                {{ isSubmittingEmailChange ? ('common.sending' | t) : ('common.next' | t) }}
               </button>
             </div>
           </div>
@@ -240,8 +240,8 @@
         <div class="modal-overlay" (click)="showEmailCodeModal = false">
           <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-              <h2 class="modal-title">Check your email</h2>
-              <button type="button" class="modal-close" (click)="cancelEmailCode()" aria-label="Close">
+              <h2 class="modal-title">{{ 'settings.profile.email.codeTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="cancelEmailCode()" [attr.aria-label]="'common.close' | t">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -249,7 +249,7 @@
             </div>
             <form [formGroup]="emailCodeForm" class="modal-body">
               <div class="modal-description">
-                To finish changing your email, please enter the 6-digit code we sent to <b>{{ emailToConfirm }}</b>
+                {{ 'settings.profile.email.codeDescriptionPrefix' | t }} <b>{{ emailToConfirm }}</b>
               </div>
               <div class="form-group">
                 <input
@@ -259,20 +259,20 @@
                   class="form-input"
                   [class.form-input--error]="emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)"
                   formControlName="code"
-                  placeholder="e.g., 123456"
+                  [placeholder]="'settings.profile.email.codePlaceholder' | t"
                 />
                 @if (emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)) {
-                  <span class="form-error">Invalid code</span>
+                  <span class="form-error">{{ 'settings.profile.email.invalidCode' | t }}</span>
                 }
               </div>
               <div class="resend-code-link">
-                <a href="#" (click)="$event.preventDefault(); resendEmailCode()">Resend Code</a>
+                <a href="#" (click)="$event.preventDefault(); resendEmailCode()">{{ 'common.resendCode' | t }}</a>
               </div>
             </form>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" (click)="cancelEmailCode()">Cancel</button>
+              <button type="button" class="btn btn-secondary" (click)="cancelEmailCode()">{{ 'common.cancel' | t }}</button>
               <button type="button" class="btn btn-primary" (click)="submitEmailCode()" [disabled]="emailCodeForm.invalid || isConfirmingEmailChange">
-                {{ isConfirmingEmailChange ? 'Confirming...' : 'Submit' }}
+                {{ isConfirmingEmailChange ? ('common.confirming' | t) : ('common.submit' | t) }}
               </button>
             </div>
           </div>
@@ -284,8 +284,8 @@
         <div class="modal-overlay" (click)="closeCancelConfirmModal()">
           <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-              <h2 class="modal-title">Cancel your changes?</h2>
-              <button type="button" class="modal-close" (click)="closeCancelConfirmModal()" aria-label="Close">
+              <h2 class="modal-title">{{ 'settings.profile.email.cancelTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="closeCancelConfirmModal()" [attr.aria-label]="'common.close' | t">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -293,12 +293,12 @@
             </div>
             <div class="modal-body">
               <div class="modal-description">
-                Your changes won’t be saved and you’ll continue using <b>{{ profileForm.get('email')?.value }}</b> to log in.
+                {{ 'settings.profile.email.cancelDescriptionPrefix' | t }} <b>{{ profileForm.get('email')?.value }}</b> {{ 'settings.profile.email.cancelDescriptionSuffix' | t }}
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary-red" (click)="closeCancelConfirmModal()">Back</button>
-              <button type="button" class="btn btn-danger" (click)="confirmCancelChange()">Cancel</button>
+              <button type="button" class="btn btn-secondary-red" (click)="closeCancelConfirmModal()">{{ 'common.back' | t }}</button>
+              <button type="button" class="btn btn-danger" (click)="confirmCancelChange()">{{ 'common.cancel' | t }}</button>
             </div>
           </div>
         </div>
@@ -307,7 +307,7 @@
       <!-- Username Field -->
       <div class="form-group">
         <div class="form-label-row">
-          <label for="username" class="form-label">Username *</label>
+          <label for="username" class="form-label">{{ 'settings.profile.fields.username' | t }} *</label>
         </div>
         <input
           id="username"
@@ -315,7 +315,7 @@
           class="form-input"
           [class.form-input--error]="isFieldInvalid('username')"
           formControlName="username"
-          placeholder="johndoe"
+          [placeholder]="'settings.profile.placeholders.username' | t"
         />
         @if (isFieldInvalid('username')) {
           <span class="form-error">{{ getFieldError('username') }}</span>
@@ -325,7 +325,7 @@
       <!-- Phone Field -->
       <div class="form-group">
         <div class="form-label-row">
-          <label for="phone" class="form-label">Phone Number</label>
+          <label for="phone" class="form-label">{{ 'settings.profile.fields.phone' | t }}</label>
         </div>
         <input
           id="phone"
@@ -333,7 +333,7 @@
           class="form-input"
           [class.form-input--error]="isFieldInvalid('phone')"
           formControlName="phone"
-          placeholder="+1 (555) 000-0000"
+          [placeholder]="'settings.profile.placeholders.phone' | t"
         />
         @if (isFieldInvalid('phone')) {
           <span class="form-error">{{ getFieldError('phone') }}</span>
@@ -344,11 +344,11 @@
 
     <!-- Location & Timezone Section -->
     <div class="profile-section">
-      <h2 class="section-title">Location & Preferences</h2>
+      <h2 class="section-title">{{ 'settings.profile.location.title' | t }}</h2>
       <div class="section-content">
         <div class="form-group">
           <div class="form-label-row">
-            <label for="country" class="form-label">Country *</label>
+            <label for="country" class="form-label">{{ 'settings.profile.fields.country' | t }} *</label>
           </div>
           <select
             id="country"
@@ -356,7 +356,7 @@
             [class.form-input--error]="isFieldInvalid('country')"
             formControlName="country"
           >
-            <option value="" disabled>Select a country</option>
+            <option value="" disabled>{{ 'settings.profile.placeholders.country' | t }}</option>
             @for (country of countries; track country) {
               <option [value]="country">{{ country }}</option>
             }
@@ -368,7 +368,7 @@
 
         <div class="form-group">
           <div class="form-label-row">
-            <label for="website" class="form-label">Website / Portfolio</label>
+            <label for="website" class="form-label">{{ 'settings.profile.fields.website' | t }}</label>
           </div>
           <input
             id="website"
@@ -376,7 +376,7 @@
             class="form-input"
             [class.form-input--error]="isFieldInvalid('website')"
             formControlName="website"
-            placeholder="https://yoursite.com"
+            [placeholder]="'settings.profile.placeholders.website' | t"
           />
           @if (isFieldInvalid('website')) {
             <span class="form-error">{{ getFieldError('website') }}</span>
@@ -387,10 +387,10 @@
 
     <!-- Social Logins Section -->
     <div class="profile-section">
-      <h2 class="section-title">Social logins</h2>
+      <h2 class="section-title">{{ 'settings.profile.social.title' | t }}</h2>
       <div class="section-content">
         <p class="social-logins-intro">
-          Link providers to sign in faster. You can always use your Forma email and password.
+          {{ 'settings.profile.social.intro' | t }}
         </p>
         <div class="social-logins" role="list">
           @for (platform of socialMediaPlatforms; track platform.id) {
@@ -405,16 +405,16 @@
                 </div>
                 <div class="social-login-row__text">
                   <div class="social-login-row__title-line">
-                    <span class="social-login-row__title">{{ platform.label }}</span>
+                    <span class="social-login-row__title">{{ platform.labelKey | t }}</span>
                     <span
                       class="social-login-row__status"
                       [class.social-login-row__status--on]="platform.status === 'connected'"
                       [class.social-login-row__status--off]="platform.status === 'disconnected'"
                     >
                       @if (platform.status === 'connected') {
-                        Connected
+                        {{ 'settings.profile.social.connected' | t }}
                       } @else {
-                        Not connected
+                        {{ 'settings.profile.social.notConnected' | t }}
                       }
                     </span>
                   </div>
@@ -422,7 +422,7 @@
                     @if (platform.status === 'connected') {
                       <span>Skander Boughnimi</span>
                     } @else {
-                      <span>Not linked</span>
+                      <span>{{ 'settings.profile.social.notLinked' | t }}</span>
                     }
                   </p>
                 </div>
@@ -434,16 +434,16 @@
                 [class.social-login-row__btn--connect]="platform.status === 'disconnected'"
               >
                 @if (platform.status === 'connected') {
-                  Disable
+                  {{ 'settings.profile.social.disable' | t }}
                 } @else {
-                  Enable
+                  {{ 'settings.profile.social.enable' | t }}
                 }
               </button>
             </div>
           }
         </div>
         <p class="social-login-note">
-          If you disable social logins, you can still sign in with your Forma email and password.
+          {{ 'settings.profile.social.note' | t }}
         </p>
       </div>
     </div>

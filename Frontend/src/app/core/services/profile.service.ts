@@ -12,6 +12,7 @@ import {
   RequestEmailChangeRequest,
   SensitiveActionVerificationResponse,
   SecuritySettingsResponse,
+  UpdatePreferencesRequest,
   UpdateRecoveryOptionsRequest,
   UpdateProfileRequest
   ,
@@ -28,6 +29,7 @@ export interface UserProfileResponse {
   phone?: string;
   country?: string;
   website?: string;
+  preferredLanguage?: 'en' | 'fr';
   role: string;
   isActive: boolean;
   emailVerified: boolean;
@@ -50,6 +52,10 @@ export class ProfileService {
 
   updateMyProfile(request: UpdateProfileRequest): Observable<UserProfileResponse> {
     return this.http.put<UserProfileResponse>(`${this.apiUrl}/me`, request);
+  }
+
+  updateMyPreferences(request: UpdatePreferencesRequest): Observable<UserProfileResponse> {
+    return this.http.put<UserProfileResponse>(`${this.apiUrl}/me/preferences`, request);
   }
 
   changeMyPassword(request: ChangePasswordRequest): Observable<{ message: string }> {

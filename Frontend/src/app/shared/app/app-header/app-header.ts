@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  effect,
   HostListener,
   inject,
   Input,
@@ -18,25 +19,28 @@ import { AuthService } from '../../../core/services/auth.service';
 import type { HeaderActionButton, ProfileMenuItem } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import type { AppIconName } from '../icons/app-icon';
+import { I18nService } from '../../../features/landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
 
 type CommandGroup = 'Pages' | 'Actions';
+type ResolvedCommandPaletteItem = CommandPaletteItem & { title: string; subtitle: string; hint?: string };
 
 interface CommandPaletteItem {
   id: string;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   icon: AppIconName;
   group: CommandGroup;
   keywords: string[];
   route?: string;
   action?: 'toggle-sidebar' | 'logout';
-  hint?: string;
+  hintKey?: string;
 }
 
 @Component({
   selector: 'app-app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, AppIcon, FormsModule],
+  imports: [CommonModule, RouterModule, AppIcon, FormsModule, TranslatePipe],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css'
 })
@@ -48,6 +52,7 @@ export class AppHeader {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private i18n = inject(I18nService);
 
   readonly pageTitle = signal(this.readPageTitle());
   readonly commandQuery = signal('');
@@ -57,13 +62,13 @@ export class AppHeader {
   isCommandPaletteOpen = false;
 
   search = {
-    placeholder: 'Search...',
+    placeholderKey: 'app.header.search',
     shortcut: 'Ctrl K'
   };
 
-  actionButtons: HeaderActionButton[] = [
-    { label: 'Upgrade plan', variant: 'secondary', route: '/pricing' },
-    { label: 'Hire a professional', variant: 'primary', route: '/contact' }
+  actionButtons: Array<HeaderActionButton & { labelKey: string }> = [
+    { label: 'Upgrade plan', labelKey: 'app.header.actions.upgrade', variant: 'secondary', route: '/pricing' },
+    { label: 'Hire a professional', labelKey: 'app.header.actions.hire', variant: 'primary', route: '/contact' }
   ];
 
   profile = {
@@ -72,20 +77,20 @@ export class AppHeader {
     avatar: 'https://i.pravatar.cc/100?img=12'
   };
 
-  profileMenuItems: ProfileMenuItem[] = [
-    { label: 'Profile', icon: 'user', action: 'profile', route: '/app/settings/profile' },
-    { label: 'Billing', icon: 'credit-card', action: 'billing', route: '/app/billing' },
-    { label: 'Settings', icon: 'settings', action: 'settings', route: '/app/settings' },
-    { label: 'Help & Support', icon: 'help', action: 'help', route: '/contact' },
-    { label: 'Log out', icon: 'log-out', action: 'logout', danger: true }
+  profileMenuItems: Array<ProfileMenuItem & { labelKey: string }> = [
+    { label: 'Profile', labelKey: 'app.header.menu.profile', icon: 'user', action: 'profile', route: '/app/settings/profile' },
+    { label: 'Billing', labelKey: 'app.header.menu.billing', icon: 'credit-card', action: 'billing', route: '/app/billing' },
+    { label: 'Settings', labelKey: 'app.header.menu.settings', icon: 'settings', action: 'settings', route: '/app/settings' },
+    { label: 'Help & Support', labelKey: 'app.header.menu.help', icon: 'help', action: 'help', route: '/contact' },
+    { label: 'Log out', labelKey: 'app.header.menu.logout', icon: 'log-out', action: 'logout', danger: true }
   ];
 
   readonly iconSize = 20;
   readonly commandPaletteItems: CommandPaletteItem[] = [
     {
       id: 'go-home',
-      title: 'Go to Home',
-      subtitle: 'Jump back to your dashboard home.',
+      titleKey: 'app.command.goHome.title',
+      subtitleKey: 'app.command.goHome.subtitle',
       icon: 'home',
       group: 'Pages',
       route: '/app/home',
@@ -93,8 +98,8 @@ export class AppHeader {
     },
     {
       id: 'go-projects',
-      title: 'Open Projects',
-      subtitle: 'Browse and manage your projects.',
+      titleKey: 'app.command.projects.title',
+      subtitleKey: 'app.command.projects.subtitle',
       icon: 'folder',
       group: 'Pages',
       route: '/app/projects',
@@ -102,8 +107,8 @@ export class AppHeader {
     },
     {
       id: 'go-templates',
-      title: 'Open Templates',
-      subtitle: 'View your template area in the app.',
+      titleKey: 'app.command.templates.title',
+      subtitleKey: 'app.command.templates.subtitle',
       icon: 'layout-grid',
       group: 'Pages',
       route: '/app/templates',
@@ -111,8 +116,8 @@ export class AppHeader {
     },
     {
       id: 'go-billing',
-      title: 'Open Billing',
-      subtitle: 'See plans, invoices, and payment settings.',
+      titleKey: 'app.command.billing.title',
+      subtitleKey: 'app.command.billing.subtitle',
       icon: 'credit-card',
       group: 'Pages',
       route: '/app/billing',
@@ -120,8 +125,8 @@ export class AppHeader {
     },
     {
       id: 'go-settings-profile',
-      title: 'Profile Settings',
-      subtitle: 'Edit your personal information.',
+      titleKey: 'app.command.settingsProfile.title',
+      subtitleKey: 'app.command.settingsProfile.subtitle',
       icon: 'user',
       group: 'Pages',
       route: '/app/settings/profile',
@@ -129,8 +134,8 @@ export class AppHeader {
     },
     {
       id: 'go-settings-security',
-      title: 'Security Settings',
-      subtitle: 'Password, 2-step verification, and recovery.',
+      titleKey: 'app.command.settingsSecurity.title',
+      subtitleKey: 'app.command.settingsSecurity.subtitle',
       icon: 'shield',
       group: 'Pages',
       route: '/app/settings/security',
@@ -138,8 +143,8 @@ export class AppHeader {
     },
     {
       id: 'go-settings-preferences',
-      title: 'Preferences',
-      subtitle: 'Language, theme, and account preferences.',
+      titleKey: 'app.command.settingsPreferences.title',
+      subtitleKey: 'app.command.settingsPreferences.subtitle',
       icon: 'settings',
       group: 'Pages',
       route: '/app/settings/preferences',
@@ -147,8 +152,8 @@ export class AppHeader {
     },
     {
       id: 'go-settings-activity',
-      title: 'Activity',
-      subtitle: 'Check login history and active sessions.',
+      titleKey: 'app.command.settingsActivity.title',
+      subtitleKey: 'app.command.settingsActivity.subtitle',
       icon: 'history',
       group: 'Pages',
       route: '/app/settings/activity',
@@ -156,47 +161,52 @@ export class AppHeader {
     },
     {
       id: 'go-pricing',
-      title: 'Upgrade Plan',
-      subtitle: 'Compare plans and upgrade your workspace.',
+      titleKey: 'app.command.upgrade.title',
+      subtitleKey: 'app.command.upgrade.subtitle',
       icon: 'sparkles',
       group: 'Actions',
       route: '/pricing',
       keywords: ['pricing', 'upgrade', 'plan', 'premium'],
-      hint: 'Open page'
+      hintKey: 'app.command.hint.openPage'
     },
     {
       id: 'go-contact',
-      title: 'Hire a Professional',
-      subtitle: 'Get in touch with Forma support or pros.',
+      titleKey: 'app.command.contact.title',
+      subtitleKey: 'app.command.contact.subtitle',
       icon: 'help',
       group: 'Actions',
       route: '/contact',
       keywords: ['contact', 'support', 'professional', 'help'],
-      hint: 'Open page'
+      hintKey: 'app.command.hint.openPage'
     },
     {
       id: 'toggle-sidebar',
-      title: this.sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar',
-      subtitle: 'Toggle the dashboard navigation rail.',
+      titleKey: 'app.command.toggleSidebar.title',
+      subtitleKey: 'app.command.toggleSidebar.subtitle',
       icon: 'panel-left',
       group: 'Actions',
       action: 'toggle-sidebar',
       keywords: ['sidebar', 'menu', 'navigation', 'toggle'],
-      hint: 'Action'
+      hintKey: 'app.command.hint.action'
     },
     {
       id: 'logout',
-      title: 'Log Out',
-      subtitle: 'End your current session and go back to login.',
+      titleKey: 'app.command.logout.title',
+      subtitleKey: 'app.command.logout.subtitle',
       icon: 'log-out',
       group: 'Actions',
       action: 'logout',
       keywords: ['logout', 'sign out', 'session', 'exit'],
-      hint: 'Action'
+      hintKey: 'app.command.hint.action'
     }
   ];
 
   constructor() {
+    effect(() => {
+      this.i18n.lang();
+      this.pageTitle.set(this.readPageTitle());
+    });
+
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -208,14 +218,9 @@ export class AppHeader {
       });
   }
 
-  get filteredCommandItems(): CommandPaletteItem[] {
+  get filteredCommandItems(): ResolvedCommandPaletteItem[] {
     const query = this.commandQuery().trim().toLowerCase();
-    const items = this.commandPaletteItems.map(item => ({
-      ...item,
-      title: item.action === 'toggle-sidebar'
-        ? (this.sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar')
-        : item.title
-    }));
+    const items = this.commandPaletteItems.map(item => this.translateCommandItem(item));
 
     if (!query) {
       return items;
@@ -232,7 +237,7 @@ export class AppHeader {
     });
   }
 
-  get groupedCommandItems(): Array<{ group: CommandGroup; items: CommandPaletteItem[] }> {
+  get groupedCommandItems(): Array<{ group: CommandGroup; items: ResolvedCommandPaletteItem[] }> {
     const items = this.filteredCommandItems;
     return ['Pages', 'Actions']
       .map(group => ({
@@ -316,7 +321,7 @@ export class AppHeader {
     }
   }
 
-  executeCommand(item: CommandPaletteItem): void {
+  executeCommand(item: ResolvedCommandPaletteItem): void {
     if (item.route) {
       this.router.navigateByUrl(item.route);
       return;
@@ -365,7 +370,7 @@ export class AppHeader {
     });
   }
 
-  isCommandHighlighted(item: CommandPaletteItem): boolean {
+  isCommandHighlighted(item: ResolvedCommandPaletteItem): boolean {
     return this.filteredCommandItems[this.highlightedIndex()]?.id === item.id;
   }
 
@@ -422,8 +427,42 @@ export class AppHeader {
     }
     // If the route is under /app/settings, always show 'Settings' as the main header title
     if (fullPath.startsWith('/app/settings')) {
-      return 'Settings';
+      return this.i18n.t('app.header.title.settings');
     }
-    return title;
+    return this.translateRouteTitle(title);
+  }
+
+  private translateRouteTitle(title: string): string {
+    switch (title) {
+      case 'Home':
+        return this.i18n.t('app.header.title.home');
+      case 'Projects':
+        return this.i18n.t('app.header.title.projects');
+      case 'Templates':
+        return this.i18n.t('app.header.title.templates');
+      case 'Profile':
+        return this.i18n.t('app.header.title.profile');
+      case 'Billing':
+        return this.i18n.t('app.header.title.billing');
+      case 'Activity':
+        return this.i18n.t('app.header.title.activity');
+      case 'Preferences':
+        return this.i18n.t('app.header.title.preferences');
+      case 'Security':
+        return this.i18n.t('app.header.title.security');
+      default:
+        return title;
+    }
+  }
+
+  private translateCommandItem(item: CommandPaletteItem): ResolvedCommandPaletteItem {
+    return {
+      ...item,
+      title: item.action === 'toggle-sidebar'
+        ? this.i18n.t(this.sidebarCollapsed ? 'app.command.toggleSidebar.expand' : 'app.command.toggleSidebar.collapse')
+        : this.i18n.t(item.titleKey),
+      subtitle: this.i18n.t(item.subtitleKey),
+      hint: item.hintKey ? this.i18n.t(item.hintKey) : undefined
+    };
   }
 }

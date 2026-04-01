@@ -6,11 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ProfileService } from '../../../../../../../core/services/profile.service';
 import { ToastService } from '../../../../../../../core/services/toast.service';
+import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
+import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
 
 @Component({
   selector: 'app-settings-security',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslatePipe],
   templateUrl: './security.html',
   styleUrl: './security.css'
 })
@@ -74,17 +76,17 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  securityQuestions: string[] = [
-        'What was your childhood nickname?',
-        'In what city did you meet your spouse/significant other?',
-        'What is the name of your favorite childhood friend?',
-        'What street did you live on in third grade?',
-        'What is your oldest sibling’s birthday month and year?',
-        'What is the middle name of your youngest child?',
-        'What is your oldest sibling’s middle name?',
-        'What school did you attend for sixth grade?',
-        'What was your childhood phone number?',
-        'What is your maternal grandmother’s maiden name?'
+  securityQuestions = [
+        'settings.security.questions.options.nickname',
+        'settings.security.questions.options.spouseCity',
+        'settings.security.questions.options.childhoodFriend',
+        'settings.security.questions.options.thirdGradeStreet',
+        'settings.security.questions.options.siblingBirthday',
+        'settings.security.questions.options.childMiddleName',
+        'settings.security.questions.options.siblingMiddleName',
+        'settings.security.questions.options.sixthGradeSchool',
+        'settings.security.questions.options.childhoodPhone',
+        'settings.security.questions.options.grandmotherMaiden'
       ];
 
       get filteredQuestions1(): string[] {
@@ -102,6 +104,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private profileService = inject(ProfileService);
   private toastService = inject(ToastService);
+  private i18n = inject(I18nService);
 
   securityForm!: FormGroup;
   loginVerificationCodeForm!: FormGroup;
@@ -232,11 +235,16 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
 
   getFieldError(fieldName: string): string | null {
     const field = this.securityForm.get(fieldName);
-    if (field?.hasError('required')) return 'This field is required';
-    if (field?.hasError('minlength')) return `Minimum ${field.getError('minlength').requiredLength} characters`;
-    if (field?.hasError('pattern')) return 'Invalid format';
-    if (field?.hasError('email')) return 'Invalid email';
-    if (fieldName === 'confirmPassword' && this.securityForm.hasError('passwordsMismatch')) return 'Passwords do not match';
+    if (field?.hasError('required')) return this.i18n.t('validation.required');
+    if (field?.hasError('minlength')) {
+      const requiredLength = field.getError('minlength').requiredLength;
+      return this.i18n.lang() === 'fr'
+        ? `Minimum ${requiredLength} caracteres`
+        : `Minimum ${requiredLength} characters`;
+    }
+    if (field?.hasError('pattern')) return this.i18n.t('validation.invalidFormat');
+    if (field?.hasError('email')) return this.i18n.t('validation.invalidEmail');
+    if (fieldName === 'confirmPassword' && this.securityForm.hasError('passwordsMismatch')) return this.i18n.t('validation.passwordsMismatch');
     return null;
   }
 
@@ -264,10 +272,10 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
             this.securityForm.get(field)?.markAsUntouched();
           });
           this.showPasswordStrengthHint = false;
-          this.toastService.success(response.message || 'Password changed successfully.');
+          this.toastService.success(response.message || this.i18n.t('settings.security.toast.passwordChanged'));
         },
         error: error => {
-          this.passwordError = error?.error?.message ?? 'Failed to change your password.';
+          this.passwordError = error?.error?.message ?? this.i18n.t('settings.security.error.changePassword');
           this.toastService.error(this.passwordError);
         }
       });
@@ -289,7 +297,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
         this.initialRecoveryOptionsValue = this.getNormalizedRecoveryOptionsValue();
       },
       error: error => {
-        this.toastService.error(error?.error?.message ?? 'Failed to load security settings.');
+        this.toastService.error(error?.error?.message ?? this.i18n.t('settings.security.error.load'));
       }
     });
   }
@@ -328,7 +336,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.toastService.info(response.message);
         },
         error: error => {
-          this.loginVerificationError = error?.error?.message ?? 'Failed to send verification code.';
+          this.loginVerificationError = error?.error?.message ?? this.i18n.t('settings.security.error.sendCode');
           this.toastService.error(this.loginVerificationError);
         }
       });
@@ -355,7 +363,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   confirmVerifyQuestionsPassword(): void {
     const currentPassword = this.verifyQuestionsPassword.trim();
     if (!currentPassword) {
-      this.verifyQuestionsError = 'Current password is required';
+      this.verifyQuestionsError = this.i18n.t('settings.security.error.requirePassword');
       this.toastService.error(this.verifyQuestionsError);
       return;
     }
@@ -372,7 +380,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.executePendingSensitiveAction();
         },
         error: error => {
-          this.verifyQuestionsError = error?.error?.message ?? 'Failed to verify your password.';
+          this.verifyQuestionsError = error?.error?.message ?? this.i18n.t('settings.security.error.verifyPassword');
           this.toastService.error(this.verifyQuestionsError);
         }
       });
@@ -414,7 +422,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.toastService.success(response.message);
         },
         error: error => {
-          this.loginVerificationError = error?.error?.message ?? 'Invalid verification code.';
+          this.loginVerificationError = error?.error?.message ?? this.i18n.t('settings.security.error.codeInvalid');
           this.toastService.error(this.loginVerificationError);
         }
       });
@@ -438,7 +446,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.toastService.success(response.message);
         },
         error: error => {
-          this.toastService.error(error?.error?.message ?? 'Failed to disable 2-step verification.');
+          this.toastService.error(error?.error?.message ?? this.i18n.t('settings.security.error.disableTwoStep'));
         }
       });
   }
@@ -486,7 +494,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.pendingAction = null;
         },
         error: error => {
-          this.handleSensitiveActionError(error, 'Failed to update security questions.');
+          this.handleSensitiveActionError(error, this.i18n.t('settings.security.error.questions'));
         }
       });
   }
@@ -510,7 +518,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           this.pendingAction = null;
         },
         error: error => {
-          this.handleSensitiveActionError(error, 'Failed to update recovery options.');
+          this.handleSensitiveActionError(error, this.i18n.t('settings.security.error.recovery'));
         }
       });
   }
