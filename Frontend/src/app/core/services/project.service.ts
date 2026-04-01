@@ -11,6 +11,7 @@ import {
   DeployProjectRequest,
   Design,
   Media,
+  TemplateRecord,
   Theme,
 } from '../models/project.model';
 
@@ -111,6 +112,12 @@ export class ProjectService {
       `${this.baseUrl}/${projectId}/theme`,
       { themeId }
     ).pipe(catchError(this.handleError));
+  }
+
+  getTemplates(): Observable<TemplateRecord[]> {
+    return this.http.get<TemplateRecord[]>(`${environment.apiUrl}/templates`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   // ── Media ──────────────────────────────────────────────
