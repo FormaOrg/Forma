@@ -1,19 +1,8 @@
 <div #profileContainer class="profile-container">
-  <div #headerSentinel class="profile-header-sentinel" aria-hidden="true"></div>
-  <div
-    #profileHeader
-    class="profile-header"
-    [class.profile-header--floating]="isHeaderSticky || isHeaderExiting"
-    [class.profile-header--stuck]="isHeaderSticky"
-    [class.profile-header--exiting]="isHeaderExiting"
-    [style.top.px]="isHeaderSticky || isHeaderExiting ? headerStickyTop : null"
-    [style.left.px]="isHeaderSticky || isHeaderExiting ? headerStickyLeft : null"
-    [style.width.px]="isHeaderSticky || isHeaderExiting ? headerStickyWidth : null"
-  >
+  <div class="profile-header">
     <h1 class="profile-title">Activity</h1>
     <p class="profile-subtitle">Monitor your account's login activity and active sessions</p>
   </div>
-  <div class="profile-header-placeholder" [style.height.px]="headerPlaceholderHeight" aria-hidden="true"></div>
 
   <!-- Active Sessions Section -->
   <div class="profile-section">
