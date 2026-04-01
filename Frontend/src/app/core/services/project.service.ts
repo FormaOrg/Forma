@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import {
   Project,
   CreateProjectRequest,
@@ -15,7 +16,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  private readonly baseUrl = 'http://localhost:8081/api/projects';
+  private readonly baseUrl = `${environment.apiUrl}/projects`;
 
   constructor(private http: HttpClient) {}
 
@@ -100,7 +101,7 @@ export class ProjectService {
   // ── Theme ──────────────────────────────────────────────
 
   getThemes(): Observable<Theme[]> {
-    return this.http.get<Theme[]>(`http://localhost:8081/api/themes`).pipe(
+    return this.http.get<Theme[]>(`${environment.apiUrl}/themes`).pipe(
       catchError(this.handleError)
     );
   }

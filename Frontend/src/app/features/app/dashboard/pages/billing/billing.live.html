@@ -1,0 +1,402 @@
+<section class="billing-page">
+  <section class="billing-hero">
+    <div class="billing-hero__content">
+      <div class="billing-hero__text">
+        <h1 class="billing-hero__title">Billing</h1>
+        <p class="billing-hero__subtitle">
+          Manage your subscription, payment details, invoices, and plan limits from one clear billing workspace.
+        </p>
+      </div>
+
+      <div class="billing-hero__summary">
+        <span class="billing-hero__label">Current subscription</span>
+        <strong class="billing-hero__plan">{{ currentSubscription().planName ? currentSubscription().planName + ' Plan' : 'No active plan' }}</strong>
+        <span class="billing-hero__meta">
+          {{ currentSubscription().billingCycleLabel ?? 'Billing details will appear here when available' }}
+          ·
+          {{ statusLabel(currentSubscription().status) }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="billing-page__stats">
+    <app-data-card
+      [icon]="walletIcon"
+      [title]="'Current spend'"
+      [value]="isLoading() ? '...' : overview()?.currentSpendLabel ?? 'No active plan'"
+      [description]="
+        isLoading()
+          ? 'Loading billing summary'
+          : currentPlan()
+            ? billingMode() === 'yearly'
+              ? 'Per month equivalent on yearly billing'
+              : 'Current monthly rate'
+            : 'Upgrade when you are ready to unlock paid billing'
+      "
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="receiptIcon"
+      [title]="'Invoices paid'"
+      [value]="isLoading() ? '...' : invoicesPaid()"
+      [description]="isLoading() ? 'Checking billing history' : 'Successful payments in recent billing history'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="shieldIcon"
+      [title]="'Active projects'"
+      [value]="isLoading() ? '...' : activeProjects()"
+      [description]="isLoading() ? 'Checking account usage' : 'Projects currently connected to your account'"
+    ></app-data-card>
+  </div>
+
+  @if (isLoading()) {
+    <section class="billing-section">
+      <div class="billing-loading" aria-hidden="true">
+        <div class="billing-loading__hero"></div>
+        <div class="billing-loading__grid">
+          <div class="billing-loading__panel"></div>
+          <div class="billing-loading__panel"></div>
+        </div>
+      </div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="billing-section">
+      <div class="billing-empty billing-empty--error" role="alert">
+        <div class="billing-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+            <path
+              d="M10.2698 4.72956C11.0386 3.3979 12.9614 3.3979 13.7302 4.72956L20.2284 15.9855C20.9972 17.3172 20.0358 18.9812 18.4982 18.9812H5.50184C3.96424 18.9812 3.00284 17.3172 3.77164 15.9855L10.2698 4.72956Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="billing-empty__title">We couldn’t load your billing workspace</h2>
+        <p class="billing-empty__text">{{ errorMessage() }}</p>
+        <button type="button" class="billing-btn billing-btn--primary" (click)="loadBilling()">Try again</button>
+      </div>
+    </section>
+  } @else {
+    <div class="billing-page__grid">
+      <section class="billing-section billing-section--plan">
+        <div class="billing-section__header">
+          <div>
+            <h2 class="billing-section__title">Current plan</h2>
+            <p class="billing-section__subtitle">A quick view of your active subscription and next renewal.</p>
+          </div>
+          <span
+            class="billing-status"
+            [class.billing-status--active]="currentSubscription().status === 'active'"
+            [class.billing-status--inactive]="currentSubscription().status !== 'active'"
+          >
+            {{ statusLabel(currentSubscription().status) }}
+          </span>
+        </div>
+
+        @if (currentPlan(); as selectedPlan) {
+          <article class="current-plan-card">
+            <div class="current-plan-card__top">
+              <div>
+                <p class="current-plan-card__eyebrow">Plan</p>
+                <h3 class="current-plan-card__name">{{ selectedPlan.name }}</h3>
+                <p class="current-plan-card__description">
+                  {{ currentSubscription().planDescription ?? selectedPlan.description }}
+                </p>
+              </div>
+
+              <div class="billing-toggle" [attr.data-mode]="billingMode()">
+                <div class="billing-toggle__pill"></div>
+                <button type="button" class="billing-toggle__option" [class.is-active]="billingMode() === 'monthly'" (click)="setBillingMode('monthly')">
+                  Monthly
+                </button>
+                <button type="button" class="billing-toggle__option" [class.is-active]="billingMode() === 'yearly'" (click)="setBillingMode('yearly')">
+                  Yearly <span>(save {{ savePercent }}%)</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="current-plan-card__price-row">
+              <span class="current-plan-card__price">{{ currentPlanPrice() }} DT</span>
+              <span class="current-plan-card__period">/ month</span>
+            </div>
+
+            <div class="current-plan-card__details">
+              <div class="current-plan-card__detail">
+                <span>Billing cycle</span>
+                <strong>{{ currentSubscription().billingCycleLabel ?? 'Not available yet' }}</strong>
+              </div>
+              <div class="current-plan-card__detail">
+                <span>Renewal date</span>
+                <strong>{{ currentSubscription().renewalDateLabel ?? 'Not available yet' }}</strong>
+              </div>
+              <div class="current-plan-card__detail">
+                <span>Next charge</span>
+                <strong>{{ currentSubscription().nextChargeLabel ?? 'Not available yet' }}</strong>
+              </div>
+              <div class="current-plan-card__detail">
+                <span>Billing summary</span>
+                <strong>{{ yearlySummary() }}</strong>
+              </div>
+            </div>
+
+            @if (currentSubscription().promoNotice) {
+              <div class="billing-notice">
+                <p>{{ currentSubscription().promoNotice }}</p>
+              </div>
+            }
+
+            <div class="current-plan-card__actions">
+              <a class="billing-btn billing-btn--primary" routerLink="/pricing">Change Plan</a>
+              <button type="button" class="billing-btn billing-btn--secondary">Manage Plan</button>
+            </div>
+          </article>
+        } @else {
+          <div class="billing-empty">
+            <div class="billing-empty__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 8.5C4 7.67157 4.67157 7 5.5 7H18.5C19.3284 7 20 7.67157 20 8.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V8.5Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path d="M16 13H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h3 class="billing-empty__title">You’re not subscribed to a plan yet</h3>
+            <p class="billing-empty__text">
+              Billing will appear here as soon as your account has an active subscription. You can still review available plans below.
+            </p>
+            <a class="billing-btn billing-btn--primary" routerLink="/pricing">Explore plans</a>
+          </div>
+        }
+      </section>
+
+      <aside class="billing-side">
+        <section class="billing-section">
+          <div class="billing-section__header">
+            <div>
+              <h2 class="billing-section__title">Payment method</h2>
+              <p class="billing-section__subtitle">Your saved card and billing contact stay ready for renewals.</p>
+            </div>
+          </div>
+
+          @if (paymentMethod(); as payment) {
+            <article class="payment-card">
+              <div class="payment-card__row">
+                <div class="payment-card__brand">{{ payment.brand ?? 'Card' }}</div>
+                <div>
+                  <p class="payment-card__title">{{ payment.last4 ? '•••• ' + payment.last4 : payment.summary }}</p>
+                  <p class="payment-card__meta">{{ payment.expiryLabel ?? 'Payment expiry unavailable' }}</p>
+                </div>
+              </div>
+              <div class="payment-card__line">
+                <span>Billing contact</span>
+                <strong>{{ payment.contactEmail ?? 'Not available yet' }}</strong>
+              </div>
+              <div class="payment-card__line">
+                <span>Security</span>
+                <strong>{{ payment.summary }}</strong>
+              </div>
+              <div class="payment-card__actions">
+                <button type="button" class="billing-btn billing-btn--secondary">Update Payment Method</button>
+                <button type="button" class="billing-btn billing-btn--ghost">Edit Billing Contact</button>
+              </div>
+            </article>
+          } @else {
+            <div class="billing-empty billing-empty--compact">
+              <div class="billing-empty__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 8.5C4 7.67157 4.67157 7 5.5 7H18.5C19.3284 7 20 7.67157 20 8.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V8.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <path d="M16 13H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </div>
+              <h3 class="billing-empty__title">No payment method saved</h3>
+              <p class="billing-empty__text">
+                We didn’t receive a saved card or billing method from the backend for this account yet.
+              </p>
+            </div>
+          }
+        </section>
+
+        <section class="billing-section">
+          <div class="billing-section__header">
+            <div>
+              <h2 class="billing-section__title">Help & support</h2>
+              <p class="billing-section__subtitle">Quick help if you need a receipt, plan advice, or payment support.</p>
+            </div>
+          </div>
+
+          <article class="help-card">
+            <p class="help-card__text">Need help with taxes, invoices, or changing your billing cycle? Our team can help before your next renewal.</p>
+            <div class="help-card__actions">
+              <a class="billing-btn billing-btn--secondary" routerLink="/contact">Contact support</a>
+              <a class="billing-btn billing-btn--ghost" routerLink="/faqs">Billing FAQ</a>
+            </div>
+          </article>
+        </section>
+      </aside>
+    </div>
+
+    <section class="billing-section">
+      <div class="billing-section__header">
+        <div>
+          <h2 class="billing-section__title">Usage & limits</h2>
+          <p class="billing-section__subtitle">Track the subscription limits that matter most for your websites and team.</p>
+        </div>
+      </div>
+
+      @if (usage().length) {
+        <div class="usage-grid">
+          @for (item of usage(); track trackByUsage($index, item)) {
+            <article class="usage-card" [class.usage-card--warning]="item.limit && usagePercent(item) >= 80">
+              <div class="usage-card__top">
+                <div>
+                  <h3 class="usage-card__title">{{ item.label }}</h3>
+                  <p class="usage-card__summary">
+                    @if (item.limit == null) {
+                      {{ item.used }} {{ item.unit }}
+                    } @else {
+                      {{ item.used }} / {{ item.limit === 999 ? 'Unlimited' : item.limit }} {{ item.unit }}
+                    }
+                  </p>
+                </div>
+                @if (item.limit != null) {
+                  <span class="usage-card__percent">{{ usagePercent(item) }}%</span>
+                } @else {
+                  <span class="usage-card__percent">Live</span>
+                }
+              </div>
+
+              @if (item.limit != null) {
+                <div class="usage-card__meter">
+                  <span class="usage-card__fill" [style.width.%]="usagePercent(item)"></span>
+                </div>
+              } @else {
+                <div class="usage-card__pill">Synced from backend</div>
+              }
+
+              <p class="usage-card__note">{{ item.note }}</p>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="billing-empty billing-empty--compact">
+          <div class="billing-empty__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 12H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M12 5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h3 class="billing-empty__title">No usage information available yet</h3>
+          <p class="billing-empty__text">Usage data will appear here once your account starts returning tracked billing metrics.</p>
+        </div>
+      }
+    </section>
+
+    <section class="billing-section">
+      <div class="billing-section__header">
+        <div>
+          <h2 class="billing-section__title">Available plans</h2>
+          <p class="billing-section__subtitle">The same plan structure from the public pricing page, adapted to your dashboard billing workflow.</p>
+        </div>
+      </div>
+
+      <div class="plans-grid">
+        @for (plan of plans(); track trackByPlan($index, plan)) {
+          <article class="plan-card" [class.plan-card--current]="isCurrentPlan(plan)" [class.plan-card--popular]="plan.popular">
+            <div class="plan-card__top">
+              <div class="plan-card__badge-row">
+                @if (plan.popular) {
+                  <span class="plan-card__badge">Most Popular</span>
+                }
+                @if (isCurrentPlan(plan)) {
+                  <span class="plan-card__badge plan-card__badge--current">Current Plan</span>
+                }
+              </div>
+
+              <h3 class="plan-card__name">{{ plan.name }}</h3>
+              <p class="plan-card__description">{{ plan.description }}</p>
+              <div class="plan-card__price-row">
+                <span class="plan-card__price">{{ getDisplayedPlanPrice(plan) }} DT</span>
+                <span class="plan-card__period">/ month</span>
+              </div>
+            </div>
+
+            <ul class="plan-card__features" role="list">
+              @for (feature of plan.features; track feature) {
+                <li>{{ feature }}</li>
+              }
+            </ul>
+
+            <div class="plan-card__actions">
+              <button
+                type="button"
+                class="billing-btn"
+                [class.billing-btn--primary]="!isCurrentPlan(plan)"
+                [class.billing-btn--secondary]="isCurrentPlan(plan)"
+              >
+                {{ planActionLabel(plan) }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="billing-section">
+      <div class="billing-section__header">
+        <div>
+          <h2 class="billing-section__title">Billing history</h2>
+          <p class="billing-section__subtitle">Download invoices and keep a clear record of recent payments.</p>
+        </div>
+      </div>
+
+      @if (invoices().length) {
+        <div class="invoice-list">
+          @for (invoice of invoices(); track trackByInvoice($index, invoice)) {
+            <article class="invoice-row">
+              <div class="invoice-row__main">
+                <strong class="invoice-row__id">{{ invoice.id }}</strong>
+                <span class="invoice-row__date">{{ invoice.dateLabel }}</span>
+              </div>
+              <div class="invoice-row__amount">{{ invoice.amountLabel }}</div>
+              <div class="invoice-row__status">
+                <span class="invoice-pill" [class.invoice-pill--pending]="invoice.statusLabel === 'Pending'">{{ invoice.statusLabel }}</span>
+              </div>
+              <div class="invoice-row__actions">
+                <button type="button" class="billing-btn billing-btn--ghost">Download</button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="billing-empty billing-empty--compact">
+          <div class="billing-empty__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M7 3H17V21L14 19L12 21L10 19L7 21V3Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <path d="M10 8H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h3 class="billing-empty__title">No invoices yet</h3>
+          <p class="billing-empty__text">
+            Billing history will show up here once the backend starts returning invoice records for your account.
+          </p>
+        </div>
+      }
+    </section>
+  }
+</section>

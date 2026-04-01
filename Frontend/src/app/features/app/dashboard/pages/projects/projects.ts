@@ -1,18 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { DashboardProjectItem } from '../../../../../core/models/dashboard.model';
+import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
 import { DataCard } from '../home/components/data-card/data-card';
-import { ProjectCard, ProjectCardItem, ProjectStatus } from './components/project-card/project-card';
+import { ProjectCard, ProjectStatus } from './components/project-card/project-card';
 
-type ProjectFilter = 'all' | ProjectStatus;
+type ProjectFilter = 'all' | ProjectStatus | 'archived';
 type ProjectSort = 'last-edited' | 'name' | 'recently-created';
-
-type ProjectItem = ProjectCardItem & {
-  description: string;
-  lastEditedAt: number;
-  createdAt: number;
-};
 
 @Component({
   selector: 'app-projects',
@@ -21,7 +18,9 @@ type ProjectItem = ProjectCardItem & {
   templateUrl: './projects.html',
   styleUrl: './projects.css',
 })
-export class Projects {
+export class Projects implements OnInit {
+  private readonly dashboardDataService = inject(DashboardDataService);
+
   readonly globeIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2Z" stroke="currentColor" stroke-width="1.8"/>
@@ -46,62 +45,12 @@ export class Projects {
   </svg>
   `;
 
-  readonly projects = signal<ProjectItem[]>([
-    {
-      id: 'portfolio-studio',
-      name: 'Portfolio Studio',
-      status: 'published',
-      domain: 'portfolio-studio.forma.site',
-      lastEditedLabel: '2 hours ago',
-      createdLabel: '6 weeks ago',
-      description: 'Personal brand site with animated case studies and a client-ready contact flow.',
-      accent: '#7566ff',
-      lastEditedAt: Date.parse('2026-03-31T11:30:00Z'),
-      createdAt: Date.parse('2026-02-12T10:00:00Z'),
-      route: '/app/projects/portfolio-studio',
-    },
-    {
-      id: 'bloom-cafe',
-      name: 'Bloom Cafe',
-      status: 'draft',
-      lastEditedLabel: 'Yesterday',
-      createdLabel: '3 days ago',
-      description: 'Neighborhood cafe concept with seasonal menus, reservations, and takeaway promos.',
-      accent: '#f29d64',
-      lastEditedAt: Date.parse('2026-03-30T16:10:00Z'),
-      createdAt: Date.parse('2026-03-28T09:00:00Z'),
-      route: '/app/projects/bloom-cafe',
-    },
-    {
-      id: 'nova-agency',
-      name: 'Nova Agency',
-      status: 'published',
-      domain: 'nova-agency.forma.site',
-      lastEditedLabel: '4 days ago',
-      createdLabel: '2 months ago',
-      description: 'Agency showcase with service landing pages, lead capture, and testimonial blocks.',
-      accent: '#59b6d9',
-      lastEditedAt: Date.parse('2026-03-27T12:00:00Z'),
-      createdAt: Date.parse('2026-01-26T08:30:00Z'),
-      route: '/app/projects/nova-agency',
-    },
-    {
-      id: 'fit-journal',
-      name: 'Fit Journal',
-      status: 'draft',
-      lastEditedLabel: '1 week ago',
-      createdLabel: '2 weeks ago',
-      description: 'Habit-focused wellness site with classes, newsletters, and a clean editorial rhythm.',
-      accent: '#6ec58d',
-      lastEditedAt: Date.parse('2026-03-24T13:20:00Z'),
-      createdAt: Date.parse('2026-03-18T14:00:00Z'),
-      route: '/app/projects/fit-journal',
-    },
-  ]);
-
+  readonly projects = signal<DashboardProjectItem[]>([]);
   readonly searchTerm = signal('');
   readonly activeFilter = signal<ProjectFilter>('all');
   readonly activeSort = signal<ProjectSort>('last-edited');
+  readonly isLoading = signal(true);
+  readonly errorMessage = signal('');
 
   readonly totalProjects = computed(() => this.projects().length);
   readonly publishedProjects = computed(() => this.projects().filter((project) => project.status === 'published').length);
@@ -120,7 +69,9 @@ export class Projects {
       const matchesQuery =
         query.length === 0 ||
         project.name.toLowerCase().includes(query) ||
-        project.description.toLowerCase().includes(query);
+        project.description.toLowerCase().includes(query) ||
+        project.typeLabel.toLowerCase().includes(query) ||
+        project.creationMethodLabel.toLowerCase().includes(query);
       const matchesFilter = filter === 'all' || project.status === filter;
 
       return matchesQuery && matchesFilter;
@@ -153,6 +104,26 @@ export class Projects {
     return this.filteredProjects().filter((project) => project.id !== featured?.id);
   });
 
+  ngOnInit(): void {
+    this.loadProjects();
+  }
+
+  loadProjects(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.dashboardDataService
+      .getProjectsOverview()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (projects) => this.projects.set(projects),
+        error: (error) => {
+          this.errorMessage.set(error?.error?.message ?? 'We could not load your projects right now.');
+          this.projects.set([]);
+        },
+      });
+  }
+
   updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
   }
@@ -165,5 +136,5 @@ export class Projects {
     this.activeSort.set(sort);
   }
 
-  trackByProject = (_: number, project: ProjectItem): string => project.id;
+  trackByProject = (_: number, project: DashboardProjectItem): string => project.id;
 }
