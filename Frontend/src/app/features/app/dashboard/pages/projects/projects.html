@@ -24,22 +24,22 @@
     <app-data-card
       [icon]="globeIcon"
       [title]="'Total projects'"
-      [value]="totalProjects().toString()"
-      [description]="'Across all workspaces'"
+      [value]="isLoading() ? '...' : totalProjects().toString()"
+      [description]="isLoading() ? 'Loading your workspaces' : 'Across all workspaces'"
     ></app-data-card>
 
     <app-data-card
       [icon]="checkIcon"
       [title]="'Published projects'"
-      [value]="publishedProjects().toString()"
-      [description]="'Currently live on a domain'"
+      [value]="isLoading() ? '...' : publishedProjects().toString()"
+      [description]="isLoading() ? 'Checking live projects' : 'Currently live on a domain'"
     ></app-data-card>
 
     <app-data-card
       [icon]="draftIcon"
       [title]="'Draft projects'"
-      [value]="draftProjects().toString()"
-      [description]="'Ready for your next edit'"
+      [value]="isLoading() ? '...' : draftProjects().toString()"
+      [description]="isLoading() ? 'Checking drafts' : 'Ready for your next edit'"
     ></app-data-card>
   </div>
 
@@ -102,7 +102,34 @@
   </section>
 
   <section class="projects-panel">
-    @if (!totalProjects()) {
+    @if (isLoading()) {
+      <div class="projects-loading" aria-hidden="true">
+        <div class="projects-loading__featured"></div>
+        <div class="projects-loading__grid">
+          @for (item of [1, 2, 3]; track item) {
+            <div class="projects-loading__card"></div>
+          }
+        </div>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="projects-empty projects-empty--error" role="alert">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+            <path
+              d="M10.2698 4.72956C11.0386 3.3979 12.9614 3.3979 13.7302 4.72956L20.2284 15.9855C20.9972 17.3172 20.0358 18.9812 18.4982 18.9812H5.50184C3.96424 18.9812 3.00284 17.3172 3.77164 15.9855L10.2698 4.72956Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">We couldn’t load your projects</h2>
+        <p class="projects-empty__text">{{ errorMessage() }}</p>
+        <button type="button" class="projects-empty__action" (click)="loadProjects()">Try again</button>
+      </div>
+    } @else if (!totalProjects()) {
       <div class="projects-empty">
         <div class="projects-empty__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
@@ -116,7 +143,7 @@
         </div>
         <h2 class="projects-empty__title">No projects yet</h2>
         <p class="projects-empty__text">
-          Create your first project to start building sites, saving drafts, and publishing when you are ready.
+          You don’t have any projects yet. Create your first project to start building, saving drafts, and publishing when you are ready.
         </p>
         <a class="projects-empty__action" routerLink="/app/templates">Create your first project</a>
       </div>
@@ -145,10 +172,15 @@
             <p class="projects-featured__text">{{ featured.description }}</p>
 
             <div class="projects-featured__meta">
-              <span class="projects-featured__badge" [class.projects-featured__badge--draft]="featured.status === 'draft'">
-                {{ featured.status === 'published' ? 'Published' : 'Draft' }}
+              <span
+                class="projects-featured__badge"
+                [class.projects-featured__badge--draft]="featured.status === 'draft'"
+                [class.projects-featured__badge--archived]="featured.status === 'archived'"
+              >
+                {{ featured.statusLabel }}
               </span>
-              <span>Last edited {{ featured.lastEditedLabel }}</span>
+              <span>Updated {{ featured.updatedDateLabel }}</span>
+              <span>{{ featured.typeLabel }} via {{ featured.creationMethodLabel }}</span>
               @if (featured.domain) {
                 <span>{{ featured.domain }}</span>
               }
@@ -156,8 +188,16 @@
           </div>
 
           <div class="projects-featured__actions">
-            <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route">Edit Project</a>
-            <a class="projects-featured__action projects-featured__action--secondary" [routerLink]="featured.route">Preview</a>
+            <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route ?? '/app/projects'">Open project</a>
+            @if (featured.previewRoute) {
+              <a class="projects-featured__action projects-featured__action--secondary" [href]="featured.previewRoute" target="_blank" rel="noreferrer">
+                Preview
+              </a>
+            } @else {
+              <button type="button" class="projects-featured__action projects-featured__action--secondary" disabled>
+                Preview unavailable
+              </button>
+            }
           </div>
         </article>
       }
