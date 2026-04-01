@@ -15,7 +15,7 @@ type ProjectSort = 'last-edited' | 'name' | 'recently-created';
   selector: 'app-projects',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, DataCard, ProjectCard],
-  templateUrl: './projects.html',
+  templateUrl: './projects.live.html',
   styleUrl: './projects.css',
 })
 export class Projects implements OnInit {
@@ -118,10 +118,29 @@ export class Projects implements OnInit {
       .subscribe({
         next: (projects) => this.projects.set(projects),
         error: (error) => {
-          this.errorMessage.set(error?.error?.message ?? 'We could not load your projects right now.');
+          this.errorMessage.set(this.toProjectsErrorMessage(error));
           this.projects.set([]);
         },
       });
+  }
+
+  private toProjectsErrorMessage(error: unknown): string {
+    const status = this.readErrorStatus(error);
+
+    if (status === 0) {
+      return 'Please check your connection and try again.';
+    }
+
+    return 'Something went wrong while loading your projects. Please try again.';
+  }
+
+  private readErrorStatus(error: unknown): number | undefined {
+    if (typeof error === 'object' && error && 'status' in error) {
+      const value = (error as { status?: unknown }).status;
+      return typeof value === 'number' ? value : undefined;
+    }
+
+    return undefined;
   }
 
   updateSearchTerm(value: string): void {

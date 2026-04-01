@@ -1,0 +1,216 @@
+<section class="projects-page">
+  <section class="projects-hero">
+    <div class="projects-hero__content">
+      <div class="projects-hero__text">
+        <h1 class="projects-hero__title">Your Projects</h1>
+        <p class="projects-hero__subtitle">
+          Keep every site organized and stay close to what is live.
+        </p>
+      </div>
+
+      <a class="projects-hero__cta" routerLink="/app/templates">
+        <span class="projects-hero__cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+            <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span>Create New Project</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="projects-page__stats">
+    <app-data-card
+      [icon]="globeIcon"
+      [title]="'Total projects'"
+      [value]="isLoading() ? '...' : totalProjects().toString()"
+      [description]="isLoading() ? 'Loading your workspaces' : 'Across all workspaces'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="checkIcon"
+      [title]="'Published projects'"
+      [value]="isLoading() ? '...' : publishedProjects().toString()"
+      [description]="isLoading() ? 'Checking live projects' : 'Currently live on a domain'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="draftIcon"
+      [title]="'Draft projects'"
+      [value]="isLoading() ? '...' : draftProjects().toString()"
+      [description]="isLoading() ? 'Checking drafts' : 'Ready for your next edit'"
+    ></app-data-card>
+  </div>
+
+  <section class="projects-toolbar">
+    <div class="projects-toolbar__search">
+      <span class="projects-toolbar__search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="projects-toolbar__search-input"
+        placeholder="Search projects"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="updateSearchTerm($event)"
+      />
+    </div>
+
+    <div class="projects-toolbar__filters" role="tablist" aria-label="Project status filter">
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'all'"
+        (click)="updateFilter('all')"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'published'"
+        (click)="updateFilter('published')"
+      >
+        Published
+      </button>
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'draft'"
+        (click)="updateFilter('draft')"
+      >
+        Draft
+      </button>
+    </div>
+
+    <label class="projects-toolbar__sort">
+      <span class="projects-toolbar__sort-label">Sort</span>
+      <select
+        class="projects-toolbar__sort-select"
+        [ngModel]="activeSort()"
+        (ngModelChange)="updateSort($event)"
+      >
+        <option value="last-edited">Last edited</option>
+        <option value="name">Name</option>
+        <option value="recently-created">Recently created</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="projects-panel">
+    @if (isLoading()) {
+      <div class="projects-loading" aria-hidden="true">
+        <div class="projects-loading__featured"></div>
+        <div class="projects-loading__grid">
+          @for (item of [1, 2, 3]; track item) {
+            <div class="projects-loading__card"></div>
+          }
+        </div>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="projects-empty projects-empty--error" role="alert">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+            <path
+              d="M10.2698 4.72956C11.0386 3.3979 12.9614 3.3979 13.7302 4.72956L20.2284 15.9855C20.9972 17.3172 20.0358 18.9812 18.4982 18.9812H5.50184C3.96424 18.9812 3.00284 17.3172 3.77164 15.9855L10.2698 4.72956Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">Something went wrong while loading your projects</h2>
+        <p class="projects-empty__text">{{ errorMessage() }}</p>
+        <button type="button" class="projects-empty__action" (click)="loadProjects()">Try again</button>
+      </div>
+    } @else if (!totalProjects()) {
+      <div class="projects-empty">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 7.5C4 6.67157 4.67157 6 5.5 6H10.379C10.7768 6 11.1583 6.15804 11.4393 6.43934L12.5607 7.56066C12.8417 7.84196 13.2232 8 13.621 8H18.5C19.3284 8 20 8.67157 20 9.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V7.5Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">You don't have any projects yet</h2>
+        <p class="projects-empty__text">
+          Start building your first website and keep every draft, edit, and launch in one place.
+        </p>
+        <a class="projects-empty__action" routerLink="/app/templates">Create Project</a>
+      </div>
+    } @else if (!filteredProjects().length) {
+      <div class="projects-empty">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">No matching projects</h2>
+        <p class="projects-empty__text">
+          Try a different name, clear the search, or switch filters to find the project you are looking for.
+        </p>
+        <button type="button" class="projects-empty__action" (click)="updateSearchTerm(''); updateFilter('all')">
+          Clear search and filters
+        </button>
+      </div>
+    } @else {
+      @if (featuredProject(); as featured) {
+        <article class="projects-featured">
+          <div class="projects-featured__content">
+            <p class="projects-featured__eyebrow">Most recently edited</p>
+            <h2 class="projects-featured__title">{{ featured.name }}</h2>
+            <p class="projects-featured__text">{{ featured.description }}</p>
+
+            <div class="projects-featured__meta">
+              <span
+                class="projects-featured__badge"
+                [class.projects-featured__badge--draft]="featured.status === 'draft'"
+                [class.projects-featured__badge--archived]="featured.status === 'archived'"
+              >
+                {{ featured.statusLabel }}
+              </span>
+              <span>Updated {{ featured.updatedDateLabel }}</span>
+              <span>{{ featured.typeLabel }} via {{ featured.creationMethodLabel }}</span>
+              @if (featured.domain) {
+                <span>{{ featured.domain }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="projects-featured__actions">
+            <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route ?? '/app/projects'">Open project</a>
+            @if (featured.previewRoute) {
+              <a class="projects-featured__action projects-featured__action--secondary" [href]="featured.previewRoute" target="_blank" rel="noreferrer">
+                Preview
+              </a>
+            } @else {
+              <button type="button" class="projects-featured__action projects-featured__action--secondary" disabled>
+                Preview unavailable
+              </button>
+            }
+          </div>
+        </article>
+      }
+
+      <div class="projects-grid">
+        @if (featuredProject(); as featuredCard) {
+          <app-project-card [project]="featuredCard" [highlighted]="true"></app-project-card>
+        }
+
+        @for (project of secondaryProjects(); track trackByProject($index, project)) {
+          <app-project-card [project]="project"></app-project-card>
+        }
+      </div>
+    }
+  </section>
+</section>
