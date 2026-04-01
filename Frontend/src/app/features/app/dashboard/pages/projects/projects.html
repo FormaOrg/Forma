@@ -1,0 +1,176 @@
+<section class="projects-page">
+  <section class="projects-hero">
+    <div class="projects-hero__content">
+      <div class="projects-hero__text">
+        <h1 class="projects-hero__title">Your Projects</h1>
+        <p class="projects-hero__subtitle">
+          Keep every site organized, jump back into drafts quickly, and stay close to what is live.
+        </p>
+      </div>
+
+      <a class="projects-hero__cta" routerLink="/app/templates">
+        <span class="projects-hero__cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+            <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span>Create New Project</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="projects-page__stats">
+    <app-data-card
+      [icon]="globeIcon"
+      [title]="'Total projects'"
+      [value]="totalProjects().toString()"
+      [description]="'Across all workspaces'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="checkIcon"
+      [title]="'Published projects'"
+      [value]="publishedProjects().toString()"
+      [description]="'Currently live on a domain'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="draftIcon"
+      [title]="'Draft projects'"
+      [value]="draftProjects().toString()"
+      [description]="'Ready for your next edit'"
+    ></app-data-card>
+  </div>
+
+  <section class="projects-toolbar">
+    <div class="projects-toolbar__search">
+      <span class="projects-toolbar__search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="projects-toolbar__search-input"
+        placeholder="Search projects"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="updateSearchTerm($event)"
+      />
+    </div>
+
+    <div class="projects-toolbar__filters" role="tablist" aria-label="Project status filter">
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'all'"
+        (click)="updateFilter('all')"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'published'"
+        (click)="updateFilter('published')"
+      >
+        Published
+      </button>
+      <button
+        type="button"
+        class="projects-toolbar__filter"
+        [class.projects-toolbar__filter--active]="activeFilter() === 'draft'"
+        (click)="updateFilter('draft')"
+      >
+        Draft
+      </button>
+    </div>
+
+    <label class="projects-toolbar__sort">
+      <span class="projects-toolbar__sort-label">Sort</span>
+      <select
+        class="projects-toolbar__sort-select"
+        [ngModel]="activeSort()"
+        (ngModelChange)="updateSort($event)"
+      >
+        <option value="last-edited">Last edited</option>
+        <option value="name">Name</option>
+        <option value="recently-created">Recently created</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="projects-panel">
+    @if (!totalProjects()) {
+      <div class="projects-empty">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 7.5C4 6.67157 4.67157 6 5.5 6H10.379C10.7768 6 11.1583 6.15804 11.4393 6.43934L12.5607 7.56066C12.8417 7.84196 13.2232 8 13.621 8H18.5C19.3284 8 20 8.67157 20 9.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V7.5Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">No projects yet</h2>
+        <p class="projects-empty__text">
+          Create your first project to start building sites, saving drafts, and publishing when you are ready.
+        </p>
+        <a class="projects-empty__action" routerLink="/app/templates">Create your first project</a>
+      </div>
+    } @else if (!filteredProjects().length) {
+      <div class="projects-empty">
+        <div class="projects-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h2 class="projects-empty__title">No matching projects</h2>
+        <p class="projects-empty__text">
+          Try a different name, clear the search, or switch filters to find the project you are looking for.
+        </p>
+        <button type="button" class="projects-empty__action" (click)="updateSearchTerm(''); updateFilter('all')">
+          Clear search and filters
+        </button>
+      </div>
+    } @else {
+      @if (featuredProject(); as featured) {
+        <article class="projects-featured">
+          <div class="projects-featured__content">
+            <p class="projects-featured__eyebrow">Most recently edited</p>
+            <h2 class="projects-featured__title">{{ featured.name }}</h2>
+            <p class="projects-featured__text">{{ featured.description }}</p>
+
+            <div class="projects-featured__meta">
+              <span class="projects-featured__badge" [class.projects-featured__badge--draft]="featured.status === 'draft'">
+                {{ featured.status === 'published' ? 'Published' : 'Draft' }}
+              </span>
+              <span>Last edited {{ featured.lastEditedLabel }}</span>
+              @if (featured.domain) {
+                <span>{{ featured.domain }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="projects-featured__actions">
+            <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route">Edit Project</a>
+            <a class="projects-featured__action projects-featured__action--secondary" [routerLink]="featured.route">Preview</a>
+          </div>
+        </article>
+      }
+
+      <div class="projects-grid">
+        @if (featuredProject(); as featuredCard) {
+          <app-project-card [project]="featuredCard" [highlighted]="true"></app-project-card>
+        }
+
+        @for (project of secondaryProjects(); track trackByProject($index, project)) {
+          <app-project-card [project]="project"></app-project-card>
+        }
+      </div>
+    }
+  </section>
+</section>

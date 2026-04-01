@@ -25,6 +25,7 @@ import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 
 import { Dashboard } from './features/app/dashboard/dashboard';
 import { Home } from './features/app/dashboard/pages/home/home';
+import { Projects } from './features/app/dashboard/pages/projects/projects';
 import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
 import { Settings } from './features/app/dashboard/pages/settings/settings';
 import { SettingsProfile } from './features/app/dashboard/pages/settings/pages/profile/profile';
@@ -68,7 +69,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: 'home', component: Home, data: { title: 'Home' } },
-      { path: 'projects', component: DashboardStub, data: { title: 'Projects' } },
+      { path: 'projects', component: Projects, data: { title: 'Projects' } },
       { path: 'templates', component: DashboardStub, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
       { path: 'billing', component: DashboardStub, data: { title: 'Billing' } },
