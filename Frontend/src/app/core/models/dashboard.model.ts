@@ -1,4 +1,5 @@
 import { BillingMode } from '../../features/pricing/pricing-plans';
+import { CreationMethod, ProjectType } from './project.model';
 
 export type DashboardProjectStatus = 'published' | 'draft' | 'archived';
 
@@ -25,6 +26,31 @@ export interface DashboardProjectItem {
   creationMethodLabel: string;
   lastEditedAt: number;
   createdAt: number;
+}
+
+export interface DashboardTemplateItem {
+  id: string;
+  backendId?: string | number;
+  name: string;
+  description: string;
+  category: string;
+  categoryLabel: string;
+  projectType: ProjectType;
+  creationMethod: CreationMethod;
+  previewImageUrl: string;
+  previewUrl?: string;
+  previewRoute?: string;
+  accent: string;
+  badgeLabel?: string;
+  source: 'backend' | 'fallback' | 'hybrid';
+  isFeatured: boolean;
+  isOwned: boolean;
+  tags: string[];
+  usesCount: number;
+  usesLabel: string;
+  updatedLabel: string;
+  updatedAt: number;
+  sortIndex: number;
 }
 
 export interface BillingUsageMetric {

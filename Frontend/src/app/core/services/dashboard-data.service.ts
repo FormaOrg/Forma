@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { DASHBOARD_TEMPLATE_FALLBACKS, DashboardTemplateFallbackSeed } from '../data/dashboard-templates-fallback.data';
 import {
   BillingInvoiceItem,
   BillingOverview,
@@ -9,8 +10,9 @@ import {
   BillingUsageMetric,
   DashboardProjectItem,
   DashboardProjectStatus,
+  DashboardTemplateItem,
 } from '../models/dashboard.model';
-import { Deployment, Media, Project } from '../models/project.model';
+import { CreationMethod, Deployment, Media, Project, ProjectType, TemplateRecord } from '../models/project.model';
 import { User } from '../models/user.model';
 import { ProjectService } from './project.service';
 import { UserService } from './user.service';
@@ -46,6 +48,21 @@ export class DashboardDataService {
       user: this.userService.getMe(),
       projects: this.getProjectsOverview().pipe(catchError(() => of([]))),
     }).pipe(map(({ user, projects }) => this.toBillingOverview(user, projects)));
+  }
+
+  getTemplatesOverview(): Observable<DashboardTemplateItem[]> {
+    return this.projectService.getTemplates().pipe(
+      map((records) => this.toDashboardTemplates(records)),
+      catchError((error) => {
+        const status = this.readErrorStatus(error);
+
+        if (status === 404 || status === 405 || status === 501) {
+          return of(this.toFallbackTemplates());
+        }
+
+        return throwError(() => error);
+      })
+    );
   }
 
   private toDashboardProject(project: Project, deployment: Deployment | null, media: Media[]): DashboardProjectItem {
@@ -129,6 +146,117 @@ export class DashboardDataService {
     };
   }
 
+  private toDashboardTemplates(records: TemplateRecord[]): DashboardTemplateItem[] {
+    if (!records.length) {
+      return this.toFallbackTemplates();
+    }
+
+    const mapped = records.map((record, index) =>
+      this.toDashboardTemplate(record, DASHBOARD_TEMPLATE_FALLBACKS[index % DASHBOARD_TEMPLATE_FALLBACKS.length], index)
+    );
+
+    const supplemental = DASHBOARD_TEMPLATE_FALLBACKS
+      .slice(0, Math.max(0, DASHBOARD_TEMPLATE_FALLBACKS.length - mapped.length))
+      .map((seed, index) => this.toFallbackTemplate(seed, mapped.length + index));
+
+    return [...mapped, ...supplemental].sort((left, right) => {
+      if (left.isFeatured !== right.isFeatured) {
+        return Number(right.isFeatured) - Number(left.isFeatured);
+      }
+
+      if (left.usesCount !== right.usesCount) {
+        return right.usesCount - left.usesCount;
+      }
+
+      return left.name.localeCompare(right.name);
+    });
+  }
+
+  private toDashboardTemplate(
+    record: TemplateRecord,
+    seed: DashboardTemplateFallbackSeed,
+    index: number
+  ): DashboardTemplateItem {
+    const name = this.readNonEmptyString(record.name) ?? this.readNonEmptyString(record.title) ?? seed.name;
+    const description =
+      this.readNonEmptyString(record.description) ?? this.readNonEmptyString(record.summary) ?? seed.description;
+    const category = this.readNonEmptyString(record.category) ?? this.readNonEmptyString(record.label) ?? seed.category;
+    const projectType = this.toTemplateProjectType(record.projectType ?? record.type, seed.projectType);
+    const creationMethod = this.toTemplateCreationMethod(record.creationMethod, seed.creationMethod);
+    const previewImageUrl = this.readNonEmptyString(record.previewImageUrl) ?? seed.previewImageUrl;
+    const previewRoute =
+      this.readNonEmptyString(record.previewRoute) ?? this.readNonEmptyString(record.route) ?? seed.previewRoute;
+    const previewUrl = this.readNonEmptyString(record.previewUrl);
+    const updatedAt = this.toTimestamp(record.updatedAt ?? record.createdAt);
+    const usesCount =
+      typeof record.usesCount === 'number' && Number.isFinite(record.usesCount) ? record.usesCount : seed.usesCount;
+    const isFeatured = typeof record.featured === 'boolean' ? record.featured : Boolean(seed.isFeatured);
+    const isOwned = Boolean(record.isOwned);
+    const tags = Array.isArray(record.tags)
+      ? record.tags.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0)
+      : [category];
+    const hasCompleteBackendData =
+      Boolean(this.readNonEmptyString(record.name) || this.readNonEmptyString(record.title)) &&
+      Boolean(this.readNonEmptyString(record.description) || this.readNonEmptyString(record.summary)) &&
+      Boolean(this.readNonEmptyString(record.previewImageUrl));
+
+    return {
+      id: `template-${String(record.id)}`,
+      backendId: record.id,
+      name,
+      description,
+      category,
+      categoryLabel: category,
+      projectType,
+      creationMethod,
+      previewImageUrl,
+      previewUrl,
+      previewRoute,
+      accent: seed.accent,
+      badgeLabel: isOwned ? 'My template' : isFeatured ? 'Featured' : undefined,
+      source: hasCompleteBackendData ? 'backend' : 'hybrid',
+      isFeatured,
+      isOwned,
+      tags,
+      usesCount,
+      usesLabel: `${usesCount} use${usesCount === 1 ? '' : 's'}`,
+      updatedLabel: this.formatRelativeDate(updatedAt),
+      updatedAt,
+      sortIndex: index,
+    };
+  }
+
+  private toFallbackTemplates(): DashboardTemplateItem[] {
+    return DASHBOARD_TEMPLATE_FALLBACKS.map((seed, index) => this.toFallbackTemplate(seed, index));
+  }
+
+  private toFallbackTemplate(seed: DashboardTemplateFallbackSeed, index: number): DashboardTemplateItem {
+    const updatedAt = Date.now() - index * 86400000;
+
+    return {
+      id: seed.id,
+      name: seed.name,
+      description: seed.description,
+      category: seed.category,
+      categoryLabel: seed.category,
+      projectType: seed.projectType,
+      creationMethod: seed.creationMethod,
+      previewImageUrl: seed.previewImageUrl,
+      previewRoute: seed.previewRoute,
+      accent: seed.accent,
+      badgeLabel: seed.isFeatured ? 'Featured' : undefined,
+      source: 'fallback',
+      isFeatured: Boolean(seed.isFeatured),
+      isOwned: false,
+      tags: [seed.category],
+      usesCount: seed.usesCount,
+      usesLabel: `${seed.usesCount} uses`,
+      updatedLabel: this.formatRelativeDate(updatedAt),
+      updatedAt,
+      sortIndex: index,
+    };
+  }
+
   private toSubscriptionSummary(user: User): BillingSubscriptionSummary {
     if (user.role === 'PREMIUM') {
       return {
@@ -198,6 +326,38 @@ export class DashboardDataService {
       .split('_')
       .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
       .join(' ');
+  }
+
+  private toTemplateProjectType(value: unknown, fallback: ProjectType): ProjectType {
+    switch (this.readNonEmptyString(value)?.toUpperCase()) {
+      case 'BLOG':
+        return 'BLOG';
+      case 'BUSINESS':
+        return 'BUSINESS';
+      case 'ECOMMERCE':
+        return 'ECOMMERCE';
+      case 'LANDING_PAGE':
+        return 'LANDING_PAGE';
+      case 'PORTFOLIO':
+        return 'PORTFOLIO';
+      default:
+        return fallback;
+    }
+  }
+
+  private toTemplateCreationMethod(value: unknown, fallback: CreationMethod): CreationMethod {
+    switch (this.readNonEmptyString(value)?.toUpperCase()) {
+      case 'AI_PROMPT':
+        return 'AI_PROMPT';
+      case 'DRAG_DROP':
+        return 'DRAG_DROP';
+      case 'HYBRID':
+        return 'HYBRID';
+      case 'VISUAL_DESIGNER':
+        return 'VISUAL_DESIGNER';
+      default:
+        return fallback;
+    }
   }
 
   private toTimestamp(value: string | null | undefined): number {
@@ -272,5 +432,18 @@ export class DashboardDataService {
 
     const palette = ['#7566ff', '#59b6d9', '#6ec58d', '#f29d64', '#ef6f91', '#5f93ff'];
     return palette[Math.abs(hash) % palette.length];
+  }
+
+  private readNonEmptyString(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+  }
+
+  private readErrorStatus(error: unknown): number | undefined {
+    if (typeof error === 'object' && error && 'status' in error) {
+      const value = (error as { status?: unknown }).status;
+      return typeof value === 'number' ? value : undefined;
+    }
+
+    return undefined;
   }
 }

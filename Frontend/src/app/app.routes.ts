@@ -28,6 +28,7 @@ import { Billing } from './features/app/dashboard/pages/billing/billing';
 import { Home } from './features/app/dashboard/pages/home/home';
 import { Projects } from './features/app/dashboard/pages/projects/projects';
 import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
+import { Templates } from './features/app/dashboard/pages/templates/templates';
 import { Settings } from './features/app/dashboard/pages/settings/settings';
 import { SettingsProfile } from './features/app/dashboard/pages/settings/pages/profile/profile';
 import { SettingsSecurity } from './features/app/dashboard/pages/settings/pages/security/security';
@@ -71,7 +72,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: 'home', component: Home, data: { title: 'Home' } },
       { path: 'projects', component: Projects, data: { title: 'Projects' } },
-      { path: 'templates', component: DashboardStub, data: { title: 'Templates' } },
+      { path: 'templates', component: Templates, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
       { path: 'billing', component: Billing, data: { title: 'Billing' } },
       {
@@ -91,4 +92,4 @@ export const routes: Routes = [
 
   { path: '**', redirectTo: '' }
 ];
-// their code
+
