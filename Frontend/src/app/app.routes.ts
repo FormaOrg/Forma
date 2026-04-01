@@ -24,6 +24,7 @@ import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase
 import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
 
 import { Dashboard } from './features/app/dashboard/dashboard';
+import { Billing } from './features/app/dashboard/pages/billing/billing';
 import { Home } from './features/app/dashboard/pages/home/home';
 import { Projects } from './features/app/dashboard/pages/projects/projects';
 import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
@@ -72,7 +73,7 @@ export const routes: Routes = [
       { path: 'projects', component: Projects, data: { title: 'Projects' } },
       { path: 'templates', component: DashboardStub, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
-      { path: 'billing', component: DashboardStub, data: { title: 'Billing' } },
+      { path: 'billing', component: Billing, data: { title: 'Billing' } },
       {
         path: 'settings',
         component: Settings,
