@@ -1,11 +1,16 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
+import { ProfileService } from '../../../../../../../core/services/profile.service';
+import { ToastService } from '../../../../../../../core/services/toast.service';
+import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
 
 @Component({
   selector: 'app-settings-preferences',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './preferences.html',
   styleUrl: './preferences.css'
 })
@@ -17,6 +22,7 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   preferencesForm!: FormGroup;
   isSaving = false;
   showDeleteModal = false;
+  private readonly themeStorageKey = 'forma_theme_preference';
   isHeaderSticky = false;
   isHeaderExiting = false;
   headerStickyTop = 0;
@@ -33,9 +39,9 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   private readonly handleStickyResize = () => this.scheduleStickyUpdate();
 
   themes = [
-    { id: 'light', label: 'Light', icon: '☀️' },
-    { id: 'dark', label: 'Dark', icon: '🌙' },
-    { id: 'system', label: 'System', icon: '💻' }
+    { id: 'light', labelKey: 'settings.preferences.theme.light', icon: '☀️' },
+    { id: 'dark', labelKey: 'settings.preferences.theme.dark', icon: '🌙' },
+    { id: 'system', labelKey: 'settings.preferences.theme.system', icon: '💻' }
   ];
 
   languages = [
@@ -43,12 +49,22 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     { code: 'fr', label: 'Français' }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private profileService: ProfileService,
+    private toastService: ToastService,
+    private i18n: I18nService
+  ) {
     this.initForm();
   }
 
   ngOnInit() {
-    // Load saved preferences
+    this.loadPreferences();
+    this.preferencesForm.get('language')?.valueChanges.subscribe(language => {
+      if (language === 'en' || language === 'fr') {
+        void this.i18n.setLang(language);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -78,27 +94,39 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
 
   private initForm() {
     this.preferencesForm = this.fb.group({
-      theme: ['light', Validators.required],
-      language: ['en', Validators.required]
+      theme: [this.readSavedTheme(), Validators.required],
+      language: [this.i18n.lang(), Validators.required]
     });
   }
 
   onSave() {
-    if (this.preferencesForm.valid) {
-      this.isSaving = true;
-      // Simulate API call
-      setTimeout(() => {
-        this.isSaving = false;
-        console.log('Preferences saved:', this.preferencesForm.value);
-      }, 1500);
+    if (this.preferencesForm.invalid) {
+      this.preferencesForm.markAllAsTouched();
+      return;
     }
+
+    this.isSaving = true;
+    const language = this.preferencesForm.get('language')?.value;
+    const theme = this.preferencesForm.get('theme')?.value;
+
+    if (theme) {
+      localStorage.setItem(this.themeStorageKey, theme);
+    }
+
+    this.profileService.updateMyPreferences({ preferredLanguage: language })
+      .pipe(finalize(() => this.isSaving = false))
+      .subscribe({
+        next: () => {
+          this.toastService.success(this.i18n.t('settings.preferences.toast.saved'));
+        },
+        error: error => {
+          this.toastService.error(error?.error?.message ?? this.i18n.t('settings.preferences.toast.saveError'));
+        }
+      });
   }
 
   onCancel() {
-    this.preferencesForm.reset({
-      theme: 'light',
-      language: 'en'
-    });
+    this.loadPreferences();
   }
 
   onDeleteAccount() {
@@ -113,6 +141,29 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     this.showDeleteModal = false;
     console.log('Account deletion requested');
     // TODO: Call API to delete account
+  }
+
+  private loadPreferences(): void {
+    const fallbackTheme = this.readSavedTheme();
+    const currentLanguage = this.i18n.lang();
+    this.profileService.getMyProfile().subscribe({
+      next: () => {
+        this.preferencesForm.reset({
+          theme: fallbackTheme,
+          language: currentLanguage
+        }, { emitEvent: false });
+      },
+      error: () => {
+        this.preferencesForm.reset({
+          theme: fallbackTheme,
+          language: currentLanguage
+        }, { emitEvent: false });
+      }
+    });
+  }
+
+  private readSavedTheme(): string {
+    return localStorage.getItem(this.themeStorageKey) ?? 'light';
   }
 
   private scheduleStickyUpdate(): void {

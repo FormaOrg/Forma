@@ -14,6 +14,7 @@ import tn.forma.users.dto.SecuritySettingsResponse;
 import tn.forma.users.dto.SensitiveActionVerificationResponse;
 import tn.forma.users.dto.UpdateRecoveryOptionsRequest;
 import tn.forma.users.dto.UpdateProfileRequest;
+import tn.forma.users.dto.UpdatePreferencesRequest;
 import tn.forma.users.dto.UpdateSecurityQuestionsRequest;
 import tn.forma.users.dto.UserDto;
 import tn.forma.users.dto.VerifySensitiveActionRequest;
@@ -120,6 +121,24 @@ public class UserService {
 
         userRepository.save(user);
         log.info("Profile updated: {}", email);
+        return mapToDto(user);
+    }
+
+    @Transactional
+    public UserDto updatePreferences(String email, UpdatePreferencesRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String preferredLanguage = blankToNull(request.getPreferredLanguage());
+        if (preferredLanguage != null) {
+            String normalizedLanguage = preferredLanguage.toLowerCase();
+            if (!normalizedLanguage.equals("en") && !normalizedLanguage.equals("fr")) {
+                throw new RuntimeException("Preferred language must be en or fr");
+            }
+            user.setPreferredLanguage(normalizedLanguage);
+        }
+
+        userRepository.save(user);
         return mapToDto(user);
     }
 
@@ -392,6 +411,7 @@ public class UserService {
                 .phone(user.getPhone())
                 .country(user.getCountry())
                 .website(user.getWebsite())
+                .preferredLanguage(user.getPreferredLanguage())
                 .role(user.getRole().name())
                 .isActive(user.isActive())
                 .emailVerified(user.isEmailVerified())

@@ -1,23 +1,23 @@
 <div #profileContainer class="profile-container">
   <div class="profile-header">
     <div class="profile-header__text">
-      <h1 class="profile-title">Preferences</h1>
-      <p class="profile-subtitle">Customize how Forma looks and behaves.</p>
+      <h1 class="profile-title">{{ 'settings.preferences.title' | t }}</h1>
+      <p class="profile-subtitle">{{ 'settings.preferences.subtitle' | t }}</p>
     </div>
   </div>
 
   <form [formGroup]="preferencesForm" class="profile-form">
     <div class="profile-section">
-      <h2 class="section-title">Appearance</h2>
+      <h2 class="section-title">{{ 'settings.preferences.appearance.title' | t }}</h2>
       <div class="section-content">
         <p class="section-intro">
-          Control the language and display mode Forma uses across your dashboard.
+          {{ 'settings.preferences.appearance.intro' | t }}
         </p>
         <div class="form-group">
           <div class="form-label-row">
-            <label class="form-label" for="language">Language</label>
+            <label class="form-label" for="language">{{ 'settings.preferences.language.label' | t }}</label>
           </div>
-          <p class="field-description">Choose your preferred language.</p>
+          <p class="field-description">{{ 'settings.preferences.language.description' | t }}</p>
           <select formControlName="language" class="form-select">
             @for (lang of languages; track lang.code) {
               <option [value]="lang.code">{{ lang.label }}</option>
@@ -27,10 +27,10 @@
 
         <div class="subsection">
           <div class="form-label-row">
-            <label class="form-label">Theme mode</label>
+            <label class="form-label">{{ 'settings.preferences.theme.label' | t }}</label>
           </div>
           <p class="field-description">
-            Choose how Forma looks to you. Select a single theme, or sync with your system.
+            {{ 'settings.preferences.theme.description' | t }}
           </p>
           <div class="theme-grid">
             @for (theme of themes; track theme.id) {
@@ -45,7 +45,7 @@
                 <div class="theme-preview">
                   <div class="theme-preview-content" [class]="'theme-' + theme.id"></div>
                 </div>
-                <span class="theme-label">{{ theme.label }}</span>
+                <span class="theme-label">{{ theme.labelKey | t }}</span>
               </label>
             }
           </div>
@@ -55,10 +55,10 @@
     </div>
 
     <div class="profile-section">
-      <h2 class="section-title">Danger Zone</h2>
+      <h2 class="section-title">{{ 'settings.preferences.danger.title' | t }}</h2>
       <div class="section-content danger-section">
         <p class="section-intro">
-          Permanently delete your Forma account and data.
+          {{ 'settings.preferences.danger.intro' | t }}
         </p>
         <div class="danger-content">
           <div class="danger-main">
@@ -68,14 +68,14 @@
               </svg>
             </div>
             <div class="danger-text">
-              <h3 class="danger-action-title">Request account deletion</h3>
+              <h3 class="danger-action-title">{{ 'settings.preferences.danger.cardTitle' | t }}</h3>
               <p class="danger-action-description">
-                Deleting your account is permanent and cannot be undone. Your data will be deleted within 30 days, but we may retain some metadata and logs for longer where required or permitted by law.
+                {{ 'settings.preferences.danger.cardDescription' | t }}
               </p>
               <div class="danger-points" aria-hidden="true">
-                <span class="danger-point">Projects removed</span>
-                <span class="danger-point">Templates removed</span>
-                <span class="danger-point">Access revoked</span>
+                <span class="danger-point">{{ 'settings.preferences.danger.points.projects' | t }}</span>
+                <span class="danger-point">{{ 'settings.preferences.danger.points.templates' | t }}</span>
+                <span class="danger-point">{{ 'settings.preferences.danger.points.access' | t }}</span>
               </div>
             </div>
           </div>
@@ -85,7 +85,7 @@
               class="btn btn-danger"
               (click)="onDeleteAccount()"
             >
-              Request to delete account
+              {{ 'settings.preferences.danger.button' | t }}
             </button>
           </div>
         </div>
@@ -97,8 +97,8 @@
     <div class="modal-overlay" (click)="closeDeleteModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2 class="modal-title">Delete account</h2>
-          <button type="button" class="modal-close" (click)="closeDeleteModal()" aria-label="Close">
+          <h2 class="modal-title">{{ 'settings.preferences.deleteModal.title' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeDeleteModal()" [attr.aria-label]="'common.close' | t">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
@@ -107,12 +107,12 @@
         <div class="modal-divider"></div>
         <div class="modal-body">
           <p class="modal-description">
-            Are you sure you want to delete your Forma account? This will permanently remove all your data, including templates, projects, and account information. This action cannot be undone.
+            {{ 'settings.preferences.deleteModal.description' | t }}
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
-          <button type="button" class="btn btn-danger" (click)="confirmDeleteAccount()">Understood, delete my account</button>
+          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">{{ 'common.cancel' | t }}</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteAccount()">{{ 'settings.preferences.deleteModal.confirm' | t }}</button>
         </div>
       </div>
     </div>

@@ -91,6 +91,13 @@ public class UserController {
         return ResponseEntity.ok(userService.updateMe(userDetails.getUsername(), request));
     }
 
+    @PutMapping("/me/preferences")
+    public ResponseEntity<UserDto> updatePreferences(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UpdatePreferencesRequest request) {
+        return ResponseEntity.ok(userService.updatePreferences(userDetails.getUsername(), request));
+    }
+
     @PatchMapping("/me/password")
     public ResponseEntity<MessageResponse> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,
