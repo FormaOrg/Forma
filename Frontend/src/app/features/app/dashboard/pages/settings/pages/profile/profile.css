@@ -24,36 +24,42 @@
   z-index: 25;
   border: 1px solid transparent;
   background: transparent;
-  border-radius: 0;
+  border-radius: 18px;
   backdrop-filter: blur(0);
-  transform: translateY(0);
-  will-change: transform, opacity;
+  opacity: 1;
+  will-change: transform, opacity, filter;
   transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    backdrop-filter 180ms ease,
-    padding 180ms ease,
-    transform 180ms ease,
-    opacity 180ms ease;
+    background-color 110ms ease-out,
+    border-color 110ms ease-out,
+    box-shadow 110ms ease-out,
+    backdrop-filter 110ms ease-out;
 }
 
-.profile-header--stuck {
+.profile-header--floating {
   position: fixed;
-  margin: 0;
   padding: 12px 18px;
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(15, 23, 42, 0.08);
   border-radius: 18px;
   backdrop-filter: blur(16px);
-  transform: translateY(0);
   box-shadow:
     0 12px 28px rgba(15, 23, 42, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.7) inset;
 }
 
+.profile-header--stuck {
+  animation: settingsHeaderSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-header--exiting {
+  pointer-events: none;
+  animation: settingsHeaderSlideOut 220ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
 .profile-header-placeholder {
   width: 100%;
+  height: 0;
+  transition: height 210ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .profile-header__content {
@@ -660,6 +666,32 @@ select:focus {
   }
   100% {
     stroke-dashoffset: -125px;
+  }
+}
+
+@keyframes settingsHeaderSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-28px) scale(0.985);
+    filter: saturate(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: saturate(1);
+  }
+}
+
+@keyframes settingsHeaderSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: saturate(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.985);
+    filter: saturate(0.88);
   }
 }
 
