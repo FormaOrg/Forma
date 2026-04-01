@@ -5,11 +5,12 @@ import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { SettingsSidebarSection } from '../settings-nav.types';
 import { AppIcon } from '../icons/app-icon';
+import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
 
 @Component({
   selector: 'app-settings-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, AppIcon],
+  imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './settings-sidebar.html',
   styleUrl: './settings-sidebar.css'
 })
@@ -43,7 +44,7 @@ export class SettingsSidebar implements OnChanges, OnInit {
       label: '',
       items: [
         {
-          label: 'Back to dashboard',
+          label: 'settings.sidebar.back',
           icon: 'arrow-left',
           route: '/app/home'
         }
@@ -51,20 +52,20 @@ export class SettingsSidebar implements OnChanges, OnInit {
     },
     {
       id: 'account',
-      label: 'Account Settings',
+      label: 'settings.sidebar.account',
       items: [
         {
-          label: 'Profile',
+          label: 'settings.sidebar.profile',
           icon: 'user',
           route: '/app/settings/profile'
         },
         {
-          label: 'Security',
+          label: 'settings.sidebar.security',
           icon: 'shield',
           route: '/app/settings/security'
         },
         {
-          label: 'Preferences',
+          label: 'settings.sidebar.preferences',
           icon: 'settings',
           route: '/app/settings/preferences'
         }
@@ -72,10 +73,10 @@ export class SettingsSidebar implements OnChanges, OnInit {
     },
     {
       id: 'logs',
-      label: 'Logs',
+      label: 'settings.sidebar.logs',
       items: [
         {
-          label: 'Activity',
+          label: 'settings.sidebar.activity',
           icon: 'history',
           route: '/app/settings/activity'
         }

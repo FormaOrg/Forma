@@ -1,23 +1,23 @@
 <div #profileContainer class="profile-container">
   <div class="profile-header">
-    <h1 class="profile-title">Activity</h1>
-    <p class="profile-subtitle">Monitor your account's login activity and active sessions</p>
+    <h1 class="profile-title">{{ 'settings.activity.title' | t }}</h1>
+    <p class="profile-subtitle">{{ 'settings.activity.subtitle' | t }}</p>
   </div>
 
   <!-- Active Sessions Section -->
   <div class="profile-section">
     <div class="section-header">
-      <h2 class="section-title">Active Sessions</h2>
+      <h2 class="section-title">{{ 'settings.activity.sessions.title' | t }}</h2>
       @if (activeSessions.length > 1) {
         <button type="button" class="btn btn-secondary btn-sm" (click)="signOutAllOtherSessions()" [disabled]="isSigningOutAll">
-          {{ isSigningOutAll ? 'Signing out...' : 'Sign out all other sessions' }}
+          {{ isSigningOutAll ? ('settings.activity.sessions.signingOut' | t) : ('settings.activity.sessions.signOutOthers' | t) }}
         </button>
       }
     </div>
     <div class="section-content">
       @if (activeSessions.length === 0) {
         <div class="empty-state">
-          <p>No active sessions</p>
+          <p>{{ 'settings.activity.sessions.empty' | t }}</p>
         </div>
       } @else {
         <div class="sessions-list">
@@ -49,7 +49,7 @@
                     <h3 class="device-name">
                       {{ session.deviceName }}
                       @if (session.isCurrent) {
-                        <span class="badge badge-current">Current</span>
+                        <span class="badge badge-current">{{ 'settings.activity.sessions.current' | t }}</span>
                       }
                     </h3>
                     <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
@@ -57,21 +57,21 @@
                 </div>
                 @if (!session.isCurrent) {
                   <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
-                    Sign out
+                    {{ 'common.signOut' | t }}
                   </button>
                 }
               </div>
               <div class="session-details">
                 <div class="detail-item">
-                  <span class="detail-label">Location:</span>
+                  <span class="detail-label">{{ 'settings.activity.details.location' | t }}</span>
                   <span class="detail-value">{{ session.location }}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="detail-label">IP Address:</span>
+                  <span class="detail-label">{{ 'settings.activity.details.ip' | t }}</span>
                   <span class="detail-value">{{ session.ipAddress }}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="detail-label">Last Active:</span>
+                  <span class="detail-label">{{ 'settings.activity.details.lastActive' | t }}</span>
                   <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
                 </div>
               </div>
@@ -80,7 +80,7 @@
         </div>
         <div class="section-footer">
           <button type="button" class="btn btn-secondary" (click)="openSessionsModal()">
-            See More
+            {{ 'common.seeMore' | t }}
           </button>
         </div>
       }
@@ -92,8 +92,8 @@
     <div class="modal-overlay" (click)="closeSessionsModal()">
       <div class="modal-content modal-large" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2 class="modal-title">All Active Sessions</h2>
-          <button type="button" class="modal-close" (click)="closeSessionsModal()" aria-label="Close">
+          <h2 class="modal-title">{{ 'settings.activity.sessions.modalTitle' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeSessionsModal()" [attr.aria-label]="'common.close' | t">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
@@ -104,20 +104,20 @@
           <!-- Filters -->
           <div class="modal-filters">
             <div class="filter-group">
-              <label class="filter-label">Device Type</label>
+              <label class="filter-label">{{ 'settings.activity.filters.deviceType' | t }}</label>
               <select [(ngModel)]="sessionsFilterDeviceType" class="filter-select">
-                <option value="all">All Devices</option>
-                <option value="Desktop">Desktop</option>
-                <option value="Mobile">Mobile</option>
-                <option value="Tablet">Tablet</option>
+                <option value="all">{{ 'settings.activity.filters.allDevices' | t }}</option>
+                <option value="Desktop">{{ 'settings.activity.filters.desktop' | t }}</option>
+                <option value="Mobile">{{ 'settings.activity.filters.mobile' | t }}</option>
+                <option value="Tablet">{{ 'settings.activity.filters.tablet' | t }}</option>
               </select>
             </div>
-            <button type="button" class="btn btn-outline btn-sm" (click)="resetSessionFilters()">Reset Filters</button>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetSessionFilters()">{{ 'common.resetFilters' | t }}</button>
           </div>
           <!-- Sessions List -->
           @if (filteredSessions.length === 0) {
             <div class="empty-state">
-              <p>No sessions match your filters</p>
+              <p>{{ 'settings.activity.sessions.noMatch' | t }}</p>
             </div>
           } @else {
             <div class="sessions-list modal-sessions-list">
@@ -149,7 +149,7 @@
                         <h3 class="device-name">
                           {{ session.deviceName }}
                           @if (session.isCurrent) {
-                            <span class="badge badge-current">Current</span>
+                            <span class="badge badge-current">{{ 'settings.activity.sessions.current' | t }}</span>
                           }
                         </h3>
                         <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
@@ -157,21 +157,21 @@
                     </div>
                     @if (!session.isCurrent) {
                       <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
-                        Sign out
+                        {{ 'common.signOut' | t }}
                       </button>
                     }
                   </div>
                   <div class="session-details">
                     <div class="detail-item">
-                      <span class="detail-label">Location:</span>
+                      <span class="detail-label">{{ 'settings.activity.details.location' | t }}</span>
                       <span class="detail-value">{{ session.location }}</span>
                     </div>
                     <div class="detail-item">
-                      <span class="detail-label">IP Address:</span>
+                      <span class="detail-label">{{ 'settings.activity.details.ip' | t }}</span>
                       <span class="detail-value">{{ session.ipAddress }}</span>
                     </div>
                     <div class="detail-item">
-                      <span class="detail-label">Last Active:</span>
+                      <span class="detail-label">{{ 'settings.activity.details.lastActive' | t }}</span>
                       <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
                     </div>
                   </div>
@@ -187,12 +187,12 @@
   <!-- Login History Section -->
   <div class="profile-section">
     <div class="section-header section-header--simple">
-      <h2 class="section-title">Login History</h2>
+      <h2 class="section-title">{{ 'settings.activity.history.title' | t }}</h2>
     </div>
     <div class="section-content">
       @if (loginHistory.length === 0) {
         <div class="empty-state">
-          <p>No login history available</p>
+          <p>{{ 'settings.activity.history.empty' | t }}</p>
         </div>
       } @else {
         <div class="login-history-list">
@@ -222,7 +222,7 @@
                 </div>
                 <div class="login-details">
                   <span class="login-detail">{{ login.location }}</span>
-                  <span class="login-detail">IP: {{ login.ipAddress }}</span>
+                  <span class="login-detail">{{ 'settings.activity.history.ipPrefix' | t }} {{ login.ipAddress }}</span>
                   @if (login.status === 'failed' && login.failureReason) {
                     <span class="login-detail login-failure">{{ login.failureReason }}</span>
                   }
@@ -233,7 +233,7 @@
         </div>
         <div class="section-footer">
           <button type="button" class="btn btn-secondary" (click)="openLoginHistoryModal()">
-            See More
+            {{ 'common.seeMore' | t }}
           </button>
         </div>
       }
@@ -245,8 +245,8 @@
     <div class="modal-overlay" (click)="closeLoginHistoryModal()">
       <div class="modal-content modal-large" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2 class="modal-title">Login History</h2>
-          <button type="button" class="modal-close" (click)="closeLoginHistoryModal()" aria-label="Close">
+          <h2 class="modal-title">{{ 'settings.activity.history.modalTitle' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeLoginHistoryModal()" [attr.aria-label]="'common.close' | t">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
@@ -257,28 +257,28 @@
           <!-- Filters -->
           <div class="modal-filters">
             <div class="filter-group">
-              <label class="filter-label">Status</label>
+              <label class="filter-label">{{ 'settings.activity.filters.status' | t }}</label>
               <select [(ngModel)]="loginFilterStatus" class="filter-select">
-                <option value="all">All</option>
-                <option value="success">Successful</option>
-                <option value="failed">Failed</option>
+                <option value="all">{{ 'common.all' | t }}</option>
+                <option value="success">{{ 'settings.activity.filters.successful' | t }}</option>
+                <option value="failed">{{ 'settings.activity.filters.failed' | t }}</option>
               </select>
             </div>
             <div class="filter-group">
-              <label class="filter-label">Date Range</label>
+              <label class="filter-label">{{ 'settings.activity.filters.dateRange' | t }}</label>
               <select [(ngModel)]="loginFilterDateRange" class="filter-select">
-                <option value="all">All Time</option>
-                <option value="7days">Last 7 Days</option>
-                <option value="30days">Last 30 Days</option>
-                <option value="90days">Last 90 Days</option>
+                <option value="all">{{ 'settings.activity.filters.allTime' | t }}</option>
+                <option value="7days">{{ 'settings.activity.filters.last7Days' | t }}</option>
+                <option value="30days">{{ 'settings.activity.filters.last30Days' | t }}</option>
+                <option value="90days">{{ 'settings.activity.filters.last90Days' | t }}</option>
               </select>
             </div>
-            <button type="button" class="btn btn-outline btn-sm" (click)="resetLoginFilters()">Reset Filters</button>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetLoginFilters()">{{ 'common.resetFilters' | t }}</button>
           </div>
           <!-- Login History List -->
           @if (filteredLoginHistory.length === 0) {
             <div class="empty-state">
-              <p>No login records match your filters</p>
+              <p>{{ 'settings.activity.history.noMatch' | t }}</p>
             </div>
           } @else {
             <div class="login-history-list modal-login-history-list">
@@ -308,7 +308,7 @@
                     </div>
                     <div class="login-details">
                       <span class="login-detail">{{ login.location }}</span>
-                      <span class="login-detail">IP: {{ login.ipAddress }}</span>
+                      <span class="login-detail">{{ 'settings.activity.history.ipPrefix' | t }} {{ login.ipAddress }}</span>
                       @if (login.status === 'failed' && login.failureReason) {
                         <span class="login-detail login-failure">{{ login.failureReason }}</span>
                       }

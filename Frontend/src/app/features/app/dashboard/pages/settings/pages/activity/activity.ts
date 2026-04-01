@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ActivitySession, LoginRecord } from '../../../../../../../core/models/user.model';
 import { ProfileService } from '../../../../../../../core/services/profile.service';
 import { ToastService } from '../../../../../../../core/services/toast.service';
+import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
+import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
 
 @Component({
   selector: 'app-settings-activity',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './activity.html',
   styleUrl: './activity.css'
 })
@@ -50,7 +52,8 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private profileService: ProfileService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private i18n: I18nService
   ) {}
 
   get filteredSessions(): ActivitySession[] {
@@ -120,7 +123,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.isLoadingSessions = false;
-        this.toastService.error(err?.error?.message ?? 'Failed to load active sessions.');
+        this.toastService.error(err?.error?.message ?? this.i18n.t('settings.activity.toast.loadSessionsError'));
       }
     });
   }
@@ -134,7 +137,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.isLoadingLoginHistory = false;
-        this.toastService.error(err?.error?.message ?? 'Failed to load login history.');
+        this.toastService.error(err?.error?.message ?? this.i18n.t('settings.activity.toast.loadHistoryError'));
       }
     });
   }
@@ -143,10 +146,10 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
     this.profileService.signOutMySession(sessionId).subscribe({
       next: (response) => {
         this.activeSessions = this.activeSessions.filter(s => s.id !== sessionId);
-        this.toastService.success(response.message || 'Session signed out.');
+        this.toastService.success(response.message || this.i18n.t('settings.activity.toast.signOutSessionSuccess'));
       },
       error: (err) => {
-        this.toastService.error(err?.error?.message ?? 'Failed to sign out that session.');
+        this.toastService.error(err?.error?.message ?? this.i18n.t('settings.activity.toast.signOutSessionError'));
       }
     });
   }
@@ -157,11 +160,11 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
       next: (response) => {
         this.activeSessions = this.activeSessions.filter(s => s.isCurrent);
         this.isSigningOutAll = false;
-        this.toastService.success(response.message || 'Other sessions signed out.');
+        this.toastService.success(response.message || this.i18n.t('settings.activity.toast.signOutOthersSuccess'));
       },
       error: (err) => {
         this.isSigningOutAll = false;
-        this.toastService.error(err?.error?.message ?? 'Failed to sign out other sessions.');
+        this.toastService.error(err?.error?.message ?? this.i18n.t('settings.activity.toast.signOutOthersError'));
       }
     });
   }
@@ -171,13 +174,13 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
     const now = new Date();
     const seconds = Math.floor((now.getTime() - parsedDate.getTime()) / 1000);
 
-    if (seconds < 60) return 'Just now';
+    if (seconds < 60) return this.i18n.t('settings.activity.time.justNow');
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 60) return `${minutes}${this.i18n.t('settings.activity.time.minutesAgo')}`;
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) return `${hours}${this.i18n.t('settings.activity.time.hoursAgo')}`;
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return `${days}${this.i18n.t('settings.activity.time.daysAgo')}`;
   }
 
   formatDate(date: string): string {
@@ -188,7 +191,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     };
-    return new Date(date).toLocaleDateString('en-US', options);
+    return new Date(date).toLocaleDateString(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', options);
   }
 
   openSessionsModal(): void {

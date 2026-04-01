@@ -10,6 +10,7 @@ import {
   LoginVerificationRequest,
   RegisterRequest,
 } from '../models/user.model';
+import { I18nService } from '../../features/landing-page/i18n/i18n.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -25,7 +26,16 @@ export class AuthService {
   private lastValidatedToken: string | null = null;
   private lastSessionValidationAt = 0;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private i18n: I18nService
+  ) {
+    const storedUser = this.currentUserSubject.value;
+    if (storedUser?.preferredLanguage === 'en' || storedUser?.preferredLanguage === 'fr') {
+      void this.i18n.setLang(storedUser.preferredLanguage);
+    }
+  }
 
   // ── Public state ───────────────────────────────────────
 
@@ -215,6 +225,9 @@ export class AuthService {
     this.lastValidatedToken = response.accessToken;
     this.lastSessionValidationAt = Date.now();
     this.currentUserSubject.next(response.user);
+    if (response.user.preferredLanguage === 'en' || response.user.preferredLanguage === 'fr') {
+      void this.i18n.setLang(response.user.preferredLanguage);
+    }
   }
 
   private loadUserFromStorage(): AuthUser | null {
