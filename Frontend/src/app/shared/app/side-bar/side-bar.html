@@ -41,6 +41,7 @@
                 [class.sidebar__row--collapsed]="collapsed"
                 (click)="toggleDropdown(item)"
                 [attr.aria-expanded]="item.expanded"
+                [attr.aria-controls]="'sidebar-submenu-' + section.id + '-' + $index"
               >
                 <span class="sidebar__icon">
                   <app-icon [name]="item.icon" [size]="iconSize" />
@@ -51,7 +52,11 @@
                 </span>
               </button>
 
-              <div class="sidebar__sub" [class.sidebar__sub--open]="item.expanded && !collapsed">
+              <div
+                class="sidebar__sub"
+                [class.sidebar__sub--open]="item.expanded && !collapsed"
+                [attr.id]="'sidebar-submenu-' + section.id + '-' + $index"
+              >
                 <div class="sidebar__sub-inner">
                   <ul class="sidebar__sub-list" role="list">
                     @for (child of item.children!; track trackChildRoute($index, child)) {

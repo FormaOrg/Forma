@@ -17,7 +17,7 @@ import {
   selector: 'app-billing',
   standalone: true,
   imports: [CommonModule, RouterLink, DataCard],
-  templateUrl: './billing.live.html',
+  templateUrl: './billing.polished.html',
   styleUrl: './billing.css',
 })
 export class Billing implements OnInit {
@@ -103,7 +103,7 @@ export class Billing implements OnInit {
           this.billingMode.set(overview.subscription.billingMode);
         },
         error: (error) => {
-          this.errorMessage.set(error?.error?.message ?? 'We could not load your billing details right now.');
+          this.errorMessage.set(this.toBillingErrorMessage(error));
           this.overview.set(null);
           this.currentPlanName.set(null);
         },
@@ -141,6 +141,25 @@ export class Billing implements OnInit {
 
   getDisplayedPlanPrice(plan: PricingPlan): number {
     return getPlanPrice(plan, this.billingMode());
+  }
+
+  private toBillingErrorMessage(error: unknown): string {
+    const status = this.readErrorStatus(error);
+
+    if (status === 0) {
+      return 'Please check your connection and try again.';
+    }
+
+    return 'Something went wrong while loading your billing details. Please try again.';
+  }
+
+  private readErrorStatus(error: unknown): number | undefined {
+    if (typeof error === 'object' && error && 'status' in error) {
+      const value = (error as { status?: unknown }).status;
+      return typeof value === 'number' ? value : undefined;
+    }
+
+    return undefined;
   }
 
   trackByPlan = (_: number, plan: PricingPlan): string => plan.name;
