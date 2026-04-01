@@ -14,7 +14,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   padding: 42px;
 }
 
@@ -23,13 +23,15 @@
 .projects-panel {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #d7d7d7;
-  border-radius: 18px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
 .projects-hero {
-  padding: 36px 24px;
+  padding: 34px 26px;
 }
 
 .projects-hero__content {
@@ -46,19 +48,19 @@
 
 .projects-hero__title {
   margin: 0;
-  font-size: 2.4rem;
-  line-height: 1.05;
+  font-size: 2.55rem;
+  line-height: 1;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: #111111;
 }
 
 .projects-hero__subtitle {
   max-width: 620px;
-  margin: 8px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #8a8a8a;
+  margin: 10px 0 0;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: #7e838d;
 }
 
 .projects-hero__cta {
@@ -103,19 +105,25 @@
 }
 
 .projects-toolbar {
-  padding: 18px 22px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) auto auto;
-  gap: 14px;
+  padding: 16px 18px;
+  display: flex;
   align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  min-height: 82px;
+}
+
+.projects-toolbar > * {
+  min-width: 0;
 }
 
 .projects-toolbar__search {
-  min-height: 46px;
+  flex: 1 1 420px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
+  padding: 0 15px;
   border-radius: 14px;
   border: 1px solid #ececf2;
   background: #fbfbfd;
@@ -155,6 +163,7 @@
 }
 
 .projects-toolbar__filters {
+  flex: 0 0 auto;
   padding: 4px;
   display: inline-flex;
   align-items: center;
@@ -188,14 +197,20 @@
 }
 
 .projects-toolbar__sort {
-  min-width: 180px;
+  flex: 0 0 190px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid #ececf2;
+  background: #fbfbfd;
 }
 
 .projects-toolbar__sort-label {
-  font-size: 0.74rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -203,11 +218,12 @@
 }
 
 .projects-toolbar__sort-select {
-  min-height: 46px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border: 1px solid #ececf2;
-  background: #fbfbfd;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: #111111;
   font: inherit;
   outline: none;
@@ -215,23 +231,23 @@
 }
 
 .projects-panel {
-  padding: 22px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .projects-featured {
-  padding: 22px;
-  border-radius: 20px;
-  border: 1px solid rgba(116, 104, 255, 0.14);
+  padding: 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(116, 104, 255, 0.12);
   background:
-    radial-gradient(circle at top left, rgba(116, 104, 255, 0.12), transparent 36%),
+    radial-gradient(circle at top left, rgba(116, 104, 255, 0.1), transparent 36%),
     linear-gradient(180deg, #f8f7ff, #ffffff 60%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 22px;
 }
 
 .projects-featured__content {
@@ -252,7 +268,7 @@
 
 .projects-featured__title {
   margin: 0;
-  font-size: 1.55rem;
+  font-size: 1.7rem;
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -350,6 +366,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 14px;
+  align-items: stretch;
 }
 
 .projects-empty {
@@ -405,7 +422,21 @@
   }
 
   .projects-toolbar {
-    grid-template-columns: 1fr;
+    flex-wrap: wrap;
+    align-items: stretch;
+    min-height: unset;
+  }
+
+  .projects-toolbar__search {
+    flex: 1 1 100%;
+  }
+
+  .projects-toolbar__filters {
+    flex: 1 1 auto;
+  }
+
+  .projects-toolbar__sort {
+    flex: 0 0 220px;
   }
 
   .projects-featured {
@@ -425,7 +456,7 @@
   }
 
   .projects-hero__cta {
-    width: 100%;
+    width: auto;
   }
 }
 
@@ -460,12 +491,18 @@
     justify-content: space-between;
   }
 
+  .projects-toolbar__search,
+  .projects-toolbar__sort {
+    flex: 1 1 100%;
+  }
+
   .projects-toolbar__filter {
     flex: 1;
   }
 
   .projects-toolbar__sort {
     min-width: 0;
+    padding: 0 14px;
   }
 
   .projects-featured {
