@@ -18,13 +18,17 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   isSaving = false;
   showDeleteModal = false;
   isHeaderSticky = false;
+  isHeaderExiting = false;
   headerStickyTop = 0;
   headerStickyLeft = 0;
   headerStickyWidth = 0;
   headerPlaceholderHeight = 0;
   private scrollRoot?: HTMLElement;
   private stickyRafId: number | null = null;
-  private readonly stickyThreshold = 12;
+  private stickyExitTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private stickySpacerRafId: number | null = null;
+  private readonly stickyThreshold = 6;
+  private readonly stickyExitDurationMs = 170;
   private readonly handleStickyScroll = () => this.scheduleStickyUpdate();
   private readonly handleStickyResize = () => this.scheduleStickyUpdate();
 
@@ -63,6 +67,12 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     window.removeEventListener('resize', this.handleStickyResize);
     if (this.stickyRafId !== null) {
       cancelAnimationFrame(this.stickyRafId);
+    }
+    if (this.stickyExitTimeoutId !== null) {
+      clearTimeout(this.stickyExitTimeoutId);
+    }
+    if (this.stickySpacerRafId !== null) {
+      cancelAnimationFrame(this.stickySpacerRafId);
     }
   }
 
@@ -125,21 +135,84 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     const sentinelRect = this.headerSentinel.nativeElement.getBoundingClientRect();
     const containerRect = this.profileContainer.nativeElement.getBoundingClientRect();
     const offset = sentinelRect.top - rootRect.top;
+    const scrollTop = this.scrollRoot.scrollTop;
+
+    if (scrollTop <= this.stickyThreshold) {
+      if (this.stickyExitTimeoutId !== null) {
+        clearTimeout(this.stickyExitTimeoutId);
+        this.stickyExitTimeoutId = null;
+      }
+
+      this.isHeaderSticky = false;
+      this.isHeaderExiting = false;
+      this.headerPlaceholderHeight = 0;
+      return;
+    }
+
     const shouldStick = this.isHeaderSticky
       ? offset <= this.stickyThreshold
       : offset <= -this.stickyThreshold;
 
-    this.isHeaderSticky = shouldStick;
+    if (shouldStick) {
+      const wasSticky = this.isHeaderSticky;
+      if (this.stickyExitTimeoutId !== null) {
+        clearTimeout(this.stickyExitTimeoutId);
+        this.stickyExitTimeoutId = null;
+      }
 
-    if (!shouldStick) {
-      this.headerPlaceholderHeight = 0;
+      this.isHeaderExiting = false;
+      this.isHeaderSticky = true;
+      if (!wasSticky) {
+        this.releaseStickySpacer();
+      }
+    } else if (this.isHeaderSticky) {
+      this.startStickyExit();
       return;
     }
 
     this.headerStickyTop = rootRect.top + 10;
     this.headerStickyLeft = containerRect.left + 8;
     this.headerStickyWidth = Math.max(containerRect.width - 16, 0);
-    this.headerPlaceholderHeight = this.profileHeader.nativeElement.offsetHeight;
+  }
+
+  private startStickyExit(): void {
+    if (this.isHeaderExiting) {
+      return;
+    }
+
+    this.isHeaderExiting = true;
+    this.stickyExitTimeoutId = setTimeout(() => {
+      this.isHeaderSticky = false;
+      this.isHeaderExiting = false;
+      this.headerPlaceholderHeight = 0;
+      this.stickyExitTimeoutId = null;
+    }, this.stickyExitDurationMs);
+  }
+
+  private releaseStickySpacer(): void {
+    this.headerPlaceholderHeight = this.getHeaderFlowHeight();
+    if (this.stickySpacerRafId !== null) {
+      cancelAnimationFrame(this.stickySpacerRafId);
+    }
+
+    this.stickySpacerRafId = requestAnimationFrame(() => {
+      this.stickySpacerRafId = requestAnimationFrame(() => {
+        if (this.isHeaderSticky && !this.isHeaderExiting) {
+          this.headerPlaceholderHeight = 0;
+        }
+        this.stickySpacerRafId = null;
+      });
+    });
+  }
+
+  private getHeaderFlowHeight(): number {
+    if (!this.profileHeader?.nativeElement) {
+      return 0;
+    }
+
+    const style = window.getComputedStyle(this.profileHeader.nativeElement);
+    const marginBottom = Number.parseFloat(style.marginBottom) || 0;
+    return this.profileHeader.nativeElement.offsetHeight + marginBottom;
   }
 
   private findScrollParent(element: HTMLElement): HTMLElement | undefined {

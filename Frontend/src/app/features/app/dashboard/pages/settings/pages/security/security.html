@@ -3,10 +3,12 @@
   <div
     #profileHeader
     class="profile-header"
+    [class.profile-header--floating]="isHeaderSticky || isHeaderExiting"
     [class.profile-header--stuck]="isHeaderSticky"
-    [style.top.px]="isHeaderSticky ? headerStickyTop : null"
-    [style.left.px]="isHeaderSticky ? headerStickyLeft : null"
-    [style.width.px]="isHeaderSticky ? headerStickyWidth : null"
+    [class.profile-header--exiting]="isHeaderExiting"
+    [style.top.px]="isHeaderSticky || isHeaderExiting ? headerStickyTop : null"
+    [style.left.px]="isHeaderSticky || isHeaderExiting ? headerStickyLeft : null"
+    [style.width.px]="isHeaderSticky || isHeaderExiting ? headerStickyWidth : null"
   >
     <div class="profile-header__text">
       <h1 class="profile-title">Security</h1>
