@@ -31,7 +31,6 @@
   <div class="project-card__body">
     <div class="project-card__top">
       <div class="project-card__title-wrap">
-        <h3 class="project-card__title">{{ project.name }}</h3>
         <span
           class="project-card__status"
           [class.project-card__status--published]="project.status === 'published'"
@@ -39,6 +38,7 @@
         >
           {{ project.status === 'published' ? 'Published' : 'Draft' }}
         </span>
+        <h3 class="project-card__title">{{ project.name }}</h3>
       </div>
 
       <button type="button" class="project-card__more" aria-label="More actions">
@@ -60,13 +60,22 @@
     </div>
 
     <div class="project-card__meta">
-      <p class="project-card__edited">Last edited {{ project.lastEditedLabel }}</p>
-
-      @if (project.status === 'published' && project.domain) {
-        <p class="project-card__domain">{{ project.domain }}</p>
-      } @else {
-        <p class="project-card__domain project-card__domain--muted">Created {{ project.createdLabel }}</p>
-      }
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Last edited</span>
+        <p class="project-card__edited">{{ project.lastEditedLabel }}</p>
+      </div>
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Domain</span>
+        @if (project.status === 'published' && project.domain) {
+          <p class="project-card__domain">{{ project.domain }}</p>
+        } @else {
+          <p class="project-card__domain project-card__domain--muted">Ready to publish</p>
+        }
+      </div>
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Created</span>
+        <p class="project-card__domain">{{ project.createdLabel }}</p>
+      </div>
     </div>
 
     <div class="project-card__actions">
