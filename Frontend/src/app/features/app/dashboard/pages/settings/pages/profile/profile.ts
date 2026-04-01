@@ -15,11 +15,13 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { ProfileService, UserProfileResponse } from '../../../../../../../core/services/profile.service';
 import { ToastService } from '../../../../../../../core/services/toast.service';
+import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
+import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
 
 @Component({
   selector: 'app-settings-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AppIcon],
+  imports: [CommonModule, ReactiveFormsModule, AppIcon, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
@@ -29,6 +31,7 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private profileService = inject(ProfileService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private i18n = inject(I18nService);
 
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;
   @ViewChild('profileContainer', { static: true }) profileContainer?: ElementRef<HTMLDivElement>;
@@ -63,8 +66,8 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private readonly handleStickyResize = () => this.scheduleStickyUpdate();
 
   readonly socialMediaPlatforms = [
-    { id: 'google', label: 'Google Account', status: 'connected' },
-    { id: 'facebook', label: 'Facebook Account', status: 'disconnected' }
+    { id: 'google', labelKey: 'settings.profile.social.google', status: 'connected' },
+    { id: 'facebook', labelKey: 'settings.profile.social.facebook', status: 'disconnected' }
   ];
 
   readonly timezones = [
@@ -185,7 +188,7 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: profile => this.applyProfile(profile),
         error: error => {
-          this.profileError = error?.error?.message ?? 'Failed to load your profile.';
+          this.profileError = error?.error?.message ?? this.i18n.t('settings.profile.error.load');
         }
       });
   }
@@ -264,10 +267,10 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
         next: profile => {
           this.applyProfile(profile);
           this.profileSuccess = 'Profile updated successfully.';
-          this.toastService.success('Your profile has been updated.');
+          this.toastService.success(this.i18n.t('settings.profile.toast.updated'));
         },
         error: error => {
-          this.profileError = error?.error?.message ?? 'Failed to update your profile.';
+          this.profileError = error?.error?.message ?? this.i18n.t('settings.profile.error.update');
           this.toastService.error(this.profileError);
         }
       });
@@ -291,11 +294,16 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
 
   getFieldError(fieldName: string): string | null {
     const field = this.profileForm.get(fieldName) ?? this.emailChangeForm?.get(fieldName);
-    if (field?.hasError('required')) return 'This field is required';
-    if (field?.hasError('minlength')) return `Minimum ${field.getError('minlength').requiredLength} characters`;
-    if (field?.hasError('email')) return 'Invalid email';
-    if (field?.hasError('pattern')) return 'Invalid format';
-    if (fieldName === 'confirmEmail' && this.emailChangeForm?.hasError('emailsMismatch')) return 'Emails do not match';
+    if (field?.hasError('required')) return this.i18n.t('validation.required');
+    if (field?.hasError('minlength')) {
+      const requiredLength = field.getError('minlength').requiredLength;
+      return this.i18n.lang() === 'fr'
+        ? `Minimum ${requiredLength} caracteres`
+        : `Minimum ${requiredLength} characters`;
+    }
+    if (field?.hasError('email')) return this.i18n.t('validation.invalidEmail');
+    if (field?.hasError('pattern')) return this.i18n.t('validation.invalidFormat');
+    if (fieldName === 'confirmEmail' && this.emailChangeForm?.hasError('emailsMismatch')) return this.i18n.t('validation.emailsMismatch');
     return null;
   }
 
@@ -330,7 +338,7 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
       },
       error: error => {
         this.showResetPasswordMsg = true;
-        this.resetPasswordMsg = error?.error?.message ?? 'Failed to send reset password email.';
+        this.resetPasswordMsg = error?.error?.message ?? this.i18n.t('settings.profile.error.resetPassword');
         this.toastService.error(this.resetPasswordMsg);
       }
     });
@@ -356,7 +364,7 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
             this.toastService.info(response.message);
           },
           error: error => {
-            this.emailChangeError = error?.error?.message ?? 'Failed to start email change.';
+            this.emailChangeError = error?.error?.message ?? this.i18n.t('settings.profile.error.startEmailChange');
             this.toastService.error(this.emailChangeError);
           }
         });
@@ -399,10 +407,10 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
               updatedAt: response.user.updatedAt
             });
             this.profileSuccess = 'Email updated successfully.';
-            this.toastService.success('Your account email has been updated.');
+            this.toastService.success(this.i18n.t('settings.profile.toast.emailUpdated'));
           },
           error: error => {
-            this.emailCodeError = error?.error?.message ?? 'Invalid verification code.';
+            this.emailCodeError = error?.error?.message ?? this.i18n.t('settings.profile.error.invalidCode');
             this.toastService.error(this.emailCodeError);
           }
         });
@@ -419,7 +427,7 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
         this.toastService.info(response.message);
       },
       error: error => {
-        this.emailCodeError = error?.error?.message ?? 'Failed to resend the verification code.';
+        this.emailCodeError = error?.error?.message ?? this.i18n.t('settings.profile.error.resendCode');
         this.toastService.error(this.emailCodeError);
       }
     });

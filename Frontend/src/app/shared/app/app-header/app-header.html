@@ -4,7 +4,7 @@
       type="button"
       class="app-header__icon-btn"
       (click)="onToggleSidebar()"
-      [attr.aria-label]="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      [attr.aria-label]="sidebarCollapsed ? ('app.header.sidebar.expand' | t) : ('app.header.sidebar.collapse' | t)"
     >
       @if (sidebarCollapsed == true) {
         <img src="assets/Logo/collapse.svg" alt="collapse" style="height: 20px;"/>
@@ -32,7 +32,7 @@
       <span class="app-header__search-icon" aria-hidden="true">
         <app-icon name="search" [size]="18" />
       </span>
-      <span class="app-header__search-input">{{ search.placeholder }}</span>
+      <span class="app-header__search-input">{{ search.placeholderKey | t }}</span>
       <kbd class="app-header__kbd">{{ search.shortcut }}</kbd>
     </button>
 
@@ -46,7 +46,7 @@
         @if (button.variant === 'primary') {
           <app-icon name="sparkles" [size]="16" class="app-header__action-icon" />
         }
-        <span>{{ button.label }}</span>
+        <span>{{ button.labelKey | t }}</span>
       </a>
     }
 
@@ -97,7 +97,7 @@
                 <span class="app-header__dropdown-ic">
                   <app-icon [name]="item.icon" [size]="18" />
                 </span>
-                <span>{{ item.label }}</span>
+                <span>{{ item.labelKey | t }}</span>
               </a>
             } @else {
               <button
@@ -110,7 +110,7 @@
                 <span class="app-header__dropdown-ic">
                   <app-icon [name]="item.icon" [size]="18" />
                 </span>
-                <span>{{ item.label }}</span>
+                <span>{{ item.labelKey | t }}</span>
               </button>
             }
           }
@@ -135,7 +135,7 @@
             [ngModel]="commandQuery()"
             (ngModelChange)="updateCommandQuery($event)"
             (keydown)="onCommandPaletteKeydown($event)"
-            placeholder="Search pages, settings, or commands"
+            [placeholder]="'app.command.input' | t"
             autocomplete="off"
             spellcheck="false"
           />
@@ -144,13 +144,13 @@
         <div #commandResults class="app-header__command-results">
           @if (filteredCommandItems.length === 0) {
             <div class="app-header__command-empty">
-              <span class="app-header__command-empty-title">No matches found</span>
-              <span class="app-header__command-empty-copy">Try another keyword like profile, projects, billing, or logout.</span>
+              <span class="app-header__command-empty-title">{{ 'app.command.empty.title' | t }}</span>
+              <span class="app-header__command-empty-copy">{{ 'app.command.empty.copy' | t }}</span>
             </div>
           } @else {
             @for (section of groupedCommandItems; track section.group) {
               <div class="app-header__command-group">
-                <div class="app-header__command-group-label">{{ section.group }}</div>
+                <div class="app-header__command-group-label">{{ section.group === 'Pages' ? ('app.command.group.pages' | t) : ('app.command.group.actions' | t) }}</div>
 
                 @for (item of section.items; track item.id) {
                   <button
@@ -178,9 +178,9 @@
         </div>
 
         <div class="app-header__command-footer">
-          <span><kbd>Enter</kbd> open</span>
-          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
-          <span><kbd>Esc</kbd> close</span>
+          <span><kbd>Enter</kbd> {{ 'app.command.footer.open' | t }}</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> {{ 'app.command.footer.move' | t }}</span>
+          <span><kbd>Esc</kbd> {{ 'app.command.footer.close' | t }}</span>
         </div>
       </div>
     </div>

@@ -53,6 +53,10 @@ public class User {
     @Size(max = 255)
     private String website;
 
+    @Column(nullable = false, length = 8)
+    @Builder.Default
+    private String preferredLanguage = "en";
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
