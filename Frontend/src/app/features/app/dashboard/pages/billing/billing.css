@@ -14,7 +14,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   padding: 42px;
 }
 
@@ -30,36 +30,36 @@
 }
 
 .billing-hero {
-  padding: 34px 26px;
+  padding: 32px 24px;
 }
 
 .billing-hero__content {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 22px;
+  gap: 18px;
 }
 
 .billing-hero__title {
   margin: 0;
-  font-size: 2.55rem;
-  line-height: 1;
+  font-size: 2.4rem;
+  line-height: 1.02;
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: #111111;
 }
 
 .billing-hero__subtitle {
   max-width: 620px;
-  margin: 10px 0 0;
-  font-size: 0.96rem;
-  line-height: 1.5;
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
   color: #7e838d;
 }
 
 .billing-hero__summary {
   min-width: 250px;
-  padding: 18px 20px;
+  padding: 16px 18px;
   border-radius: 18px;
   border: 1px solid #ececf2;
   background: linear-gradient(180deg, #fbfbfd, #f6f7fb);
@@ -77,13 +77,13 @@
 }
 
 .billing-hero__plan {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   line-height: 1.1;
   color: #111111;
 }
 
 .billing-hero__meta {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   color: #727784;
 }
 
@@ -107,10 +107,10 @@
 }
 
 .billing-section {
-  padding: 22px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .billing-section__header {
@@ -131,8 +131,8 @@
 
 .billing-section__subtitle {
   margin: 6px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: #8a8f98;
 }
 
@@ -168,20 +168,20 @@
   border: 1px solid #ececf2;
   border-radius: 20px;
   background: #fbfbfd;
-  padding: 20px;
+  padding: 18px;
 }
 
 .current-plan-card {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .current-plan-card__top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
 }
 
 .current-plan-card__eyebrow {
@@ -195,16 +195,16 @@
 
 .current-plan-card__name {
   margin: 8px 0 0;
-  font-size: 1.8rem;
-  line-height: 1.05;
+  font-size: 1.6rem;
+  line-height: 1.08;
   letter-spacing: -0.04em;
   color: #111111;
 }
 
 .current-plan-card__description {
   margin: 8px 0 0;
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: #727784;
 }
 
@@ -265,7 +265,7 @@
 
 .current-plan-card__price,
 .plan-card__price {
-  font-size: clamp(2.35rem, 4vw, 3rem);
+  font-size: clamp(2.1rem, 3.5vw, 2.7rem);
   line-height: 0.95;
   letter-spacing: -0.05em;
   color: #111111;
@@ -285,7 +285,7 @@
 }
 
 .current-plan-card__detail {
-  min-height: 82px;
+  min-height: 78px;
   border-radius: 16px;
   border: 1px solid #ececf2;
   background: #ffffff;
@@ -306,18 +306,18 @@
 
 .current-plan-card__detail strong,
 .payment-card__line strong {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   line-height: 1.45;
   color: #111111;
 }
 
 .billing-notice {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-radius: 16px;
   background: #f5f3ff;
   color: #5f6470;
-  font-size: 0.9rem;
-  line-height: 1.55;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .billing-notice p,
@@ -388,7 +388,7 @@
 .help-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .payment-card__row {
@@ -412,14 +412,14 @@
 
 .payment-card__title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #111111;
 }
 
 .payment-card__meta {
   margin: 4px 0 0;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   color: #8a8f98;
 }
 
@@ -437,13 +437,13 @@
 
 .usage-card {
   min-height: 186px;
-  padding: 18px;
+  padding: 16px;
   border-radius: 20px;
   border: 1px solid #ececf2;
   background: #fbfbfd;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .usage-card--warning {
@@ -460,7 +460,7 @@
 
 .usage-card__title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   line-height: 1.2;
   font-weight: 600;
   color: #111111;
@@ -469,8 +469,8 @@
 .usage-card__summary,
 .usage-card__note {
   margin: 8px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
+  font-size: 0.84rem;
+  line-height: 1.45;
   color: #7e838d;
 }
 
@@ -503,13 +503,14 @@
 
 .plan-card {
   min-height: 100%;
-  padding: 22px 20px;
+  height: 100%;
+  padding: 20px 18px;
   border-radius: 20px;
   border: 1px solid #ececf2;
   background: #fbfbfd;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .plan-card--popular {
@@ -525,11 +526,21 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 182px;
+}
+
+.plan-card__badge-row {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .plan-card__name {
   margin: 0;
-  font-size: 1.55rem;
+  min-height: 34px;
+  font-size: 1.4rem;
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -538,8 +549,8 @@
 
 .plan-card__description {
   margin: 0;
-  min-height: 44px;
-  font-size: 0.9rem;
+  min-height: 52px;
+  font-size: 0.86rem;
   line-height: 1.45;
   color: #727784;
 }
@@ -549,16 +560,23 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 10px;
+  gap: 9px;
   flex: 1;
+  align-content: start;
+  min-height: 208px;
 }
 
 .plan-card__features li {
   position: relative;
   padding-left: 18px;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   line-height: 1.45;
   color: #23232d;
+}
+
+.plan-card__actions {
+  margin-top: auto;
+  padding-top: 2px;
 }
 
 .plan-card__features li::before {
@@ -575,7 +593,7 @@
 .invoice-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .invoice-row {
@@ -598,13 +616,13 @@
 }
 
 .invoice-row__id {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #111111;
 }
 
 .invoice-row__date,
 .invoice-row__amount {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   color: #7e838d;
 }
 

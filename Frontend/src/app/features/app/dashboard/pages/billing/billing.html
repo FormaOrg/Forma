@@ -197,12 +197,14 @@
       @for (plan of plans(); track trackByPlan($index, plan)) {
         <article class="plan-card" [class.plan-card--current]="isCurrentPlan(plan)" [class.plan-card--popular]="plan.popular">
           <div class="plan-card__top">
-            @if (plan.popular) {
-              <span class="plan-card__badge">Most Popular</span>
-            }
-            @if (isCurrentPlan(plan)) {
-              <span class="plan-card__badge plan-card__badge--current">Current Plan</span>
-            }
+            <div class="plan-card__badge-row">
+              @if (plan.popular) {
+                <span class="plan-card__badge">Most Popular</span>
+              }
+              @if (isCurrentPlan(plan)) {
+                <span class="plan-card__badge plan-card__badge--current">Current Plan</span>
+              }
+            </div>
 
             <h3 class="plan-card__name">{{ plan.name }}</h3>
             <p class="plan-card__description">{{ plan.description }}</p>

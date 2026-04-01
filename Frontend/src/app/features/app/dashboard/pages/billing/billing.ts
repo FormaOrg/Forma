@@ -70,7 +70,7 @@ export class Billing {
     billingCycleLabel: 'Yearly billing',
     renewalDate: 'April 24, 2026',
     nextCharge: '564 DT',
-    contactEmail: 'billing@portfolio-studio.com',
+    contactEmail: 'billing@forma.com',
     promoNotice: 'You are saving 20% with annual billing and your onboarding discount is locked until renewal.',
   });
 
