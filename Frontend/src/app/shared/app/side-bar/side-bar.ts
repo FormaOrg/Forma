@@ -97,16 +97,16 @@ export class SideBar implements OnChanges {
     }
   ];
 
-  logoSrc(): string {
-    return this.themeService.resolvedTheme() === 'dark'
-      ? 'assets/Logo/FormaLogoOnly-white.svg'
-      : 'assets/Logo/FormaLogoOnly.svg';
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['collapsed']?.currentValue === true) {
       this.closeAllDropdowns();
     }
+  }
+
+  logoSrc(): string {
+    return this.themeService.resolvedTheme() === 'dark'
+      ? 'assets/Logo/FormaLogoOnly-white.svg'
+      : 'assets/Logo/FormaLogoOnly.svg';
   }
 
   trackSectionId(_: number, s: SidebarSection): string {
@@ -115,6 +115,10 @@ export class SideBar implements OnChanges {
 
   trackItemLabel(_: number, item: SidebarItem): string {
     return item.label;
+  }
+
+  shouldUseExactMatch(route?: string): boolean {
+    return route !== '/app/settings' && route !== '/app/projects';
   }
 
   toggleDropdown(item: SidebarItem): void {
