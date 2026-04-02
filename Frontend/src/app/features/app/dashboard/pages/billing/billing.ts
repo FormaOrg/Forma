@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { BillingInvoiceItem, BillingOverview, BillingUsageMetric } from '../../../../../core/models/dashboard.model';
+import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
 import { DataCard } from '../home/components/data-card/data-card';
 import {
   BillingMode,
@@ -10,33 +13,21 @@ import {
   getPlanPrice,
 } from '../../../../pricing/pricing-plans';
 
-type SubscriptionStatus = 'active' | 'trial' | 'canceled' | 'past-due';
-
-type UsageMetric = {
-  label: string;
-  used: number;
-  limit: number;
-  unit: string;
-  note: string;
-};
-
-type Invoice = {
-  id: string;
-  date: string;
-  amount: string;
-  status: 'Paid' | 'Pending' | 'Refunded';
-};
-
 @Component({
   selector: 'app-billing',
   standalone: true,
   imports: [CommonModule, RouterLink, DataCard],
-  templateUrl: './billing.html',
+  templateUrl: './billing.polished.html',
   styleUrl: './billing.css',
 })
-export class Billing {
+export class Billing implements OnInit {
+  private readonly dashboardDataService = inject(DashboardDataService);
+
   readonly billingMode = signal<BillingMode>('yearly');
-  readonly currentPlanName = signal('Pro');
+  readonly currentPlanName = signal<string | null>(null);
+  readonly isLoading = signal(true);
+  readonly errorMessage = signal('');
+  readonly overview = signal<BillingOverview | null>(null);
 
   readonly walletIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,48 +55,67 @@ export class Billing {
   readonly plans = signal<PricingPlan[]>(PRICING_PLANS);
   readonly savePercent = PRICING_SAVE_PERCENT;
 
-  readonly currentSubscription = signal({
-    planName: 'Pro',
-    status: 'active' as SubscriptionStatus,
-    billingCycleLabel: 'Yearly billing',
-    renewalDate: 'April 24, 2026',
-    nextCharge: '564 DT',
-    contactEmail: 'billing@forma.com',
-    promoNotice: 'You are saving 20% with annual billing and your onboarding discount is locked until renewal.',
-  });
-
-  readonly usage = signal<UsageMetric[]>([
-    { label: 'Projects', used: 4, limit: 999, unit: 'sites', note: 'Unlimited project slots on Pro' },
-    { label: 'Custom domains', used: 3, limit: 10, unit: 'domains', note: '7 domains still available before your next review' },
-    { label: 'Storage', used: 62, limit: 100, unit: 'GB', note: 'You are approaching your included storage allowance' },
-    { label: 'Collaborators', used: 5, limit: 8, unit: 'members', note: 'Invite up to 3 more teammates on the current plan' },
-  ]);
-
-  readonly invoices = signal<Invoice[]>([
-    { id: 'INV-2404', date: 'Mar 24, 2026', amount: '564 DT', status: 'Paid' },
-    { id: 'INV-2312', date: 'Feb 24, 2026', amount: '564 DT', status: 'Paid' },
-    { id: 'INV-2258', date: 'Jan 24, 2026', amount: '564 DT', status: 'Paid' },
-    { id: 'INV-2196', date: 'Dec 24, 2025', amount: '564 DT', status: 'Paid' },
-  ]);
+  readonly currentSubscription = computed(
+    () =>
+      this.overview()?.subscription ?? {
+        status: 'inactive' as const,
+        billingMode: this.billingMode(),
+      }
+  );
+  readonly usage = computed(() => this.overview()?.usage ?? []);
+  readonly invoices = computed(() => this.overview()?.invoices ?? []);
+  readonly paymentMethod = computed(() => this.overview()?.paymentMethod ?? null);
 
   readonly currentPlan = computed(
-    () => this.plans().find((plan) => plan.name === this.currentPlanName()) ?? this.plans()[0]
+    () => this.plans().find((plan) => plan.name === this.currentPlanName()) ?? null
   );
 
-  readonly currentPlanPrice = computed(() => getPlanPrice(this.currentPlan(), this.billingMode()));
+  readonly currentPlanPrice = computed(() => {
+    const plan = this.currentPlan();
+    return plan ? getPlanPrice(plan, this.billingMode()) : 0;
+  });
   readonly yearlySummary = computed(() =>
-    this.billingMode() === 'yearly' ? `${this.currentPlanPrice() * 12} DT billed yearly` : 'Switch to yearly to save'
+    this.currentPlan()
+      ? this.billingMode() === 'yearly'
+        ? `${this.currentPlanPrice() * 12} DT billed yearly`
+        : 'Switch to yearly to save'
+      : 'No billing summary available yet'
   );
 
-  readonly activeProjects = computed(() => this.usage()[0]?.used.toString() ?? '0');
-  readonly invoicesPaid = computed(() => this.invoices().filter((invoice) => invoice.status === 'Paid').length.toString());
+  readonly activeProjects = computed(() => this.overview()?.activeProjectsCount.toString() ?? '0');
+  readonly invoicesPaid = computed(() => this.overview()?.paidInvoicesCount.toString() ?? '0');
+
+  ngOnInit(): void {
+    this.loadBilling();
+  }
+
+  loadBilling(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.dashboardDataService
+      .getBillingOverview()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (overview) => {
+          this.overview.set(overview);
+          this.currentPlanName.set(overview.subscription.planName ?? null);
+          this.billingMode.set(overview.subscription.billingMode);
+        },
+        error: (error) => {
+          this.errorMessage.set(this.toBillingErrorMessage(error));
+          this.overview.set(null);
+          this.currentPlanName.set(null);
+        },
+      });
+  }
 
   setBillingMode(mode: BillingMode): void {
     this.billingMode.set(mode);
   }
 
-  usagePercent(metric: UsageMetric): number {
-    if (metric.limit <= 0) return 0;
+  usagePercent(metric: BillingUsageMetric): number {
+    if (!metric.limit || metric.limit <= 0) return 0;
     return Math.min(100, Math.round((metric.used / metric.limit) * 100));
   }
 
@@ -114,15 +124,18 @@ export class Billing {
   }
 
   planActionLabel(plan: PricingPlan): string {
+    const currentPlan = this.currentPlan();
     if (this.isCurrentPlan(plan)) return 'Current Plan';
-    if (plan.monthlyPrice > this.currentPlan().monthlyPrice) return 'Upgrade';
+    if (!currentPlan) return 'Choose Plan';
+    if (plan.monthlyPrice > currentPlan.monthlyPrice) return 'Upgrade';
     return 'Downgrade';
   }
 
-  statusLabel(status: SubscriptionStatus): string {
+  statusLabel(status: 'active' | 'trial' | 'canceled' | 'past-due' | 'inactive'): string {
     if (status === 'past-due') return 'Past due';
     if (status === 'trial') return 'Trial';
     if (status === 'canceled') return 'Canceled';
+    if (status === 'inactive') return 'No active plan';
     return 'Active';
   }
 
@@ -130,7 +143,26 @@ export class Billing {
     return getPlanPrice(plan, this.billingMode());
   }
 
+  private toBillingErrorMessage(error: unknown): string {
+    const status = this.readErrorStatus(error);
+
+    if (status === 0) {
+      return 'Please check your connection and try again.';
+    }
+
+    return 'Something went wrong while loading your billing details. Please try again.';
+  }
+
+  private readErrorStatus(error: unknown): number | undefined {
+    if (typeof error === 'object' && error && 'status' in error) {
+      const value = (error as { status?: unknown }).status;
+      return typeof value === 'number' ? value : undefined;
+    }
+
+    return undefined;
+  }
+
   trackByPlan = (_: number, plan: PricingPlan): string => plan.name;
-  trackByUsage = (_: number, item: UsageMetric): string => item.label;
-  trackByInvoice = (_: number, invoice: Invoice): string => invoice.id;
+  trackByUsage = (_: number, item: BillingUsageMetric): string => item.label;
+  trackByInvoice = (_: number, invoice: BillingInvoiceItem): string => invoice.id;
 }

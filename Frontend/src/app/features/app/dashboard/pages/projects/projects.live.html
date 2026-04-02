@@ -125,7 +125,7 @@
             />
           </svg>
         </div>
-        <h2 class="projects-empty__title">We couldn’t load your projects</h2>
+        <h2 class="projects-empty__title">Something went wrong while loading your projects</h2>
         <p class="projects-empty__text">{{ errorMessage() }}</p>
         <button type="button" class="projects-empty__action" (click)="loadProjects()">Try again</button>
       </div>
@@ -141,11 +141,11 @@
             />
           </svg>
         </div>
-        <h2 class="projects-empty__title">No projects yet</h2>
+        <h2 class="projects-empty__title">You don't have any projects yet</h2>
         <p class="projects-empty__text">
-          You don’t have any projects yet. Create your first project to start building, saving drafts, and publishing when you are ready.
+          Start building your first website and keep every draft, edit, and launch in one place.
         </p>
-        <a class="projects-empty__action" routerLink="/app/templates">Create your first project</a>
+        <a class="projects-empty__action" routerLink="/app/templates">Create Project</a>
       </div>
     } @else if (!filteredProjects().length) {
       <div class="projects-empty">

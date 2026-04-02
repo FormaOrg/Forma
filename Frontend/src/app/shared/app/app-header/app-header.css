@@ -4,7 +4,7 @@
 
 .app-header {
   --h: 56px;
-  --radius: 14px;
+  --radius: 35px;
   --ease: cubic-bezier(0.33, 1, 0.68, 1);
   --dur: 220ms;
 

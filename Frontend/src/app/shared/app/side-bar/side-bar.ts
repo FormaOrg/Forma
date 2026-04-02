@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  ElementRef,
+  HostListener,
   Input,
   OnChanges,
   SimpleChanges,
@@ -28,6 +30,7 @@ export class SideBar implements OnChanges {
 
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private elementRef = inject(ElementRef<HTMLElement>);
 
   constructor() {
     this.router.events
@@ -133,6 +136,23 @@ export class SideBar implements OnChanges {
     }
 
     item.expanded = !item.expanded;
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscapeKey(): void {
+    this.closeAllDropdowns();
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleOutsideClick(event: MouseEvent): void {
+    if (this.collapsed) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (target && !this.elementRef.nativeElement.contains(target)) {
+      this.closeAllDropdowns();
+    }
   }
 
   isChildActive(child: SidebarChildItem): boolean {

@@ -7,12 +7,18 @@ export type ProjectStatus = 'published' | 'draft';
 export type ProjectCardItem = {
   id: string;
   name: string;
-  status: ProjectStatus;
+  status: ProjectStatus | 'archived';
+  statusLabel: string;
   domain?: string;
+  previewUrl?: string;
+  thumbnailUrl?: string;
   lastEditedLabel: string;
+  updatedDateLabel?: string;
   createdLabel: string;
+  createdDateLabel?: string;
   accent: string;
-  route: string;
+  route?: string;
+  metadata?: string;
 };
 
 @Component({

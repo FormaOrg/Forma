@@ -1,0 +1,204 @@
+<section class="templates-page">
+  <section class="templates-hero">
+    <div class="templates-hero__content">
+      <div class="templates-hero__text">
+        <h1 class="templates-hero__title">Templates</h1>
+        <p class="templates-hero__subtitle">
+          Browse polished starting points for portfolios, stores, landing pages, and editorial builds without leaving your dashboard flow.
+        </p>
+      </div>
+
+      <a class="templates-hero__cta" routerLink="/app/projects">
+        <span class="templates-hero__cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+            <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span>Create blank project</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="templates-page__stats">
+    <app-data-card
+      [icon]="layersIcon"
+      [title]="'Available templates'"
+      [value]="isLoading() ? '...' : totalTemplates().toString()"
+      [description]="isLoading() ? 'Syncing your catalog' : 'Ready to use in your workspace'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="sparkIcon"
+      [title]="'Featured picks'"
+      [value]="isLoading() ? '...' : featuredTemplates().toString()"
+      [description]="isLoading() ? 'Curating highlights' : 'Recommended starting points'"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="bookIcon"
+      [title]="'Categories'"
+      [value]="isLoading() ? '...' : categoryCount().toString()"
+      [description]="isLoading() ? 'Grouping layouts' : 'Portfolio, blog, ecommerce, and more'"
+    ></app-data-card>
+  </div>
+
+  <section class="templates-toolbar">
+    <div class="templates-toolbar__search">
+      <span class="templates-toolbar__search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="templates-toolbar__search-input"
+        placeholder="Search templates"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="updateSearchTerm($event)"
+      />
+    </div>
+
+    <div class="templates-toolbar__scope" role="tablist" aria-label="Template scope">
+      <button
+        type="button"
+        class="templates-toolbar__scope-button"
+        [class.templates-toolbar__scope-button--active]="activeScope() === 'all'"
+        (click)="updateScope('all')"
+      >
+        All templates
+      </button>
+      <button
+        type="button"
+        class="templates-toolbar__scope-button"
+        [class.templates-toolbar__scope-button--active]="activeScope() === 'my'"
+        (click)="updateScope('my')"
+      >
+        My templates
+      </button>
+    </div>
+
+    <label class="templates-toolbar__select">
+      <span class="templates-toolbar__select-label">Category</span>
+      <select
+        class="templates-toolbar__select-input"
+        [ngModel]="activeCategory()"
+        (ngModelChange)="updateCategory($event)"
+      >
+        @for (category of categories(); track category) {
+          <option [value]="category">{{ category === 'all' ? 'All categories' : category }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="templates-toolbar__select">
+      <span class="templates-toolbar__select-label">Sort</span>
+      <select
+        class="templates-toolbar__select-input"
+        [ngModel]="activeSort()"
+        (ngModelChange)="updateSort($event)"
+      >
+        <option value="featured">Featured</option>
+        <option value="popular">Most used</option>
+        <option value="newest">Newest</option>
+        <option value="name">Name</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="templates-panel">
+    @if (isLoading()) {
+      <div class="templates-loading" aria-hidden="true">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <article class="templates-loading__card">
+            <div class="templates-loading__preview"></div>
+            <div class="templates-loading__line templates-loading__line--badge"></div>
+            <div class="templates-loading__line templates-loading__line--title"></div>
+            <div class="templates-loading__line"></div>
+            <div class="templates-loading__line templates-loading__line--short"></div>
+            <div class="templates-loading__meta">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="templates-loading__actions">
+              <span></span>
+              <span></span>
+            </div>
+          </article>
+        }
+      </div>
+    } @else if (errorMessage()) {
+      <div class="templates-empty templates-empty--error" role="alert">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+            <path
+              d="M10.2698 4.72956C11.0386 3.3979 12.9614 3.3979 13.7302 4.72956L20.2284 15.9855C20.9972 17.3172 20.0358 18.9812 18.4982 18.9812H5.50184C3.96424 18.9812 3.00284 17.3172 3.77164 15.9855L10.2698 4.72956Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">We could not load templates</h2>
+        <p class="templates-empty__text">{{ errorMessage() }}</p>
+        <button type="button" class="templates-empty__action" (click)="loadTemplates()">Try again</button>
+      </div>
+    } @else if (!totalTemplates()) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 7.5C4 6.67157 4.67157 6 5.5 6H18.5C19.3284 6 20 6.67157 20 7.5V16.5C20 17.3284 19.3284 18 18.5 18H5.5C4.67157 18 4 17.3284 4 16.5V7.5Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M8 13.5H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">No templates available yet</h2>
+        <p class="templates-empty__text">
+          Your template catalog is still empty. As soon as templates are published from the backend, they will appear here automatically.
+        </p>
+      </div>
+    } @else if (activeScope() === 'my' && !filteredTemplates().length) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 5L18 8.5V15.5L12 19L6 15.5V8.5L12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9.5 11.5L11.2 13.2L14.8 9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">No saved templates yet</h2>
+        <p class="templates-empty__text">
+          When your account starts returning saved or custom templates from the backend, they will show up here for quick reuse.
+        </p>
+        <button type="button" class="templates-empty__action" (click)="updateScope('all')">Browse all templates</button>
+      </div>
+    } @else if (!filteredTemplates().length) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">No matching templates</h2>
+        <p class="templates-empty__text">
+          Try a different name, switch categories, or clear your filters to see more options.
+        </p>
+        <button type="button" class="templates-empty__action" (click)="clearFilters()">Clear filters</button>
+      </div>
+    } @else {
+      <div class="templates-grid">
+        @for (template of filteredTemplates(); track trackByTemplate($index, template)) {
+          <app-template-card
+            [template]="template"
+            [isCreating]="creatingTemplateId() === template.id"
+            (useTemplate)="useTemplate(template)"
+          ></app-template-card>
+        }
+      </div>
+    }
+  </section>
+</section>
