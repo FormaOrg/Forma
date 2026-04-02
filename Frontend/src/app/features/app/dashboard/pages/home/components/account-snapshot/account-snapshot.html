@@ -1,6 +1,9 @@
 <section class="account-snap" aria-labelledby="account-snap-title">
   <div class="account-snap__top">
-    <h2 id="account-snap-title" class="account-snap__title">Plan</h2>
+    <div class="account-snap__heading">
+      <p class="account-snap__eyebrow">Subscription</p>
+      <h2 id="account-snap-title" class="account-snap__title">Plan</h2>
+    </div>
     <a [routerLink]="billingRoute" class="account-snap__link">Manage</a>
   </div>
   <div class="account-snap__plan">
@@ -13,4 +16,8 @@
     <span>Pro</span>
   </div>
   <p class="account-snap__meta">{{ renewsLabel }}</p>
+  <div class="account-snap__badge-row">
+    <span class="account-snap__badge">Unlimited exports</span>
+    <span class="account-snap__badge">Priority support</span>
+  </div>
 </section>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { GreetingSection } from './components/greeting-section/greeting-section';
 import { DataCard } from "./components/data-card/data-card";
 import { RecentProjects } from "./components/recent-projects/recent-projects";
@@ -9,7 +10,7 @@ import { RecentTemplates } from './components/recent-templates/recent-templates'
 
 @Component({
   selector: 'app-home',
-  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates],
+  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
