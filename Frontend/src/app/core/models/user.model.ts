@@ -11,10 +11,20 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  username?: string;
   phone?: string;
+  country?: string;
+  website?: string;
+  avatarUrl?: string;
+  googleConnected?: boolean;
+  googleEmail?: string;
+  preferredLanguage?: 'en' | 'fr';
+  preferredTheme?: 'light' | 'dark' | 'system';
   role: UserRole;
   isActive: boolean;
+  emailVerified?: boolean;
   createdAt: string; // ISO 8601
+  updatedAt?: string; // ISO 8601
 }
 
 // ── Auth — never expose full User ─────────────────────────

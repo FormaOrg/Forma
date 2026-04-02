@@ -1,12 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
-type RecentTemplateItem = {
-  name: string;
-  hint: string;
-  image: string;
-  route: string;
-};
+import { HomeRecentTemplateItem } from '../../home.model';
 
 @Component({
   selector: 'app-recent-templates',
@@ -16,26 +10,7 @@ type RecentTemplateItem = {
   styleUrl: './recent-templates.css'
 })
 export class RecentTemplates {
-  readonly templates = signal<RecentTemplateItem[]>([
-    {
-      name: 'Portfolio starter',
-      hint: 'Multi-page',
-      image: 'assets/Templates Gallery/Mock Templates/9.jpg',
-      route: '/app/templates'
-    },
-    {
-      name: 'Landing minimal',
-      hint: 'Single page',
-      image: 'assets/Templates Gallery/Mock Templates/5.jpg',
-      route: '/app/templates'
-    },
-    {
-      name: 'Blog editorial',
-      hint: 'Content',
-      image: 'assets/Templates Gallery/Mock Templates/11.jpg',
-      route: '/app/templates'
-    }
-  ]);
+  @Input() templates: HomeRecentTemplateItem[] = [];
 
-  trackBy = (_: number, t: RecentTemplateItem): string => t.name;
+  trackBy = (_: number, t: HomeRecentTemplateItem): string => t.name;
 }

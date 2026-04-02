@@ -177,6 +177,8 @@ export class Templates implements OnInit {
     }).pipe(finalize(() => this.creatingTemplateId.set(null)))
       .subscribe({
         next: () => {
+          this.dashboardDataService.invalidateProjectsOverviewCache();
+          this.dashboardDataService.invalidateTemplatesOverviewCache();
           this.toastService.success(`${template.name} is ready in your projects.`);
           void this.router.navigate(['/app/projects']);
         },
