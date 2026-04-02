@@ -92,6 +92,55 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
+.security-skeleton-line,
+.security-skeleton-box {
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
+  background-size: 220% 100%;
+  animation: securitySkeletonShimmer 1.25s linear infinite;
+}
+
+.security-skeleton-line {
+  height: 13px;
+}
+
+.security-skeleton-line--label {
+  width: 110px;
+}
+
+.security-skeleton-line--wide {
+  width: 100%;
+  max-width: 440px;
+}
+
+.security-skeleton-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.security-skeleton-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.security-skeleton-box--input {
+  width: 100%;
+  height: 44px;
+}
+
+.security-skeleton-box--button {
+  width: 150px;
+  height: 44px;
+  margin-left: auto;
+}
+
+@keyframes securitySkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -20% 0; }
+}
+
 .section-intro {
   margin: 0 0 -8px;
   font-size: 13px;
@@ -707,6 +756,14 @@ select::-ms-expand {
 
 
 @media (max-width: 640px) {
+  .security-skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .security-skeleton-box--button {
+    width: 100%;
+  }
+
   .profile-container {
     padding: 12px 12px 28px;
   }

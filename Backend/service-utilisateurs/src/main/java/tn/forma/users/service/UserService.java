@@ -2,10 +2,13 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import tn.forma.users.dto.ActivitySessionResponse;
 import tn.forma.users.dto.AuthResponse;
 import tn.forma.users.dto.ConfirmLoginVerificationChangeRequest;
 import tn.forma.users.dto.ConfirmEmailChangeRequest;
+import tn.forma.users.dto.GoogleLinkRequest;
+import tn.forma.users.dto.GoogleLinkCodeRequest;
 import tn.forma.users.dto.LoginHistoryEntryResponse;
 import tn.forma.users.dto.MessageResponse;
 import tn.forma.users.dto.RequestLoginVerificationChangeRequest;
@@ -44,6 +47,8 @@ public class UserService {
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
     private final ActivityService activityService;
+    private final GoogleIdentityService googleIdentityService;
+    private final GoogleLinkOauthService googleLinkOauthService;
 
     // ── Current user ───────────────────────────────────────
 
@@ -138,6 +143,96 @@ public class UserService {
             user.setPreferredLanguage(normalizedLanguage);
         }
 
+        String preferredTheme = blankToNull(request.getPreferredTheme());
+        if (preferredTheme != null) {
+            String normalizedTheme = preferredTheme.toLowerCase();
+            if (!normalizedTheme.equals("light") && !normalizedTheme.equals("dark") && !normalizedTheme.equals("system")) {
+                throw new RuntimeException("Preferred theme must be light, dark, or system");
+            }
+            user.setPreferredTheme(normalizedTheme);
+        }
+
+        userRepository.save(user);
+        return mapToDto(user);
+    }
+
+    @Transactional
+    public UserDto linkGoogleAccount(String email, GoogleLinkRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GoogleIdToken.Payload payload = googleIdentityService.verifyIdToken(request.getIdToken());
+        String googleEmail = payload.getEmail();
+        String googleId = payload.getSubject();
+
+        if (googleEmail == null || googleEmail.isBlank()) {
+            throw new RuntimeException("Google account did not provide an email address");
+        }
+
+        if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
+            throw new RuntimeException("Google account email is not verified");
+        }
+
+        User existingLinkedUser = userRepository.findByGoogleId(googleId).orElse(null);
+        if (existingLinkedUser != null && !Objects.equals(existingLinkedUser.getId(), user.getId())) {
+            throw new RuntimeException("This Google account is already linked to another user");
+        }
+
+        assertGoogleEmailAvailable(user, googleEmail);
+
+        user.setGoogleId(googleId);
+        user.setGoogleEmail(googleEmail);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        return mapToDto(user);
+    }
+
+    @Transactional
+    public UserDto linkGoogleAccountWithCode(String email, GoogleLinkCodeRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GoogleIdToken.Payload payload = googleLinkOauthService.exchangeCodeForPayload(
+                request.getCode(),
+                request.getRedirectUri()
+        );
+
+        String googleEmail = payload.getEmail();
+        String googleId = payload.getSubject();
+
+        if (googleEmail == null || googleEmail.isBlank()) {
+            throw new RuntimeException("Google account did not provide an email address");
+        }
+
+        if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
+            throw new RuntimeException("Google account email is not verified");
+        }
+
+        User existingLinkedUser = userRepository.findByGoogleId(googleId).orElse(null);
+        if (existingLinkedUser != null && !Objects.equals(existingLinkedUser.getId(), user.getId())) {
+            throw new RuntimeException("This Google account is already linked to another user");
+        }
+
+        assertGoogleEmailAvailable(user, googleEmail);
+
+        user.setGoogleId(googleId);
+        user.setGoogleEmail(googleEmail);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        return mapToDto(user);
+    }
+
+    @Transactional
+    public UserDto disableGoogleAccount(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getGoogleId() == null || user.getGoogleId().isBlank()) {
+            return mapToDto(user);
+        }
+
+        user.setGoogleId(null);
+        user.setGoogleEmail(null);
         userRepository.save(user);
         return mapToDto(user);
     }
@@ -411,7 +506,11 @@ public class UserService {
                 .phone(user.getPhone())
                 .country(user.getCountry())
                 .website(user.getWebsite())
+                .avatarUrl(user.getAvatarUrl())
+                .googleConnected(user.getGoogleId() != null && !user.getGoogleId().isBlank())
+                .googleEmail(user.getGoogleEmail())
                 .preferredLanguage(user.getPreferredLanguage())
+                .preferredTheme(user.getPreferredTheme())
                 .role(user.getRole().name())
                 .isActive(user.isActive())
                 .emailVerified(user.isEmailVerified())
@@ -420,10 +519,50 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
+    public void updateAvatar(String email, String avatarUrl, String avatarPublicId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setAvatarUrl(blankToNull(avatarUrl));
+        user.setAvatarPublicId(blankToNull(avatarPublicId));
+        userRepository.save(user);
+    }
+
+    public String getAvatarPublicId(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return blankToNull(user.getAvatarPublicId());
+    }
+
+    @Transactional
+    public String clearAvatar(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String avatarPublicId = blankToNull(user.getAvatarPublicId());
+        user.setAvatarUrl(null);
+        user.setAvatarPublicId(null);
+        userRepository.save(user);
+        return avatarPublicId;
+    }
+
     private String blankToNull(String value) {
         if (value == null) return null;
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private void assertGoogleEmailAvailable(User currentUser, String googleEmail) {
+        User emailOwner = userRepository.findByEmailIgnoreCase(googleEmail).orElse(null);
+        if (emailOwner != null && !Objects.equals(emailOwner.getId(), currentUser.getId())) {
+            throw new RuntimeException("This Google email is already used by another account");
+        }
+
+        User linkedEmailOwner = userRepository.findByGoogleEmailIgnoreCase(googleEmail).orElse(null);
+        if (linkedEmailOwner != null && !Objects.equals(linkedEmailOwner.getId(), currentUser.getId())) {
+            throw new RuntimeException("This Google email is already linked to another user");
+        }
     }
 
     private void verifyCurrentPassword(User user, String currentPassword) {

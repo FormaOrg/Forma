@@ -17,6 +17,8 @@ import { ProfileService, UserProfileResponse } from '../../../../../../../core/s
 import { ToastService } from '../../../../../../../core/services/toast.service';
 import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
 import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
+import { UploadService } from '../../../../../../../core/services/upload.service';
+import { GoogleLinkOauthService } from '../../../../../../../core/services/google-link-oauth.service';
 
 @Component({
   selector: 'app-settings-profile',
@@ -32,6 +34,8 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private i18n = inject(I18nService);
+  private uploadService = inject(UploadService);
+  private googleLinkOauthService = inject(GoogleLinkOauthService);
 
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;
   @ViewChild('profileContainer', { static: true }) profileContainer?: ElementRef<HTMLDivElement>;
@@ -43,13 +47,19 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   isLoadingProfile = false;
   isSubmittingEmailChange = false;
   isConfirmingEmailChange = false;
+  isUploadingAvatar = false;
   userEmail = '';
   profileError = '';
   profileSuccess = '';
   emailChangeError = '';
   emailChangeSuccess = '';
   emailCodeError = '';
+  isGoogleConnected = false;
+  googleConnectedEmail = '';
+  isLinkingGoogle = false;
+  isDisablingGoogle = false;
   initialProfileValue: Record<string, string> | null = null;
+  initialAvatarUrl: string | null = null;
   isHeaderSticky = false;
   isHeaderExiting = false;
   headerStickyTop = 0;
@@ -64,11 +74,6 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private readonly stickyExitDurationMs = 170;
   private readonly handleStickyScroll = () => this.scheduleStickyUpdate();
   private readonly handleStickyResize = () => this.scheduleStickyUpdate();
-
-  readonly socialMediaPlatforms = [
-    { id: 'google', labelKey: 'settings.profile.social.google', status: 'connected' },
-    { id: 'facebook', labelKey: 'settings.profile.social.facebook', status: 'disconnected' }
-  ];
 
   readonly timezones = [
     '(UTC-12:00) International Date Line West',
@@ -204,7 +209,12 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
       country: profile.country ?? '',
       website: profile.website ?? ''
     });
+    this.avatarPreview = profile.avatarUrl ?? null;
+    this.initialAvatarUrl = profile.avatarUrl ?? null;
+    this.isGoogleConnected = !!profile.googleConnected;
+    this.googleConnectedEmail = profile.googleEmail ?? '';
     this.initialProfileValue = this.getNormalizedProfileFormValue();
+    this.syncStoredGoogleState(this.isGoogleConnected);
   }
 
   get hasProfileChanges(): boolean {
@@ -234,13 +244,40 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
 
   onAvatarChange(event: any): void {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.avatarPreview = reader.result;
-      };
-      reader.readAsDataURL(file);
+    if (!file) {
+      return;
     }
+
+    const validation = this.uploadService.validateAvatar(file);
+    if (!validation.valid) {
+      this.toastService.error(validation.error ?? this.i18n.t('validation.invalidFormat'));
+      event.target.value = '';
+      return;
+    }
+
+    this.isUploadingAvatar = true;
+    this.uploadService.uploadAvatar(file)
+      .pipe(finalize(() => {
+        this.isUploadingAvatar = false;
+        event.target.value = '';
+      }))
+      .subscribe({
+        next: response => {
+          this.avatarPreview = response.url;
+          const currentUser = this.authService.currentUser;
+          if (currentUser) {
+            this.authService.updateStoredUser({
+              ...currentUser,
+              avatarUrl: response.url
+            });
+          }
+          this.toastService.success(response.message || this.i18n.t('settings.profile.toast.updated'));
+        },
+        error: error => {
+          const message = error?.error?.message ?? 'Failed to upload avatar';
+          this.toastService.error(message);
+        }
+      });
   }
 
   onSave(): void {
@@ -283,13 +320,36 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
         email: this.userEmail
       });
     }
-    this.avatarPreview = null;
+    this.avatarPreview = this.initialAvatarUrl;
     this.profileError = '';
     this.profileSuccess = '';
   }
 
   removeAvatar(): void {
-    this.avatarPreview = null;
+    if (!this.avatarPreview || this.isUploadingAvatar) {
+      return;
+    }
+
+    this.isUploadingAvatar = true;
+    this.uploadService.deleteAvatar()
+      .pipe(finalize(() => this.isUploadingAvatar = false))
+      .subscribe({
+        next: response => {
+          this.avatarPreview = null;
+          const currentUser = this.authService.currentUser;
+          if (currentUser) {
+            this.authService.updateStoredUser({
+              ...currentUser,
+              avatarUrl: undefined
+            });
+          }
+          this.toastService.success(response.message);
+        },
+        error: error => {
+          const message = error?.error?.message ?? 'Failed to remove avatar';
+          this.toastService.error(message);
+        }
+      });
   }
 
   getFieldError(fieldName: string): string | null {
@@ -400,6 +460,10 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
               phone: response.user.phone,
               country: response.user.country,
               website: response.user.website,
+              avatarUrl: response.user.avatarUrl,
+              googleConnected: response.user.googleConnected,
+              preferredLanguage: response.user.preferredLanguage,
+              preferredTheme: response.user.preferredTheme,
               role: response.user.role,
               isActive: response.user.isActive ?? true,
               emailVerified: response.user.emailVerified ?? true,
@@ -588,5 +652,90 @@ export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return undefined;
+  }
+
+  get googleConnectionLabel(): string {
+    return this.isGoogleConnected && this.googleConnectedEmail ? this.googleConnectedEmail : 'Disabled';
+  }
+
+  async startGoogleLink(): Promise<void> {
+    if (this.isGoogleConnected || this.isLinkingGoogle) {
+      return;
+    }
+
+    this.isLinkingGoogle = true;
+    try {
+      const linkedUser = await this.googleLinkOauthService.start();
+      if (linkedUser) {
+        this.applyProfile({
+          id: linkedUser.id,
+          firstName: linkedUser.firstName,
+          lastName: linkedUser.lastName,
+          username: linkedUser.username,
+          email: linkedUser.email,
+          phone: linkedUser.phone,
+          country: linkedUser.country,
+          website: linkedUser.website,
+          avatarUrl: linkedUser.avatarUrl,
+          googleConnected: linkedUser.googleConnected,
+          googleEmail: linkedUser.googleEmail,
+          preferredLanguage: linkedUser.preferredLanguage,
+          preferredTheme: linkedUser.preferredTheme,
+          role: linkedUser.role,
+          isActive: linkedUser.isActive ?? true,
+          emailVerified: linkedUser.emailVerified ?? true,
+          createdAt: linkedUser.createdAt,
+          updatedAt: linkedUser.updatedAt
+        });
+      } else {
+        this.isGoogleConnected = true;
+        this.syncStoredGoogleState(true);
+      }
+      this.toastService.success(this.i18n.t('settings.profile.social.linkedSuccess'));
+    } catch (error) {
+      console.error('Failed to initialize Google link flow', error);
+      const message = error instanceof Error && error.message
+        ? error.message
+        : this.i18n.t('settings.profile.social.linkError');
+      this.toastService.error(message);
+    } finally {
+      this.isLinkingGoogle = false;
+    }
+  }
+
+  disableGoogleLink(): void {
+    if (!this.isGoogleConnected || this.isDisablingGoogle) {
+      return;
+    }
+
+    this.isDisablingGoogle = true;
+    this.profileService.disableGoogleAccount()
+      .pipe(finalize(() => this.isDisablingGoogle = false))
+      .subscribe({
+        next: profile => {
+          this.applyProfile(profile);
+          this.toastService.success('Google account disabled.');
+        },
+        error: error => {
+          const message = error?.error?.message ?? this.i18n.t('settings.profile.social.linkError');
+          this.toastService.error(message);
+        }
+      });
+  }
+
+  private syncStoredGoogleState(isGoogleConnected: boolean): void {
+    const currentUser = this.authService.currentUser;
+    if (
+      !currentUser ||
+      (currentUser.googleConnected === isGoogleConnected && (currentUser.googleEmail ?? '') === this.googleConnectedEmail)
+    ) {
+      return;
+    }
+
+    this.authService.updateStoredUser({
+      ...currentUser,
+      googleConnected: isGoogleConnected,
+      googleEmail: this.googleConnectedEmail || undefined
+    });
   }
 }

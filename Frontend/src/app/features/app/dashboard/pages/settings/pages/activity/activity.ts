@@ -1,11 +1,13 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivitySession, LoginRecord } from '../../../../../../../core/models/user.model';
+import { Subscription } from 'rxjs';
+import { ActivityRealtimeEvent, ActivitySession, LoginRecord } from '../../../../../../../core/models/user.model';
 import { ProfileService } from '../../../../../../../core/services/profile.service';
 import { ToastService } from '../../../../../../../core/services/toast.service';
 import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
 import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
+import { ActivityRealtimeService } from '../../../../../../../core/services/activity-realtime.service';
 
 @Component({
   selector: 'app-settings-activity',
@@ -34,6 +36,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   private stickyRafId: number | null = null;
   private stickyExitTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private stickySpacerRafId: number | null = null;
+  private realtimeSubscription?: Subscription;
   private readonly stickyThreshold = 6;
   private readonly stickyExitDurationMs = 170;
   private readonly handleStickyScroll = () => this.scheduleStickyUpdate();
@@ -47,13 +50,13 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   sessionsFilterDeviceType: 'all' | 'Desktop' | 'Mobile' | 'Tablet' = 'all';
 
   // Filter states for login history
-  loginFilterStatus: 'all' | 'success' | 'failed' = 'all';
-  loginFilterDateRange: 'all' | '7days' | '30days' | '90days' = 'all';
+  loginFilterDateRange: '7days' | '30days' = '30days';
 
   constructor(
     private profileService: ProfileService,
     private toastService: ToastService,
-    private i18n: I18nService
+    private i18n: I18nService,
+    private activityRealtimeService: ActivityRealtimeService
   ) {}
 
   get filteredSessions(): ActivitySession[] {
@@ -68,17 +71,11 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   get filteredLoginHistory(): LoginRecord[] {
     const now = new Date();
     return this.loginHistory.filter(login => {
-      // Filter by status
-      if (this.loginFilterStatus !== 'all' && login.status !== this.loginFilterStatus) {
-        return false;
-      }
       // Filter by date range
-      if (this.loginFilterDateRange !== 'all') {
-        const daysAgo = this.loginFilterDateRange === '7days' ? 7 : this.loginFilterDateRange === '30days' ? 30 : 90;
-        const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 3600000);
-        if (new Date(login.timestamp) < cutoffDate) {
-          return false;
-        }
+      const daysAgo = this.loginFilterDateRange === '7days' ? 7 : 30;
+      const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 3600000);
+      if (new Date(login.timestamp) < cutoffDate) {
+        return false;
       }
       return true;
     });
@@ -87,6 +84,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.loadActiveSessions();
     this.loadLoginHistory();
+    this.connectRealtime();
   }
 
   ngAfterViewInit(): void {
@@ -101,6 +99,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.realtimeSubscription?.unsubscribe();
     this.scrollRoot?.removeEventListener('scroll', this.handleStickyScroll);
     window.removeEventListener('resize', this.handleStickyResize);
     if (this.stickyRafId !== null) {
@@ -183,6 +182,23 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
     return `${days}${this.i18n.t('settings.activity.time.daysAgo')}`;
   }
 
+  private connectRealtime(): void {
+    this.activityRealtimeService.connect();
+    this.realtimeSubscription?.unsubscribe();
+    this.realtimeSubscription = this.activityRealtimeService.events$.subscribe((event) => {
+      this.handleRealtimeEvent(event);
+    });
+  }
+
+  private handleRealtimeEvent(event: ActivityRealtimeEvent): void {
+    if (event.type !== 'activity_refresh') {
+      return;
+    }
+
+    this.loadActiveSessions();
+    this.loadLoginHistory();
+  }
+
   formatDate(date: string): string {
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
@@ -215,8 +231,7 @@ export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetLoginFilters(): void {
-    this.loginFilterStatus = 'all';
-    this.loginFilterDateRange = 'all';
+    this.loginFilterDateRange = '30days';
   }
 
   private normalizeCurrentSession(sessions: ActivitySession[]): ActivitySession[] {

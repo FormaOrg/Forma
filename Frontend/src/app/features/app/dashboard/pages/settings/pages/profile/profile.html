@@ -50,6 +50,72 @@
   </div>
 
   <form [formGroup]="profileForm" class="profile-form">
+    @if (isLoadingProfile) {
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.picture.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-avatar">
+            <div class="profile-skeleton profile-skeleton--avatar"></div>
+            <div class="profile-skeleton-avatar__copy">
+              <div class="profile-skeleton profile-skeleton--title"></div>
+              <div class="profile-skeleton profile-skeleton--text profile-skeleton--text-lg"></div>
+              <div class="profile-skeleton profile-skeleton--button"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.personal.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-grid">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+              <div class="profile-skeleton-field">
+                <div class="profile-skeleton profile-skeleton--label"></div>
+                <div class="profile-skeleton profile-skeleton--input"></div>
+              </div>
+            }
+          </div>
+          <div class="profile-skeleton-field">
+            <div class="profile-skeleton profile-skeleton--label"></div>
+            <div class="profile-skeleton profile-skeleton--input"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.location.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-grid">
+            @for (_ of [1, 2]; track $index) {
+              <div class="profile-skeleton-field">
+                <div class="profile-skeleton profile-skeleton--label"></div>
+                <div class="profile-skeleton profile-skeleton--input"></div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.social.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton profile-skeleton--text"></div>
+          @for (_ of [1, 2]; track $index) {
+            <div class="profile-skeleton-social">
+              <div class="profile-skeleton-social__left">
+                <div class="profile-skeleton profile-skeleton--social-icon"></div>
+                <div class="profile-skeleton-social__copy">
+                  <div class="profile-skeleton profile-skeleton--label"></div>
+                  <div class="profile-skeleton profile-skeleton--text profile-skeleton--text-sm"></div>
+                </div>
+              </div>
+              <div class="profile-skeleton profile-skeleton--chip"></div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
     <!-- Avatar Section -->
     <div class="profile-section">
       <h2 class="section-title">{{ 'settings.profile.picture.title' | t }}</h2>
@@ -62,6 +128,7 @@
                 type="button"
                 class="avatar-remove-overlay"
                 (click)="removeAvatar()"
+                [disabled]="isUploadingAvatar"
                 [attr.aria-label]="'settings.profile.picture.remove' | t"
                 [attr.title]="'settings.profile.picture.remove' | t"
               >
@@ -85,9 +152,10 @@
                 type="file"
                 accept="image/*"
                 (change)="onAvatarChange($event)"
+                [disabled]="isUploadingAvatar"
                 hidden
               />
-              {{ 'settings.profile.picture.button' | t }}
+              {{ isUploadingAvatar ? ('common.saving' | t) : ('settings.profile.picture.button' | t) }}
             </label>
           </div>
         </div>
@@ -393,54 +461,49 @@
           {{ 'settings.profile.social.intro' | t }}
         </p>
         <div class="social-logins" role="list">
-          @for (platform of socialMediaPlatforms; track platform.id) {
-            <div class="social-login-row" role="listitem">
-              <div class="social-login-row__left">
-                <div class="social-login-row__icon" aria-hidden="true">
-                  @if (platform.id === 'google') {
-                    <img src="assets/app/settings/profile/google.svg" alt="" class="social-login-row__icon-img" />
-                  } @else if (platform.id === 'facebook') {
-                    <img src="assets/app/settings/profile/facebook.svg" alt="" class="social-login-row__icon-img" />
-                  }
-                </div>
-                <div class="social-login-row__text">
-                  <div class="social-login-row__title-line">
-                    <span class="social-login-row__title">{{ platform.labelKey | t }}</span>
-                    <span
-                      class="social-login-row__status"
-                      [class.social-login-row__status--on]="platform.status === 'connected'"
-                      [class.social-login-row__status--off]="platform.status === 'disconnected'"
-                    >
-                      @if (platform.status === 'connected') {
-                        {{ 'settings.profile.social.connected' | t }}
-                      } @else {
-                        {{ 'settings.profile.social.notConnected' | t }}
-                      }
-                    </span>
-                  </div>
-                  <p class="social-login-row__meta">
-                    @if (platform.status === 'connected') {
-                      <span>Skander Boughnimi</span>
-                    } @else {
-                      <span>{{ 'settings.profile.social.notLinked' | t }}</span>
-                    }
-                  </p>
-                </div>
+          <div class="social-login-row" role="listitem">
+            <div class="social-login-row__left">
+              <div class="social-login-row__icon" aria-hidden="true">
+                <img src="assets/app/settings/profile/google.svg" alt="" class="social-login-row__icon-img" />
               </div>
+              <div class="social-login-row__text">
+                <div class="social-login-row__title-line">
+                  <span class="social-login-row__title">{{ 'settings.profile.social.google' | t }}</span>
+                  <span
+                    class="social-login-row__status"
+                    [class.social-login-row__status--on]="isGoogleConnected"
+                    [class.social-login-row__status--off]="!isGoogleConnected"
+                  >
+                    @if (isGoogleConnected) {
+                      {{ 'settings.profile.social.connected' | t }}
+                    } @else {
+                      {{ 'settings.profile.social.notConnected' | t }}
+                    }
+                  </span>
+                </div>
+                <p class="social-login-row__meta">{{ googleConnectionLabel }}</p>
+              </div>
+            </div>
+            @if (isGoogleConnected) {
               <button
                 type="button"
-                class="social-login-row__btn"
-                [class.social-login-row__btn--disconnect]="platform.status === 'connected'"
-                [class.social-login-row__btn--connect]="platform.status === 'disconnected'"
+                class="social-login-row__btn social-login-row__btn--disconnect"
+                [disabled]="isDisablingGoogle"
+                (click)="disableGoogleLink()"
               >
-                @if (platform.status === 'connected') {
-                  {{ 'settings.profile.social.disable' | t }}
-                } @else {
-                  {{ 'settings.profile.social.enable' | t }}
-                }
+                Disable
               </button>
-            </div>
-          }
+            } @else {
+              <button
+                type="button"
+                class="social-login-row__btn social-login-row__btn--connect"
+                [disabled]="isLinkingGoogle"
+                (click)="startGoogleLink()"
+              >
+                {{ 'settings.profile.social.enable' | t }}
+              </button>
+            }
+          </div>
         </div>
         <p class="social-login-note">
           {{ 'settings.profile.social.note' | t }}
@@ -449,5 +512,6 @@
     </div>
 
     <div class="form-actions-spacer" aria-hidden="true"></div>
+    }
   </form>
 </div>

@@ -111,6 +111,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   isSavingPassword = false;
   isSavingQuestions = false;
   isSavingRecovery = false;
+  isLoadingSecuritySettings = false;
   isVerifyingSensitiveAction = false;
   is2FAEnabled = false;
   showVerifyEmailModal = false;
@@ -282,6 +283,7 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadSecuritySettings(): void {
+    this.isLoadingSecuritySettings = true;
     this.profileService.getMySecuritySettings().subscribe({
       next: settings => {
         this.userEmail = settings.email;
@@ -295,8 +297,10 @@ export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
           recoveryPhone: settings.recoveryPhone ?? ''
         }, { emitEvent: false });
         this.initialRecoveryOptionsValue = this.getNormalizedRecoveryOptionsValue();
+        this.isLoadingSecuritySettings = false;
       },
       error: error => {
+        this.isLoadingSecuritySettings = false;
         this.toastService.error(error?.error?.message ?? this.i18n.t('settings.security.error.load'));
       }
     });

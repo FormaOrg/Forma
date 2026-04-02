@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import tn.forma.users.websocket.ActivityRealtimeService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ActivityService {
 
     private final UserSessionRepository userSessionRepository;
     private final LoginHistoryEntryRepository loginHistoryEntryRepository;
+    private final ActivityRealtimeService activityRealtimeService;
 
     @Transactional
     public String createAuthenticatedSession(User user, boolean rememberMe) {
@@ -61,6 +63,7 @@ public class ActivityService {
                 .status("success")
                 .build());
 
+        activityRealtimeService.publishRefresh(user.getEmail(), "session_created");
         return sessionId;
     }
 
@@ -80,6 +83,10 @@ public class ActivityService {
                 .status("failed")
                 .failureReason(failureReason)
                 .build());
+
+        if (user != null) {
+            activityRealtimeService.publishRefresh(user.getEmail(), "login_failed");
+        }
     }
 
     @Transactional
@@ -111,6 +118,7 @@ public class ActivityService {
     public List<LoginHistoryEntryResponse> getLoginHistory(User user) {
         return loginHistoryEntryRepository.findTop100ByAttemptedEmailIgnoreCaseOrderByCreatedAtDesc(user.getEmail())
                 .stream()
+                .filter(entry -> "success".equalsIgnoreCase(entry.getStatus()))
                 .map(this::mapLoginHistory)
                 .toList();
     }
@@ -130,6 +138,7 @@ public class ActivityService {
         }
 
         revokeSession(session);
+        activityRealtimeService.publishRefresh(user.getEmail(), "session_revoked");
         return new MessageResponse("Session signed out successfully");
     }
 
@@ -145,6 +154,10 @@ public class ActivityService {
             }
             revokeSession(session);
             revokedCount++;
+        }
+
+        if (revokedCount > 0) {
+            activityRealtimeService.publishRefresh(user.getEmail(), "sessions_revoked");
         }
 
         return new MessageResponse(revokedCount == 0

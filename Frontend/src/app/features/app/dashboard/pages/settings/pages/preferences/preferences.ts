@@ -6,6 +6,8 @@ import { ProfileService } from '../../../../../../../core/services/profile.servi
 import { ToastService } from '../../../../../../../core/services/toast.service';
 import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
 import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
+import { AppTheme, ThemeService } from '../../../../../../../core/services/theme.service';
+import { AuthService } from '../../../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-settings-preferences',
@@ -21,8 +23,10 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
 
   preferencesForm!: FormGroup;
   isSaving = false;
+  isLoadingPreferences = false;
   showDeleteModal = false;
-  private readonly themeStorageKey = 'forma_theme_preference';
+  private lastSavedTheme: AppTheme = 'light';
+  private lastSavedLanguage: 'en' | 'fr' = 'en';
   isHeaderSticky = false;
   isHeaderExiting = false;
   headerStickyTop = 0;
@@ -53,7 +57,9 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private profileService: ProfileService,
     private toastService: ToastService,
-    private i18n: I18nService
+    private i18n: I18nService,
+    private themeService: ThemeService,
+    private authService: AuthService
   ) {
     this.initForm();
   }
@@ -63,6 +69,11 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
     this.preferencesForm.get('language')?.valueChanges.subscribe(language => {
       if (language === 'en' || language === 'fr') {
         void this.i18n.setLang(language);
+      }
+    });
+    this.preferencesForm.get('theme')?.valueChanges.subscribe(theme => {
+      if (theme === 'light' || theme === 'dark' || theme === 'system') {
+        this.themeService.setTheme(theme, false);
       }
     });
   }
@@ -94,39 +105,77 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
 
   private initForm() {
     this.preferencesForm = this.fb.group({
-      theme: [this.readSavedTheme(), Validators.required],
+      theme: [this.themeService.getTheme(), Validators.required],
       language: [this.i18n.lang(), Validators.required]
     });
   }
 
-  onSave() {
-    if (this.preferencesForm.invalid) {
-      this.preferencesForm.markAllAsTouched();
+  onLanguageSelected(): void {
+    const language = this.preferencesForm.get('language')?.value;
+    const theme = this.preferencesForm.get('theme')?.value;
+    if (language !== 'en' && language !== 'fr') {
+      return;
+    }
+
+    if (language === this.lastSavedLanguage) {
+      return;
+    }
+
+    this.persistPreferences(language, theme);
+  }
+
+  onThemeSelected(): void {
+    const language = this.preferencesForm.get('language')?.value;
+    const theme = this.preferencesForm.get('theme')?.value as AppTheme | null;
+
+    if (language !== 'en' && language !== 'fr') {
+      return;
+    }
+
+    if (theme !== 'light' && theme !== 'dark' && theme !== 'system') {
+      return;
+    }
+
+    if (theme === this.lastSavedTheme) {
+      return;
+    }
+
+    this.persistPreferences(language, theme);
+  }
+
+  private persistPreferences(language: 'en' | 'fr', theme: AppTheme): void {
+    if (this.isSaving) {
       return;
     }
 
     this.isSaving = true;
-    const language = this.preferencesForm.get('language')?.value;
-    const theme = this.preferencesForm.get('theme')?.value;
+    this.themeService.setTheme(theme);
 
-    if (theme) {
-      localStorage.setItem(this.themeStorageKey, theme);
-    }
-
-    this.profileService.updateMyPreferences({ preferredLanguage: language })
+    this.profileService.updateMyPreferences({ preferredLanguage: language, preferredTheme: theme })
       .pipe(finalize(() => this.isSaving = false))
       .subscribe({
-        next: () => {
-          this.toastService.success(this.i18n.t('settings.preferences.toast.saved'));
+        next: (updatedUser) => {
+          this.lastSavedLanguage = updatedUser.preferredLanguage ?? language;
+          this.lastSavedTheme = updatedUser.preferredTheme ?? theme;
+          const currentUser = this.authService.currentUser;
+          if (currentUser) {
+            this.authService.updateStoredUser({
+              ...currentUser,
+              preferredLanguage: updatedUser.preferredLanguage ?? currentUser.preferredLanguage,
+              preferredTheme: updatedUser.preferredTheme ?? currentUser.preferredTheme
+            });
+          }
         },
         error: error => {
+          this.preferencesForm.patchValue({
+            language: this.lastSavedLanguage,
+            theme: this.lastSavedTheme
+          }, { emitEvent: false });
+          void this.i18n.setLang(this.lastSavedLanguage);
+          this.themeService.setTheme(this.lastSavedTheme);
           this.toastService.error(error?.error?.message ?? this.i18n.t('settings.preferences.toast.saveError'));
         }
       });
-  }
-
-  onCancel() {
-    this.loadPreferences();
   }
 
   onDeleteAccount() {
@@ -144,26 +193,35 @@ export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadPreferences(): void {
-    const fallbackTheme = this.readSavedTheme();
+    const fallbackTheme = this.themeService.getTheme();
     const currentLanguage = this.i18n.lang();
+    this.isLoadingPreferences = true;
     this.profileService.getMyProfile().subscribe({
-      next: () => {
+      next: (profile) => {
+        const savedLanguage = profile.preferredLanguage === 'fr' ? 'fr' : profile.preferredLanguage === 'en' ? 'en' : currentLanguage;
+        const savedTheme = profile.preferredTheme === 'dark' || profile.preferredTheme === 'system' || profile.preferredTheme === 'light'
+          ? profile.preferredTheme
+          : fallbackTheme;
+        this.lastSavedLanguage = savedLanguage;
+        this.lastSavedTheme = savedTheme;
         this.preferencesForm.reset({
-          theme: fallbackTheme,
-          language: currentLanguage
+          theme: savedTheme,
+          language: savedLanguage
         }, { emitEvent: false });
+        void this.i18n.setLang(savedLanguage);
+        this.themeService.setTheme(savedTheme, false);
+        this.isLoadingPreferences = false;
       },
       error: () => {
+        this.lastSavedLanguage = currentLanguage;
+        this.lastSavedTheme = fallbackTheme;
         this.preferencesForm.reset({
           theme: fallbackTheme,
           language: currentLanguage
         }, { emitEvent: false });
+        this.isLoadingPreferences = false;
       }
     });
-  }
-
-  private readSavedTheme(): string {
-    return localStorage.getItem(this.themeStorageKey) ?? 'light';
   }
 
   private scheduleStickyUpdate(): void {

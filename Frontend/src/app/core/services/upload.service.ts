@@ -33,6 +33,10 @@ export class UploadService {
     return this.http.post<UploadResponse>(`${this.apiUrl}/avatar`, formData);
   }
 
+  deleteAvatar(): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/avatar`);
+  }
+
   // ── Project media (images used inside site pages) ──────
 
   uploadProjectMedia(file: File, projectId: number): Observable<UploadResponse> {

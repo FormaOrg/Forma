@@ -7,6 +7,41 @@
   </div>
 
   <form [formGroup]="preferencesForm" class="profile-form">
+    @if (isLoadingPreferences) {
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.preferences.appearance.title' | t }}</h2>
+        <div class="section-content">
+          <div class="preferences-skeleton-line preferences-skeleton-line--wide"></div>
+          <div class="preferences-skeleton-field">
+            <div class="preferences-skeleton-line preferences-skeleton-line--label"></div>
+            <div class="preferences-skeleton-box preferences-skeleton-box--input"></div>
+          </div>
+          <div class="preferences-skeleton-field">
+            <div class="preferences-skeleton-line preferences-skeleton-line--label"></div>
+            <div class="preferences-skeleton-themes">
+              @for (_ of [1, 2, 3]; track $index) {
+                <div class="preferences-skeleton-box preferences-skeleton-box--theme"></div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.preferences.danger.title' | t }}</h2>
+        <div class="section-content">
+          <div class="preferences-skeleton-danger">
+            <div class="preferences-skeleton-box preferences-skeleton-box--icon"></div>
+            <div class="preferences-skeleton-danger__copy">
+              <div class="preferences-skeleton-line preferences-skeleton-line--title"></div>
+              <div class="preferences-skeleton-line preferences-skeleton-line--wide"></div>
+              <div class="preferences-skeleton-line preferences-skeleton-line--medium"></div>
+            </div>
+            <div class="preferences-skeleton-box preferences-skeleton-box--button"></div>
+          </div>
+        </div>
+      </div>
+    } @else {
     <div class="profile-section">
       <h2 class="section-title">{{ 'settings.preferences.appearance.title' | t }}</h2>
       <div class="section-content">
@@ -18,7 +53,7 @@
             <label class="form-label" for="language">{{ 'settings.preferences.language.label' | t }}</label>
           </div>
           <p class="field-description">{{ 'settings.preferences.language.description' | t }}</p>
-          <select formControlName="language" class="form-select">
+          <select formControlName="language" class="form-select" (change)="onLanguageSelected()">
             @for (lang of languages; track lang.code) {
               <option [value]="lang.code">{{ lang.label }}</option>
             }
@@ -40,6 +75,7 @@
                   name="theme"
                   [value]="theme.id"
                   formControlName="theme"
+                  (change)="onThemeSelected()"
                   hidden
                 />
                 <div class="theme-preview">
@@ -91,6 +127,7 @@
         </div>
       </div>
     </div>
+    }
   </form>
 
   @if (showDeleteModal) {

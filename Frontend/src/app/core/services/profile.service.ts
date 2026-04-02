@@ -17,7 +17,8 @@ import {
   UpdateProfileRequest
   ,
   UpdateSecurityQuestionsRequest,
-  VerifySensitiveActionRequest
+  VerifySensitiveActionRequest,
+  GoogleLinkRequest
 } from '../models/user.model';
 
 export interface UserProfileResponse {
@@ -29,7 +30,11 @@ export interface UserProfileResponse {
   phone?: string;
   country?: string;
   website?: string;
+  avatarUrl?: string;
+  googleConnected?: boolean;
+  googleEmail?: string;
   preferredLanguage?: 'en' | 'fr';
+  preferredTheme?: 'light' | 'dark' | 'system';
   role: string;
   isActive: boolean;
   emailVerified: boolean;
@@ -56,6 +61,14 @@ export class ProfileService {
 
   updateMyPreferences(request: UpdatePreferencesRequest): Observable<UserProfileResponse> {
     return this.http.put<UserProfileResponse>(`${this.apiUrl}/me/preferences`, request);
+  }
+
+  linkGoogleAccount(request: GoogleLinkRequest): Observable<UserProfileResponse> {
+    return this.http.post<UserProfileResponse>(`${this.apiUrl}/me/social/google/link`, request);
+  }
+
+  disableGoogleAccount(): Observable<UserProfileResponse> {
+    return this.http.post<UserProfileResponse>(`${this.apiUrl}/me/social/google/disable`, {});
   }
 
   changeMyPassword(request: ChangePasswordRequest): Observable<{ message: string }> {
