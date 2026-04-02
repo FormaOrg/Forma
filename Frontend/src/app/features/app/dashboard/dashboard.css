@@ -138,8 +138,13 @@
   transform: translate3d(calc(var(--shell-sidebar-shift) * -1), 0, 0);
 }
 
+.dashboard-sidebar-layer--project {
+  transform: translate3d(calc(var(--shell-sidebar-shift) * -1), 0, 0);
+}
+
 .dashboard-shell:not(.dashboard-shell--settings) .dashboard-sidebar-layer--main,
-.dashboard-shell.dashboard-shell--settings .dashboard-sidebar-layer--settings {
+.dashboard-shell.dashboard-shell--settings .dashboard-sidebar-layer--settings,
+.dashboard-shell.dashboard-shell--project .dashboard-sidebar-layer--project {
   transform: translate3d(0, 0, 0);
 }
 
