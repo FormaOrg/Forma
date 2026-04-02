@@ -157,6 +157,16 @@
   color: #4f8f66;
 }
 
+.invoice-pill--pending {
+  background: #fff1df;
+  color: #ba6b2e;
+}
+
+.invoice-pill--failed {
+  background: #ffe5e8;
+  color: #c15367;
+}
+
 .plan-card__badge {
   background: #eef0ff;
   color: #7468ff;
@@ -483,6 +493,160 @@
   color: #7e838d;
 }
 
+.invoice-row__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.invoice-download {
+  min-height: 40px;
+  padding: 0 14px 0 42px;
+  border-radius: 14px;
+  border: 1px solid #7468ff;
+  background: #7468ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  position: relative;
+  transition:
+    opacity 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.invoice-download:hover {
+  opacity: 0.92;
+}
+
+.invoice-download__icon-shell {
+  position: absolute;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.invoice-download:hover .invoice-download__icon-shell {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.invoice-download__icon-wrap {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.invoice-download:hover .invoice-download__icon-wrap {
+  transform: scale(1.15);
+}
+
+.invoice-download__icon-wrap svg {
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.invoice-download span {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.invoice-download:hover span {
+  opacity: 0;
+}
+
+.billing-section__footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 16, 28, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: min(90vh, 900px);
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(217, 220, 230, 0.9);
+  background: #ffffff;
+  box-shadow: 0 30px 70px rgba(17, 24, 39, 0.22);
+}
+
+.modal-content.modal-large {
+  max-width: 900px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #ececf2;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  color: #111111;
+}
+
+.modal-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #5f6470;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.modal-close:hover {
+  background: #f3f4f8;
+  color: #111111;
+}
+
+.modal-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-body {
+  max-height: calc(90vh - 76px);
+  overflow-y: auto;
+  padding: 18px 20px 20px;
+}
+
+.invoice-list--modal {
+  gap: 12px;
+}
+
 @media (max-width: 1100px) {
   .billing-page__stats,
   .usage-grid,
@@ -514,6 +678,24 @@
   .invoice-row {
     grid-template-columns: 1fr;
     align-items: flex-start;
+  }
+
+  .invoice-row__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .invoice-download {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modal-overlay {
+    padding: 14px;
+  }
+
+  .modal-body {
+    padding: 14px;
   }
 }
 

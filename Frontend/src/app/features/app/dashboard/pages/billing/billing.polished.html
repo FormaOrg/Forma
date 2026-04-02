@@ -362,7 +362,7 @@
 
       @if (invoices().length) {
         <div class="invoice-list">
-          @for (invoice of invoices(); track trackByInvoice($index, invoice)) {
+          @for (invoice of visibleInvoices(); track trackByInvoice($index, invoice)) {
             <article class="invoice-row">
               <div class="invoice-row__main">
                 <strong class="invoice-row__id">{{ invoice.id }}</strong>
@@ -370,14 +370,38 @@
               </div>
               <div class="invoice-row__amount">{{ invoice.amountLabel }}</div>
               <div class="invoice-row__status">
-                <span class="invoice-pill" [class.invoice-pill--pending]="invoice.statusLabel === 'Pending'">{{ invoice.statusLabel }}</span>
+                <span
+                  class="invoice-pill"
+                  [class.invoice-pill--pending]="invoice.statusLabel === 'Pending'"
+                  [class.invoice-pill--failed]="invoice.statusLabel === 'Failed'"
+                >
+                  {{ invoice.statusLabel }}
+                </span>
               </div>
               <div class="invoice-row__actions">
-                <button type="button" class="billing-btn billing-btn--ghost">Download</button>
+                <button type="button" class="invoice-download" (click)="downloadInvoice(invoice)">
+                  <div class="invoice-download__icon-shell">
+                    <div class="invoice-download__icon-wrap">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 4V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M8 10L12 14L16 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M5 19H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    </div>
+                  </div>
+                  <span>Download</span>
+                </button>
               </div>
             </article>
           }
         </div>
+        @if (hasHiddenInvoices()) {
+          <div class="billing-section__footer">
+            <button type="button" class="billing-btn billing-btn--secondary" (click)="openInvoicesModal()">
+              More
+            </button>
+          </div>
+        }
       } @else {
         <div class="billing-empty billing-empty--compact">
           <div class="billing-empty__icon" aria-hidden="true">
@@ -398,5 +422,56 @@
         </div>
       }
     </section>
+
+    @if (showInvoicesModal()) {
+      <div class="modal-overlay" (click)="closeInvoicesModal()">
+        <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">Billing history</h2>
+            <button type="button" class="modal-close" (click)="closeInvoicesModal()" aria-label="Close">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="invoice-list invoice-list--modal">
+              @for (invoice of invoices(); track trackByInvoice($index, invoice)) {
+                <article class="invoice-row">
+                  <div class="invoice-row__main">
+                    <strong class="invoice-row__id">{{ invoice.id }}</strong>
+                    <span class="invoice-row__date">{{ invoice.dateLabel }}</span>
+                  </div>
+                  <div class="invoice-row__amount">{{ invoice.amountLabel }}</div>
+                  <div class="invoice-row__status">
+                    <span
+                      class="invoice-pill"
+                      [class.invoice-pill--pending]="invoice.statusLabel === 'Pending'"
+                      [class.invoice-pill--failed]="invoice.statusLabel === 'Failed'"
+                    >
+                      {{ invoice.statusLabel }}
+                    </span>
+                  </div>
+                  <div class="invoice-row__actions">
+                    <button type="button" class="invoice-download" (click)="downloadInvoice(invoice)">
+                      <div class="invoice-download__icon-shell">
+                        <div class="invoice-download__icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 4V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                            <path d="M8 10L12 14L16 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M5 19H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                          </svg>
+                        </div>
+                      </div>
+                      <span>Download</span>
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   }
 </section>
