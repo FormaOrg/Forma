@@ -14,4 +14,7 @@ public class UpdatePreferencesRequest {
 
     @Pattern(regexp = "en|fr", message = "Preferred language must be en or fr")
     private String preferredLanguage;
+
+    @Pattern(regexp = "light|dark|system", message = "Preferred theme must be light, dark, or system")
+    private String preferredTheme;
 }

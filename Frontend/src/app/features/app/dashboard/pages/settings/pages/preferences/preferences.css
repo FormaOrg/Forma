@@ -78,6 +78,90 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
+.preferences-skeleton-line,
+.preferences-skeleton-box {
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
+  background-size: 220% 100%;
+  animation: preferencesSkeletonShimmer 1.25s linear infinite;
+}
+
+.preferences-skeleton-line {
+  height: 13px;
+}
+
+.preferences-skeleton-line--label {
+  width: 96px;
+}
+
+.preferences-skeleton-line--title {
+  width: 160px;
+  height: 16px;
+}
+
+.preferences-skeleton-line--wide {
+  width: 100%;
+  max-width: 420px;
+}
+
+.preferences-skeleton-line--medium {
+  width: 100%;
+  max-width: 320px;
+}
+
+.preferences-skeleton-box--input {
+  width: 100%;
+  height: 44px;
+}
+
+.preferences-skeleton-box--theme {
+  width: 160px;
+  height: 132px;
+}
+
+.preferences-skeleton-box--icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.preferences-skeleton-box--button {
+  width: 132px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.preferences-skeleton-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preferences-skeleton-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 160px);
+  gap: 16px;
+}
+
+.preferences-skeleton-danger {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.preferences-skeleton-danger__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+@keyframes preferencesSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -20% 0; }
+}
+
 .subsection {
   display: flex;
   flex-direction: column;
@@ -434,9 +518,9 @@
   gap: 18px;
   padding: 18px;
   border-radius: 16px;
-  background: rgba(239, 68, 68, 0.03);
-  border: 1px solid rgba(239, 68, 68, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  background: rgba(239, 68, 68, 0.045);
+  border: none;
+  box-shadow: none;
 }
 
 .danger-main {
@@ -659,8 +743,9 @@ select.form-select {
   background-color: #fff;
   background-image: url('data:image/svg+xml;utf8,<svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M6 8L10 12L14 8" stroke="%237566ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
   background-repeat: no-repeat;
-  background-position: right 8px center;
-  padding-right: 16px !important;
+  background-position: right 10px center;
+  background-size: 18px 18px;
+  padding-right: 38px !important;
 }
 
 select::-ms-expand {
@@ -668,6 +753,15 @@ select::-ms-expand {
 }
 
 @media (max-width: 640px) {
+  .preferences-skeleton-danger {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preferences-skeleton-box--button {
+    width: 100%;
+  }
+
   .profile-container {
     padding: 12px 12px 28px;
   }

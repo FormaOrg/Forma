@@ -98,6 +98,26 @@ public class UserController {
         return ResponseEntity.ok(userService.updatePreferences(userDetails.getUsername(), request));
     }
 
+    @PostMapping("/me/social/google/link")
+    public ResponseEntity<UserDto> linkGoogleAccount(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody GoogleLinkRequest request) {
+        return ResponseEntity.ok(userService.linkGoogleAccount(userDetails.getUsername(), request));
+    }
+
+    @PostMapping("/me/social/google/link/code")
+    public ResponseEntity<UserDto> linkGoogleAccountWithCode(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody GoogleLinkCodeRequest request) {
+        return ResponseEntity.ok(userService.linkGoogleAccountWithCode(userDetails.getUsername(), request));
+    }
+
+    @PostMapping("/me/social/google/disable")
+    public ResponseEntity<UserDto> disableGoogleAccount(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(userService.disableGoogleAccount(userDetails.getUsername()));
+    }
+
     @PatchMapping("/me/password")
     public ResponseEntity<MessageResponse> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,

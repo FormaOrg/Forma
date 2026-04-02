@@ -7,6 +7,25 @@
   </div>
 
   <form [formGroup]="securityForm" class="profile-form">
+    @if (isLoadingSecuritySettings) {
+      @for (_ of [1, 2, 3, 4]; track $index) {
+        <div class="profile-section">
+          <h2 class="section-title">{{ 'settings.security.title' | t }}</h2>
+          <div class="section-content">
+            <div class="security-skeleton-line security-skeleton-line--wide"></div>
+            <div class="security-skeleton-grid">
+              @for (__ of [1, 2]; track $index) {
+                <div class="security-skeleton-field">
+                  <div class="security-skeleton-line security-skeleton-line--label"></div>
+                  <div class="security-skeleton-box security-skeleton-box--input"></div>
+                </div>
+              }
+            </div>
+            <div class="security-skeleton-box security-skeleton-box--button"></div>
+          </div>
+        </div>
+      }
+    } @else {
     <!-- Change Password Section -->
     <div class="profile-section">
       <h2 class="section-title">{{ 'settings.security.password.title' | t }}</h2>
@@ -423,5 +442,6 @@
         </div>
       </div>
     </div>
+    }
   </form>
 </div>

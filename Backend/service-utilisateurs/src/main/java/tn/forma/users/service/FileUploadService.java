@@ -1,76 +1,92 @@
 package tn.forma.users.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import tn.forma.users.dto.FileUploadResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileUploadService {
 
-    @Value("${application.upload.dir:uploads}")
-    private String uploadDir;
-
-    @Value("${application.frontend-url}")
-    private String baseUrl;
+    private final Cloudinary cloudinary;
 
     private static final long MAX_SIZE       = 10L * 1024 * 1024; // 10 MB
     private static final String[] ALLOWED    = {"image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"};
 
     // ── Upload methods ─────────────────────────────────────
 
-    public String uploadAvatar(MultipartFile file) throws IOException {
-        return upload(file, "avatars");
+    public FileUploadResponse uploadAvatar(MultipartFile file) {
+        return upload(file, "forma/avatars");
     }
 
-    public String uploadProjectMedia(MultipartFile file) throws IOException {
-        return upload(file, "media");
+    public FileUploadResponse uploadProjectMedia(MultipartFile file) {
+        return upload(file, "forma/media");
     }
 
-    public String uploadDesignAsset(MultipartFile file) throws IOException {
-        return upload(file, "design");
+    public FileUploadResponse uploadDesignAsset(MultipartFile file) {
+        return upload(file, "forma/design");
     }
 
     // ── Delete ─────────────────────────────────────────────
 
-    public void deleteFile(String fileUrl) throws IOException {
-        // Extract relative path from URL
-        String relativePath = fileUrl.replace(baseUrl + "/uploads/", "");
-        Path path = Paths.get(uploadDir).resolve(relativePath);
+    public void deleteFile(String fileUrl) {
+        String publicId = extractPublicId(fileUrl);
+        if (publicId != null) {
+            deleteByPublicId(publicId);
+        }
+    }
 
-        if (Files.exists(path)) {
-            Files.delete(path);
-            log.info("Deleted file: {}", path);
+    public void deleteByPublicId(String publicId) {
+        if (publicId == null || publicId.isBlank()) {
+            return;
+        }
+
+        try {
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            log.info("Deleted Cloudinary asset: {}", publicId);
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to delete file", ex);
         }
     }
 
     // ── Private helpers ────────────────────────────────────
 
-    private String upload(MultipartFile file, String folder) throws IOException {
+    private FileUploadResponse upload(MultipartFile file, String folder) {
         validate(file);
 
-        // Create folder if it doesn't exist
-        Path folderPath = Paths.get(uploadDir, folder);
-        Files.createDirectories(folderPath);
+        try {
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "image",
+                            "use_filename", true,
+                            "unique_filename", true,
+                            "overwrite", true
+                    )
+            );
 
-        // Generate unique filename
-        String extension = getExtension(file.getOriginalFilename());
-        String filename  = UUID.randomUUID() + "." + extension;
-        Path filePath    = folderPath.resolve(filename);
+            String url = result.get("secure_url") != null
+                    ? result.get("secure_url").toString()
+                    : result.get("url").toString();
+            String publicId = result.get("public_id").toString();
 
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        log.info("File uploaded: {}", filePath);
-
-        // Return accessible URL
-        return baseUrl + "/uploads/" + folder + "/" + filename;
+            log.info("File uploaded to Cloudinary: {}", publicId);
+            return FileUploadResponse.builder()
+                    .url(url)
+                    .publicId(publicId)
+                    .build();
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to upload file", ex);
+        }
     }
 
     private void validate(MultipartFile file) {
@@ -94,8 +110,22 @@ public class FileUploadService {
         }
     }
 
-    private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "jpg";
-        return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+    private String extractPublicId(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank() || !fileUrl.contains("/upload/")) {
+            return null;
+        }
+
+        String normalized = fileUrl.split("\\?")[0];
+        String[] parts = normalized.split("/upload/");
+        if (parts.length < 2) {
+            return null;
+        }
+
+        String path = parts[1].replaceFirst("^v\\d+/", "");
+        int extensionIndex = path.lastIndexOf('.');
+        if (extensionIndex > 0) {
+            path = path.substring(0, extensionIndex);
+        }
+        return path;
     }
 }

@@ -53,9 +53,27 @@ public class User {
     @Size(max = 255)
     private String website;
 
+    @Size(max = 1000)
+    private String avatarUrl;
+
+    @Size(max = 255)
+    private String avatarPublicId;
+
+    @Size(max = 255)
+    @Column(unique = true)
+    private String googleId;
+
+    @Email
+    @Size(max = 255)
+    private String googleEmail;
+
     @Column(nullable = false, length = 8)
     @Builder.Default
     private String preferredLanguage = "en";
+
+    @Column(nullable = false, length = 16)
+    @Builder.Default
+    private String preferredTheme = "light";
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

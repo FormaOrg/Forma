@@ -15,7 +15,11 @@ public class UserDto {
     private String phone;
     private String country;
     private String website;
+    private String avatarUrl;
+    private boolean googleConnected;
+    private String googleEmail;
     private String preferredLanguage;
+    private String preferredTheme;
     private String role;
     private boolean isActive;
     private boolean emailVerified;
