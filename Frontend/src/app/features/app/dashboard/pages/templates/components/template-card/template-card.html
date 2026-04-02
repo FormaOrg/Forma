@@ -1,0 +1,67 @@
+<article class="template-card" [style.--template-accent]="template.accent">
+  <div class="template-card__preview">
+    <img class="template-card__image" [src]="template.previewImageUrl" [alt]="template.name + ' preview'" />
+
+    <div class="template-card__overlay">
+      <div class="template-card__window">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      @if (template.badgeLabel) {
+        <span class="template-card__badge">{{ template.badgeLabel }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="template-card__body">
+    <div class="template-card__top">
+      <div class="template-card__title-wrap">
+        <span class="template-card__category">{{ template.categoryLabel }}</span>
+        <h3 class="template-card__title">{{ template.name }}</h3>
+        <p class="template-card__description">{{ template.description }}</p>
+      </div>
+    </div>
+
+    <div class="template-card__meta">
+      <div class="template-card__meta-row">
+        <span class="template-card__meta-label">Type</span>
+        <span class="template-card__meta-value">{{ template.projectType.toLowerCase().replace('_', ' ') | titlecase }}</span>
+      </div>
+      <div class="template-card__meta-row">
+        <span class="template-card__meta-label">Builder</span>
+        <span class="template-card__meta-value">{{ template.creationMethod.toLowerCase().replace('_', ' ') | titlecase }}</span>
+      </div>
+      <div class="template-card__meta-row">
+        <span class="template-card__meta-label">Activity</span>
+        <span class="template-card__meta-value">{{ template.usesLabel }} and updated {{ template.updatedLabel }}</span>
+      </div>
+    </div>
+
+    <div class="template-card__actions">
+      @if (template.previewUrl) {
+        <a class="template-card__action template-card__action--secondary" [href]="template.previewUrl" target="_blank" rel="noreferrer">
+          Preview
+        </a>
+      } @else if (template.previewRoute) {
+        <a class="template-card__action template-card__action--secondary" [routerLink]="template.previewRoute">
+          Preview
+        </a>
+      } @else {
+        <button type="button" class="template-card__action template-card__action--secondary" disabled>
+          Preview
+        </button>
+      }
+
+      <button
+        type="button"
+        class="template-card__action template-card__action--primary"
+        [disabled]="isCreating"
+        (click)="useTemplate.emit()"
+      >
+        {{ isCreating ? 'Creating...' : 'Use Template' }}
+      </button>
+    </div>
+  </div>
+</article>

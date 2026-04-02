@@ -55,6 +55,25 @@
     linear-gradient(135deg, color-mix(in srgb, var(--project-accent) 78%, white 22%), #ffffff);
 }
 
+.project-card__preview-image,
+.project-card__preview-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.project-card__preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-card__preview-overlay {
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(17, 17, 17, 0.04), rgba(17, 17, 17, 0.2)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent);
+}
+
 .project-card__preview-window {
   display: inline-flex;
   align-items: center;
@@ -194,6 +213,11 @@
   color: #9a8740;
 }
 
+.project-card__status--archived {
+  background: #ebedf3;
+  color: #6b7280;
+}
+
 .project-card__more {
   width: 34px;
   height: 34px;
@@ -315,6 +339,11 @@
   background: #f8f8fc;
   border-color: #e5e5ef;
   color: #4d515a;
+}
+
+.project-card__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .project-card__action--secondary:hover,

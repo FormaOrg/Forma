@@ -88,6 +88,29 @@ export interface EcommerceConfig {
   taxRate: number;
 }
 
+export interface TemplateRecord {
+  id: number | string;
+  name?: string | null;
+  title?: string | null;
+  description?: string | null;
+  summary?: string | null;
+  category?: string | null;
+  label?: string | null;
+  type?: ProjectType | string | null;
+  projectType?: ProjectType | string | null;
+  creationMethod?: CreationMethod | string | null;
+  previewImageUrl?: string | null;
+  previewUrl?: string | null;
+  previewRoute?: string | null;
+  route?: string | null;
+  featured?: boolean | null;
+  isOwned?: boolean | null;
+  tags?: string[] | null;
+  usesCount?: number | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
 // ── Request DTOs ───────────────────────────────────────────
 export interface CreateProjectRequest {
   name: string;
