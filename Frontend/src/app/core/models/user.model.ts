@@ -27,7 +27,11 @@ export interface AuthUser {
   phone?: string;
   country?: string;
   website?: string;
+  avatarUrl?: string;
+  googleConnected?: boolean;
+  googleEmail?: string;
   preferredLanguage?: 'en' | 'fr';
+  preferredTheme?: 'light' | 'dark' | 'system';
   role: UserRole;
   emailVerified?: boolean;
   isActive?: boolean;
@@ -90,6 +94,19 @@ export interface LoginRequest {
   rememberMe: boolean;
 }
 
+export interface GoogleAuthRequest {
+  idToken: string;
+  rememberMe: boolean;
+}
+
+export interface GoogleClientConfigResponse {
+  clientId: string;
+}
+
+export interface GoogleLinkRequest {
+  idToken: string;
+}
+
 export interface LoginVerificationRequest {
   token: string;
   code: string;
@@ -110,6 +127,7 @@ export interface UpdateProfileRequest {
 
 export interface UpdatePreferencesRequest {
   preferredLanguage?: 'en' | 'fr';
+  preferredTheme?: 'light' | 'dark' | 'system';
 }
 
 export interface RequestEmailChangeRequest {
@@ -191,4 +209,10 @@ export interface LoginRecord {
   ipAddress: string;
   status: 'success' | 'failed';
   failureReason?: string;
+}
+
+export interface ActivityRealtimeEvent {
+  type: 'activity_refresh';
+  reason?: string;
+  occurredAt: string;
 }

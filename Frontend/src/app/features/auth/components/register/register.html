@@ -191,9 +191,10 @@
       <button
         type="button"
         class="social-btn"
-        title="Sign Up with Google"
+        [disabled]="isGoogleLoading"
         (click)="signupWithGoogle()">
-        <span class="icon icon-google"></span>
+        <span class="icon icon-google" aria-hidden="true"></span>
+        <span>Sign up with Google</span>
       </button>
     </div>
   </div>

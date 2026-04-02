@@ -1,10 +1,10 @@
-// login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { GoogleAuthPopupService } from '../../../../core/services/google-auth-popup.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +14,6 @@ import { ToastService } from '../../../../core/services/toast.service';
   imports: [FormsModule, NgIf, RouterModule]
 })
 export class LoginComponent implements OnInit {
-
   email        = '';
   password     = '';
   rememberMe   = false;
@@ -27,12 +26,14 @@ export class LoginComponent implements OnInit {
   isResending      = false;
   resendSuccess    = '';
   resendError      = '';
+  isGoogleLoading  = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private googleAuthPopupService: GoogleAuthPopupService
   ) {}
 
   ngOnInit(): void {
@@ -112,5 +113,43 @@ export class LoginComponent implements OnInit {
         this.toastService.error(this.resendError);
       }
     });
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    if (this.isGoogleLoading) {
+      return;
+    }
+
+    this.authService.clearPendingLoginVerification();
+    this.error            = '';
+    this.emailNotVerified = false;
+    this.resendSuccess    = '';
+    this.resendError      = '';
+    this.isGoogleLoading  = true;
+
+    try {
+      const response = await this.googleAuthPopupService.start(this.rememberMe, this.returnUrl);
+      this.isGoogleLoading = false;
+
+      if (response.requiresLoginVerification && response.loginVerificationToken) {
+        this.authService.savePendingLoginVerification({
+          token: response.loginVerificationToken,
+          email: response.user.email,
+          message: response.message,
+          rememberMe: this.rememberMe,
+          returnUrl: this.returnUrl
+        });
+        await this.router.navigate(['/login-verification'], {
+          queryParams: { returnUrl: this.returnUrl }
+        });
+        return;
+      }
+
+      await this.router.navigateByUrl(this.returnUrl);
+    } catch (error: any) {
+      this.isGoogleLoading = false;
+      const message = error?.message ?? 'Google sign-in failed. Please try again.';
+      this.toastService.error(message);
+    }
   }
 }
