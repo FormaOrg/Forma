@@ -19,7 +19,7 @@
 
 .recent-activity__header {
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  border-bottom: 1px solid var(--home-border, rgba(15, 23, 42, 0.07));
 }
 
 .recent-activity__heading {
@@ -55,7 +55,7 @@
 
 .recent-activity__title {
   margin: 0;
-  color: #121722;
+  color: var(--home-text-strong, #121722);
   font-size: 1.32rem;
   line-height: 1.1;
   font-weight: 650;
@@ -64,7 +64,7 @@
 
 .recent-activity__subtitle {
   margin: 0;
-  color: #8a8f98;
+  color: var(--home-text-muted, #8a8f98);
   font-size: 0.88rem;
   line-height: 1.45;
 }
@@ -138,7 +138,7 @@
 
 .activity-item__title {
   margin: 0;
-  color: #111111;
+  color: var(--home-text-strong, #111111);
   font-size: 0.9rem;
   line-height: 1.35;
   font-weight: 600;
@@ -147,7 +147,7 @@
 
 .activity-item__time {
   margin: 0;
-  color: #8a8f98;
+  color: var(--home-text-muted, #8a8f98);
   font-size: 0.8rem;
   line-height: 1.35;
 }
@@ -177,4 +177,14 @@
   .activity-item__time {
     font-size: 0.88rem;
   }
+}
+
+:host-context(.theme-dark) .recent-activity {
+  background: var(--home-surface, #171e2a);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .activity-item__line {
+  background: rgba(226, 231, 244, 0.12);
 }
