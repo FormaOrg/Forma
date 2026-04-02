@@ -7,7 +7,7 @@ import type { AuthUser } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AppBootstrapService {
   readonly isLoading = signal(false);
-  private readonly debugLoaderDelayMs = 3000;
+  private readonly debugLoaderDelayMs = 15000;
 
   private initializedUserId: number | null = null;
   private initPromise: Promise<void> | null = null;
