@@ -30,10 +30,12 @@ export class Dashboard implements OnInit {
   readonly appBootstrapService = inject(AppBootstrapService);
   isSettingsRoute = false;
   isImmersiveRoute = false;
+  isProjectRoute = false;
+  currentProjectId = '';
   sidebarMotionReady = false;
 
   constructor() {
-    this.syncRouteState(this.router.url);
+    this.syncShellRouteState(this.router.url);
 
     this.router.events
       .pipe(
@@ -41,7 +43,7 @@ export class Dashboard implements OnInit {
         takeUntilDestroyed()
       )
       .subscribe((event) => {
-        this.syncRouteState(event.urlAfterRedirects);
+        this.syncShellRouteState(event.urlAfterRedirects);
       });
   }
 
@@ -70,8 +72,19 @@ export class Dashboard implements OnInit {
     return url === '/app/settings' || url.startsWith('/app/settings/');
   }
 
-  private syncRouteState(url: string): void {
+  private checkIsProjectRoute(url: string): boolean {
+    return /^\/app\/projects\/[^/]+(?:\/.*)?$/.test(url);
+  }
+
+  private readProjectId(url: string): string {
+    const match = url.match(/^\/app\/projects\/([^/?#]+)/);
+    return match?.[1] ?? '';
+  }
+
+  private syncShellRouteState(url: string): void {
     this.isSettingsRoute = this.checkIsSettingsRoute(url);
+    this.isProjectRoute = this.checkIsProjectRoute(url);
+    this.currentProjectId = this.isProjectRoute ? this.readProjectId(url) : '';
     this.isImmersiveRoute = this.readDeepestRouteDataFlag('immersive');
   }
 
