@@ -66,11 +66,22 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
+:host-context(.theme-dark) .section-content {
+  background: #171e2a;
+  border-color: rgba(226, 231, 244, 0.1);
+  box-shadow: none;
+}
+
 .section-footer {
   padding: 16px 24px;
   border-top: 1px solid #e5e7eb;
   background-color: #fafafa;
   text-align: left;
+}
+
+:host-context(.theme-dark) .section-footer {
+  background: rgba(20, 28, 41, 0.72);
+  border-top-color: rgba(226, 231, 244, 0.1);
 }
 
 .section-footer .btn {

@@ -29,10 +29,11 @@ export class Dashboard implements OnInit {
   private themeService = inject(ThemeService);
   readonly appBootstrapService = inject(AppBootstrapService);
   isSettingsRoute = false;
+  isImmersiveRoute = false;
   sidebarMotionReady = false;
 
   constructor() {
-    this.isSettingsRoute = this.checkIsSettingsRoute(this.router.url);
+    this.syncRouteState(this.router.url);
 
     this.router.events
       .pipe(
@@ -40,7 +41,7 @@ export class Dashboard implements OnInit {
         takeUntilDestroyed()
       )
       .subscribe((event) => {
-        this.isSettingsRoute = this.checkIsSettingsRoute(event.urlAfterRedirects);
+        this.syncRouteState(event.urlAfterRedirects);
       });
   }
 
@@ -67,5 +68,20 @@ export class Dashboard implements OnInit {
 
   private checkIsSettingsRoute(url: string): boolean {
     return url === '/app/settings' || url.startsWith('/app/settings/');
+  }
+
+  private syncRouteState(url: string): void {
+    this.isSettingsRoute = this.checkIsSettingsRoute(url);
+    this.isImmersiveRoute = this.readDeepestRouteDataFlag('immersive');
+  }
+
+  private readDeepestRouteDataFlag(key: string): boolean {
+    let current = this.router.routerState.snapshot.root;
+
+    while (current.firstChild) {
+      current = current.firstChild;
+    }
+
+    return Boolean(current.data[key]);
   }
 }

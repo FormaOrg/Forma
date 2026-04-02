@@ -2,6 +2,10 @@
   <div class="dashboard-boot">
     <app-bootstrap-loader></app-bootstrap-loader>
   </div>
+} @else if (isImmersiveRoute) {
+  <div class="dashboard-immersive">
+    <router-outlet></router-outlet>
+  </div>
 } @else {
   <div
     class="dashboard-shell"

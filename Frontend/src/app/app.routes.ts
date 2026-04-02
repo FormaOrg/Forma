@@ -34,6 +34,7 @@ import { SettingsProfile } from './features/app/dashboard/pages/settings/pages/p
 import { SettingsSecurity } from './features/app/dashboard/pages/settings/pages/security/security';
 import { SettingsPreferences } from './features/app/dashboard/pages/settings/pages/preferences/preferences';
 import { SettingsActivity } from './features/app/dashboard/pages/settings/pages/activity/activity';
+import { ProjectCreation } from './features/app/dashboard/pages/project-creation/project-creation';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, canActivate: [RootRedirectGuard] },
@@ -71,6 +72,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: 'home', component: Home, data: { title: 'Home' } },
+      { path: 'create-project', component: ProjectCreation, data: { title: 'Create Project', immersive: true } },
       { path: 'projects', component: Projects, data: { title: 'Projects' } },
       { path: 'templates', component: Templates, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },

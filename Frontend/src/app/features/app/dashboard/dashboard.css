@@ -31,6 +31,13 @@
   background: var(--shell-bg);
 }
 
+.dashboard-immersive {
+  min-height: 100vh;
+  height: 100vh;
+  background: #f7f5f1;
+  overflow: hidden;
+}
+
 .dashboard-sidebar-stage {
   position: fixed;
   inset: 0 auto 0 0;

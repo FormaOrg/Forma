@@ -1,0 +1,202 @@
+<section class="project-creation">
+  <div class="project-creation__scene" aria-hidden="true">
+    @for (card of sceneCards; track card.image) {
+      <figure class="project-creation__scene-card {{ card.className }}">
+        <span class="project-creation__scene-card-chrome" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <img [src]="card.image" [alt]="card.label + ' preview'" />
+      </figure>
+    }
+  </div>
+
+  <header class="project-creation__header">
+    <a class="project-creation__brand" routerLink="/app/home">
+      <img src="assets/Logo/FormaLogoOnly.svg" alt="" width="28" height="28" />
+      <span>Forma</span>
+    </a>
+
+    @if (screen() !== 'launching') {
+      <button type="button" class="project-creation__skip-top" (click)="skipToDashboard()">
+        Skip to Dashboard
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10H16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          <path d="M11.5 5.5L16 10L11.5 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    }
+  </header>
+
+  <div class="project-creation__viewport">
+    <article class="project-creation__card" [class.project-creation__card--transition]="screen() === 'customizing' || screen() === 'launching'">
+      @if (screen() !== 'launching') {
+        <div class="project-creation__progress" aria-hidden="true">
+          <span class="project-creation__progress-bar" [style.width.%]="progressValue()"></span>
+        </div>
+      }
+
+      <div class="project-creation__body">
+        @switch (screen()) {
+          @case ('type') {
+            <div class="project-creation__step project-creation__step--type">
+              <h1 class="project-creation__title">What type of site are you building?</h1>
+
+              <div class="project-creation__type-grid">
+                @for (option of typeOptions; track option.type) {
+                  <button
+                    type="button"
+                    class="project-creation__type-card"
+                    [class.project-creation__type-card--active]="selectedType() === option.type"
+                    (click)="selectType(option.type)"
+                  >
+                    <span class="project-creation__type-preview">
+                      <img [src]="option.previewImage" [alt]="option.label + ' preview'" />
+                      <span class="project-creation__type-preview-overlay"></span>
+                      <span class="project-creation__type-preview-badge" [style.border-color]="'color-mix(in srgb, ' + option.accent + ' 26%, white)'">
+                        {{ option.label }}
+                      </span>
+                    </span>
+                    <span class="project-creation__type-meta">
+                      <span class="project-creation__type-tag" [style.color]="option.accent" [style.background]="'color-mix(in srgb, ' + option.accent + ' 12%, white)'">
+                        {{ option.tag }}
+                      </span>
+                      <strong>{{ option.label }}</strong>
+                      <span>{{ option.description }}</span>
+                    </span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @case ('customizing') {
+            <div class="project-creation__transition">
+              <div class="project-creation__transition-text project-creation__transition-text--customizing" aria-label="Customizing the next steps for you">
+                <span class="project-creation__transition-line project-creation__transition-line--shine" data-text="Customizing the next steps">
+                  Customizing the next steps
+                </span>
+                <span class="project-creation__transition-line project-creation__transition-line--second project-creation__transition-line--shine" data-text="for you">
+                  for you
+                </span>
+              </div>
+            </div>
+          }
+
+          @case ('name') {
+              <div class="project-creation__step project-creation__step--name">
+                <h1 class="project-creation__title">What do you want to call your site?</h1>
+
+              <div class="project-creation__input-shell">
+                <input
+                  class="project-creation__input"
+                  type="text"
+                  [ngModel]="siteName()"
+                  (ngModelChange)="siteName.set($event)"
+                  placeholder="Enter or choose a name for your site"
+                  maxlength="120"
+                />
+              </div>
+
+              <div class="project-creation__suggestions">
+                <p class="project-creation__suggestions-label">Suggestions</p>
+                <div class="project-creation__chip-list">
+                  @for (suggestion of nameSuggestions(); track suggestion) {
+                    <button type="button" class="project-creation__chip" (click)="chooseNameSuggestion(suggestion)">
+                      {{ suggestion }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          @case ('goals') {
+            <div class="project-creation__step">
+              <h1 class="project-creation__title">What are your goals for this site?</h1>
+
+                <div class="project-creation__input-shell project-creation__input-shell--textarea">
+                  <textarea
+                    class="project-creation__input project-creation__input--textarea"
+                    [ngModel]="goalsText()"
+                    (ngModelChange)="updateGoalsText($event)"
+                    placeholder="Enter or select your site goals"
+                    rows="4"
+                  ></textarea>
+                </div>
+
+              <div class="project-creation__suggestions">
+                <p class="project-creation__suggestions-label">Suggestions</p>
+                  <div class="project-creation__chip-list">
+                    @for (goal of goalSuggestions(); track goal) {
+                      <button
+                        type="button"
+                        class="project-creation__chip"
+                        [class.project-creation__chip--active]="isGoalSelected(goal)"
+                        (click)="appendGoalSuggestion(goal)"
+                      >
+                        {{ goal }}
+                      </button>
+                    }
+                </div>
+              </div>
+            </div>
+          }
+
+            @case ('launching') {
+              <div class="project-creation__transition project-creation__transition--launch">
+                <p class="project-creation__transition-text project-creation__transition-text--launch" aria-label="Taking you to your site dashboard">
+                  <span
+                    class="project-creation__transition-line project-creation__transition-line--shine"
+                    data-text="Taking you to your site dashboard"
+                  >
+                    Taking you to your site dashboard
+                  </span>
+                  <span
+                    class="project-creation__transition-line project-creation__transition-line--second project-creation__transition-line--shine"
+                    [attr.data-text]="'for ' + resolvedSiteName()"
+                  >
+                    for {{ resolvedSiteName() }}
+                  </span>
+                </p>
+
+                <ul class="project-creation__launch-list">
+                <li>Adding site details to your dashboard</li>
+                <li>Preparing tools to manage your site</li>
+                <li>Personalizing steps in your setup guide</li>
+              </ul>
+            </div>
+          }
+        }
+      </div>
+
+      @if (shouldShowFooter()) {
+        <footer class="project-creation__footer">
+          <button type="button" class="project-creation__back" (click)="goBack()">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M16 10H4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+              <path d="M8.5 5.5L4 10L8.5 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Back
+          </button>
+
+          <div class="project-creation__footer-actions">
+            @if (screen() === 'name' || screen() === 'goals') {
+              <button type="button" class="project-creation__ghost" (click)="skipCurrentStep()">Skip</button>
+            }
+
+            <button
+              type="button"
+              class="project-creation__primary"
+              [disabled]="!canContinue()"
+              (click)="continue()"
+            >
+              {{ primaryCtaLabel() }}
+            </button>
+          </div>
+        </footer>
+      }
+    </article>
+  </div>
+</section>
