@@ -27,6 +27,9 @@ import { Dashboard } from './features/app/dashboard/dashboard';
 import { Billing } from './features/app/dashboard/pages/billing/billing';
 import { Home } from './features/app/dashboard/pages/home/home';
 import { Projects } from './features/app/dashboard/pages/projects/projects';
+import { ProjectsRouteLayout } from './features/app/dashboard/pages/projects/projects-route-layout/projects-route-layout';
+import { ProjectWorkspaceLayout } from './features/app/dashboard/pages/projects/project-workspace-layout/project-workspace-layout';
+import { ProjectRoutePlaceholder } from './features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder';
 import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
 import { Templates } from './features/app/dashboard/pages/templates/templates';
 import { Settings } from './features/app/dashboard/pages/settings/settings';
@@ -71,7 +74,29 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: 'home', component: Home, data: { title: 'Home' } },
-      { path: 'projects', component: Projects, data: { title: 'Projects' } },
+      {
+        path: 'projects',
+        component: ProjectsRouteLayout,
+        data: { title: 'Projects' },
+        children: [
+          { path: '', component: Projects, data: { title: 'Projects' } },
+          {
+            path: ':projectId',
+            component: ProjectWorkspaceLayout,
+            data: { title: 'Project' },
+            children: [
+              { path: '', component: ProjectRoutePlaceholder, data: { title: 'Project' } },
+              { path: 'overview', component: ProjectRoutePlaceholder, data: { title: 'Overview' } },
+              { path: 'editor', component: ProjectRoutePlaceholder, data: { title: 'Editor' } },
+              { path: 'pages', component: ProjectRoutePlaceholder, data: { title: 'Pages' } },
+              { path: 'preview', component: ProjectRoutePlaceholder, data: { title: 'Preview' } },
+              { path: 'deploy', component: ProjectRoutePlaceholder, data: { title: 'Deploy' } },
+              { path: 'settings', component: ProjectRoutePlaceholder, data: { title: 'Settings' } },
+              { path: 'media', component: ProjectRoutePlaceholder, data: { title: 'Media' } }
+            ]
+          }
+        ]
+      },
       { path: 'templates', component: Templates, data: { title: 'Templates' } },
       { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
       { path: 'billing', component: Billing, data: { title: 'Billing' } },

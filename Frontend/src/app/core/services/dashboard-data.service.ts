@@ -159,7 +159,7 @@ export class DashboardDataService {
       previewUrl: undefined,
       thumbnailUrl: undefined,
       accent: this.colorFromSeed(`${project.id}-${project.type}`),
-      route: '/app/projects',
+      route: `/app/projects/${project.id}`,
       previewRoute: undefined,
       metadata: `${this.toProjectTypeLabel(project.type)} · ${this.toCreationMethodLabel(project.creationMethod)}`,
       lastEditedLabel: this.formatRelativeDate(updatedAt),

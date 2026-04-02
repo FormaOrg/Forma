@@ -4,6 +4,7 @@ import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppHeader } from '../../../shared/app/app-header/app-header';
 import { SideBar } from '../../../shared/app/side-bar/side-bar';
+import { ProjectSidebar } from '../../../shared/app/project-sidebar/project-sidebar';
 import { SettingsSidebar } from '../../../shared/app/settings-sidebar/settings-sidebar';
 import { SidebarStateService } from '../../../core/services/sidebar-state.service';
 import { AppBootstrapService } from '../../../core/services/app-bootstrap.service';
@@ -17,6 +18,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     RouterOutlet,
     AppHeader,
     SideBar,
+    ProjectSidebar,
     SettingsSidebar,
     BootstrapLoader
   ],
@@ -29,10 +31,12 @@ export class Dashboard implements OnInit {
   private themeService = inject(ThemeService);
   readonly appBootstrapService = inject(AppBootstrapService);
   isSettingsRoute = false;
+  isProjectRoute = false;
+  currentProjectId = '';
   sidebarMotionReady = false;
 
   constructor() {
-    this.isSettingsRoute = this.checkIsSettingsRoute(this.router.url);
+    this.syncShellRouteState(this.router.url);
 
     this.router.events
       .pipe(
@@ -40,7 +44,7 @@ export class Dashboard implements OnInit {
         takeUntilDestroyed()
       )
       .subscribe((event) => {
-        this.isSettingsRoute = this.checkIsSettingsRoute(event.urlAfterRedirects);
+        this.syncShellRouteState(event.urlAfterRedirects);
       });
   }
 
@@ -67,5 +71,20 @@ export class Dashboard implements OnInit {
 
   private checkIsSettingsRoute(url: string): boolean {
     return url === '/app/settings' || url.startsWith('/app/settings/');
+  }
+
+  private checkIsProjectRoute(url: string): boolean {
+    return /^\/app\/projects\/[^/]+(?:\/.*)?$/.test(url);
+  }
+
+  private readProjectId(url: string): string {
+    const match = url.match(/^\/app\/projects\/([^/?#]+)/);
+    return match?.[1] ?? '';
+  }
+
+  private syncShellRouteState(url: string): void {
+    this.isSettingsRoute = this.checkIsSettingsRoute(url);
+    this.isProjectRoute = this.checkIsProjectRoute(url);
+    this.currentProjectId = this.isProjectRoute ? this.readProjectId(url) : '';
   }
 }

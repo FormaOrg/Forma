@@ -25,7 +25,7 @@
               class="sidebar__row"
               [routerLink]="item.route!"
               routerLinkActive="sidebar__row--active"
-              [routerLinkActiveOptions]="{ exact: item.route !== '/app/settings' }"
+              [routerLinkActiveOptions]="{ exact: shouldUseExactMatch(item.route) }"
               [class.sidebar__row--collapsed]="collapsed"
             >
               <span class="sidebar__icon">
