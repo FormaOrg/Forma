@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <div class="app-header__right">
+  <div class="app-header__center">
     <button
       type="button"
       class="app-header__search"
@@ -35,6 +35,9 @@
       <span class="app-header__search-input">{{ search.placeholderKey | t }}</span>
       <kbd class="app-header__kbd">{{ search.shortcut }}</kbd>
     </button>
+  </div>
+
+  <div class="app-header__right">
 
     @for (button of actionButtons; track button.label) {
       <a

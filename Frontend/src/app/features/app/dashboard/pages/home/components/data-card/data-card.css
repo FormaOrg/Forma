@@ -95,12 +95,28 @@
 }
 
 :host-context(.theme-dark) .data-card {
-  background: var(--home-surface, #171e2a);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    var(--home-surface, #171e2a);
   border-color: var(--home-border, rgba(255, 255, 255, 0.08));
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
 :host-context(.theme-dark) .data-card__icon {
   background: var(--home-accent-soft, rgba(117, 102, 255, 0.18));
   box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.12);
+}
+
+:host-context(.theme-dark) .data-card__title {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .data-card__value {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .data-card__description {
+  color: rgba(226, 231, 244, 0.62);
 }

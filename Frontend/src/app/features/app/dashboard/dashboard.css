@@ -16,6 +16,7 @@
   --shell-sidebar-collapsed: 72px;
   --shell-border: rgba(0, 0, 0, 0.08);
   --shell-bg: #f7f7f8;
+  --shell-brand-bg: #fff;
   --shell-brand-surface: transparent;
   --shell-brand-border: transparent;
   --shell-brand-wordmark: #000;
@@ -52,7 +53,7 @@
   align-items: center;
   gap: 10px;
   padding: 0 14px 0 16px;
-  background: #fff;
+  background: var(--shell-brand-bg);
   border-right: 1px solid var(--shell-border);
   transition:
     width var(--shell-dur) var(--shell-ease),
@@ -184,25 +185,28 @@
   background: #11151d;
 }
 
-:root[data-theme='dark'] .dashboard-shell {
+:root[data-theme='dark'] .dashboard-shell,
+body.theme-dark .dashboard-shell,
+:host-context(.theme-dark) .dashboard-shell {
   --shell-border: rgba(255, 255, 255, 0.08);
   --shell-bg: #10141c;
+  --shell-brand-bg: #121824;
   --shell-brand-surface: transparent;
   --shell-brand-border: transparent;
   --shell-brand-wordmark: #f4f7ff;
   --shell-brand-shadow: none;
 }
 
-:root[data-theme='dark'] .dashboard-sidebar-brand {
-  background: #121824;
-}
-
-:root[data-theme='dark'] .dashboard-sidebar-brand__mark {
+:root[data-theme='dark'] .dashboard-sidebar-brand__mark,
+body.theme-dark .dashboard-sidebar-brand__mark,
+:host-context(.theme-dark) .dashboard-sidebar-brand__mark {
   background: transparent;
   border-color: transparent;
 }
 
-:root[data-theme='dark'] .dashboard-content {
+:root[data-theme='dark'] .dashboard-content,
+body.theme-dark .dashboard-content,
+:host-context(.theme-dark) .dashboard-content {
   background: #0f141d;
 }
 

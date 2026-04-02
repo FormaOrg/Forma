@@ -97,6 +97,80 @@
   gap: 14px;
 }
 
+.billing-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.billing-loading__hero,
+.billing-loading__panel {
+  border: 1px solid var(--billing-border);
+  border-radius: 22px;
+  background: #fbfbfd;
+  overflow: hidden;
+}
+
+.billing-loading__hero {
+  min-height: 220px;
+  padding: 22px;
+}
+
+.billing-loading__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.billing-loading__panel {
+  min-height: 210px;
+  padding: 18px;
+}
+
+.billing-loading__hero::before,
+.billing-loading__hero::after,
+.billing-loading__panel::before,
+.billing-loading__panel::after {
+  content: '';
+  display: block;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #eef1f6 25%, #f8f9fc 38%, #eef1f6 52%);
+  background-size: 200% 100%;
+  animation: billing-shimmer 1.2s linear infinite;
+}
+
+.billing-loading__hero::before {
+  width: 160px;
+  height: 14px;
+  margin-bottom: 16px;
+}
+
+.billing-loading__hero::after {
+  width: 100%;
+  height: 138px;
+}
+
+.billing-loading__panel::before {
+  width: 60%;
+  height: 16px;
+  margin-bottom: 14px;
+}
+
+.billing-loading__panel::after {
+  width: 100%;
+  height: 128px;
+}
+
+@keyframes billing-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
 .billing-page__grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
@@ -892,6 +966,10 @@
   .billing-page__grid {
     grid-template-columns: 1fr;
   }
+
+  .billing-loading__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -986,6 +1064,9 @@
 
 :host-context(.theme-dark) {
   --billing-bg: #0f141d;
+  --home-surface: #171e2a;
+  --home-border: rgba(226, 231, 244, 0.1);
+  --home-accent-soft: rgba(117, 102, 255, 0.18);
   --billing-border: rgba(226, 231, 244, 0.1);
   --billing-border-strong: rgba(117, 102, 255, 0.34);
   --billing-surface-soft: #182131;
@@ -1032,6 +1113,14 @@
 :host-context(.theme-dark) .invoice-row__amount,
 :host-context(.theme-dark) .billing-notice p {
   color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .payment-card__line span {
+  color: rgba(226, 231, 244, 0.62);
+}
+
+:host-context(.theme-dark) .payment-card__line strong {
+  color: #f4f7ff;
 }
 
 :host-context(.theme-dark) .billing-hero__summary,
@@ -1102,4 +1191,23 @@
 
 :host-context(.theme-dark) .modal-overlay {
   background: rgba(5, 8, 14, 0.72);
+}
+
+:host-context(.theme-dark) .billing-loading__hero,
+:host-context(.theme-dark) .billing-loading__panel {
+  border-color: rgba(138, 149, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    #171e2a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 12px 28px rgba(5, 9, 16, 0.2);
+}
+
+:host-context(.theme-dark) .billing-loading__hero::before,
+:host-context(.theme-dark) .billing-loading__hero::after,
+:host-context(.theme-dark) .billing-loading__panel::before,
+:host-context(.theme-dark) .billing-loading__panel::after {
+  background: linear-gradient(90deg, #1b2432 25%, #243043 38%, #1b2432 52%);
+  background-size: 200% 100%;
 }
