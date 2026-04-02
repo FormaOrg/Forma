@@ -1,10 +1,17 @@
-<aside class="settings-sidebar" [class.settings-sidebar--collapsed]="collapsed" [class.settings-sidebar--no-transition]="!isInitialized">
-  <div class="settings-sidebar__brand">
-    <div class="settings-sidebar__mark" aria-hidden="true">
-      <img [src]="logoSrc()" alt="" width="28" height="28" />
+<aside
+  class="settings-sidebar"
+  [class.settings-sidebar--collapsed]="collapsed"
+  [class.settings-sidebar--no-transition]="!isInitialized"
+  [class.settings-sidebar--brandless]="!showBrand"
+>
+  @if (showBrand) {
+    <div class="settings-sidebar__brand">
+      <div class="settings-sidebar__mark" aria-hidden="true">
+        <img [src]="logoSrc()" alt="" width="28" height="28" />
+      </div>
+      <span class="settings-sidebar__wordmark">Forma</span>
     </div>
-    <span class="settings-sidebar__wordmark">Forma</span>
-  </div>
+  }
 
   <nav class="settings-sidebar__body" aria-label="Settings">
     @for (section of sections; track trackSectionId($index, section)) {

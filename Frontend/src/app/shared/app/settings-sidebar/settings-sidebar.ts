@@ -17,6 +17,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 })
 export class SettingsSidebar implements OnChanges, OnInit {
   @Input() collapsed = false;
+  @Input() showBrand = true;
 
   readonly iconSize = 20;
   isInitialized = false;

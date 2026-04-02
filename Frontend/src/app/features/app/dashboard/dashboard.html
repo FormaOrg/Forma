@@ -3,8 +3,36 @@
     <app-bootstrap-loader></app-bootstrap-loader>
   </div>
 } @else {
-  <div class="dashboard-shell" [class.sidebar-collapsed]="sidebarCollapsed">
-    <app-side-bar [collapsed]="sidebarCollapsed"></app-side-bar>
+  <div
+    class="dashboard-shell"
+    [class.sidebar-collapsed]="sidebarCollapsed"
+    [class.dashboard-shell--settings]="isSettingsRoute"
+    [class.dashboard-shell--sidebar-motion-ready]="sidebarMotionReady"
+  >
+    <div class="dashboard-sidebar-brand">
+      <div class="dashboard-sidebar-brand__mark" aria-hidden="true">
+        <img [src]="sidebarLogoSrc()" alt="" width="28" height="28" />
+      </div>
+      <span class="dashboard-sidebar-brand__wordmark">Forma</span>
+    </div>
+
+    <div class="dashboard-sidebar-stage" aria-hidden="true">
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--main"
+        [class.is-active]="!isSettingsRoute"
+        [attr.inert]="isSettingsRoute ? '' : null"
+      >
+        <app-side-bar [collapsed]="sidebarCollapsed" [showBrand]="false"></app-side-bar>
+      </div>
+
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--settings"
+        [class.is-active]="isSettingsRoute"
+        [attr.inert]="!isSettingsRoute ? '' : null"
+      >
+        <app-settings-sidebar [collapsed]="sidebarCollapsed" [showBrand]="false"></app-settings-sidebar>
+      </div>
+    </div>
 
     <div class="dashboard-main">
       <app-app-header

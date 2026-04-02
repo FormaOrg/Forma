@@ -11,7 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
-import type { SidebarChildItem, SidebarItem, SidebarSection } from '../dashboard-nav.types';
+import type { SidebarItem, SidebarSection } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -25,6 +25,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 })
 export class SideBar implements OnChanges {
   @Input() collapsed = false;
+  @Input() showBrand = true;
 
   readonly iconSize = 20;
 
@@ -62,12 +63,8 @@ export class SideBar implements OnChanges {
         {
           label: 'app.sidebar.templates',
           icon: 'layout-grid',
-          hasDropdown: true,
-          expanded: false,
-          children: [
-            { label: 'app.sidebar.templates.all', route: '/app/templates' },
-            { label: 'app.sidebar.templates.mine', route: '/app/templates?tab=my' }
-          ]
+          route: '/app/templates',
+          hasDropdown: false
         }
       ]
     },
@@ -120,10 +117,6 @@ export class SideBar implements OnChanges {
     return item.label;
   }
 
-  trackChildRoute(_: number, c: SidebarChildItem): string {
-    return c.route;
-  }
-
   toggleDropdown(item: SidebarItem): void {
     if (!item.hasDropdown || this.collapsed) return;
 
@@ -155,43 +148,9 @@ export class SideBar implements OnChanges {
     }
   }
 
-  isChildActive(child: SidebarChildItem): boolean {
-    const curUrl = this.router.url;
-    const [curPath, curQuery = ''] = curUrl.split('?');
-    const [childPath, childQuery = ''] = child.route.split('?');
-
-    if (curPath !== childPath) return false;
-
-    const curParams = new URLSearchParams(curQuery);
-    const childParams = new URLSearchParams(childQuery);
-    const wantTab = childParams.get('tab');
-    const curTab = curParams.get('tab');
-
-    if (wantTab === null || wantTab === '') {
-      return curTab === null || curTab === '';
-    }
-
-    return curTab === wantTab;
-  }
-
-  navPath(child: SidebarChildItem): string {
-    return child.route.split('?')[0];
-  }
-
-  navQuery(child: SidebarChildItem): Record<string, string> {
-    const q = child.route.split('?')[1];
-    if (!q) return {};
-    const params = new URLSearchParams(q);
-    const out: Record<string, string> = {};
-    params.forEach((v, k) => {
-      out[k] = v;
-    });
-    return out;
-  }
-
   isParentActive(item: SidebarItem): boolean {
     if (!item.hasDropdown || !item.children?.length) return false;
-    return item.children.some((c) => this.isChildActive(c));
+    return false;
   }
 
   private closeAllDropdowns(): void {
@@ -204,19 +163,5 @@ export class SideBar implements OnChanges {
 
   private syncDropdownsFromRoute(): void {
     if (this.collapsed) return;
-
-    for (const section of this.sections) {
-      for (const item of section.items) {
-        if (item.hasDropdown && item.children?.some((c) => this.isChildActive(c))) {
-          for (const s of this.sections) {
-            for (const row of s.items) {
-              if (row !== item && row.hasDropdown) row.expanded = false;
-            }
-          }
-          item.expanded = true;
-          return;
-        }
-      }
-    }
   }
 }

@@ -8,14 +8,14 @@
         </p>
       </div>
 
-      <a class="templates-hero__cta" routerLink="/app/projects">
+      <a class="templates-hero__cta templates-hero__cta--animated" routerLink="/app/projects">
         <span class="templates-hero__cta-icon">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
             <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
           </svg>
         </span>
-        <span>Create blank project</span>
+        <span class="templates-hero__cta-text">Create blank project</span>
       </a>
     </div>
   </section>
@@ -81,29 +81,43 @@
 
     <label class="templates-toolbar__select">
       <span class="templates-toolbar__select-label">Category</span>
-      <select
-        class="templates-toolbar__select-input"
-        [ngModel]="activeCategory()"
-        (ngModelChange)="updateCategory($event)"
-      >
-        @for (category of categories(); track category) {
-          <option [value]="category">{{ category === 'all' ? 'All categories' : category }}</option>
-        }
-      </select>
+      <span class="templates-toolbar__select-field">
+        <select
+          class="templates-toolbar__select-input"
+          [ngModel]="activeCategory()"
+          (ngModelChange)="updateCategory($event)"
+        >
+          @for (category of categories(); track category) {
+            <option [value]="category">{{ category === 'all' ? 'All categories' : category }}</option>
+          }
+        </select>
+        <span class="templates-toolbar__select-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </span>
     </label>
 
     <label class="templates-toolbar__select">
       <span class="templates-toolbar__select-label">Sort</span>
-      <select
-        class="templates-toolbar__select-input"
-        [ngModel]="activeSort()"
-        (ngModelChange)="updateSort($event)"
-      >
-        <option value="featured">Featured</option>
-        <option value="popular">Most used</option>
-        <option value="newest">Newest</option>
-        <option value="name">Name</option>
-      </select>
+      <span class="templates-toolbar__select-field">
+        <select
+          class="templates-toolbar__select-input"
+          [ngModel]="activeSort()"
+          (ngModelChange)="updateSort($event)"
+        >
+          <option value="featured">Featured</option>
+          <option value="popular">Most used</option>
+          <option value="newest">Newest</option>
+          <option value="name">Name</option>
+        </select>
+        <span class="templates-toolbar__select-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </span>
     </label>
   </section>
 
