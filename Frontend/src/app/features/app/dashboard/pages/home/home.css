@@ -3,9 +3,16 @@
   --home-surface: #ffffff;
   --home-surface-strong: #ffffff;
   --home-surface-muted: #fbfbfd;
+  --home-surface-soft: #f5f7fb;
   --home-border: rgba(215, 217, 223, 0.95);
-  --home-border-strong: rgba(116, 104, 255, 0.14);
+  --home-border-strong: rgba(116, 104, 255, 0.18);
   --home-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 12px 30px rgba(17, 17, 17, 0.04);
+  --home-text-strong: #121722;
+  --home-text: #435061;
+  --home-text-muted: #6d7480;
+  --home-accent: #7468ff;
+  --home-accent-soft: rgba(116, 104, 255, 0.11);
+  --home-focus-ring: 0 0 0 3px rgba(117, 102, 255, 0.14);
   --home-radius-xl: 20px;
   --home-radius-lg: 20px;
   --home-radius-md: 18px;
@@ -72,7 +79,7 @@
   padding: 20px;
   border: 1px solid var(--home-border);
   border-radius: var(--home-radius-lg);
-  background: var(--home-surface);
+  background: linear-gradient(180deg, var(--home-surface), var(--home-surface-muted));
   box-shadow: var(--home-shadow);
   display: flex;
   flex-direction: column;
@@ -98,7 +105,7 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  border-bottom: 1px solid var(--home-border);
 }
 
 .home-quick-actions__eyebrow {
@@ -107,7 +114,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #7468ff;
+  color: var(--home-accent);
 }
 
 .home-quick-actions__title {
@@ -116,7 +123,7 @@
   line-height: 1.15;
   font-weight: 650;
   letter-spacing: -0.03em;
-  color: #121722;
+  color: var(--home-text-strong);
 }
 
 .home-quick-actions__list {
@@ -129,8 +136,8 @@
   min-height: 68px;
   padding: 12px;
   border-radius: var(--home-radius-md);
-  border: 1px solid #ececf2;
-  background: var(--home-surface-muted);
+  border: 1px solid var(--home-border);
+  background: var(--home-surface-soft);
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);
   gap: 14px;
@@ -138,14 +145,16 @@
   text-decoration: none;
   transition:
     background-color var(--home-transition),
-    border-color var(--home-transition);
+    border-color var(--home-transition),
+    box-shadow var(--home-transition);
 }
 
 .home-quick-actions__item:hover,
 .home-quick-actions__item:focus-visible {
   outline: none;
-  border-color: rgba(116, 104, 255, 0.18);
-  background: #ffffff;
+  border-color: var(--home-border-strong);
+  background: var(--home-surface);
+  box-shadow: var(--home-focus-ring);
 }
 
 .home-quick-actions__icon {
@@ -155,8 +164,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(116, 104, 255, 0.11);
-  color: #7468ff;
+  background: var(--home-accent-soft);
+  color: var(--home-accent);
 }
 
 .home-quick-actions__icon svg {
@@ -172,14 +181,14 @@
 }
 
 .home-quick-actions__label {
-  color: #121722;
+  color: var(--home-text-strong);
   font-size: 0.94rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .home-quick-actions__hint {
-  color: #6d7480;
+  color: var(--home-text-muted);
   font-size: 0.84rem;
   line-height: 1.45;
 }
@@ -220,4 +229,39 @@
     grid-template-columns: 36px minmax(0, 1fr);
     padding: 12px;
   }
+}
+
+:host-context(.theme-dark) {
+  --home-bg: #0f141d;
+  --home-surface: #171e2a;
+  --home-surface-strong: #1d2532;
+  --home-surface-muted: #121925;
+  --home-surface-soft: #141c29;
+  --home-border: rgba(226, 231, 244, 0.1);
+  --home-border-strong: rgba(117, 102, 255, 0.34);
+  --home-shadow: none;
+  --home-text-strong: #f4f7ff;
+  --home-text: rgba(226, 231, 244, 0.82);
+  --home-text-muted: rgba(226, 231, 244, 0.7);
+  --home-accent-soft: rgba(117, 102, 255, 0.18);
+  --home-focus-ring: 0 0 0 3px rgba(117, 102, 255, 0.22);
+
+  background: #10141c;
+}
+
+:host-context(.theme-dark) .home-quick-actions {
+  background: var(--home-surface);
+}
+
+:host-context(.theme-dark) .home-quick-actions__item {
+  background: var(--home-surface-muted);
+}
+
+:host-context(.theme-dark) .home-quick-actions__item:hover,
+:host-context(.theme-dark) .home-quick-actions__item:focus-visible {
+  background: #182131;
+}
+
+:host-context(.theme-dark) .home-page__panel--featured::after {
+  background: linear-gradient(90deg, transparent, rgba(117, 102, 255, 0.42), transparent);
 }

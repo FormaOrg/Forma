@@ -22,7 +22,7 @@
   justify-content: space-between;
   gap: 14px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  border-bottom: 1px solid var(--home-border, rgba(15, 23, 42, 0.07));
 }
 
 .recent-projects__heading {
@@ -33,7 +33,7 @@
 
 .recent-projects__title {
   margin: 0;
-  color: #121722;
+  color: var(--home-text-strong, #121722);
   font-size: 1.32rem;
   line-height: 1.1;
   font-weight: 650;
@@ -42,7 +42,7 @@
 
 .recent-projects__subtitle {
   margin: 0;
-  color: #8a8f98;
+  color: var(--home-text-muted, #8a8f98);
   font-size: 0.98rem;
   line-height: 1.45;
 }
@@ -53,8 +53,8 @@
   padding: 0 16px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.09);
-  background: rgba(247, 249, 252, 0.95);
-  color: #3b4554;
+  background: var(--home-surface-soft, rgba(247, 249, 252, 0.95));
+  color: var(--home-text, #3b4554);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -69,9 +69,9 @@
 }
 
 .recent-projects__view-all:hover {
-  background: #ffffff;
-  border-color: rgba(116, 104, 255, 0.18);
-  color: #7468ff;
+  background: var(--home-surface, #ffffff);
+  border-color: var(--home-border-strong, rgba(116, 104, 255, 0.18));
+  color: var(--home-accent, #7468ff);
 }
 
 .recent-projects__list {
@@ -83,9 +83,9 @@
 
 .project-row {
   min-height: 76px;
-  border: 1px solid rgba(15, 23, 42, 0.07);
+  border: 1px solid var(--home-border, rgba(15, 23, 42, 0.07));
   border-radius: var(--home-radius-md, 18px);
-  background: rgba(247, 249, 252, 0.94);
+  background: var(--home-surface-soft, rgba(247, 249, 252, 0.94));
   padding: 12px 12px 12px 14px;
   display: flex;
   align-items: center;
@@ -99,8 +99,9 @@
 }
 
 .project-row:hover {
-  background: #ffffff;
-  border-color: rgba(116, 104, 255, 0.16);
+  background: var(--home-surface, #ffffff);
+  border-color: var(--home-border-strong, rgba(116, 104, 255, 0.16));
+  box-shadow: var(--home-focus-ring, none);
 }
 
 .project-row__left {
@@ -119,7 +120,7 @@
 
 .project-row__name {
   margin: 0;
-  color: #121722;
+  color: var(--home-text-strong, #121722);
   font-size: 0.95rem;
   line-height: 1.2;
   font-weight: 600;
@@ -154,7 +155,7 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  color: #8e939c;
+  color: var(--home-text-muted, #8e939c);
   font-size: 0.85rem;
   line-height: 1.4;
 }
@@ -262,4 +263,27 @@
   .project-row__meta {
     font-size: 0.9rem;
   }
+}
+
+:host-context(.theme-dark) .recent-projects {
+  background: var(--home-surface, #171e2a);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .recent-projects__view-all,
+:host-context(.theme-dark) .project-row {
+  background: var(--home-surface-muted, #121925);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  color: rgba(226, 231, 244, 0.84);
+}
+
+:host-context(.theme-dark) .recent-projects__view-all:hover,
+:host-context(.theme-dark) .project-row:hover {
+  background: #182131;
+  border-color: rgba(117, 102, 255, 0.28);
+}
+
+:host-context(.theme-dark) .project-row__dot {
+  background: rgba(226, 231, 244, 0.24);
 }

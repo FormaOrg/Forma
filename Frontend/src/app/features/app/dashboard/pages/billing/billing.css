@@ -1,8 +1,12 @@
 :host {
+  --billing-bg: #eceff3;
+  --billing-border: rgba(215, 217, 223, 0.95);
+  --billing-border-strong: rgba(116, 104, 255, 0.2);
+  --billing-surface-soft: #f5f7fb;
   display: flex;
   justify-content: center;
   width: 100%;
-  background-color: #eceff3;
+  background-color: var(--billing-bg);
 }
 
 * {
@@ -631,6 +635,28 @@
   color: #727784;
 }
 
+.plan-card__price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.plan-card__price {
+  font-size: 2rem;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #111111;
+}
+
+.plan-card__period {
+  padding-bottom: 3px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #727784;
+}
+
 .plan-card__features {
   margin: 0;
   padding: 0;
@@ -837,7 +863,7 @@
 }
 
 .modal-close:hover {
-  background: #f3f4f8;
+  background: var(--billing-surface-soft);
   color: #111111;
 }
 
@@ -956,4 +982,124 @@
   .billing-btn {
     width: 100%;
   }
+}
+
+:host-context(.theme-dark) {
+  --billing-bg: #0f141d;
+  --billing-border: rgba(226, 231, 244, 0.1);
+  --billing-border-strong: rgba(117, 102, 255, 0.34);
+  --billing-surface-soft: #182131;
+  background: #10141c;
+}
+
+:host-context(.theme-dark) .billing-hero,
+:host-context(.theme-dark) .billing-section,
+:host-context(.theme-dark) .modal-content {
+  background: #171e2a;
+  border-color: var(--billing-border);
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .billing-hero__title,
+:host-context(.theme-dark) .billing-section__title,
+:host-context(.theme-dark) .current-plan-card__name,
+:host-context(.theme-dark) .current-plan-card__price,
+:host-context(.theme-dark) .current-plan-card__detail strong,
+:host-context(.theme-dark) .payment-card__title,
+:host-context(.theme-dark) .usage-card__title,
+:host-context(.theme-dark) .usage-card__percent,
+:host-context(.theme-dark) .plan-card__name,
+:host-context(.theme-dark) .plan-card__price,
+:host-context(.theme-dark) .invoice-row__id,
+:host-context(.theme-dark) .modal-title {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .billing-hero__subtitle,
+:host-context(.theme-dark) .billing-hero__meta,
+:host-context(.theme-dark) .billing-section__subtitle,
+:host-context(.theme-dark) .current-plan-card__description,
+:host-context(.theme-dark) .current-plan-card__period,
+:host-context(.theme-dark) .current-plan-card__price-note,
+:host-context(.theme-dark) .current-plan-card__detail span,
+:host-context(.theme-dark) .payment-card__meta,
+:host-context(.theme-dark) .usage-card__summary,
+:host-context(.theme-dark) .usage-card__note,
+:host-context(.theme-dark) .plan-card__description,
+:host-context(.theme-dark) .plan-card__period,
+:host-context(.theme-dark) .plan-card__features li,
+:host-context(.theme-dark) .invoice-row__date,
+:host-context(.theme-dark) .invoice-row__amount,
+:host-context(.theme-dark) .billing-notice p {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .billing-hero__summary,
+:host-context(.theme-dark) .current-plan-card,
+:host-context(.theme-dark) .current-plan-card__price-card,
+:host-context(.theme-dark) .current-plan-card__detail,
+:host-context(.theme-dark) .billing-notice,
+:host-context(.theme-dark) .payment-card,
+:host-context(.theme-dark) .help-card,
+:host-context(.theme-dark) .usage-card,
+:host-context(.theme-dark) .plan-card,
+:host-context(.theme-dark) .invoice-row {
+  background: #121925;
+  border-color: var(--billing-border);
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .billing-section__header,
+:host-context(.theme-dark) .modal-header {
+  border-bottom-color: var(--billing-border);
+}
+
+:host-context(.theme-dark) .billing-btn--secondary,
+:host-context(.theme-dark) .billing-btn--ghost,
+:host-context(.theme-dark) .billing-toggle,
+:host-context(.theme-dark) .modal-close {
+  background: #0f1621;
+  border-color: var(--billing-border);
+  color: rgba(226, 231, 244, 0.86);
+}
+
+:host-context(.theme-dark) .billing-btn--secondary:hover,
+:host-context(.theme-dark) .billing-btn--ghost:hover,
+:host-context(.theme-dark) .modal-close:hover {
+  background: var(--billing-surface-soft);
+  border-color: var(--billing-border-strong);
+}
+
+:host-context(.theme-dark) .billing-toggle__option {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .billing-toggle__option.is-active {
+  color: #ffffff;
+}
+
+:host-context(.theme-dark) .usage-card__meter {
+  background: rgba(226, 231, 244, 0.12);
+}
+
+:host-context(.theme-dark) .plan-card--current {
+  background: #151d29;
+}
+
+:host-context(.theme-dark) .current-plan-card__detail,
+:host-context(.theme-dark) .billing-hero__summary {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+}
+
+:host-context(.theme-dark) .billing-notice {
+  background: rgba(117, 102, 255, 0.12);
+  border-color: rgba(117, 102, 255, 0.24);
+}
+
+:host-context(.theme-dark) .invoice-download {
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .modal-overlay {
+  background: rgba(5, 8, 14, 0.72);
 }

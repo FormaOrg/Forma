@@ -16,6 +16,10 @@
   --shell-sidebar-collapsed: 72px;
   --shell-border: rgba(0, 0, 0, 0.08);
   --shell-bg: #f7f7f8;
+  --shell-brand-surface: transparent;
+  --shell-brand-border: transparent;
+  --shell-brand-wordmark: #000;
+  --shell-brand-shadow: none;
   --shell-ease: cubic-bezier(0.33, 1, 0.68, 1);
   --shell-dur: 280ms;
   --shell-sidebar-shift: 24px;
@@ -64,17 +68,22 @@
 }
 
 .dashboard-sidebar-brand__mark {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  border-radius: 0;
+  background: var(--shell-brand-surface);
+  border: 1px solid var(--shell-brand-border);
+  box-shadow: var(--shell-brand-shadow);
 }
 
 .dashboard-sidebar-brand__mark img {
-  width: 28px;
-  height: 28px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
@@ -85,7 +94,7 @@
   white-space: nowrap;
   font-size: 19px;
   font-weight: 500;
-  color: #000;
+  color: var(--shell-brand-wordmark);
   opacity: 1;
   transition:
     opacity 0.22s ease,
@@ -173,6 +182,28 @@
 
 :root[data-theme='dark'] .dashboard-boot {
   background: #11151d;
+}
+
+:root[data-theme='dark'] .dashboard-shell {
+  --shell-border: rgba(255, 255, 255, 0.08);
+  --shell-bg: #10141c;
+  --shell-brand-surface: transparent;
+  --shell-brand-border: transparent;
+  --shell-brand-wordmark: #f4f7ff;
+  --shell-brand-shadow: none;
+}
+
+:root[data-theme='dark'] .dashboard-sidebar-brand {
+  background: #121824;
+}
+
+:root[data-theme='dark'] .dashboard-sidebar-brand__mark {
+  background: transparent;
+  border-color: transparent;
+}
+
+:root[data-theme='dark'] .dashboard-content {
+  background: #0f141d;
 }
 
 @media (prefers-reduced-motion: reduce) {
