@@ -1,20 +1,21 @@
 package tn.forma.users.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tn.forma.users.dto.*;
-import tn.forma.users.model.Role;
-import tn.forma.users.model.User;
-import tn.forma.users.repository.UserRepository;
-import tn.forma.users.security.UserDetailsServiceImpl;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tn.forma.users.dto.*;
+import tn.forma.users.model.Role;
+import tn.forma.users.model.User;
+import tn.forma.users.repository.UserRepository;
+import tn.forma.users.security.UserDetailsServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -33,6 +34,8 @@ public class AuthService {
     private final UserDetailsServiceImpl userDetailsService;
     private final EmailService emailService;
     private final ActivityService activityService;
+    private final GoogleIdentityService googleIdentityService;
+    private final GoogleLinkOauthService googleLinkOauthService;
 
     // ── Register ───────────────────────────────────────────
 
@@ -132,6 +135,62 @@ public class AuthService {
         }
 
         return createAuthenticatedResponse(user, request.isRememberMe());
+    }
+
+    @Transactional
+    public AuthResponse loginWithGoogle(GoogleAuthRequest request) {
+        GoogleIdToken.Payload payload = googleIdentityService.verifyIdToken(request.getIdToken());
+        return loginWithGooglePayload(payload, request.isRememberMe());
+    }
+
+    @Transactional
+    public AuthResponse loginWithGoogleCode(GoogleAuthCodeRequest request) {
+        GoogleIdToken.Payload payload = googleLinkOauthService.exchangeCodeForPayload(
+                request.getCode(),
+                request.getRedirectUri()
+        );
+        return loginWithGooglePayload(payload, request.isRememberMe());
+    }
+
+    private AuthResponse loginWithGooglePayload(GoogleIdToken.Payload payload, boolean rememberMe) {
+        String email = payload.getEmail();
+        String googleId = payload.getSubject();
+
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("Google account did not provide an email address");
+        }
+
+        if (!Boolean.TRUE.equals(payload.getEmailVerified())) {
+            throw new RuntimeException("Google account email is not verified");
+        }
+
+        User user = userRepository.findByGoogleId(googleId)
+                .orElseGet(() -> userRepository.findByEmail(email)
+                .map(existingUser -> syncGoogleUser(existingUser, payload))
+                .orElseGet(() -> createGoogleUser(payload)));
+
+        if (!user.isActive()) {
+            throw new RuntimeException("Account is disabled");
+        }
+
+        if (user.isLoginVerificationEnabled()) {
+            issueLoginVerificationChallenge(user);
+
+            return AuthResponse.builder()
+                    .user(mapToUserDto(user))
+                    .requiresLoginVerification(true)
+                    .loginVerificationToken(
+                            jwtService.generateLoginVerificationToken(
+                                    user.getEmail(),
+                                    user.getId(),
+                                    rememberMe
+                            )
+                    )
+                    .message("We sent a 6-digit verification code to your email.")
+                    .build();
+        }
+
+        return createAuthenticatedResponse(user, rememberMe);
     }
 
     @Transactional
@@ -275,6 +334,14 @@ public class AuthService {
         return new MessageResponse("Password reset successfully.");
     }
 
+    public String getGoogleClientId() {
+        return googleIdentityService.getClientId();
+    }
+
+    public GoogleLinkConfigResponse getGoogleLinkConfig() {
+        return googleLinkOauthService.getConfig();
+    }
+
     // ── Private helpers ────────────────────────────────────
 
     private UserDto mapToUserDto(User user) {
@@ -287,6 +354,11 @@ public class AuthService {
                 .phone(user.getPhone())
                 .country(user.getCountry())
                 .website(user.getWebsite())
+                .avatarUrl(user.getAvatarUrl())
+                .googleConnected(user.getGoogleId() != null && !user.getGoogleId().isBlank())
+                .googleEmail(user.getGoogleEmail())
+                .preferredLanguage(user.getPreferredLanguage())
+                .preferredTheme(user.getPreferredTheme())
                 .role(user.getRole().name())
                 .isActive(user.isActive())
                 .emailVerified(user.isEmailVerified())
@@ -349,5 +421,79 @@ public class AuthService {
 
     private String generateSixDigitCode() {
         return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1_000_000));
+    }
+
+    private User syncGoogleUser(User user, GoogleIdToken.Payload payload) {
+        boolean changed = false;
+        String googleId = payload.getSubject();
+
+        if (googleId != null && !googleId.equals(user.getGoogleId())) {
+            if (userRepository.existsByGoogleId(googleId) && userRepository.findByGoogleId(googleId).map(User::getId).filter(id -> !id.equals(user.getId())).isPresent()) {
+                throw new RuntimeException("This Google account is already linked to another user");
+            }
+            user.setGoogleId(googleId);
+            changed = true;
+        }
+
+        String googleEmail = payload.getEmail();
+        if (googleEmail != null && !googleEmail.equalsIgnoreCase(Objects.toString(user.getGoogleEmail(), ""))) {
+            user.setGoogleEmail(googleEmail);
+            changed = true;
+        }
+
+        if (!user.isEmailVerified()) {
+            user.setEmailVerified(true);
+            user.setVerificationToken(null);
+            user.setVerificationTokenExpiry(null);
+            changed = true;
+        }
+
+        String firstName = normalizeName((String) payload.get("given_name"), "Google");
+        String lastName = normalizeName((String) payload.get("family_name"), "User");
+
+        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
+            user.setFirstName(firstName);
+            changed = true;
+        }
+
+        if (user.getLastName() == null || user.getLastName().isBlank()) {
+            user.setLastName(lastName);
+            changed = true;
+        }
+
+        return changed ? userRepository.save(user) : user;
+    }
+
+    private User createGoogleUser(GoogleIdToken.Payload payload) {
+        String email = payload.getEmail();
+        String firstName = normalizeName((String) payload.get("given_name"), "Google");
+        String lastName = normalizeName((String) payload.get("family_name"), "User");
+
+        User user = User.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .googleId(payload.getSubject())
+                .googleEmail(email)
+                .role(Role.STANDARD)
+                .isActive(true)
+                .emailVerified(true)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    private String normalizeName(String value, String fallback) {
+        if (value == null || value.isBlank()) {
+            return fallback;
+        }
+
+        String trimmed = value.trim();
+        if (trimmed.length() == 1) {
+            return trimmed + fallback.charAt(0);
+        }
+
+        return trimmed.length() > 50 ? trimmed.substring(0, 50) : trimmed;
     }
 }

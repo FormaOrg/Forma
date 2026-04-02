@@ -94,8 +94,13 @@
 
   <div class="alternative">
     <div class="social-buttons">
-      <button type="button" class="social-btn" title="Sign In with Google">
-        <span class="icon icon-google"></span>
+      <button
+        type="button"
+        class="social-btn"
+        [disabled]="isGoogleLoading"
+        (click)="loginWithGoogle()">
+        <span class="icon icon-google" aria-hidden="true"></span>
+        <span>Sign in with Google</span>
       </button>
     </div>
   </div>

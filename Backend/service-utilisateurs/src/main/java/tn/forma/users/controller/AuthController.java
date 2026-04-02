@@ -26,6 +26,28 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @GetMapping("/google/config")
+    public ResponseEntity<GoogleClientConfigResponse> googleConfig() {
+        return ResponseEntity.ok(new GoogleClientConfigResponse(authService.getGoogleClientId()));
+    }
+
+    @GetMapping("/google/link-config")
+    public ResponseEntity<GoogleLinkConfigResponse> googleLinkConfig() {
+        return ResponseEntity.ok(authService.getGoogleLinkConfig());
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleLogin(
+            @Valid @RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok(authService.loginWithGoogle(request));
+    }
+
+    @PostMapping("/google/code")
+    public ResponseEntity<AuthResponse> googleLoginWithCode(
+            @Valid @RequestBody GoogleAuthCodeRequest request) {
+        return ResponseEntity.ok(authService.loginWithGoogleCode(request));
+    }
+
     @PostMapping("/login/verify")
     public ResponseEntity<AuthResponse> verifyLogin(
             @Valid @RequestBody LoginVerificationRequest request) {
