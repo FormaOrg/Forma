@@ -4,6 +4,7 @@ import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppHeader } from '../../../shared/app/app-header/app-header';
 import { SideBar } from '../../../shared/app/side-bar/side-bar';
+import { ProjectSidebar } from '../../../shared/app/project-sidebar/project-sidebar';
 import { SettingsSidebar } from '../../../shared/app/settings-sidebar/settings-sidebar';
 import { SidebarStateService } from '../../../core/services/sidebar-state.service';
 import { AppBootstrapService } from '../../../core/services/app-bootstrap.service';
@@ -17,6 +18,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     RouterOutlet,
     AppHeader,
     SideBar,
+    ProjectSidebar,
     SettingsSidebar,
     BootstrapLoader
   ],
