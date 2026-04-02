@@ -1,0 +1,40 @@
+<div
+  class="bootstrap-loader"
+  [class.bootstrap-loader--dark]="isDarkMode()"
+  aria-live="polite"
+  aria-busy="true"
+>
+  <div class="bootstrap-loader__stage">
+    <div class="bootstrap-loader__light-visuals" aria-hidden="true">
+      <div class="bootstrap-loader__light-bloom"></div>
+      <div class="bootstrap-loader__light-ring"></div>
+      <div class="bootstrap-loader__light-sheen"></div>
+      <div class="bootstrap-loader__light-core"></div>
+    </div>
+
+    <div class="bootstrap-loader__dark-visuals" aria-hidden="true">
+      <div class="bootstrap-loader__orb bootstrap-loader__orb--outer"></div>
+      <div class="bootstrap-loader__orb bootstrap-loader__orb--mid"></div>
+      <div class="bootstrap-loader__orb bootstrap-loader__orb--inner"></div>
+    </div>
+
+    <div
+      class="bootstrap-loader__logo logo-link"
+      [class.bootstrap-loader__logo--dark]="isDarkMode()"
+      [class.animating]="isAnimating"
+    >
+      <span class="logo-word-container">
+        <span class="logo-word">{{ currentWord }}</span>
+      </span>
+
+      <div class="logo-icon" aria-hidden="true">
+        <img [src]="isDarkMode() ? 'assets/Logo/part1-white.svg' : 'assets/Logo/part1.svg'" alt="" />
+        <img [src]="isDarkMode() ? 'assets/Logo/part2-white.svg' : 'assets/Logo/part2.svg'" alt="" />
+        <img [src]="isDarkMode() ? 'assets/Logo/part3-white.svg' : 'assets/Logo/part3.svg'" alt="" />
+        <img [src]="isDarkMode() ? 'assets/Logo/dot-white.svg' : 'assets/Logo/dot.svg'" alt="" />
+      </div>
+
+      <span class="logo-name">Forma</span>
+    </div>
+  </div>
+</div>

@@ -11,11 +11,13 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import type { SidebarChildItem, SidebarItem, SidebarSection } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
+import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-side-bar',
   standalone: true,
-  imports: [CommonModule, RouterModule, AppIcon],
+  imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.css'
 })
@@ -25,6 +27,7 @@ export class SideBar implements OnChanges {
   readonly iconSize = 20;
 
   private router = inject(Router);
+  private themeService = inject(ThemeService);
 
   constructor() {
     this.router.events
@@ -39,44 +42,44 @@ export class SideBar implements OnChanges {
   readonly sections: SidebarSection[] = [
     {
       id: 'main',
-      label: 'Menu',
+      label: 'app.sidebar.section.menu',
       items: [
         {
-          label: 'Home',
+          label: 'app.sidebar.home',
           icon: 'home',
           route: '/app/home',
           hasDropdown: false
         },
         {
-          label: 'Projects',
+          label: 'app.sidebar.projects',
           icon: 'folder',
           route: '/app/projects',
           hasDropdown: false
         },
         {
-          label: 'Templates',
+          label: 'app.sidebar.templates',
           icon: 'layout-grid',
           hasDropdown: true,
           expanded: false,
           children: [
-            { label: 'All Templates', route: '/app/templates' },
-            { label: 'My Templates', route: '/app/templates?tab=my' }
+            { label: 'app.sidebar.templates.all', route: '/app/templates' },
+            { label: 'app.sidebar.templates.mine', route: '/app/templates?tab=my' }
           ]
         }
       ]
     },
     {
       id: 'account',
-      label: 'Account',
+      label: 'app.sidebar.section.account',
       items: [
         {
-          label: 'Billing',
+          label: 'app.sidebar.billing',
           icon: 'credit-card',
           route: '/app/billing',
           hasDropdown: false
         },
         {
-          label: 'Settings',
+          label: 'app.sidebar.settings',
           icon: 'settings',
           route: '/app/settings',
           hasDropdown: false
@@ -87,12 +90,18 @@ export class SideBar implements OnChanges {
 
   readonly footerItems: SidebarItem[] = [
     {
-      label: 'Help & Support',
+      label: 'app.sidebar.help',
       icon: 'help',
       route: '/contact',
       hasDropdown: false
     }
   ];
+
+  logoSrc(): string {
+    return this.themeService.resolvedTheme() === 'dark'
+      ? 'assets/Logo/FormaLogoOnly-white.svg'
+      : 'assets/Logo/FormaLogoOnly.svg';
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['collapsed']?.currentValue === true) {

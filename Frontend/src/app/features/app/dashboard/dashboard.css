@@ -3,6 +3,13 @@
   height: 100%;
 }
 
+.dashboard-boot {
+  --shell-bg: #f7f7f8;
+
+  min-height: 100vh;
+  background: var(--shell-bg);
+}
+
 .dashboard-shell {
   --shell-header-h: 56px;
   --shell-sidebar-expanded: 260px;
@@ -50,4 +57,8 @@
   min-height: 0;
   overflow: auto;
   background: #eceff3;
+}
+
+:root[data-theme='dark'] .dashboard-boot {
+  background: #11151d;
 }

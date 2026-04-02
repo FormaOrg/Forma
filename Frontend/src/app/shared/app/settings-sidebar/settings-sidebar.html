@@ -1,7 +1,7 @@
 <aside class="settings-sidebar" [class.settings-sidebar--collapsed]="collapsed" [class.settings-sidebar--no-transition]="!isInitialized">
   <div class="settings-sidebar__brand">
     <div class="settings-sidebar__mark" aria-hidden="true">
-      <img src="assets/Logo/FormaLogoOnly.svg" alt="" width="28" height="28" />
+      <img [src]="logoSrc()" alt="" width="28" height="28" />
     </div>
     <span class="settings-sidebar__wordmark">Forma</span>
   </div>

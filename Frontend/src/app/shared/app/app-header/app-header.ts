@@ -16,6 +16,7 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import type { HeaderActionButton, ProfileMenuItem } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import type { AppIconName } from '../icons/app-icon';
@@ -53,6 +54,7 @@ export class AppHeader {
   private router = inject(Router);
   private authService = inject(AuthService);
   private i18n = inject(I18nService);
+  private themeService = inject(ThemeService);
 
   readonly pageTitle = signal(this.readPageTitle());
   readonly commandQuery = signal('');
@@ -74,7 +76,7 @@ export class AppHeader {
   profile = {
     name: 'John Doe',
     role: 'Admin',
-    avatar: 'https://i.pravatar.cc/100?img=12'
+    avatar: null as string | null
   };
 
   profileMenuItems: Array<ProfileMenuItem & { labelKey: string }> = [
@@ -202,10 +204,21 @@ export class AppHeader {
   ];
 
   constructor() {
+    this.syncProfileFromAuth(this.authService.currentUser);
+
     effect(() => {
       this.i18n.lang();
       this.pageTitle.set(this.readPageTitle());
     });
+
+    effect(() => {
+      this.themeService.resolvedTheme();
+      this.syncProfileFromAuth(this.authService.currentUser);
+    });
+
+    this.authService.currentUser$
+      .pipe(takeUntilDestroyed())
+      .subscribe(user => this.syncProfileFromAuth(user));
 
     this.router.events
       .pipe(
@@ -251,7 +264,8 @@ export class AppHeader {
     this.toggleSidebar.emit();
   }
 
-  toggleProfileMenu(): void {
+  toggleProfileMenu(event?: MouseEvent): void {
+    event?.stopPropagation();
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
@@ -463,6 +477,29 @@ export class AppHeader {
         : this.i18n.t(item.titleKey),
       subtitle: this.i18n.t(item.subtitleKey),
       hint: item.hintKey ? this.i18n.t(item.hintKey) : undefined
+    };
+  }
+
+  private syncProfileFromAuth(user: {
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    avatarUrl?: string;
+  } | null): void {
+    if (!user) {
+      this.profile = {
+        name: 'John Doe',
+        role: 'Admin',
+        avatar: null
+      };
+      return;
+    }
+
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    this.profile = {
+      name: fullName || 'Forma user',
+      role: user.role ?? 'STANDARD',
+      avatar: user.avatarUrl || null
     };
   }
 }

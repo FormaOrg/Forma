@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Forma Google Auth</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        color: #0f172a;
+        font-family: Arial, sans-serif;
+      }
+
+      .card {
+        width: min(360px, calc(100vw - 32px));
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        text-align: center;
+      }
+
+      .title {
+        margin: 0 0 10px;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .status {
+        margin: 0;
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p class="title">Connecting Google</p>
+      <p class="status" id="status">Finishing the popup flow...</p>
+    </div>
+
+    <script>
+      (function () {
+        var CONTEXT_KEY = 'forma_google_popup_context';
+        var AUTH_MESSAGE_TYPE = 'forma-google-auth-result';
+        var AUTH_CHANNEL_NAME = 'forma-google-auth';
+        var AUTH_RESULT_KEY = 'forma_google_auth_result';
+        var AUTH_PENDING_KEY = 'forma_google_auth_pending_response';
+        var LINK_MESSAGE_TYPE = 'forma-google-link-result';
+        var LINK_CHANNEL_NAME = 'forma-google-link';
+        var LINK_RESULT_KEY = 'forma_google_link_result';
+        var LOGIN_VERIFICATION_KEY = 'forma_login_verification';
+        var TOKEN_KEY = 'forma_token';
+        var statusEl = document.getElementById('status');
+
+        function setStatus(message) {
+          if (statusEl) {
+            statusEl.textContent = message;
+          }
+        }
+
+        function parseJson(value) {
+          if (!value) {
+            return null;
+          }
+
+          try {
+            return JSON.parse(value);
+          } catch (error) {
+            return null;
+          }
+        }
+
+        function extractTargetRoute(state) {
+          return decodeURIComponent(state.split(':')[3] || '/app/home');
+        }
+
+        function extractRememberMe(state) {
+          return state.split(':')[2] === '1';
+        }
+
+        function createChannel(name) {
+          if (typeof BroadcastChannel === 'undefined') {
+            return null;
+          }
+
+          return new BroadcastChannel(name);
+        }
+
+        function notifyOpener(type, key, channelName, payload) {
+          localStorage.setItem(key, JSON.stringify(payload));
+
+          var channel = createChannel(channelName);
+          if (channel) {
+            channel.postMessage(payload);
+            channel.close();
+          }
+
+          if (window.opener) {
+            window.opener.postMessage({ type: type, payload: payload }, window.location.origin);
+          }
+        }
+
+        function closeSoon(delay) {
+          window.setTimeout(function () {
+            window.close();
+          }, delay || 120);
+        }
+
+        function getErrorMessage(response, fallbackMessage) {
+          return response.text().then(function (text) {
+            var parsed = parseJson(text);
+            if (parsed && typeof parsed.message === 'string' && parsed.message) {
+              return parsed.message;
+            }
+
+            return fallbackMessage;
+          });
+        }
+
+        function postJson(url, body, authToken, fallbackMessage) {
+          var headers = {
+            'Content-Type': 'application/json'
+          };
+
+          if (authToken) {
+            headers.Authorization = 'Bearer ' + authToken;
+          }
+
+          return fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          }).then(function (response) {
+            if (!response.ok) {
+              return getErrorMessage(response, fallbackMessage).then(function (message) {
+                throw new Error(message);
+              });
+            }
+
+            return response.json();
+          });
+        }
+
+        function finishWithError(state, message) {
+          var payload = {
+            state: state || 'google-auth:error',
+            success: false,
+            message: message
+          };
+
+          if (state && state.indexOf('google-link:') === 0) {
+            notifyOpener(LINK_MESSAGE_TYPE, LINK_RESULT_KEY, LINK_CHANNEL_NAME, payload);
+          } else {
+            notifyOpener(AUTH_MESSAGE_TYPE, AUTH_RESULT_KEY, AUTH_CHANNEL_NAME, payload);
+          }
+
+          setStatus(message);
+          closeSoon(1200);
+        }
+
+        function handleGoogleAuth(state, apiUrl, code) {
+          setStatus('Signing you in...');
+
+          var rememberMe = extractRememberMe(state);
+          var targetRoute = extractTargetRoute(state);
+          var redirectUri = window.location.origin + window.location.pathname;
+
+          return postJson(
+            apiUrl + '/auth/google/code',
+            {
+              code: code,
+              redirectUri: redirectUri,
+              rememberMe: rememberMe
+            },
+            null,
+            'Google sign-in failed. Please try again.'
+          ).then(function (response) {
+            var payload = {
+              state: state,
+              success: true,
+              response: response
+            };
+
+            notifyOpener(AUTH_MESSAGE_TYPE, AUTH_RESULT_KEY, AUTH_CHANNEL_NAME, payload);
+
+            if (window.opener) {
+              if (response.requiresLoginVerification && response.loginVerificationToken) {
+                localStorage.setItem(LOGIN_VERIFICATION_KEY, JSON.stringify({
+                  token: response.loginVerificationToken,
+                  email: response.user.email,
+                  message: response.message,
+                  rememberMe: rememberMe,
+                  returnUrl: targetRoute
+                }));
+
+                window.opener.location.assign(
+                  '/login-verification?returnUrl=' + encodeURIComponent(targetRoute)
+                );
+              } else {
+                localStorage.setItem(AUTH_PENDING_KEY, JSON.stringify({
+                  response: response,
+                  rememberMe: rememberMe
+                }));
+
+                window.opener.location.assign(targetRoute);
+              }
+            }
+
+            setStatus('Done. Returning to Forma...');
+            closeSoon();
+          }).catch(function (error) {
+            finishWithError(state, error.message || 'Google sign-in failed. Please try again.');
+          });
+        }
+
+        function handleGoogleLink(state, apiUrl, code, context) {
+          setStatus('Linking your Google account...');
+
+          var redirectUri = window.location.origin + window.location.pathname;
+          var authToken = context && typeof context.authToken === 'string' && context.authToken
+            ? context.authToken
+            : localStorage.getItem(TOKEN_KEY);
+
+          if (!authToken) {
+            finishWithError(state, 'You must be signed in to link Google.');
+            return;
+          }
+
+          postJson(
+            apiUrl + '/users/me/social/google/link/code',
+            {
+              code: code,
+              redirectUri: redirectUri
+            },
+            authToken,
+            'Failed to link Google account.'
+          ).then(function (user) {
+            notifyOpener(LINK_MESSAGE_TYPE, LINK_RESULT_KEY, LINK_CHANNEL_NAME, {
+              state: state,
+              success: true,
+              user: user
+            });
+
+            setStatus('Done. Returning to Forma...');
+            closeSoon();
+          }).catch(function (error) {
+            finishWithError(state, error.message || 'Failed to link Google account.');
+          });
+        }
+
+        var url = new URL(window.location.href);
+        var state = url.searchParams.get('state');
+        var code = url.searchParams.get('code');
+        var error = url.searchParams.get('error');
+        var context = parseJson(localStorage.getItem(CONTEXT_KEY));
+        var apiUrl = context && typeof context.apiUrl === 'string' ? context.apiUrl : '';
+
+        if (!state) {
+          finishWithError('', 'Missing Google popup state.');
+          return;
+        }
+
+        if (error) {
+          finishWithError(state, 'Google authorization was cancelled.');
+          return;
+        }
+
+        if (!code) {
+          finishWithError(state, 'Missing Google authorization code.');
+          return;
+        }
+
+        if (!apiUrl) {
+          finishWithError(state, 'Google popup configuration is missing. Please try again.');
+          return;
+        }
+
+        if (state.indexOf('google-link:') === 0) {
+          handleGoogleLink(state, apiUrl, code, context);
+          return;
+        }
+
+        if (state.indexOf('google-auth:') === 0) {
+          handleGoogleAuth(state, apiUrl, code);
+          return;
+        }
+
+        finishWithError(state, 'Unknown Google popup flow.');
+      })();
+    </script>
+  </body>
+</html>
