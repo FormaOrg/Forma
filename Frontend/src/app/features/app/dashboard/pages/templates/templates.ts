@@ -173,6 +173,7 @@ export class Templates implements OnInit {
       description: template.description,
       type: template.projectType,
       creationMethod: template.creationMethod,
+      templateId: typeof template.backendId === 'number' ? template.backendId : null,
     }).pipe(finalize(() => this.creatingTemplateId.set(null)))
       .subscribe({
         next: () => {

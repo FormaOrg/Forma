@@ -1,53 +1,33 @@
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { DASHBOARD_TEMPLATE_FALLBACKS, DashboardTemplateFallbackSeed } from '../data/dashboard-templates-fallback.data';
 import {
-  BillingInvoiceItem,
   BillingOverview,
-  BillingPaymentMethodSummary,
-  BillingSubscriptionSummary,
-  BillingUsageMetric,
   DashboardProjectItem,
   DashboardProjectStatus,
   DashboardTemplateItem,
 } from '../models/dashboard.model';
-import { CreationMethod, Deployment, Media, Project, ProjectType, TemplateRecord } from '../models/project.model';
-import { User } from '../models/user.model';
+import { CreationMethod, Project, ProjectType, TemplateRecord } from '../models/project.model';
 import { ProjectService } from './project.service';
-import { UserService } from './user.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardDataService {
   constructor(
-    private readonly projectService: ProjectService,
-    private readonly userService: UserService
+    private readonly http: HttpClient,
+    private readonly projectService: ProjectService
   ) {}
 
   getProjectsOverview(): Observable<DashboardProjectItem[]> {
     return this.projectService.getMyProjects().pipe(
-      switchMap((projects) => {
-        if (!projects.length) {
-          return of([]);
-        }
-
-        return forkJoin(
-          projects.map((project) =>
-            forkJoin({
-              deployment: this.projectService.getDeployment(project.id).pipe(catchError(() => of(null))),
-              media: this.projectService.getProjectMedia(project.id).pipe(catchError(() => of([] as Media[]))),
-            }).pipe(map((extras) => this.toDashboardProject(project, extras.deployment, extras.media)))
-          )
-        );
-      })
+      map((projects) => projects.map((project) => this.toDashboardProject(project)))
     );
   }
 
   getBillingOverview(): Observable<BillingOverview> {
-    return forkJoin({
-      user: this.userService.getMe(),
-      projects: this.getProjectsOverview().pipe(catchError(() => of([]))),
-    }).pipe(map(({ user, projects }) => this.toBillingOverview(user, projects)));
+    return this.http.get<BillingOverview>(`${environment.apiUrl}/billing/overview`);
   }
 
   getTemplatesOverview(): Observable<DashboardTemplateItem[]> {
@@ -65,13 +45,10 @@ export class DashboardDataService {
     );
   }
 
-  private toDashboardProject(project: Project, deployment: Deployment | null, media: Media[]): DashboardProjectItem {
+  private toDashboardProject(project: Project): DashboardProjectItem {
     const createdAt = this.toTimestamp(project.createdAt);
-    const updatedAt = this.toTimestamp(deployment?.deployedAt ?? project.createdAt);
+    const updatedAt = this.toTimestamp(project.updatedAt ?? project.createdAt);
     const status = this.toProjectStatus(project.status);
-    const domain = this.resolveDomain(deployment);
-    const liveUrl = this.resolveLiveUrl(deployment);
-    const image = media.find((item) => item.type === 'IMAGE');
 
     return {
       id: String(project.id),
@@ -80,13 +57,13 @@ export class DashboardDataService {
       description: project.description?.trim() || `${this.toProjectTypeLabel(project.type)} project`,
       status,
       statusLabel: this.toProjectStatusLabel(status),
-      domain,
-      liveUrl,
-      previewUrl: liveUrl,
-      thumbnailUrl: image?.fileUrl,
+      domain: undefined,
+      liveUrl: undefined,
+      previewUrl: undefined,
+      thumbnailUrl: undefined,
       accent: this.colorFromSeed(`${project.id}-${project.type}`),
       route: '/app/projects',
-      previewRoute: liveUrl,
+      previewRoute: undefined,
       metadata: `${this.toProjectTypeLabel(project.type)} · ${this.toCreationMethodLabel(project.creationMethod)}`,
       lastEditedLabel: this.formatRelativeDate(updatedAt),
       createdLabel: this.formatRelativeDate(createdAt),
@@ -99,67 +76,10 @@ export class DashboardDataService {
     };
   }
 
-  private toBillingOverview(user: User, projects: DashboardProjectItem[]): BillingOverview {
-    const activeProjectsCount = projects.length;
-    const publishedProjects = projects.filter((project) => project.status === 'published').length;
-    const draftProjects = projects.filter((project) => project.status === 'draft').length;
-    const subscription = this.toSubscriptionSummary(user);
-    const paymentMethod = this.toPaymentMethodSummary(user, subscription);
-    const invoices: BillingInvoiceItem[] = [];
-    const usage: BillingUsageMetric[] = [
-      {
-        label: 'Projects',
-        used: activeProjectsCount,
-        limit: subscription.status === 'active' ? null : undefined,
-        unit: 'sites',
-        note:
-          subscription.status === 'active'
-            ? 'Project count synced from your live account.'
-            : 'Create a paid plan to unlock tracked subscription limits.',
-      },
-      {
-        label: 'Published sites',
-        used: publishedProjects,
-        unit: 'live sites',
-        note: publishedProjects
-          ? 'Live deployments connected from your current projects.'
-          : 'Publish a project to see live sites appear here.',
-      },
-      {
-        label: 'Drafts',
-        used: draftProjects,
-        unit: 'drafts',
-        note: draftProjects
-          ? 'Draft projects are ready for more edits before publishing.'
-          : 'No draft projects are waiting in your workspace.',
-      },
-    ];
-
-    return {
-      subscription,
-      usage,
-      paymentMethod,
-      invoices,
-      activeProjectsCount,
-      paidInvoicesCount: invoices.filter((invoice) => invoice.statusLabel === 'Paid').length,
-      currentSpendLabel: subscription.nextChargeLabel ?? 'No active plan',
-    };
-  }
-
   private toDashboardTemplates(records: TemplateRecord[]): DashboardTemplateItem[] {
-    if (!records.length) {
-      return this.toFallbackTemplates();
-    }
-
-    const mapped = records.map((record, index) =>
+    return records.map((record, index) =>
       this.toDashboardTemplate(record, DASHBOARD_TEMPLATE_FALLBACKS[index % DASHBOARD_TEMPLATE_FALLBACKS.length], index)
-    );
-
-    const supplemental = DASHBOARD_TEMPLATE_FALLBACKS
-      .slice(0, Math.max(0, DASHBOARD_TEMPLATE_FALLBACKS.length - mapped.length))
-      .map((seed, index) => this.toFallbackTemplate(seed, mapped.length + index));
-
-    return [...mapped, ...supplemental].sort((left, right) => {
+    ).sort((left, right) => {
       if (left.isFeatured !== right.isFeatured) {
         return Number(right.isFeatured) - Number(left.isFeatured);
       }
@@ -254,39 +174,6 @@ export class DashboardDataService {
       updatedLabel: this.formatRelativeDate(updatedAt),
       updatedAt,
       sortIndex: index,
-    };
-  }
-
-  private toSubscriptionSummary(user: User): BillingSubscriptionSummary {
-    if (user.role === 'PREMIUM') {
-      return {
-        planName: 'Pro',
-        planDescription: 'Premium access inferred from your current account role.',
-        status: 'active',
-        billingMode: 'yearly',
-        billingCycleLabel: 'Billing details unavailable',
-        promoNotice:
-          'Your account has premium access, but this workspace does not yet expose renewal or invoice records from the backend.',
-      };
-    }
-
-    return {
-      status: 'inactive',
-      billingMode: 'yearly',
-    };
-  }
-
-  private toPaymentMethodSummary(
-    user: User,
-    subscription: BillingSubscriptionSummary
-  ): BillingPaymentMethodSummary | null {
-    if (subscription.status !== 'active') {
-      return null;
-    }
-
-    return {
-      contactEmail: user.email,
-      summary: 'No saved payment method was returned by the backend for this account yet.',
     };
   }
 
@@ -398,30 +285,6 @@ export class DashboardDataService {
       day: 'numeric',
       year: 'numeric',
     }).format(timestamp);
-  }
-
-  private resolveDomain(deployment: Deployment | null): string | undefined {
-    if (!deployment) {
-      return undefined;
-    }
-
-    if (deployment.customDomain?.trim()) {
-      return deployment.customDomain.trim();
-    }
-
-    try {
-      return new URL(deployment.serverUrl).host;
-    } catch {
-      return deployment.subdomain?.trim() || undefined;
-    }
-  }
-
-  private resolveLiveUrl(deployment: Deployment | null): string | undefined {
-    if (!deployment?.serverUrl?.trim()) {
-      return undefined;
-    }
-
-    return deployment.serverUrl.trim();
   }
 
   private colorFromSeed(seed: string): string {
