@@ -83,16 +83,22 @@ export const routes: Routes = [
           {
             path: ':projectId',
             component: ProjectWorkspaceLayout,
-            data: { title: 'Project' },
+            data: { title: 'Setup' },
             children: [
-              { path: '', component: ProjectRoutePlaceholder, data: { title: 'Project' } },
-              { path: 'overview', component: ProjectRoutePlaceholder, data: { title: 'Overview' } },
+              { path: '', component: ProjectRoutePlaceholder, data: { title: 'Setup' } },
+              { path: 'home', component: ProjectRoutePlaceholder, data: { title: 'Home' } },
+              { path: 'sales', component: ProjectRoutePlaceholder, data: { title: 'Sales' } },
+              { path: 'catalog', component: ProjectRoutePlaceholder, data: { title: 'Catalog' } },
+              { path: 'customers', component: ProjectRoutePlaceholder, data: { title: 'Customers' } },
+              { path: 'analytics', component: ProjectRoutePlaceholder, data: { title: 'Analytics' } },
+              { path: 'help', component: ProjectRoutePlaceholder, data: { title: 'Help' } },
               { path: 'editor', component: ProjectRoutePlaceholder, data: { title: 'Editor' } },
-              { path: 'pages', component: ProjectRoutePlaceholder, data: { title: 'Pages' } },
-              { path: 'preview', component: ProjectRoutePlaceholder, data: { title: 'Preview' } },
-              { path: 'deploy', component: ProjectRoutePlaceholder, data: { title: 'Deploy' } },
               { path: 'settings', component: ProjectRoutePlaceholder, data: { title: 'Settings' } },
-              { path: 'media', component: ProjectRoutePlaceholder, data: { title: 'Media' } }
+              { path: 'overview', redirectTo: 'home', pathMatch: 'full' },
+              { path: 'deploy', redirectTo: 'sales', pathMatch: 'full' },
+              { path: 'pages', redirectTo: 'catalog', pathMatch: 'full' },
+              { path: 'media', redirectTo: 'customers', pathMatch: 'full' },
+              { path: 'preview', redirectTo: 'analytics', pathMatch: 'full' }
             ]
           }
         ]

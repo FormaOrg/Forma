@@ -48,24 +48,24 @@ export class ProjectSidebar {
       id: 'workspace',
       label: 'Workspace',
       items: [
-        { label: 'Home', icon: 'home', path: 'overview', route: 'overview', hasDropdown: false },
-        { label: 'Sales', icon: 'dollar-sign', path: 'deploy', route: 'deploy', hasDropdown: false },
-        { label: 'Catalog', icon: 'package', path: 'pages', route: 'pages', hasDropdown: false }
+        { label: 'Home', icon: 'home', path: 'home', route: 'home', hasDropdown: false },
+        { label: 'Sales', icon: 'dollar-sign', path: 'sales', route: 'sales', hasDropdown: false },
+        { label: 'Catalog', icon: 'package', path: 'catalog', route: 'catalog', hasDropdown: false }
       ]
     },
     {
       id: 'audience',
       label: 'Audience',
       items: [
-        { label: 'Customers', icon: 'users', path: 'media', route: 'media', hasDropdown: false },
-        { label: 'Analytics', icon: 'bar-chart', path: 'preview', route: 'preview', hasDropdown: false }
+        { label: 'Customers', icon: 'users', path: 'customers', route: 'customers', hasDropdown: false },
+        { label: 'Analytics', icon: 'bar-chart', path: 'analytics', route: 'analytics', hasDropdown: false }
       ]
     },
     {
       id: 'support',
       label: 'Support',
       items: [
-        { label: 'Help', icon: 'help-circle', path: 'media', route: 'media', hasDropdown: false },
+        { label: 'Help', icon: 'help-circle', path: 'help', route: 'help', hasDropdown: false },
         { label: 'Settings', icon: 'settings', path: 'settings', route: 'settings', hasDropdown: false }
       ]
     }
