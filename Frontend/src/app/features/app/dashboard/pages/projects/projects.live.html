@@ -8,14 +8,14 @@
         </p>
       </div>
 
-      <a class="projects-hero__cta" routerLink="/app/templates">
+      <a class="projects-hero__cta projects-hero__cta--animated" routerLink="/app/templates">
         <span class="projects-hero__cta-icon">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
             <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
           </svg>
         </span>
-        <span>Create New Project</span>
+        <span class="projects-hero__cta-text">Create New Project</span>
       </a>
     </div>
   </section>
@@ -89,15 +89,22 @@
 
     <label class="projects-toolbar__sort">
       <span class="projects-toolbar__sort-label">Sort</span>
-      <select
-        class="projects-toolbar__sort-select"
-        [ngModel]="activeSort()"
-        (ngModelChange)="updateSort($event)"
-      >
-        <option value="last-edited">Last edited</option>
-        <option value="name">Name</option>
-        <option value="recently-created">Recently created</option>
-      </select>
+      <span class="projects-toolbar__sort-field">
+        <select
+          class="projects-toolbar__sort-select"
+          [ngModel]="activeSort()"
+          (ngModelChange)="updateSort($event)"
+        >
+          <option value="last-edited">Last edited</option>
+          <option value="name">Name</option>
+          <option value="recently-created">Recently created</option>
+        </select>
+        <span class="projects-toolbar__sort-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </span>
     </label>
   </section>
 
