@@ -32,6 +32,10 @@
   width: 72px;
 }
 
+.settings-sidebar--brandless {
+  padding-top: var(--sb-header-h);
+}
+
 /* ——— Brand (logo fixed size; wordmark fades only) ——— */
 .settings-sidebar__brand {
   height: var(--sb-header-h);

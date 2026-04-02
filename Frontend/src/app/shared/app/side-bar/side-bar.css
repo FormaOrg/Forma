@@ -31,6 +31,10 @@
   width: 72px;
 }
 
+.sidebar--brandless {
+  padding-top: var(--sb-header-h);
+}
+
 /* ——— Brand (logo fixed size; wordmark fades only) ——— */
 .sidebar__brand {
   height: var(--sb-header-h);
@@ -163,9 +167,8 @@
   color: rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition:
-    background-color var(--sb-dur) var(--sb-ease),
-    color var(--sb-dur) var(--sb-ease),
-    box-shadow var(--sb-dur) var(--sb-ease);
+    background-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .sidebar__row--collapsed {
@@ -196,7 +199,7 @@
   width: 20px;
   height: 20px;
   color: rgba(0, 0, 0, 0.5);
-  transition: color var(--sb-dur) var(--sb-ease);
+  transition: color 0.18s ease;
 }
 
 .sidebar__label {
@@ -227,12 +230,12 @@
 }
 
 .sidebar__row:hover {
-  background: rgba(0, 0, 0, 0.045);
-  color: rgba(0, 0, 0, 0.74);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.72);
 }
 
 .sidebar__row:hover .sidebar__icon {
-  color: rgba(0, 0, 0, 0.74);
+  color: rgba(0, 0, 0, 0.72);
 }
 
 .sidebar__row:focus-visible,
@@ -241,11 +244,9 @@
 }
 
 .sidebar__row:focus-visible {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   color: rgba(0, 0, 0, 0.82);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.08),
-    0 0 0 3px rgba(117, 102, 255, 0.10);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.10);
 }
 
 .sidebar__row:focus-visible .sidebar__icon,
@@ -255,10 +256,9 @@
 
 .sidebar__row--active,
 .sidebar__row--trigger.sidebar__row--active {
-  background: rgba(0, 0, 0, 0.072);
+  background: rgba(0, 0, 0, 0.07);
   color: #000;
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.035);
 }
 
 .sidebar__row--active .sidebar__icon,
