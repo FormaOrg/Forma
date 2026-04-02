@@ -8,3 +8,11 @@
   overflow-y: auto;
   padding: 20px;
 }
+
+:host-context(.theme-dark) {
+  background: #10141c;
+}
+
+:host-context(.theme-dark) .settings-content {
+  background: #10141c;
+}
