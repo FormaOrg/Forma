@@ -1,14 +1,20 @@
-<div class="dashboard-shell" [class.sidebar-collapsed]="sidebarCollapsed">
-  <app-side-bar [collapsed]="sidebarCollapsed"></app-side-bar>
+@if (appBootstrapService.isLoading()) {
+  <div class="dashboard-boot">
+    <app-bootstrap-loader></app-bootstrap-loader>
+  </div>
+} @else {
+  <div class="dashboard-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+    <app-side-bar [collapsed]="sidebarCollapsed"></app-side-bar>
 
-  <div class="dashboard-main">
-    <app-app-header
-      [sidebarCollapsed]="sidebarCollapsed"
-      (toggleSidebar)="toggleSidebar()"
-    ></app-app-header>
+    <div class="dashboard-main">
+      <app-app-header
+        [sidebarCollapsed]="sidebarCollapsed"
+        (toggleSidebar)="toggleSidebar()"
+      ></app-app-header>
 
-    <div class="dashboard-content">
-      <router-outlet></router-outlet>
+      <div class="dashboard-content">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </div>
-</div>
+}

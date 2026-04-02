@@ -54,30 +54,42 @@
       <button
         type="button"
         class="app-header__avatar-btn"
-        (click)="toggleProfileMenu()"
+        (click)="toggleProfileMenu($event)"
         [class.app-header__avatar-btn--open]="isProfileMenuOpen"
         aria-haspopup="menu"
         [attr.aria-expanded]="isProfileMenuOpen"
       >
-        <img
-          [src]="profile.avatar"
-          [alt]="profile.name"
-          class="app-header__avatar"
-          width="36"
-          height="36"
-        />
+        @if (profile.avatar) {
+          <img
+            [src]="profile.avatar"
+            [alt]="profile.name"
+            class="app-header__avatar"
+            width="36"
+            height="36"
+          />
+        } @else {
+          <span class="app-header__avatar-placeholder" aria-hidden="true">
+            <app-icon name="user" [size]="20" />
+          </span>
+        }
       </button>
 
       @if (isProfileMenuOpen) {
-        <div class="app-header__dropdown" role="menu">
+        <div class="app-header__dropdown" role="menu" (click)="$event.stopPropagation()">
           <div class="app-header__dropdown-summary">
-            <img
-              [src]="profile.avatar"
-              [alt]=""
-              width="40"
-              height="40"
-              class="app-header__dropdown-avatar"
-            />
+            @if (profile.avatar) {
+              <img
+                [src]="profile.avatar"
+                [alt]=""
+                width="40"
+                height="40"
+                class="app-header__dropdown-avatar"
+              />
+            } @else {
+              <span class="app-header__dropdown-avatar-placeholder" aria-hidden="true">
+                <app-icon name="user" [size]="18" />
+              </span>
+            }
             <div class="app-header__dropdown-meta">
               <span class="app-header__dropdown-name">{{ profile.name }}</span>
               <span class="app-header__dropdown-role">{{ profile.role }}</span>
@@ -163,10 +175,7 @@
                     <span class="app-header__command-item-icon">
                       <app-icon [name]="item.icon" [size]="18" />
                     </span>
-                    <span class="app-header__command-item-copy">
-                      <span class="app-header__command-item-title">{{ item.title }}</span>
-                      <span class="app-header__command-item-subtitle">{{ item.subtitle }}</span>
-                    </span>
+                    <span class="app-header__command-item-title">{{ item.title }}</span>
                     @if (item.hint) {
                       <span class="app-header__command-item-hint">{{ item.hint }}</span>
                     }

@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { SettingsSidebarSection } from '../settings-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-settings-sidebar',
@@ -21,6 +22,7 @@ export class SettingsSidebar implements OnChanges, OnInit {
   isInitialized = false;
 
   private router = inject(Router);
+  private themeService = inject(ThemeService);
 
   ngOnInit() {
     // Enable transitions after initial render
@@ -83,6 +85,12 @@ export class SettingsSidebar implements OnChanges, OnInit {
       ]
     }
   ];
+
+  logoSrc(): string {
+    return this.themeService.resolvedTheme() === 'dark'
+      ? 'assets/Logo/FormaLogoOnly-white.svg'
+      : 'assets/Logo/FormaLogoOnly.svg';
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Handle collapsed state if needed

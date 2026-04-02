@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
@@ -6,11 +6,15 @@ import { Router } from '@angular/router';
 import {
   AuthUser,
   AuthResponse,
+  GoogleAuthRequest,
   LoginRequest,
   LoginVerificationRequest,
   RegisterRequest,
 } from '../models/user.model';
 import { I18nService } from '../../features/landing-page/i18n/i18n.service';
+import { ActivityRealtimeService } from './activity-realtime.service';
+import { ThemeService } from './theme.service';
+import { AppBootstrapService } from './app-bootstrap.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -29,11 +33,14 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private i18n: I18nService
+    private injector: Injector,
+    private i18n: I18nService,
+    private activityRealtimeService: ActivityRealtimeService,
+    private themeService: ThemeService
   ) {
     const storedUser = this.currentUserSubject.value;
-    if (storedUser?.preferredLanguage === 'en' || storedUser?.preferredLanguage === 'fr') {
-      void this.i18n.setLang(storedUser.preferredLanguage);
+    if (storedUser) {
+      void this.applyUserPreferences(storedUser);
     }
   }
 
@@ -94,6 +101,17 @@ export class AuthService {
     );
   }
 
+  googleLogin(payload: GoogleAuthRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/google`, payload).pipe(
+      tap(response => {
+        if (response.accessToken && response.refreshToken && response.user) {
+          this.storeSession(response, payload.rememberMe);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
   verifyLoginCode(data: LoginVerificationRequest, rememberMe?: boolean): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login/verify`, data).pipe(
       tap(response => {
@@ -121,6 +139,8 @@ export class AuthService {
   }
 
   logout(): void {
+    this.activityRealtimeService.disconnect();
+    this.injector.get(AppBootstrapService).reset();
     this.clearSessionStorage(localStorage);
     this.clearSessionStorage(sessionStorage);
     sessionStorage.removeItem(this.loginVerificationKey);
@@ -144,9 +164,9 @@ export class AuthService {
     ).pipe(catchError(this.handleError));
   }
 
-  applyAuthResponse(response: AuthResponse): void {
+  applyAuthResponse(response: AuthResponse, rememberMe?: boolean): void {
     if (response.accessToken && response.refreshToken && response.user) {
-      this.storeSession(response);
+      this.storeSession(response, rememberMe);
     }
   }
 
@@ -184,6 +204,7 @@ export class AuthService {
     rememberMe: boolean;
     returnUrl?: string;
   }): void {
+    localStorage.setItem(this.loginVerificationKey, JSON.stringify(payload));
     sessionStorage.setItem(this.loginVerificationKey, JSON.stringify(payload));
   }
 
@@ -195,7 +216,7 @@ export class AuthService {
     returnUrl?: string;
   } | null {
     try {
-      const stored = sessionStorage.getItem(this.loginVerificationKey);
+      const stored = sessionStorage.getItem(this.loginVerificationKey) ?? localStorage.getItem(this.loginVerificationKey);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -204,6 +225,7 @@ export class AuthService {
 
   clearPendingLoginVerification(): void {
     sessionStorage.removeItem(this.loginVerificationKey);
+    localStorage.removeItem(this.loginVerificationKey);
   }
 
   // ── Private helpers ────────────────────────────────────
@@ -225,8 +247,23 @@ export class AuthService {
     this.lastValidatedToken = response.accessToken;
     this.lastSessionValidationAt = Date.now();
     this.currentUserSubject.next(response.user);
-    if (response.user.preferredLanguage === 'en' || response.user.preferredLanguage === 'fr') {
-      void this.i18n.setLang(response.user.preferredLanguage);
+    void this.applyUserPreferences(response.user);
+  }
+
+  async updateStoredUser(user: AuthUser): Promise<void> {
+    const isRemembered = this.isRememberedSession();
+    const storage = isRemembered ? localStorage : sessionStorage;
+    storage.setItem(this.userKey, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+    await this.applyUserPreferences(user);
+  }
+
+  private async applyUserPreferences(user: AuthUser): Promise<void> {
+    if (user.preferredLanguage === 'en' || user.preferredLanguage === 'fr') {
+      await this.i18n.setLang(user.preferredLanguage);
+    }
+    if (user.preferredTheme === 'light' || user.preferredTheme === 'dark' || user.preferredTheme === 'system') {
+      this.themeService.syncStoredTheme(user.preferredTheme);
     }
   }
 

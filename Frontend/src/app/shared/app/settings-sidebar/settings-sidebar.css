@@ -118,6 +118,9 @@
   text-transform: uppercase;
   color: rgba(0, 0, 0, 0.45);
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
   transition: opacity 0.2s ease;
 }
 
