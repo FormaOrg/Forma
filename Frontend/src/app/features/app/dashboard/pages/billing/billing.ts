@@ -22,12 +22,14 @@ import {
 })
 export class Billing implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);
+  private readonly maxVisibleInvoices = 4;
 
   readonly billingMode = signal<BillingMode>('yearly');
   readonly currentPlanName = signal<string | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
   readonly overview = signal<BillingOverview | null>(null);
+  readonly showInvoicesModal = signal(false);
 
   readonly walletIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +66,8 @@ export class Billing implements OnInit {
   );
   readonly usage = computed(() => this.overview()?.usage ?? []);
   readonly invoices = computed(() => this.overview()?.invoices ?? []);
+  readonly visibleInvoices = computed(() => this.invoices().slice(0, this.maxVisibleInvoices));
+  readonly hasHiddenInvoices = computed(() => this.invoices().length > this.maxVisibleInvoices);
   readonly paymentMethod = computed(() => this.overview()?.paymentMethod ?? null);
 
   readonly currentPlan = computed(
@@ -92,6 +96,7 @@ export class Billing implements OnInit {
   loadBilling(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.showInvoicesModal.set(false);
 
     this.dashboardDataService
       .getBillingOverview()
@@ -143,6 +148,52 @@ export class Billing implements OnInit {
     return getPlanPrice(plan, this.billingMode());
   }
 
+  openInvoicesModal(): void {
+    this.showInvoicesModal.set(true);
+  }
+
+  closeInvoicesModal(): void {
+    this.showInvoicesModal.set(false);
+  }
+
+  downloadInvoice(invoice: BillingInvoiceItem): void {
+    if (invoice.downloadUrl) {
+      window.open(invoice.downloadUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const subscription = this.currentSubscription();
+    const paymentMethod = this.paymentMethod();
+    const pdfBytes = this.buildInvoicePdf([
+      `FORMA INVOICE`,
+      ``,
+      `Invoice: ${invoice.id}`,
+      `Date: ${invoice.dateLabel}`,
+      `Status: ${invoice.statusLabel}`,
+      ``,
+      `Plan: ${subscription.planName ?? 'No active plan'}`,
+      `Billing cycle: ${subscription.billingCycleLabel ?? 'Billing cycle unavailable'}`,
+      `Renewal: ${subscription.renewalDateLabel ?? 'Not scheduled'}`,
+      ``,
+      `Billing contact: ${paymentMethod?.contactEmail ?? 'Not available'}`,
+      `Payment summary: ${paymentMethod?.summary ?? 'Generated from your Forma billing overview'}`,
+      ``,
+      `Total charged: ${invoice.amountLabel}`,
+      ``,
+      `Generated from your Forma dashboard billing data for preview and testing.`,
+    ]);
+
+    const pdfBuffer = new ArrayBuffer(pdfBytes.byteLength);
+    new Uint8Array(pdfBuffer).set(pdfBytes);
+    const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = `${this.toFileSafeName(invoice.id)}.pdf`;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
+  }
+
   private toBillingErrorMessage(error: unknown): string {
     const status = this.readErrorStatus(error);
 
@@ -160,6 +211,58 @@ export class Billing implements OnInit {
     }
 
     return undefined;
+  }
+
+  private toFileSafeName(value: string): string {
+    return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'forma-invoice';
+  }
+
+  private buildInvoicePdf(lines: string[]): Uint8Array {
+    const objects: string[] = [];
+    const escapedLines = lines.map((line) => this.escapePdfText(line));
+    const content = [
+      'BT',
+      '/F1 24 Tf',
+      '72 770 Td',
+      `(${escapedLines[0]}) Tj`,
+      '/F1 12 Tf',
+      '0 -34 Td',
+      ...escapedLines.slice(1).map((line) => `(${line}) Tj T*`),
+      'ET',
+    ].join('\n');
+
+    objects.push('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj');
+    objects.push('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj');
+    objects.push(
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj'
+    );
+    objects.push('4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj');
+    objects.push(`5 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj`);
+
+    let pdf = '%PDF-1.4\n';
+    const offsets: number[] = [0];
+
+    for (const object of objects) {
+      offsets.push(pdf.length);
+      pdf += `${object}\n`;
+    }
+
+    const xrefStart = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n`;
+    pdf += '0000000000 65535 f \n';
+    for (let index = 1; index < offsets.length; index += 1) {
+      pdf += `${offsets[index].toString().padStart(10, '0')} 00000 n \n`;
+    }
+    pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+
+    return new TextEncoder().encode(pdf);
+  }
+
+  private escapePdfText(value: string): string {
+    return value
+      .replaceAll('\\', '\\\\')
+      .replaceAll('(', '\\(')
+      .replaceAll(')', '\\)');
   }
 
   trackByPlan = (_: number, plan: PricingPlan): string => plan.name;

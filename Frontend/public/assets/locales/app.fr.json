@@ -86,7 +86,7 @@
   "app.command.footer.move": "Naviguer",
   "app.command.footer.close": "Fermer",
 
-  "settings.sidebar.back": "Retour au tableau de bord",
+  "settings.sidebar.back": "Retourner",
   "settings.sidebar.account": "Paramètres du compte",
   "settings.sidebar.profile": "Profil",
   "settings.sidebar.security": "Sécurité",
