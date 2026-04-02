@@ -19,7 +19,10 @@ export interface Project {
   creationMethod: CreationMethod;
   status: ProjectStatus;
   ownerId: number;
+  templateId?: number | null;
+  isPublished?: boolean;
   createdAt: string; // ISO 8601
+  updatedAt?: string; // ISO 8601
 }
 
 // ── Deployment — separate resource, references project ────
@@ -117,6 +120,7 @@ export interface CreateProjectRequest {
   description?: string;
   type: ProjectType;
   creationMethod: CreationMethod;
+  templateId?: number | null;
 }
 
 export interface UpdateProjectRequest {

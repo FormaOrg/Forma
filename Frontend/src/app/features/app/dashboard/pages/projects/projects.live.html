@@ -218,6 +218,63 @@
           <app-project-card [project]="project"></app-project-card>
         }
       </div>
+
+      <section class="projects-records">
+        <div class="projects-records__header">
+          <div>
+            <p class="projects-records__eyebrow">Projects table</p>
+            <h3 class="projects-records__title">Live records from your workspace database</h3>
+          </div>
+
+          <span class="projects-records__count">{{ filteredProjects().length }} rows</span>
+        </div>
+
+        <div class="projects-records__table-wrap">
+          <table class="projects-records__table">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Type</th>
+                <th>Creation</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Domain</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (project of filteredProjects(); track trackByProject($index, project)) {
+                <tr>
+                  <td>
+                    <div class="projects-records__project">
+                      <span class="projects-records__swatch" [style.background]="project.accent"></span>
+                      <div class="projects-records__project-copy">
+                        <strong>{{ project.name }}</strong>
+                        <span>{{ project.description }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ project.typeLabel }}</td>
+                  <td>{{ project.creationMethodLabel }}</td>
+                  <td>
+                    <span
+                      class="projects-records__status"
+                      [class.projects-records__status--published]="project.status === 'published'"
+                      [class.projects-records__status--draft]="project.status === 'draft'"
+                      [class.projects-records__status--archived]="project.status === 'archived'"
+                    >
+                      {{ project.statusLabel }}
+                    </span>
+                  </td>
+                  <td>{{ project.createdDateLabel }}</td>
+                  <td>{{ project.updatedDateLabel }}</td>
+                  <td>{{ project.domain || 'Not deployed' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
     }
   </section>
 </section>

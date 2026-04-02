@@ -330,8 +330,8 @@
 .templates-grid,
 .templates-loading {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
   align-items: stretch;
 }
 
@@ -471,6 +471,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .templates-grid,
+  .templates-loading {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .templates-toolbar {
     flex-wrap: wrap;
     align-items: stretch;
@@ -503,6 +508,11 @@
   }
 
   .templates-page__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .templates-grid,
+  .templates-loading {
     grid-template-columns: 1fr;
   }
 
