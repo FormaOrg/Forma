@@ -1,5 +1,5 @@
 :host {
-  --home-bg: #eef2f7;
+  --home-bg: #eceff3;
   --home-surface: #ffffff;
   --home-surface-strong: #ffffff;
   --home-surface-muted: #fbfbfd;
@@ -15,9 +15,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  background:
-    radial-gradient(circle at top left, rgba(116, 104, 255, 0.08), transparent 32%),
-    linear-gradient(180deg, #f4f7fb 0%, var(--home-bg) 32%, #e9edf4 100%);
+  background: var(--home-bg);
 }
 
 * {
@@ -25,7 +23,7 @@
 }
 
 .home-page {
-  max-width: 1480px;
+  max-width: 1400px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -40,6 +38,259 @@
 
 .home-page__panel {
   min-width: 0;
+}
+
+.home-skeleton,
+.home-skeleton-card,
+.home-skeleton-panel,
+.home-skeleton-row,
+.home-skeleton-template,
+.home-skeleton-check,
+.home-skeleton-activity,
+.home-skeleton-action {
+  box-sizing: border-box;
+}
+
+.home-skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
+  background-size: 220% 100%;
+  animation: homeSkeletonShimmer 1.25s linear infinite;
+}
+
+.home-skeleton-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 6px 4px;
+}
+
+.home-skeleton--title {
+  width: min(420px, 72%);
+  height: 42px;
+}
+
+.home-skeleton--title-sm {
+  width: 160px;
+  height: 20px;
+}
+
+.home-skeleton--text {
+  width: min(360px, 64%);
+  height: 14px;
+}
+
+.home-skeleton--text-lg {
+  width: min(520px, 82%);
+}
+
+.home-skeleton--label {
+  width: 92px;
+  height: 12px;
+}
+
+.home-skeleton--value {
+  width: 88px;
+  height: 34px;
+}
+
+.home-skeleton--icon,
+.home-skeleton--activity-icon,
+.home-skeleton--action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.home-skeleton--button {
+  width: 92px;
+  height: 38px;
+  border-radius: 999px;
+}
+
+.home-skeleton--line-md {
+  width: 70%;
+  height: 14px;
+}
+
+.home-skeleton--line-sm {
+  width: 52%;
+  height: 12px;
+}
+
+.home-skeleton--line-xs {
+  width: 34%;
+  height: 12px;
+}
+
+.home-skeleton--chip {
+  width: 82px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.home-skeleton--thumb {
+  width: 72px;
+  height: 52px;
+  border-radius: 12px;
+}
+
+.home-skeleton--progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.home-skeleton--dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.home-skeleton--pill {
+  width: 88px;
+  height: 32px;
+  border-radius: 999px;
+}
+
+.home-skeleton--badge {
+  width: 130px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.home-page__stats--loading {
+  align-items: stretch;
+}
+
+.home-skeleton-card,
+.home-skeleton-panel {
+  border: 1px solid var(--home-border);
+  border-radius: var(--home-radius-lg);
+  background: var(--home-surface);
+  box-shadow: var(--home-shadow);
+}
+
+.home-skeleton-card {
+  min-height: 154px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-skeleton-card__head,
+.home-skeleton-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.home-skeleton-card__head {
+  justify-content: flex-start;
+}
+
+.home-skeleton-panel {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-skeleton-list,
+.home-skeleton-grid,
+.home-skeleton-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-skeleton-row,
+.home-skeleton-template,
+.home-skeleton-check,
+.home-skeleton-activity,
+.home-skeleton-action {
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  border-radius: var(--home-radius-md);
+  background: var(--home-surface-muted);
+}
+
+.home-skeleton-row,
+.home-skeleton-template,
+.home-skeleton-action {
+  padding: 12px;
+}
+
+.home-skeleton-row {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.home-skeleton-row__copy,
+.home-skeleton-template__copy,
+.home-skeleton-activity__copy,
+.home-skeleton-action__copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-skeleton-grid {
+  gap: 10px;
+}
+
+.home-skeleton-template {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.home-skeleton-check {
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-skeleton-activity {
+  min-height: 64px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.home-skeleton-action {
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.home-skeleton-badges {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@keyframes homeSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
 }
 
 .home-page__stats {
@@ -212,6 +463,16 @@
     gap: 12px;
   }
 
+  .home-skeleton--title {
+    width: 78%;
+    height: 34px;
+  }
+
+  .home-skeleton--text,
+  .home-skeleton--text-lg {
+    width: 88%;
+  }
+
   .home-quick-actions {
     padding: 16px;
   }
@@ -220,4 +481,35 @@
     grid-template-columns: 36px minmax(0, 1fr);
     padding: 12px;
   }
+
+  .home-skeleton-card,
+  .home-skeleton-panel {
+    padding: 16px;
+  }
+
+  .home-skeleton-template,
+  .home-skeleton-action {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+}
+
+:host-context(.theme-dark) .home-skeleton-card,
+:host-context(.theme-dark) .home-skeleton-panel {
+  background: #171d28;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .home-skeleton-row,
+:host-context(.theme-dark) .home-skeleton-template,
+:host-context(.theme-dark) .home-skeleton-check,
+:host-context(.theme-dark) .home-skeleton-activity,
+:host-context(.theme-dark) .home-skeleton-action {
+  background: #111722;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context(.theme-dark) .home-skeleton {
+  background: linear-gradient(90deg, rgba(33, 40, 56, 0.95) 0%, rgba(42, 50, 69, 1) 50%, rgba(33, 40, 56, 0.95) 100%);
+  background-size: 220% 100%;
 }

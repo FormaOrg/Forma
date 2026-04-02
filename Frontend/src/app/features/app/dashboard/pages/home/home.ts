@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
+import { BillingOverview, DashboardProjectItem, DashboardTemplateItem } from '../../../../../core/models/dashboard.model';
+import { User } from '../../../../../core/models/user.model';
+import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
+import { UserService } from '../../../../../core/services/user.service';
+import { PRICING_PLANS } from '../../../../pricing/pricing-plans';
 import { GreetingSection } from './components/greeting-section/greeting-section';
 import { DataCard } from "./components/data-card/data-card";
 import { RecentProjects } from "./components/recent-projects/recent-projects";
@@ -7,6 +13,7 @@ import { RecentActivity } from "./components/recent-activity/recent-activity";
 import { AccountSnapshot } from './components/account-snapshot/account-snapshot';
 import { SetupProgress } from './components/setup-progress/setup-progress';
 import { RecentTemplates } from './components/recent-templates/recent-templates';
+import { HomeActivityItem, HomeRecentProject, HomeRecentTemplateItem, HomeSetupStep } from './home.model';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +21,31 @@ import { RecentTemplates } from './components/recent-templates/recent-templates'
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements OnInit {
+  private readonly userService = inject(UserService);
+  private readonly dashboardDataService = inject(DashboardDataService);
+
+  isLoadingHome = true;
+  userName = 'there';
+  sitesCreatedValue = '0';
+  sitesCreatedDescription = 'No projects yet';
+  publishedSitesValue = '0';
+  publishedSitesDescription = 'Nothing published yet';
+  draftSitesValue = '0';
+  draftSitesDescription = 'No drafts right now';
+  lastActivityValue = 'No activity';
+  lastActivityDescription = 'Create your first project';
+
+  recentProjects: HomeRecentProject[] = [];
+  recentTemplates: HomeRecentTemplateItem[] = [];
+  recentActivities: HomeActivityItem[] = [];
+  setupSteps: HomeSetupStep[] = [];
+  setupPercent = 0;
+
+  planLabel = 'Free';
+  renewsLabel = 'No active plan';
+  accountBadges: string[] = [];
+
   globeIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2Z" stroke="currentColor" stroke-width="1.8"/>
@@ -45,4 +76,217 @@ export class Home {
     <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
   `;
+
+  ngOnInit(): void {
+    forkJoin({
+      user: this.userService.getMe().pipe(catchError(() => of(null))),
+      projects: this.dashboardDataService.getProjectsOverview({ useCache: false }).pipe(catchError(() => of([]))),
+      templates: this.dashboardDataService.getTemplatesOverview({ useCache: false }).pipe(catchError(() => of([]))),
+      billing: this.dashboardDataService.getBillingOverview({ useCache: false }).pipe(catchError(() => of(null))),
+    }).subscribe(({ user, projects, templates, billing }) => {
+      this.userName = this.toDisplayName(user);
+      this.recentProjects = this.toRecentProjects(projects);
+      this.recentTemplates = this.toRecentTemplates(templates);
+      this.recentActivities = this.toRecentActivities(projects);
+      this.setupSteps = this.toSetupSteps(user, projects);
+      this.setupPercent = this.toSetupPercent(this.setupSteps);
+
+      this.applyStats(projects, this.recentActivities);
+      this.applyBillingSnapshot(billing);
+      this.isLoadingHome = false;
+    });
+  }
+
+  private applyStats(projects: DashboardProjectItem[], activities: HomeActivityItem[]): void {
+    const publishedCount = projects.filter((project) => project.status === 'published').length;
+    const draftCount = projects.filter((project) => project.status === 'draft').length;
+    const createdThisMonth = projects.filter((project) => this.isInCurrentMonth(project.createdAt)).length;
+
+    this.sitesCreatedValue = String(projects.length);
+    this.sitesCreatedDescription =
+      createdThisMonth > 0
+        ? `+${createdThisMonth} this month`
+        : projects.length > 0
+          ? 'No new projects this month'
+          : 'Create your first project';
+
+    this.publishedSitesValue = String(publishedCount);
+    this.publishedSitesDescription =
+      projects.length > 0
+        ? `${Math.round((publishedCount / projects.length) * 100)}% of total`
+        : 'Nothing published yet';
+
+    this.draftSitesValue = String(draftCount);
+    this.draftSitesDescription =
+      draftCount > 0
+        ? draftCount === 1
+          ? '1 project ready to publish'
+          : `${draftCount} projects ready to publish`
+        : 'No drafts right now';
+
+    if (activities.length > 0) {
+      this.lastActivityValue = activities[0].time;
+      this.lastActivityDescription = activities[0].title;
+      return;
+    }
+
+    this.lastActivityValue = 'No activity';
+    this.lastActivityDescription = 'Create your first project';
+  }
+
+  private applyBillingSnapshot(billing: BillingOverview | null): void {
+    const planName = billing?.subscription.planName?.trim();
+    const status = billing?.subscription.status ?? 'inactive';
+
+    if (!planName || status === 'inactive' || status === 'canceled') {
+      this.planLabel = 'Free';
+      this.renewsLabel = 'No active plan';
+      this.accountBadges = [];
+      return;
+    }
+
+    this.planLabel = planName;
+    this.renewsLabel = billing?.subscription.renewalDateLabel
+      ? `Renews ${billing.subscription.renewalDateLabel}`
+      : billing?.subscription.nextChargeLabel
+        ? `Next charge ${billing.subscription.nextChargeLabel}`
+        : 'Plan active';
+
+    const plan = PRICING_PLANS.find((entry) => entry.name.toLowerCase() === planName.toLowerCase());
+    this.accountBadges = plan?.features.slice(0, 2) ?? [];
+  }
+
+  private toDisplayName(user: User | null): string {
+    if (!user) {
+      return 'there';
+    }
+
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    return fullName || user.username?.trim() || user.email.split('@')[0] || 'there';
+  }
+
+  private toRecentProjects(projects: DashboardProjectItem[]): HomeRecentProject[] {
+    return [...projects]
+      .filter((project) => project.status !== 'archived')
+      .sort((left, right) => right.lastEditedAt - left.lastEditedAt)
+      .slice(0, 5)
+      .map((project) => ({
+        name: project.name,
+        domain: project.domain || project.metadata || project.typeLabel,
+        updatedAt: project.lastEditedLabel,
+        status: project.status === 'published' ? 'published' : 'draft',
+        route: project.route || '/app/projects',
+      }));
+  }
+
+  private toRecentTemplates(templates: DashboardTemplateItem[]): HomeRecentTemplateItem[] {
+    return [...templates]
+      .sort((left, right) => right.updatedAt - left.updatedAt)
+      .slice(0, 3)
+      .map((template) => ({
+        name: template.name,
+        hint: template.description || template.categoryLabel,
+        image: template.previewImageUrl,
+        route: template.previewRoute || '/app/templates',
+      }));
+  }
+
+  private toRecentActivities(projects: DashboardProjectItem[]): HomeActivityItem[] {
+    return projects
+      .flatMap((project) => {
+        const activities: Array<{ title: string; type: HomeActivityItem['type']; timestamp: number }> = [
+          {
+            title: `Created ${project.name}`,
+            type: 'created',
+            timestamp: project.createdAt,
+          },
+        ];
+
+        if (project.status === 'published') {
+          activities.push({
+            title: `Published ${project.name}`,
+            type: 'published',
+            timestamp: project.lastEditedAt,
+          });
+        } else if (project.lastEditedAt - project.createdAt > 60000) {
+          activities.push({
+            title: `Edited ${project.name}`,
+            type: 'edited',
+            timestamp: project.lastEditedAt,
+          });
+        }
+
+        return activities;
+      })
+      .sort((left, right) => right.timestamp - left.timestamp)
+      .slice(0, 6)
+      .map((activity) => ({
+        title: activity.title,
+        type: activity.type,
+        time: this.formatRelativeTime(activity.timestamp),
+      }));
+  }
+
+  private toSetupSteps(user: User | null, projects: DashboardProjectItem[]): HomeSetupStep[] {
+    const profileDone = Boolean(
+      user && (
+        user.phone?.trim() ||
+        user.country?.trim() ||
+        user.website?.trim() ||
+        user.avatarUrl?.trim()
+      )
+    );
+    const hasProjects = projects.length > 0;
+    const hasPublishedProject = projects.some((project) => project.status === 'published');
+
+    return [
+      { id: 'profile', label: 'Complete your profile', done: profileDone },
+      { id: 'google', label: 'Connect a social login', done: Boolean(user?.googleConnected) },
+      { id: 'first-project', label: 'Create your first project', done: hasProjects },
+      { id: 'publish', label: 'Publish a site', done: hasPublishedProject },
+    ];
+  }
+
+  private toSetupPercent(steps: HomeSetupStep[]): number {
+    if (!steps.length) {
+      return 0;
+    }
+
+    const doneCount = steps.filter((step) => step.done).length;
+    return Math.round((doneCount / steps.length) * 100);
+  }
+
+  private isInCurrentMonth(timestamp: number): boolean {
+    const value = new Date(timestamp);
+    const now = new Date();
+
+    return value.getFullYear() === now.getFullYear() && value.getMonth() === now.getMonth();
+  }
+
+  private formatRelativeTime(timestamp: number): string {
+    const diffInMinutes = Math.round((timestamp - Date.now()) / 60000);
+    const absoluteMinutes = Math.abs(diffInMinutes);
+    const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+    if (absoluteMinutes < 60) {
+      return formatter.format(diffInMinutes, 'minute');
+    }
+
+    const diffInHours = Math.round(diffInMinutes / 60);
+    if (Math.abs(diffInHours) < 24) {
+      return formatter.format(diffInHours, 'hour');
+    }
+
+    const diffInDays = Math.round(diffInHours / 24);
+    if (Math.abs(diffInDays) < 30) {
+      return formatter.format(diffInDays, 'day');
+    }
+
+    const diffInMonths = Math.round(diffInDays / 30);
+    if (Math.abs(diffInMonths) < 12) {
+      return formatter.format(diffInMonths, 'month');
+    }
+
+    return formatter.format(Math.round(diffInMonths / 12), 'year');
+  }
 }

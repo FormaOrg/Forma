@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { DASHBOARD_TEMPLATE_FALLBACKS, DashboardTemplateFallbackSeed } from '../data/dashboard-templates-fallback.data';
 import {
   BillingOverview,
@@ -10,27 +10,120 @@ import {
   DashboardTemplateItem,
 } from '../models/dashboard.model';
 import { CreationMethod, Project, ProjectType, TemplateRecord } from '../models/project.model';
+import { AuthService } from './auth.service';
 import { ProjectService } from './project.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardDataService {
+  private projectsOverviewCache$?: Observable<DashboardProjectItem[]>;
+  private projectsOverviewCacheKey: string | null = null;
+  private templatesOverviewCache$?: Observable<DashboardTemplateItem[]>;
+  private templatesOverviewCacheKey: string | null = null;
+  private billingOverviewCache$?: Observable<BillingOverview>;
+  private billingOverviewCacheKey: string | null = null;
+
   constructor(
     private readonly http: HttpClient,
-    private readonly projectService: ProjectService
+    private readonly projectService: ProjectService,
+    private readonly authService: AuthService
   ) {}
 
-  getProjectsOverview(): Observable<DashboardProjectItem[]> {
+  getProjectsOverview(options?: { useCache?: boolean }): Observable<DashboardProjectItem[]> {
+    if (options?.useCache === false) {
+      return this.fetchProjectsOverview();
+    }
+
+    const cacheKey = this.getCacheKey();
+    if (!this.projectsOverviewCache$ || this.projectsOverviewCacheKey !== cacheKey) {
+      this.projectsOverviewCacheKey = cacheKey;
+      this.projectsOverviewCache$ = this.fetchProjectsOverview().pipe(
+        catchError((error) => {
+          this.projectsOverviewCache$ = undefined;
+          this.projectsOverviewCacheKey = null;
+          return throwError(() => error);
+        }),
+        shareReplay(1)
+      );
+    }
+
+    return this.projectsOverviewCache$;
+  }
+
+  getBillingOverview(options?: { useCache?: boolean }): Observable<BillingOverview> {
+    if (options?.useCache === false) {
+      return this.fetchBillingOverview();
+    }
+
+    const cacheKey = this.getCacheKey();
+    if (!this.billingOverviewCache$ || this.billingOverviewCacheKey !== cacheKey) {
+      this.billingOverviewCacheKey = cacheKey;
+      this.billingOverviewCache$ = this.fetchBillingOverview().pipe(
+        catchError((error) => {
+          this.billingOverviewCache$ = undefined;
+          this.billingOverviewCacheKey = null;
+          return throwError(() => error);
+        }),
+        shareReplay(1)
+      );
+    }
+
+    return this.billingOverviewCache$;
+  }
+
+  getTemplatesOverview(options?: { useCache?: boolean }): Observable<DashboardTemplateItem[]> {
+    if (options?.useCache === false) {
+      return this.fetchTemplatesOverview();
+    }
+
+    const cacheKey = this.getCacheKey();
+    if (!this.templatesOverviewCache$ || this.templatesOverviewCacheKey !== cacheKey) {
+      this.templatesOverviewCacheKey = cacheKey;
+      this.templatesOverviewCache$ = this.fetchTemplatesOverview().pipe(
+        catchError((error) => {
+          this.templatesOverviewCache$ = undefined;
+          this.templatesOverviewCacheKey = null;
+          return throwError(() => error);
+        }),
+        shareReplay(1)
+      );
+    }
+
+    return this.templatesOverviewCache$;
+  }
+
+  invalidateProjectsOverviewCache(): void {
+    this.projectsOverviewCache$ = undefined;
+    this.projectsOverviewCacheKey = null;
+  }
+
+  invalidateTemplatesOverviewCache(): void {
+    this.templatesOverviewCache$ = undefined;
+    this.templatesOverviewCacheKey = null;
+  }
+
+  invalidateBillingOverviewCache(): void {
+    this.billingOverviewCache$ = undefined;
+    this.billingOverviewCacheKey = null;
+  }
+
+  invalidatePageCaches(): void {
+    this.invalidateProjectsOverviewCache();
+    this.invalidateTemplatesOverviewCache();
+    this.invalidateBillingOverviewCache();
+  }
+
+  private fetchProjectsOverview(): Observable<DashboardProjectItem[]> {
     return this.projectService.getMyProjects().pipe(
       map((projects) => projects.map((project) => this.toDashboardProject(project)))
     );
   }
 
-  getBillingOverview(): Observable<BillingOverview> {
+  private fetchBillingOverview(): Observable<BillingOverview> {
     return this.http.get<BillingOverview>(`${environment.apiUrl}/billing/overview`);
   }
 
-  getTemplatesOverview(): Observable<DashboardTemplateItem[]> {
+  private fetchTemplatesOverview(): Observable<DashboardTemplateItem[]> {
     return this.projectService.getTemplates().pipe(
       map((records) => this.toDashboardTemplates(records)),
       catchError((error) => {
@@ -43,6 +136,10 @@ export class DashboardDataService {
         return throwError(() => error);
       })
     );
+  }
+
+  private getCacheKey(): string {
+    return String(this.authService.currentUserValue?.id ?? 'guest');
   }
 
   private toDashboardProject(project: Project): DashboardProjectItem {

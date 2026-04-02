@@ -9,7 +9,8 @@ import { RouterLink } from '@angular/router';
   styleUrl: './account-snapshot.css'
 })
 export class AccountSnapshot {
-  @Input() planLabel = 'Pro';
-  @Input() renewsLabel = 'Renews Apr 12, 2026';
+  @Input() planLabel = 'Free';
+  @Input() renewsLabel = 'No active plan';
+  @Input() badges: string[] = [];
   @Input() billingRoute = '/app/billing';
 }

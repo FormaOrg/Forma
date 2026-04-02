@@ -35,79 +35,99 @@
     </a>
   </div>
 
-  <div class="recent-projects__list">
-    @for (project of projects(); track trackByName($index, project)) {
-      <a class="project-row" [routerLink]="project.route">
-        <div class="project-row__left">
-          <div class="project-row__main">
-            <h3 class="project-row__name">{{ project.name }}</h3>
+  @if (projects.length) {
+    <div class="recent-projects__list">
+      @for (project of projects; track trackByName($index, project)) {
+        <a class="project-row" [routerLink]="project.route">
+          <div class="project-row__left">
+            <div class="project-row__main">
+              <h3 class="project-row__name">{{ project.name }}</h3>
 
-            <span
-              class="project-row__status"
-              [class.project-row__status--published]="project.status === 'published'"
-              [class.project-row__status--draft]="project.status === 'draft'"
-            >
-              {{ project.status === 'published' ? 'Published' : 'Draft' }}
-            </span>
-          </div>
-
-          <div class="project-row__meta">
-            <span class="project-row__domain">
-              <svg
-                class="project-row__domain-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
+              <span
+                class="project-row__status"
+                [class.project-row__status--published]="project.status === 'published'"
+                [class.project-row__status--draft]="project.status === 'draft'"
               >
-                <path
-                  d="M14 5H19V10"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 14L19 5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M19 14V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5H10"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              {{ project.domain }}
-            </span>
+                {{ project.status === 'published' ? 'Published' : 'Draft' }}
+              </span>
+            </div>
 
-            <span class="project-row__dot"></span>
+            <div class="project-row__meta">
+              <span class="project-row__domain">
+                <svg
+                  class="project-row__domain-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M14 5H19V10"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M10 14L19 5"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M19 14V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5H10"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                {{ project.domain }}
+              </span>
 
-            <span class="project-row__updated">{{ project.updatedAt }}</span>
+              <span class="project-row__dot"></span>
+
+              <span class="project-row__updated">{{ project.updatedAt }}</span>
+            </div>
           </div>
-        </div>
 
-        <div class="project-row__right" aria-hidden="true">
-          <svg
-            class="project-row__chevron"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9 6L15 12L9 18"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </a>
-    }
-  </div>
+          <div class="project-row__right" aria-hidden="true">
+            <svg
+              class="project-row__chevron"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 6L15 12L9 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+        </a>
+      }
+    </div>
+  } @else {
+    <div class="recent-projects__empty-state">
+      <div class="recent-projects__empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M4 7.5C4 6.67157 4.67157 6 5.5 6H10.379C10.7768 6 11.1583 6.15804 11.4393 6.43934L12.5607 7.56066C12.8417 7.84196 13.2232 8 13.621 8H18.5C19.3284 8 20 8.67157 20 9.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V7.5Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h3 class="recent-projects__empty-title">No projects yet</h3>
+      <p class="recent-projects__empty-text">
+        Start building your first website and your recent work will show up here automatically.
+      </p>
+      <a routerLink="/app/templates" class="recent-projects__empty-action">Create project</a>
+    </div>
+  }
 </section>
