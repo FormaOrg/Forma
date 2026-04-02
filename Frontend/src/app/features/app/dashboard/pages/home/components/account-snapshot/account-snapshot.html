@@ -13,11 +13,14 @@
       </svg>
     </span>
 
-    <span>Pro</span>
+    <span>{{ planLabel }}</span>
   </div>
   <p class="account-snap__meta">{{ renewsLabel }}</p>
-  <div class="account-snap__badge-row">
-    <span class="account-snap__badge">Unlimited exports</span>
-    <span class="account-snap__badge">Priority support</span>
-  </div>
+  @if (badges.length) {
+    <div class="account-snap__badge-row">
+      @for (badge of badges; track badge) {
+        <span class="account-snap__badge">{{ badge }}</span>
+      }
+    </div>
+  }
 </section>
