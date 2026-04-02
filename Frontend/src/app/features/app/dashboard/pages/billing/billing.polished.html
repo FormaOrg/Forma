@@ -310,20 +310,22 @@
         </div>
       </div>
 
-      <div class="plans-grid">
-        @for (plan of plans(); track trackByPlan($index, plan)) {
+        <div class="plans-grid">
+          @for (plan of plans(); track trackByPlan($index, plan)) {
           <article class="plan-card" [class.plan-card--current]="isCurrentPlan(plan)" [class.plan-card--popular]="plan.popular">
             <div class="plan-card__top">
-              <div class="plan-card__badge-row">
-                @if (plan.popular) {
-                  <span class="plan-card__badge">Most Popular</span>
-                }
-                @if (isCurrentPlan(plan)) {
-                  <span class="plan-card__badge plan-card__badge--current">Current Plan</span>
-                }
-              </div>
+              <div class="plan-card__title-row">
+                <h3 class="plan-card__name">{{ plan.name }}</h3>
 
-              <h3 class="plan-card__name">{{ plan.name }}</h3>
+                <div class="plan-card__badge-row">
+                  @if (plan.popular) {
+                    <span class="plan-card__badge">Most Popular</span>
+                  }
+                  @if (isCurrentPlan(plan)) {
+                    <span class="plan-card__badge plan-card__badge--current">Current Plan</span>
+                  }
+                </div>
+              </div>
               <p class="plan-card__description">{{ plan.description }}</p>
               <div class="plan-card__price-row">
                 <span class="plan-card__price">{{ getDisplayedPlanPrice(plan) }} DT</span>
