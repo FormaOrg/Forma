@@ -6,7 +6,13 @@ export type ProjectType =
   | 'ECOMMERCE'
   | 'LANDING_PAGE';
 
-export type CreationMethod = 'DRAG_DROP' | 'VISUAL_DESIGNER' | 'AI_PROMPT' | 'HYBRID';
+export type CreationMethod =
+  | 'DRAG_DROP'
+  | 'VISUAL_DESIGNER'
+  | 'GUIDED_SETUP'
+  | 'QUICK_START'
+  | 'AI_PROMPT'
+  | 'HYBRID';
 export type ProjectStatus  = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type DeploymentStatus = 'PENDING' | 'DEPLOYED' | 'FAILED' | 'UNDEPLOYED';
 

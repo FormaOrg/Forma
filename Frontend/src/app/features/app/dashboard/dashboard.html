@@ -11,6 +11,7 @@
     class="dashboard-shell"
     [class.sidebar-collapsed]="sidebarCollapsed"
     [class.dashboard-shell--settings]="isSettingsRoute"
+    [class.dashboard-shell--project]="isProjectRoute"
     [class.dashboard-shell--sidebar-motion-ready]="sidebarMotionReady"
   >
     <div class="dashboard-sidebar-brand">
@@ -23,10 +24,22 @@
     <div class="dashboard-sidebar-stage" aria-hidden="true">
       <div
         class="dashboard-sidebar-layer dashboard-sidebar-layer--main"
-        [class.is-active]="!isSettingsRoute"
-        [attr.inert]="isSettingsRoute ? '' : null"
+        [class.is-active]="!isSettingsRoute && !isProjectRoute"
+        [attr.inert]="isSettingsRoute || isProjectRoute ? '' : null"
       >
         <app-side-bar [collapsed]="sidebarCollapsed" [showBrand]="false"></app-side-bar>
+      </div>
+
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--project"
+        [class.is-active]="isProjectRoute"
+        [attr.inert]="!isProjectRoute ? '' : null"
+      >
+        <app-project-sidebar
+          [collapsed]="sidebarCollapsed"
+          [showBrand]="false"
+          [projectId]="currentProjectId"
+        ></app-project-sidebar>
       </div>
 
       <div
