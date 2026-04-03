@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { ProjectType } from '../../../../../core/models/project.model';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CreationMethod, Project, ProjectType } from '../../../../../core/models/project.model';
 import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
 import { ProjectService } from '../../../../../core/services/project.service';
 import { ToastService } from '../../../../../core/services/toast.service';
@@ -22,6 +24,10 @@ interface SceneCard {
   image: string;
   label: string;
   className: string;
+}
+
+interface LaunchStep {
+  label: string;
 }
 
 const TYPE_OPTIONS: TypeOption[] = [
@@ -74,6 +80,17 @@ const SCENE_CARDS: SceneCard[] = [
   { image: 'assets/Templates Gallery/Mock Templates/8.jpg', label: 'Lampish', className: 'project-creation__scene-card--left-mid' },
 ];
 
+const LAUNCH_STEPS: LaunchStep[] = [
+  { label: 'Adding site details to your dashboard' },
+  { label: 'Preparing tools to manage your site' },
+  { label: 'Personalizing steps in your setup guide' },
+];
+
+const CUSTOMIZING_TEXT = 'Customizing the next steps for you';
+const SCREEN_EXIT_DELAY = 1000;
+const SCREEN_ENTER_DURATION = 2000;
+const CUSTOMIZING_HOLD_DURATION = 3200;
+
 @Component({
   selector: 'app-project-creation',
   standalone: true,
@@ -87,16 +104,29 @@ export class ProjectCreation implements OnDestroy {
   private readonly dashboardDataService = inject(DashboardDataService);
   private readonly toastService = inject(ToastService);
   private readonly timeouts: number[] = [];
+  private readonly handleResize = () => this.scheduleTransitionLineLayout();
+  private layoutFrame: number | null = null;
+
+  @ViewChild('customizingMeasure') private customizingMeasure?: ElementRef<HTMLElement>;
+  @ViewChild('launchMeasure') private launchMeasure?: ElementRef<HTMLElement>;
 
   readonly screen = signal<CreationScreen>('type');
+  readonly leavingScreen = signal<CreationScreen | null>(null);
   readonly selectedType = signal<ProjectType | null>(null);
   readonly siteName = signal('');
   readonly selectedGoals = signal<string[]>([]);
   readonly goalsText = signal('');
   readonly isCreating = signal(false);
-
+  readonly launchStepProgress = signal(0);
+  readonly customizingLines = signal<string[]>([CUSTOMIZING_TEXT]);
+  readonly launchLines = signal<string[]>([]);
+  readonly sceneMotion = signal<'idle' | 'enter' | 'leave'>('idle');
+  readonly sceneAnimationName = signal<'projectCreationSceneCardEnterA' | 'projectCreationSceneCardEnterB'>('projectCreationSceneCardEnterA');
   readonly typeOptions = TYPE_OPTIONS;
   readonly sceneCards = SCENE_CARDS;
+  readonly launchSteps = LAUNCH_STEPS;
+  readonly customizingText = CUSTOMIZING_TEXT;
+  readonly customizingMeasureWords = this.splitMeasureWords(CUSTOMIZING_TEXT);
 
   readonly progressValue = computed(() => {
     switch (this.screen()) {
@@ -146,6 +176,9 @@ export class ProjectCreation implements OnDestroy {
     return 'New Forma Site';
   });
 
+  readonly launchText = computed(() => `Taking you to your site dashboard for ${this.resolvedSiteName()}`);
+  readonly launchMeasureWords = computed(() => this.splitMeasureWords(this.launchText()));
+
   readonly primaryCtaLabel = computed(() => {
     switch (this.screen()) {
       case 'goals':
@@ -168,7 +201,31 @@ export class ProjectCreation implements OnDestroy {
     }
   });
 
+  constructor() {
+    window.addEventListener('resize', this.handleResize);
+
+    this.queueTimeout(() => {
+      this.sceneMotion.set('enter');
+    }, 40);
+
+    this.queueTimeout(() => {
+      if (this.sceneMotion() === 'enter') {
+        this.sceneMotion.set('idle');
+      }
+    }, SCREEN_ENTER_DURATION + 80);
+
+    effect(() => {
+      this.screen();
+      this.launchText();
+      this.scheduleTransitionLineLayout();
+    });
+  }
+
   ngOnDestroy(): void {
+    window.removeEventListener('resize', this.handleResize);
+    if (this.layoutFrame !== null) {
+      window.cancelAnimationFrame(this.layoutFrame);
+    }
     this.clearTimers();
   }
 
@@ -188,6 +245,11 @@ export class ProjectCreation implements OnDestroy {
   appendGoalSuggestion(goal: string): void {
     const currentGoals = this.parseGoalEntries(this.goalsText());
     if (currentGoals.includes(goal)) {
+      const nextGoals = currentGoals.filter((item) => item !== goal);
+      const nextValue = nextGoals.join(', ');
+
+      this.goalsText.set(nextValue);
+      this.selectedGoals.set(nextGoals);
       return;
     }
 
@@ -202,13 +264,34 @@ export class ProjectCreation implements OnDestroy {
     return this.selectedGoals().includes(goal);
   }
 
+  transitionCycle(lineCount: number): string {
+    return `${Math.max(1, lineCount) * 1450}ms`;
+  }
+
+  transitionDelay(index: number): string {
+    return `${index * 1450}ms`;
+  }
+
+  launchStepState(index: number): 'done' | 'loading' | 'pending' {
+    const progress = this.launchStepProgress();
+    if (index < progress) {
+      return 'done';
+    }
+
+    if (index === progress && progress < this.launchSteps.length) {
+      return 'loading';
+    }
+
+    return 'pending';
+  }
+
   goBack(): void {
     switch (this.screen()) {
       case 'name':
-        this.screen.set('type');
+        this.setScreen('type');
         break;
       case 'goals':
-        this.screen.set('name');
+        this.setScreen('name');
         break;
       default:
         void this.router.navigate(['/app/projects']);
@@ -227,7 +310,7 @@ export class ProjectCreation implements OnDestroy {
         if (!this.siteName().trim()) {
           return;
         }
-        this.screen.set('goals');
+        this.setScreen('goals');
         break;
       case 'goals':
         if (!this.canContinue()) {
@@ -242,7 +325,7 @@ export class ProjectCreation implements OnDestroy {
     switch (this.screen()) {
       case 'name':
         this.siteName.set(this.resolvedSiteName());
-        this.screen.set('goals');
+        this.setScreen('goals');
         break;
       case 'goals':
         this.startProjectCreation();
@@ -255,12 +338,33 @@ export class ProjectCreation implements OnDestroy {
       return;
     }
 
-    void this.router.navigate(['/app/projects']);
+    const type = this.selectedType() ?? 'PORTFOLIO';
+    const defaultName = this.selectedType()
+      ? `Untitled ${this.typeLabel()}`
+      : 'Untitled Project';
+
+    this.isCreating.set(true);
+    this.createProjectWithFallback({
+      name: defaultName,
+      description: '',
+      type,
+      creationMethod: 'QUICK_START',
+    }, 'VISUAL_DESIGNER').subscribe({
+      next: (project) => {
+        this.dashboardDataService.invalidateProjectsOverviewCache();
+        this.toastService.success(`${defaultName} is ready in your dashboard.`);
+        void this.router.navigate(['/app/projects', project.id]);
+      },
+      error: () => {
+        this.isCreating.set(false);
+        this.toastService.error('We could not create your quick project. Please try again.');
+      },
+    });
   }
 
   private startCustomizingTransition(): void {
-    this.screen.set('customizing');
-    this.queueTimeout(() => this.screen.set('name'), 1500);
+    this.setScreen('customizing');
+    this.queueTimeout(() => this.setScreen('name'), CUSTOMIZING_HOLD_DURATION);
   }
 
   private startProjectCreation(): void {
@@ -269,33 +373,122 @@ export class ProjectCreation implements OnDestroy {
       return;
     }
 
-    this.screen.set('launching');
+    this.clearTimers();
+    this.setScreen('launching');
     this.isCreating.set(true);
+    this.launchStepProgress.set(0);
+
+    const totalDuration = 5000;
+    const finalStepLead = 2500;
+    this.queueTimeout(() => this.launchStepProgress.set(1), totalDuration * 0.3);
+    this.queueTimeout(() => this.launchStepProgress.set(2), totalDuration * 0.58);
+    this.queueTimeout(() => this.launchStepProgress.set(3), totalDuration - finalStepLead);
 
     const startedAt = Date.now();
-    this.projectService.createProject({
+    this.createProjectWithFallback({
       name: this.resolvedSiteName(),
       description: this.buildProjectDescription(),
       type,
-      creationMethod: 'AI_PROMPT',
-    }).subscribe({
-      next: () => {
+      creationMethod: 'GUIDED_SETUP',
+    }, 'VISUAL_DESIGNER').subscribe({
+      next: (project) => {
         this.dashboardDataService.invalidateProjectsOverviewCache();
 
         const elapsed = Date.now() - startedAt;
-        const remaining = Math.max(900, 1800 - elapsed);
+        const remaining = Math.max(0, totalDuration - elapsed);
 
         this.queueTimeout(() => {
-          this.toastService.success(`${this.resolvedSiteName()} is ready in your projects.`);
-          void this.router.navigate(['/app/projects']);
+          this.launchStepProgress.set(this.launchSteps.length);
+          this.toastService.success(`${this.resolvedSiteName()} is ready in your dashboard.`);
+          void this.router.navigate(['/app/projects', project.id]);
         }, remaining);
       },
       error: () => {
+        this.clearTimers();
         this.isCreating.set(false);
-        this.screen.set('goals');
+        this.launchStepProgress.set(0);
+        this.setScreen('goals');
         this.toastService.error('We could not create your project. Please try again.');
       },
     });
+  }
+
+  private createProjectWithFallback(
+    request: {
+      name: string;
+      description: string;
+      type: ProjectType;
+      creationMethod: CreationMethod;
+    },
+    fallbackCreationMethod: CreationMethod
+  ): Observable<Project> {
+    return this.projectService.createProject(request).pipe(
+      catchError((error) => {
+        if (!this.shouldRetryWithFallback(error, request.creationMethod, fallbackCreationMethod)) {
+          return throwError(() => error);
+        }
+
+        return this.projectService.createProject({
+          ...request,
+          creationMethod: fallbackCreationMethod,
+        });
+      })
+    );
+  }
+
+  private shouldRetryWithFallback(
+    error: unknown,
+    creationMethod: CreationMethod,
+    fallbackCreationMethod: CreationMethod
+  ): boolean {
+    if (creationMethod === fallbackCreationMethod) {
+      return false;
+    }
+
+    if (typeof error !== 'object' || !error) {
+      return false;
+    }
+
+    const status = 'status' in error && typeof (error as { status?: unknown }).status === 'number'
+      ? (error as { status: number }).status
+      : undefined;
+
+    return status === 400 || status === 500;
+  }
+
+  private setScreen(next: CreationScreen): void {
+    const current = this.screen();
+    if (current === next) {
+      return;
+    }
+
+    this.leavingScreen.set(current);
+    this.sceneMotion.set('leave');
+    this.queueTimeout(() => {
+      this.screen.set(next);
+      this.sceneAnimationName.set(
+        this.sceneAnimationName() === 'projectCreationSceneCardEnterA'
+          ? 'projectCreationSceneCardEnterB'
+          : 'projectCreationSceneCardEnterA'
+      );
+      this.sceneMotion.set('idle');
+
+      this.queueTimeout(() => {
+        this.sceneMotion.set('enter');
+      }, 16);
+
+      this.queueTimeout(() => {
+        if (this.leavingScreen() === current) {
+          this.leavingScreen.set(null);
+        }
+      }, SCREEN_ENTER_DURATION);
+
+      this.queueTimeout(() => {
+        if (this.sceneMotion() === 'enter') {
+          this.sceneMotion.set('idle');
+        }
+      }, SCREEN_ENTER_DURATION + 32);
+    }, SCREEN_EXIT_DELAY);
   }
 
   private buildProjectDescription(): string {
@@ -317,6 +510,74 @@ export class ProjectCreation implements OnDestroy {
           .filter(Boolean)
       )
     );
+  }
+
+  private splitMeasureWords(text: string): string[] {
+    return text
+      .split(' ')
+      .map((word, index, words) => (index < words.length - 1 ? `${word} ` : word));
+  }
+
+  private scheduleTransitionLineLayout(): void {
+    if (this.layoutFrame !== null) {
+      window.cancelAnimationFrame(this.layoutFrame);
+    }
+
+    this.layoutFrame = window.requestAnimationFrame(() => {
+      this.layoutFrame = null;
+      this.recomputeTransitionLines();
+    });
+  }
+
+  private recomputeTransitionLines(): void {
+    const customizingMeasured = this.measureRenderedLines(this.customizingMeasure?.nativeElement);
+    if (customizingMeasured.length) {
+      this.customizingLines.set(customizingMeasured);
+    }
+
+    const launchMeasured = this.measureRenderedLines(this.launchMeasure?.nativeElement);
+    if (launchMeasured.length) {
+      this.launchLines.set(launchMeasured);
+    } else {
+      this.launchLines.set([this.launchText()]);
+    }
+  }
+
+  private measureRenderedLines(container?: HTMLElement): string[] {
+    if (!container) {
+      return [];
+    }
+
+    const words = Array.from(container.querySelectorAll<HTMLElement>('.project-creation__transition-measure-word'));
+    if (!words.length) {
+      return [];
+    }
+
+    const lines: string[] = [];
+    let currentTop: number | null = null;
+    let currentLine = '';
+
+    for (const word of words) {
+      const top = Math.round(word.offsetTop);
+
+      if (currentTop === null) {
+        currentTop = top;
+      }
+
+      if (Math.abs(top - currentTop) > 1) {
+        lines.push(currentLine.trimEnd());
+        currentLine = '';
+        currentTop = top;
+      }
+
+      currentLine += word.textContent ?? '';
+    }
+
+    if (currentLine.trim()) {
+      lines.push(currentLine.trimEnd());
+    }
+
+    return lines;
   }
 
   private queueTimeout(callback: () => void, delay: number): void {

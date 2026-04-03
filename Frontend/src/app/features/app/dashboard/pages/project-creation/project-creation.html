@@ -1,5 +1,11 @@
 <section class="project-creation">
-  <div class="project-creation__scene" aria-hidden="true">
+  <div
+    class="project-creation__scene"
+    [class.project-creation__scene--enter]="sceneMotion() === 'enter'"
+    [class.project-creation__scene--leave]="sceneMotion() === 'leave'"
+    [style.--scene-animation-name]="sceneAnimationName()"
+    aria-hidden="true"
+  >
     @for (card of sceneCards; track card.image) {
       <figure class="project-creation__scene-card {{ card.className }}">
         <span class="project-creation__scene-card-chrome" aria-hidden="true">
@@ -38,7 +44,23 @@
       }
 
       <div class="project-creation__body">
-        @switch (screen()) {
+        <div class="project-creation__stage">
+          @if (leavingScreen(); as leaving) {
+            <div class="project-creation__screen-layer project-creation__screen-layer--leave">
+              <ng-container *ngTemplateOutlet="screenTemplate; context: { $implicit: leaving }"></ng-container>
+            </div>
+          }
+
+          @if (!leavingScreen() || screen() !== leavingScreen()) {
+            <div class="project-creation__screen-layer project-creation__screen-layer--enter">
+              <ng-container *ngTemplateOutlet="screenTemplate; context: { $implicit: screen() }"></ng-container>
+            </div>
+          }
+        </div>
+      </div>
+
+      <ng-template #screenTemplate let-currentScreen>
+        @switch (currentScreen) {
           @case ('type') {
             <div class="project-creation__step project-creation__step--type">
               <h1 class="project-creation__title">What type of site are you building?</h1>
@@ -71,18 +93,31 @@
             </div>
           }
 
-          @case ('customizing') {
-            <div class="project-creation__transition">
-              <div class="project-creation__transition-text project-creation__transition-text--customizing" aria-label="Customizing the next steps for you">
-                <span class="project-creation__transition-line project-creation__transition-line--shine" data-text="Customizing the next steps">
-                  Customizing the next steps
-                </span>
-                <span class="project-creation__transition-line project-creation__transition-line--second project-creation__transition-line--shine" data-text="for you">
-                  for you
-                </span>
+            @case ('customizing') {
+              <div class="project-creation__transition">
+                <div
+                  class="project-creation__transition-text project-creation__transition-text--customizing project-creation__transition-text--shine"
+                  aria-label="Customizing the next steps for you"
+                  [style.--shine-cycle]="transitionCycle(customizingLines().length)"
+                >
+                  <span class="project-creation__transition-measure" #customizingMeasure aria-hidden="true">
+                    @for (word of customizingMeasureWords; track $index) {
+                      <span class="project-creation__transition-measure-word">{{ word }}</span>
+                    }
+                  </span>
+
+                  @for (line of customizingLines(); track $index) {
+                    <span
+                      class="project-creation__transition-line project-creation__transition-line--shine"
+                      [attr.data-text]="line"
+                      [style.--line-delay]="transitionDelay($index)"
+                    >
+                      {{ line }}
+                    </span>
+                  }
+                </div>
               </div>
-            </div>
-          }
+            }
 
           @case ('name') {
               <div class="project-creation__step project-creation__step--name">
@@ -146,30 +181,62 @@
 
             @case ('launching') {
               <div class="project-creation__transition project-creation__transition--launch">
-                <p class="project-creation__transition-text project-creation__transition-text--launch" aria-label="Taking you to your site dashboard">
-                  <span
-                    class="project-creation__transition-line project-creation__transition-line--shine"
-                    data-text="Taking you to your site dashboard"
-                  >
-                    Taking you to your site dashboard
+                <p
+                  class="project-creation__transition-text project-creation__transition-text--launch project-creation__transition-text--shine"
+                  aria-label="Taking you to your site dashboard"
+                  [style.--shine-cycle]="transitionCycle(launchLines().length)"
+                >
+                  <span class="project-creation__transition-measure" #launchMeasure aria-hidden="true">
+                    @for (word of launchMeasureWords(); track $index) {
+                      <span class="project-creation__transition-measure-word">{{ word }}</span>
+                    }
                   </span>
-                  <span
-                    class="project-creation__transition-line project-creation__transition-line--second project-creation__transition-line--shine"
-                    [attr.data-text]="'for ' + resolvedSiteName()"
-                  >
-                    for {{ resolvedSiteName() }}
-                  </span>
+
+                  @for (line of launchLines(); track $index) {
+                    <span
+                      class="project-creation__transition-line project-creation__transition-line--shine"
+                      [attr.data-text]="line"
+                      [style.--line-delay]="transitionDelay($index)"
+                    >
+                      {{ line }}
+                    </span>
+                  }
                 </p>
 
                 <ul class="project-creation__launch-list">
-                <li>Adding site details to your dashboard</li>
-                <li>Preparing tools to manage your site</li>
-                <li>Personalizing steps in your setup guide</li>
-              </ul>
-            </div>
-          }
+                  @for (step of launchSteps; track step.label; let index = $index) {
+                    <li
+                      class="project-creation__launch-step"
+                      [class.is-done]="launchStepState(index) === 'done'"
+                      [class.is-loading]="launchStepState(index) === 'loading'"
+                      [class.is-pending]="launchStepState(index) === 'pending'"
+                    >
+                      <span class="project-creation__launch-step-icon" aria-hidden="true">
+                        @if (launchStepState(index) === 'done') {
+                          <svg viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="9" fill="#0f1117"></circle>
+                            <path
+                              d="M6.2 10.3L8.8 12.8L13.9 7.5"
+                              stroke="#ffffff"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        } @else if (launchStepState(index) === 'loading') {
+                          <span class="project-creation__launch-dot project-creation__launch-dot--loading">✦</span>
+                        } @else {
+                          <span class="project-creation__launch-dot">✦</span>
+                        }
+                      </span>
+                      <span class="project-creation__launch-step-label">{{ step.label }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
         }
-      </div>
+      </ng-template>
 
       @if (shouldShowFooter()) {
         <footer class="project-creation__footer">

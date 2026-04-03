@@ -335,8 +335,12 @@ export class DashboardDataService {
         return 'AI_PROMPT';
       case 'DRAG_DROP':
         return 'DRAG_DROP';
+      case 'GUIDED_SETUP':
+        return 'GUIDED_SETUP';
       case 'HYBRID':
         return 'HYBRID';
+      case 'QUICK_START':
+        return 'QUICK_START';
       case 'VISUAL_DESIGNER':
         return 'VISUAL_DESIGNER';
       default:
