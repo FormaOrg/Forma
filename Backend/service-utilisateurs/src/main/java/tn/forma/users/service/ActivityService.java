@@ -17,11 +17,19 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import tn.forma.users.websocket.ActivityRealtimeService;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +39,12 @@ public class ActivityService {
     private final UserSessionRepository userSessionRepository;
     private final LoginHistoryEntryRepository loginHistoryEntryRepository;
     private final ActivityRealtimeService activityRealtimeService;
+
+    private final HttpClient geoHttpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(2))
+            .build();
+    private final ConcurrentHashMap<String, String> locationCache = new ConcurrentHashMap<>();
+    private static final Pattern JSON_STRING_FIELD_PATTERN = Pattern.compile("\"%s\"\\s*:\\s*\"([^\"]*)\"");
 
     @Transactional
     public String createAuthenticatedSession(User user, boolean rememberMe) {
@@ -289,13 +303,11 @@ public class ActivityService {
             return "Unknown location";
         }
 
-        if (normalized.startsWith("127.") || normalized.startsWith("10.") || normalized.startsWith("192.168.")
-                || normalized.startsWith("172.16.") || normalized.startsWith("172.17.") || normalized.startsWith("172.18.")
-                || normalized.startsWith("172.19.") || normalized.startsWith("172.2") || normalized.startsWith("localhost")) {
+        if (isLocalOrPrivateIp(normalized)) {
             return "Local network";
         }
 
-        return "Unknown location";
+        return locationCache.computeIfAbsent(normalized, this::lookupLocation);
     }
 
     private String detectDeviceType(String userAgent) {
@@ -335,6 +347,74 @@ public class ActivityService {
 
     private boolean safeEquals(String left, String right) {
         return safe(left).equalsIgnoreCase(safe(right));
+    }
+
+    private boolean isLocalOrPrivateIp(String ipAddress) {
+        String normalized = safe(ipAddress).toLowerCase(Locale.ROOT);
+
+        return normalized.startsWith("127.")
+                || normalized.equals("::1")
+                || normalized.equals("0:0:0:0:0:0:0:1")
+                || normalized.startsWith("10.")
+                || normalized.startsWith("192.168.")
+                || normalized.startsWith("172.16.")
+                || normalized.startsWith("172.17.")
+                || normalized.startsWith("172.18.")
+                || normalized.startsWith("172.19.")
+                || normalized.startsWith("172.2")
+                || normalized.startsWith("localhost");
+    }
+
+    private String lookupLocation(String ipAddress) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://ip-api.com/json/" + ipAddress + "?fields=status,city,country"))
+                    .timeout(Duration.ofSeconds(3))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = geoHttpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                return "Unknown location";
+            }
+
+            String body = response.body();
+            String status = extractJsonField(body, "status");
+            if (!"success".equalsIgnoreCase(status)) {
+                return "Unknown location";
+            }
+
+            String city = extractJsonField(body, "city");
+            String country = extractJsonField(body, "country");
+
+            if (!city.isBlank() && !country.isBlank()) {
+                return city + ", " + country;
+            }
+
+            if (!country.isBlank()) {
+                return country;
+            }
+
+            return "Unknown location";
+        } catch (Exception exception) {
+            log.debug("Failed to resolve geolocation for IP {}", ipAddress, exception);
+            return "Unknown location";
+        }
+    }
+
+    private String extractJsonField(String body, String fieldName) {
+        if (body == null || body.isBlank() || fieldName == null || fieldName.isBlank()) {
+            return "";
+        }
+
+        Pattern pattern = Pattern.compile(JSON_STRING_FIELD_PATTERN.pattern().formatted(Pattern.quote(fieldName)));
+        Matcher matcher = pattern.matcher(body);
+        if (!matcher.find()) {
+            return "";
+        }
+
+        return safe(matcher.group(1));
     }
 
     private record RequestMetadata(
