@@ -1,0 +1,89 @@
+<section class="orders-panel orders-panel--featured">
+  <div class="orders-panel__header">
+    <div>
+      <h2 class="orders-panel__title">Orders</h2>
+    </div>
+    <button type="button" class="orders-panel__primary-action" (click)="refresh.emit()">Refresh data</button>
+  </div>
+
+  <div class="orders-panel__summary-strip">
+    <div class="orders-panel__summary-metrics">
+      <article class="orders-panel__summary-item">
+        <span class="orders-panel__summary-label">Order value</span>
+        <strong class="orders-panel__summary-value">{{ kpis[0]?.value ?? '-' }}</strong>
+        <span class="orders-panel__summary-delta">{{ kpis[0]?.change ?? '0%' }}</span>
+      </article>
+      <article class="orders-panel__summary-item">
+        <span class="orders-panel__summary-label">Orders</span>
+        <strong class="orders-panel__summary-value">{{ kpis[1]?.value ?? '0' }}</strong>
+        <span class="orders-panel__summary-delta">{{ kpis[1]?.change ?? '0%' }}</span>
+      </article>
+      <article class="orders-panel__summary-item">
+        <span class="orders-panel__summary-label">Awaiting delivery</span>
+        <strong class="orders-panel__summary-value">{{ kpis[3]?.value ?? '0' }}</strong>
+        <span class="orders-panel__summary-delta">{{ kpis[3]?.change ?? '0' }}</span>
+      </article>
+    </div>
+
+    <div class="orders-panel__summary-actions">
+      <span class="orders-panel__summary-action">{{ rangeLabel }}</span>
+      <span class="orders-panel__summary-link">{{ query.compare ? 'Comparing previous period' : 'Current period only' }}</span>
+    </div>
+  </div>
+
+  <div class="orders-panel__table-shell">
+    <div class="orders-panel__toolbar">
+      <div class="orders-panel__toolbar-actions">
+        <select class="orders-panel__toolbar-select" [value]="query.filter" (change)="onFilterChange($any($event.target).value)">
+          @for (option of filterOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        <select class="orders-panel__toolbar-select" [value]="query.sort" (change)="onSortChange($any($event.target).value)">
+          @for (option of sortOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+
+      <label class="orders-panel__search">
+        <app-icon class="orders-panel__search-icon" name="search" [size]="14"></app-icon>
+        <input
+          type="text"
+          [value]="searchValue"
+          placeholder="Search orders or customers"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+      </label>
+    </div>
+
+    @if (hasOrders) {
+      <app-project-sales-orders-table
+        [orders]="orders"
+        [selectedOrderIds]="selectedOrderIds"
+        [allVisibleOrdersSelected]="allVisibleOrdersSelected"
+        (selectAllChange)="toggleAllOrders.emit($event)"
+        (orderSelectionChange)="toggleOrderSelection.emit($event)"
+      />
+
+      @if (totalPages > 1) {
+        <div class="orders-panel__pagination">
+          <button type="button" class="orders-panel__pagination-btn" [disabled]="page === 0" (click)="previousPage()">
+            Previous
+          </button>
+          <span class="orders-panel__pagination-label">
+            Page {{ page + 1 }} of {{ totalPages }} | {{ totalElements }} orders
+          </span>
+          <button type="button" class="orders-panel__pagination-btn" [disabled]="page + 1 >= totalPages" (click)="nextPage()">
+            Next
+          </button>
+        </div>
+      }
+    } @else {
+      <div class="orders-panel__empty">
+        <h3>No matching orders</h3>
+        <p>Try a different search term, status filter, or date range.</p>
+      </div>
+    }
+  </div>
+</section>

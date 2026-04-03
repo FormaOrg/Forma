@@ -1,0 +1,21 @@
+<section class="sales-panel">
+  <div class="sales-panel__header">
+    <div>
+      <p class="sales-panel__eyebrow">Today's focus</p>
+      <h2 class="sales-panel__title">Keep local delivery moving</h2>
+      <p class="sales-panel__subtitle">Operational guidance derived from the real order and delivery state of this store.</p>
+    </div>
+  </div>
+
+  <div class="sales-note-list">
+    @for (item of items; track item.step) {
+      <article class="sales-note-item">
+        <span class="sales-note-item__step">{{ item.step }}</span>
+        <div class="sales-note-item__body">
+          <strong>{{ item.title }}</strong>
+          <p>{{ item.body }}</p>
+        </div>
+      </article>
+    }
+  </div>
+</section>

@@ -1,0 +1,52 @@
+<section class="sales-panel sales-panel--chart">
+  <div class="sales-panel__header">
+    <div>
+      <p class="sales-panel__eyebrow">Revenue trend</p>
+      <h2 class="sales-panel__title">Order value over time</h2>
+      <p class="sales-panel__subtitle">Daily revenue based on real orders in the selected period.</p>
+    </div>
+    <div class="sales-chart__legend">
+      <span class="sales-chart__legend-item">
+        <span class="sales-chart__legend-dot sales-chart__legend-dot--revenue"></span>
+        Revenue
+      </span>
+    </div>
+  </div>
+
+  @if (trend.length > 0) {
+    <div class="sales-chart">
+      <div class="sales-chart__y-axis">
+        @for (tick of revenueTicks(); track $index) {
+          <span class="sales-chart__tick" [style.top.px]="tickOffset(tick)">{{ tick / 1000 }}k</span>
+        }
+      </div>
+
+      <div class="sales-chart__canvas">
+        @for (tick of revenueTicks(); track $index) {
+          <span class="sales-chart__grid-line" [style.top.px]="tickOffset(tick)"></span>
+        }
+
+        <svg viewBox="0 0 640 240" class="sales-chart__svg" preserveAspectRatio="none" aria-hidden="true">
+          <path [attr.d]="areaPath()" fill="rgba(117, 102, 255, 0.08)"></path>
+          <polyline [attr.points]="revenuePolyline()" class="sales-chart__line"></polyline>
+          @for (point of trend; track point.label) {
+            <circle
+              [attr.cx]="pointX($index)"
+              [attr.cy]="pointY(point.revenue)"
+              r="4"
+              class="sales-chart__point"
+            ></circle>
+          }
+        </svg>
+
+        <div class="sales-chart__x-axis">
+          @for (point of trend; track point.label) {
+            <span class="sales-chart__x-label">{{ point.label }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="sales-panel__empty">No chart data for this period.</div>
+  }
+</section>

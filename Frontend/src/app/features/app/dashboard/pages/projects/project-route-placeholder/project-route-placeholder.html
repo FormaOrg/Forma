@@ -152,6 +152,43 @@
       </div>
     </section>
   </section>
+} @else if (title() === 'Sales') {
+  <app-project-sales-page
+    [rangeOptions]="salesRangeOptions"
+    [sortOptions]="salesSortOptions"
+    [filterOptions]="salesFilterOptions"
+    [query]="salesQuery()"
+    [rangeLabel]="salesRangeLabel()"
+    [kpis]="salesKpis()"
+    [trend]="salesTrend()"
+    [deliveryStats]="salesDeliveryStats()"
+    [topProducts]="salesTopProducts()"
+    [focusItems]="salesFocusItems()"
+    [orders]="salesOrders()"
+    [searchValue]="salesSearchValue()"
+    [errorMessage]="salesErrorMessage()"
+    [isLoading]="isSalesLoading()"
+    [hasLoaded]="hasLoadedSales()"
+    [hasData]="salesHasData()"
+    [hasOrders]="salesHasOrders()"
+    [isExporting]="isExportingSales()"
+    [selectedOrderIds]="selectedOrderIds()"
+    [allVisibleOrdersSelected]="allVisibleOrdersSelected()"
+    [ordersPage]="salesOrdersPage()"
+    [ordersTotalPages]="salesOrdersTotalPages()"
+    [ordersTotalElements]="salesOrdersTotalElements()"
+    (rangeChange)="setSalesRange($event)"
+    (compareToggle)="toggleComparePeriod()"
+    (refresh)="refreshSalesData()"
+    (export)="exportSalesData()"
+    (retry)="retrySalesLoad()"
+    (filterChange)="setSalesFilter($event)"
+    (sortChange)="setSalesSort($event)"
+    (searchChange)="onSalesSearchInput($event)"
+    (toggleAllOrders)="toggleAllOrders($event)"
+    (toggleOrderSelection)="toggleOrderSelection($event.orderId, $event.selected)"
+    (pageChange)="goToOrdersPage($event)"
+  ></app-project-sales-page>
 } @else {
   <section class="project-placeholder">
     <div class="project-placeholder__card">

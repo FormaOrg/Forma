@@ -3,10 +3,11 @@ import { Component, Input, OnChanges, SimpleChanges, inject, OnInit } from '@ang
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { SettingsSidebarSection } from '../settings-nav.types';
+import type { SettingsSidebarItem, SettingsSidebarSection } from '../settings-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
 import { ThemeService } from '../../../core/services/theme.service';
+import { SettingsNavigationService } from '../../../core/services/settings-navigation.service';
 
 @Component({
   selector: 'app-settings-sidebar',
@@ -24,6 +25,7 @@ export class SettingsSidebar implements OnChanges, OnInit {
 
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private settingsNavigationService = inject(SettingsNavigationService);
 
   ngOnInit() {
     // Enable transitions after initial render
@@ -49,7 +51,7 @@ export class SettingsSidebar implements OnChanges, OnInit {
         {
           label: 'settings.sidebar.back',
           icon: 'arrow-left',
-          route: '/app/home'
+          action: 'back'
         }
       ]
     },
@@ -105,11 +107,20 @@ export class SettingsSidebar implements OnChanges, OnInit {
     return item.label;
   }
 
-  trackItemRoute(_: number, route: string): string {
-    return route;
+  trackItemRoute(_: number, item: SettingsSidebarItem): string {
+    return item.route ?? item.action ?? item.label;
   }
 
   isActive(route: string): boolean {
     return this.router.url === route;
+  }
+
+  onItemClick(item: SettingsSidebarItem, event?: MouseEvent): void {
+    if (item.action !== 'back') {
+      return;
+    }
+
+    event?.preventDefault();
+    void this.settingsNavigationService.navigateBack();
   }
 }

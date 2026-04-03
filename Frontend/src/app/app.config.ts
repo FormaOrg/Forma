@@ -19,6 +19,7 @@ import { SettingsRouteReuseStrategy } from './core/routing/settings-route-reuse.
 import { ThemeService } from './core/services/theme.service';
 import { GoogleLinkOauthService } from './core/services/google-link-oauth.service';
 import { GoogleAuthPopupService } from './core/services/google-auth-popup.service';
+import { SettingsNavigationService } from './core/services/settings-navigation.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -69,6 +70,12 @@ export const appConfig: ApplicationConfig = {
       multi: true,
       useFactory: (googleAuthPopupService: GoogleAuthPopupService) => () => googleAuthPopupService.initBridge(),
       deps: [GoogleAuthPopupService]
+    },
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: (settingsNavigationService: SettingsNavigationService) => () => settingsNavigationService.init(),
+      deps: [SettingsNavigationService]
     },
     {
       provide: RouteReuseStrategy,
