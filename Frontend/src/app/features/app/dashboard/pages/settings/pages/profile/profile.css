@@ -86,9 +86,13 @@
 }
 
 :host-context(.theme-dark) .section-content {
-  background: #171e2a;
-  border-color: rgba(226, 231, 244, 0.1);
-  box-shadow: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    #171e2a;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
 .profile-skeleton {

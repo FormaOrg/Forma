@@ -62,6 +62,7 @@
   padding: 0 14px 0 16px;
   background: var(--shell-brand-bg);
   border-right: 1px solid var(--shell-border);
+  border-bottom: 1px solid var(--shell-border);
   transition:
     width var(--shell-dur) var(--shell-ease),
     padding var(--shell-dur) var(--shell-ease),
@@ -159,19 +160,6 @@
   transition: none;
 }
 
-/* Continuous rule under header row across sidebar + main */
-.dashboard-shell::before {
-  content: '';
-  position: fixed;
-  top: var(--shell-header-h);
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--shell-border);
-  z-index: 50;
-  pointer-events: none;
-}
-
 .dashboard-main {
   margin-left: var(--shell-sidebar-expanded);
   min-height: 100vh;
@@ -201,8 +189,8 @@
 body.theme-dark .dashboard-shell,
 :host-context(.theme-dark) .dashboard-shell {
   --shell-border: rgba(255, 255, 255, 0.08);
-  --shell-bg: #10141c;
-  --shell-brand-bg: #121824;
+  --shell-bg: #0f141d;
+  --shell-brand-bg: #171e2a;
   --shell-brand-surface: transparent;
   --shell-brand-border: transparent;
   --shell-brand-wordmark: #f4f7ff;

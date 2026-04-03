@@ -10,9 +10,9 @@
 }
 
 :host-context(.theme-dark) {
-  background: #10141c;
+  background: #0f141d;
 }
 
 :host-context(.theme-dark) .settings-content {
-  background: #10141c;
+  background: #0f141d;
 }
