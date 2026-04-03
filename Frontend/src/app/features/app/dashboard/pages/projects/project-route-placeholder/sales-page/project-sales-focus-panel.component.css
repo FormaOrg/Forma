@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+.sales-panel {
+  padding: 18px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sales-panel__header > div {
+  min-width: 0;
+}
+
+.sales-panel__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+.sales-panel__title {
+  margin: 0;
+  font-size: 1.34rem;
+  line-height: 1.1;
+  font-weight: 590;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+.sales-panel__subtitle {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #6f7480;
+}
+
+.sales-note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sales-note-item {
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fbfbfd;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.sales-note-item__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(117, 102, 255, 0.1);
+  color: #7566ff;
+  font-size: 0.78rem;
+  font-weight: 620;
+}
+
+.sales-note-item strong {
+  font-size: 0.8rem;
+  font-weight: 560;
+  color: #111111;
+}
+
+.sales-note-item p {
+  margin: 6px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: #6f7480;
+}

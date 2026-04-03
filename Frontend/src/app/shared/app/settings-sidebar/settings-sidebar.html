@@ -26,20 +26,34 @@
       }
 
       <ul class="settings-sidebar__list" role="list">
-        @for (item of section.items; track trackItemRoute($index, item.route)) {
+        @for (item of section.items; track trackItemRoute($index, item)) {
           <li class="settings-sidebar__item">
-            <a
-              class="settings-sidebar__row"
-              [routerLink]="item.route"
-              routerLinkActive="settings-sidebar__row--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              [class.settings-sidebar__row--collapsed]="collapsed"
-            >
-              <span class="settings-sidebar__icon">
-                <app-icon [name]="item.icon" [size]="iconSize" />
-              </span>
-              <span class="settings-sidebar__label">{{ item.label | t }}</span>
-            </a>
+            @if (item.action === 'back') {
+              <button
+                type="button"
+                class="settings-sidebar__row"
+                [class.settings-sidebar__row--collapsed]="collapsed"
+                (click)="onItemClick(item, $event)"
+              >
+                <span class="settings-sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="settings-sidebar__label">{{ item.label | t }}</span>
+              </button>
+            } @else {
+              <a
+                class="settings-sidebar__row"
+                [routerLink]="item.route"
+                routerLinkActive="settings-sidebar__row--active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [class.settings-sidebar__row--collapsed]="collapsed"
+              >
+                <span class="settings-sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="settings-sidebar__label">{{ item.label | t }}</span>
+              </a>
+            }
           </li>
         }
       </ul>

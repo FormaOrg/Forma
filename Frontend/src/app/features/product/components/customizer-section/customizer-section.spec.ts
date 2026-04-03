@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CustomizerSection } from './customizer-section';
+import { CustomizerSectionComponent } from './customizer-section';
 
-describe('CustomizerSection', () => {
-  let component: CustomizerSection;
-  let fixture: ComponentFixture<CustomizerSection>;
+describe('CustomizerSectionComponent', () => {
+  let component: CustomizerSectionComponent;
+  let fixture: ComponentFixture<CustomizerSectionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CustomizerSection]
+      imports: [CustomizerSectionComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CustomizerSection);
+    fixture = TestBed.createComponent(CustomizerSectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

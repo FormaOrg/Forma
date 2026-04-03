@@ -114,3 +114,75 @@ create table if not exists projects (
 
 create index if not exists idx_projects_user_id on projects(user_id);
 create index if not exists idx_projects_template_id on projects(template_id);
+
+create table if not exists project_customers (
+    id bigserial primary key,
+    project_id bigint not null references projects(id) on delete cascade,
+    first_name varchar(120) not null,
+    last_name varchar(120) not null,
+    email varchar(255),
+    phone varchar(40),
+    address varchar(255),
+    zone_label varchar(120),
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now()
+);
+
+create index if not exists idx_project_customers_project_id on project_customers(project_id);
+create index if not exists idx_project_customers_email on project_customers(email);
+
+create table if not exists project_products (
+    id bigserial primary key,
+    project_id bigint not null references projects(id) on delete cascade,
+    name varchar(140) not null,
+    sku varchar(80),
+    category varchar(120),
+    price numeric(12, 2) not null default 0,
+    active boolean not null default true,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now()
+);
+
+create index if not exists idx_project_products_project_id on project_products(project_id);
+
+create table if not exists project_orders (
+    id bigserial primary key,
+    project_id bigint not null references projects(id) on delete cascade,
+    customer_id bigint references project_customers(id) on delete set null,
+    order_number varchar(60) not null,
+    placed_at timestamp not null,
+    scheduled_for timestamp,
+    delivered_at timestamp,
+    payment_status varchar(32) not null,
+    fulfillment_status varchar(32) not null,
+    subtotal numeric(12, 2) not null default 0,
+    delivery_fee numeric(12, 2) not null default 0,
+    total numeric(12, 2) not null default 0,
+    delivery_address varchar(255),
+    notes varchar(1000),
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
+    constraint chk_project_orders_payment_status
+        check (payment_status in ('DUE_ON_DELIVERY', 'COLLECTED', 'DEPOSIT_TAKEN', 'DEPOSIT_RETURNED')),
+    constraint chk_project_orders_fulfillment_status
+        check (fulfillment_status in ('NEW', 'PACKING', 'SCHEDULED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'))
+);
+
+create index if not exists idx_project_orders_project_id on project_orders(project_id);
+create index if not exists idx_project_orders_placed_at on project_orders(placed_at);
+create index if not exists idx_project_orders_order_number on project_orders(order_number);
+
+create table if not exists project_order_items (
+    id bigserial primary key,
+    order_id bigint not null references project_orders(id) on delete cascade,
+    product_id bigint references project_products(id) on delete set null,
+    product_name varchar(140) not null,
+    product_sku varchar(80),
+    quantity integer not null,
+    unit_price numeric(12, 2) not null default 0,
+    line_total numeric(12, 2) not null default 0,
+    constraint chk_project_order_items_quantity check (quantity >= 1)
+);
+
+create index if not exists idx_project_order_items_order_id on project_order_items(order_id);
+create index if not exists idx_project_order_items_product_id on project_order_items(product_id);

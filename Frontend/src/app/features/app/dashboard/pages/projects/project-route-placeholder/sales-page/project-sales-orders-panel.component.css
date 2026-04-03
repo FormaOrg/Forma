@@ -1,0 +1,258 @@
+:host {
+  display: block;
+}
+
+.orders-panel {
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  overflow: hidden;
+}
+
+.orders-panel--featured {
+  margin-top: 2px;
+}
+
+.orders-panel__header {
+  padding: 16px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.orders-panel__title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 600;
+  color: #111111;
+}
+
+.orders-panel__primary-action {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  background: #7566ff;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+
+.orders-panel__summary-strip {
+  margin: 0 16px 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.orders-panel__summary-metrics {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.orders-panel__summary-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.orders-panel__summary-label,
+.orders-panel__summary-delta {
+  font-size: 0.74rem;
+}
+
+.orders-panel__summary-label {
+  color: #3c4351;
+  font-weight: 480;
+}
+
+.orders-panel__summary-value {
+  font-size: 0.92rem;
+  line-height: 1;
+  font-weight: 560;
+  color: #111111;
+}
+
+.orders-panel__summary-delta {
+  color: rgba(17, 17, 17, 0.42);
+}
+
+.orders-panel__summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.orders-panel__summary-action,
+.orders-panel__summary-link {
+  font-size: 0.76rem;
+  font-weight: 520;
+}
+
+.orders-panel__summary-action {
+  color: #7566ff;
+}
+
+.orders-panel__summary-link {
+  color: rgba(17, 17, 17, 0.54);
+}
+
+.orders-panel__table-shell {
+  margin: 0 16px 16px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.orders-panel__toolbar {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(225, 227, 236, 0.95);
+}
+
+.orders-panel__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orders-panel__toolbar-select {
+  min-height: 30px;
+  padding: 0 32px 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #4b5060;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.orders-panel__search {
+  min-width: 190px;
+  height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+}
+
+.orders-panel__search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.74rem;
+  color: #3c4351;
+}
+
+.orders-panel__search-icon {
+  display: inline-flex;
+  color: #8d92a0;
+}
+
+.orders-panel__pagination {
+  padding: 12px 14px;
+  border-top: 1px solid rgba(225, 227, 236, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.orders-panel__pagination-label {
+  font-size: 0.76rem;
+  color: #4b5060;
+}
+
+.orders-panel__pagination-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.orders-panel__pagination-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.orders-panel__empty {
+  padding: 22px;
+  text-align: center;
+}
+
+.orders-panel__empty h3,
+.orders-panel__empty p {
+  margin: 0;
+}
+
+.orders-panel__empty h3 {
+  font-size: 1rem;
+  color: #111111;
+}
+
+.orders-panel__empty p {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #6f7480;
+}
+
+@media (max-width: 768px) {
+  .orders-panel__summary-strip,
+  .orders-panel__toolbar,
+  .orders-panel__header,
+  .orders-panel__toolbar-actions,
+  .orders-panel__pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .orders-panel__summary-metrics,
+  .orders-panel__summary-actions {
+    gap: 12px;
+  }
+
+  .orders-panel__search {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .orders-panel__toolbar-select,
+  .orders-panel__pagination-btn {
+    width: 100%;
+  }
+}

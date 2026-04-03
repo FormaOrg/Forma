@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MainSection } from './forma-process-showcase';
+import { FormaProcessShowcaseComponent } from './forma-process-showcase';
 
-describe('MainSection', () => {
-  let component: MainSection;
-  let fixture: ComponentFixture<MainSection>;
+describe('FormaProcessShowcaseComponent', () => {
+  let component: FormaProcessShowcaseComponent;
+  let fixture: ComponentFixture<FormaProcessShowcaseComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MainSection]
+      imports: [FormaProcessShowcaseComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MainSection);
+    fixture = TestBed.createComponent(FormaProcessShowcaseComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

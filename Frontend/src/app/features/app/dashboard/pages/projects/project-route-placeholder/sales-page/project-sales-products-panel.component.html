@@ -1,0 +1,39 @@
+<section class="sales-panel">
+  <div class="sales-panel__header">
+    <div>
+      <p class="sales-panel__eyebrow">Merchandising</p>
+      <h2 class="sales-panel__title">Top-selling products</h2>
+      <p class="sales-panel__subtitle">Products ranked from actual order lines in the current date range.</p>
+    </div>
+  </div>
+
+  @if (products.length > 0) {
+    <div class="sales-products">
+      <div class="sales-products__head" aria-hidden="true">
+        <span>Product</span>
+        <span>Revenue</span>
+        <span>Units</span>
+        <span>Growth</span>
+      </div>
+      @for (product of products; track product.sku + product.name) {
+        <article class="sales-product-row">
+          <div class="sales-product-row__main">
+            <strong class="sales-product-row__name">{{ product.name }}</strong>
+            <span class="sales-product-row__sku">{{ product.sku }}</span>
+          </div>
+          <div class="sales-product-row__metric">
+            <span class="sales-product-row__metric-label">Revenue</span>
+            <strong>{{ product.revenue }}</strong>
+          </div>
+          <div class="sales-product-row__metric">
+            <span class="sales-product-row__metric-label">Units</span>
+            <strong>{{ product.units }}</strong>
+          </div>
+          <div class="sales-product-row__trend">{{ product.trend }}</div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="sales-panel__empty">Top products will appear here once order lines are available.</div>
+  }
+</section>

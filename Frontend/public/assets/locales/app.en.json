@@ -86,7 +86,7 @@
   "app.command.footer.move": "Move",
   "app.command.footer.close": "Close",
 
-  "settings.sidebar.back": "Back to dashboard",
+  "settings.sidebar.back": "Back",
   "settings.sidebar.account": "Account Settings",
   "settings.sidebar.profile": "Profile",
   "settings.sidebar.security": "Security",

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuilderHelpDeck } from './builder-help-deck';
+import { ProductHelpDeck } from './builder-help-deck';
 
-describe('BuilderHelpDeck', () => {
-  let component: BuilderHelpDeck;
-  let fixture: ComponentFixture<BuilderHelpDeck>;
+describe('ProductHelpDeck', () => {
+  let component: ProductHelpDeck;
+  let fixture: ComponentFixture<ProductHelpDeck>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BuilderHelpDeck]
+      imports: [ProductHelpDeck]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BuilderHelpDeck);
+    fixture = TestBed.createComponent(ProductHelpDeck);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
