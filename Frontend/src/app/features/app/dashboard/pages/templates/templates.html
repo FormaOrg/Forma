@@ -43,7 +43,7 @@
     ></app-data-card>
   </div>
 
-  <section class="templates-toolbar">
+  <section class="templates-toolbar" (click)="closeDropdowns()">
     <div class="templates-toolbar__search">
       <span class="templates-toolbar__search-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
@@ -60,7 +60,13 @@
       />
     </div>
 
-    <div class="templates-toolbar__scope" role="tablist" aria-label="Template scope">
+    <div
+      class="templates-toolbar__scope"
+      role="tablist"
+      aria-label="Template scope"
+      [attr.data-scope]="activeScope()"
+    >
+      <span class="templates-toolbar__scope-pill" aria-hidden="true"></span>
       <button
         type="button"
         class="templates-toolbar__scope-button"
@@ -79,46 +85,61 @@
       </button>
     </div>
 
-    <label class="templates-toolbar__select">
-      <span class="templates-toolbar__select-label">Category</span>
-      <span class="templates-toolbar__select-field">
-        <select
-          class="templates-toolbar__select-input"
-          [ngModel]="activeCategory()"
-          (ngModelChange)="updateCategory($event)"
-        >
-          @for (category of categories(); track category) {
-            <option [value]="category">{{ category === 'all' ? 'All categories' : category }}</option>
-          }
-        </select>
-        <span class="templates-toolbar__select-caret" aria-hidden="true">
+    <div
+      class="templates-toolbar__dropdown templates-toolbar__dropdown--category"
+      [class.is-open]="categoryDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleCategoryDropdown()">
+        <span class="templates-toolbar__dropdown-label">Category</span>
+        <span class="templates-toolbar__dropdown-value">{{ activeCategoryLabel() }}</span>
+        <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
           <svg viewBox="0 0 20 20" fill="none">
             <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-      </span>
-    </label>
+      </button>
 
-    <label class="templates-toolbar__select">
-      <span class="templates-toolbar__select-label">Sort</span>
-      <span class="templates-toolbar__select-field">
-        <select
-          class="templates-toolbar__select-input"
-          [ngModel]="activeSort()"
-          (ngModelChange)="updateSort($event)"
-        >
-          <option value="featured">Featured</option>
-          <option value="popular">Most used</option>
-          <option value="newest">Newest</option>
-          <option value="name">Name</option>
-        </select>
-        <span class="templates-toolbar__select-caret" aria-hidden="true">
+      @if (categoryDropdownOpen()) {
+        <div class="templates-toolbar__dropdown-menu">
+          @for (category of categories(); track category) {
+            <button
+              type="button"
+              class="templates-toolbar__dropdown-item"
+              [class.is-selected]="activeCategory() === category"
+              (click)="updateCategory(category)"
+            >
+              {{ category === 'all' ? 'All categories' : category }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div
+      class="templates-toolbar__dropdown templates-toolbar__dropdown--sort"
+      [class.is-open]="sortDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleSortDropdown()">
+        <span class="templates-toolbar__dropdown-label">Sort</span>
+        <span class="templates-toolbar__dropdown-value">{{ activeSortLabel() }}</span>
+        <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
           <svg viewBox="0 0 20 20" fill="none">
             <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-      </span>
-    </label>
+      </button>
+
+      @if (sortDropdownOpen()) {
+        <div class="templates-toolbar__dropdown-menu">
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'featured'" (click)="updateSort('featured')">Featured</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'popular'" (click)="updateSort('popular')">Most used</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'newest'" (click)="updateSort('newest')">Newest</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'name'" (click)="updateSort('name')">Name</button>
+        </div>
+      }
+    </div>
   </section>
 
   <section class="templates-panel">

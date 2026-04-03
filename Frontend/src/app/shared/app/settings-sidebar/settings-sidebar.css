@@ -8,6 +8,10 @@
   --sb-pad-x: 12px;
   --sb-dur: 240ms;
   --sb-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --sb-brand-surface: transparent;
+  --sb-brand-border: transparent;
+  --sb-brand-logo-shadow: none;
+  --sb-brand-wordmark: #000;
   --sb-active-bg: rgba(117, 102, 255, 0.14);
   --sb-active-text: #3e4fb8;
   --sb-hover-bg: rgba(17, 24, 39, 0.045);
@@ -50,6 +54,8 @@
   align-items: center;
   gap: 10px;
   padding: 0 14px 0 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: inherit;
   border-top-right-radius: 24px;
 }
 
@@ -60,6 +66,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2px;
+  border-radius: 10px;
+  background: var(--sb-brand-surface);
+  border: 1px solid var(--sb-brand-border);
+  box-shadow: var(--sb-brand-logo-shadow);
+  transition:
+    background-color var(--sb-dur) var(--sb-ease),
+    border-color var(--sb-dur) var(--sb-ease),
+    box-shadow var(--sb-dur) var(--sb-ease),
+    transform var(--sb-dur) var(--sb-ease);
 }
 
 .settings-sidebar__mark img {
@@ -72,7 +88,7 @@
 .settings-sidebar__wordmark {
   font-size: 19px;
   font-weight: 500;
-  color: #000;
+  color: var(--sb-brand-wordmark);
   white-space: nowrap;
   overflow: hidden;
   max-width: 160px;
@@ -87,6 +103,10 @@
   justify-content: center;
   padding: 0;
   gap: 0;
+}
+
+.settings-sidebar--collapsed .settings-sidebar__mark {
+  transform: scale(0.98);
 }
 
 .settings-sidebar--collapsed .settings-sidebar__wordmark {
@@ -233,4 +253,64 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+:host-context(.theme-dark) .settings-sidebar {
+  --sb-brand-surface: rgba(255, 255, 255, 0.04);
+  --sb-brand-border: rgba(255, 255, 255, 0.06);
+  --sb-brand-logo-shadow: none;
+  --sb-brand-wordmark: #f4f7ff;
+  --sb-active-bg: rgba(117, 102, 255, 0.18);
+  --sb-active-text: #ffffff;
+  --sb-hover-bg: rgba(255, 255, 255, 0.06);
+  background: #171e2a;
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context(.theme-dark) .settings-sidebar__brand {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  background: #171e2a;
+}
+
+:host-context(.theme-dark) .settings-sidebar__separator {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:host-context(.theme-dark) .settings-sidebar__section-label-text {
+  color: rgba(219, 226, 242, 0.46);
+}
+
+:host-context(.theme-dark) .settings-sidebar__row {
+  color: rgba(219, 226, 242, 0.62);
+}
+
+:host-context(.theme-dark) .settings-sidebar__icon {
+  color: rgba(219, 226, 242, 0.54);
+}
+
+:host-context(.theme-dark) .settings-sidebar__row:hover {
+  background: var(--sb-hover-bg);
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .settings-sidebar__row:hover .settings-sidebar__icon {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .settings-sidebar__row--active {
+  background: var(--sb-active-bg);
+  color: var(--sb-active-text);
+}
+
+:host-context(.theme-dark) .settings-sidebar__row--active .settings-sidebar__icon {
+  color: var(--sb-active-text);
+}
+
+:host-context(.theme-dark) .settings-sidebar__brand:hover .settings-sidebar__mark {
+  background: rgba(117, 102, 255, 0.12);
+  border-color: rgba(117, 102, 255, 0.18);
+}
+
+:host-context(.theme-dark) .settings-sidebar--collapsed .settings-sidebar__mark {
+  background: rgba(255, 255, 255, 0.04);
 }

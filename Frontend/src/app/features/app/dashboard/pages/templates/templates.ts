@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
@@ -26,6 +26,7 @@ export class Templates implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   readonly layersIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,6 +55,8 @@ export class Templates implements OnInit {
   readonly activeScope = signal<TemplateScope>('all');
   readonly activeCategory = signal('all');
   readonly activeSort = signal<TemplateSort>('featured');
+  readonly categoryDropdownOpen = signal(false);
+  readonly sortDropdownOpen = signal(false);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
   readonly creatingTemplateId = signal<string | null>(null);
@@ -66,6 +69,19 @@ export class Templates implements OnInit {
   readonly totalTemplates = computed(() => this.templates().length);
   readonly featuredTemplates = computed(() => this.templates().filter((template) => template.isFeatured).length);
   readonly categoryCount = computed(() => Math.max(0, this.categories().length - 1));
+  readonly activeCategoryLabel = computed(() => this.activeCategory() === 'all' ? 'All categories' : this.activeCategory());
+  readonly activeSortLabel = computed(() => {
+    switch (this.activeSort()) {
+      case 'popular':
+        return 'Most used';
+      case 'newest':
+        return 'Newest';
+      case 'name':
+        return 'Name';
+      default:
+        return 'Featured';
+    }
+  });
 
   readonly filteredTemplates = computed(() => {
     const query = this.searchTerm().trim().toLowerCase();
@@ -140,6 +156,7 @@ export class Templates implements OnInit {
   }
 
   updateScope(scope: TemplateScope): void {
+    this.closeDropdowns();
     void this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: scope === 'my' ? { tab: 'my' } : { tab: null },
@@ -149,15 +166,18 @@ export class Templates implements OnInit {
 
   updateCategory(category: string): void {
     this.activeCategory.set(category);
+    this.categoryDropdownOpen.set(false);
   }
 
   updateSort(sort: TemplateSort): void {
     this.activeSort.set(sort);
+    this.sortDropdownOpen.set(false);
   }
 
   clearFilters(): void {
     this.searchTerm.set('');
     this.activeCategory.set('all');
+    this.closeDropdowns();
     this.updateScope('all');
   }
 
@@ -189,6 +209,30 @@ export class Templates implements OnInit {
   }
 
   trackByTemplate = (_: number, template: DashboardTemplateItem): string => template.id;
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen.update((value) => !value);
+    this.sortDropdownOpen.set(false);
+  }
+
+  toggleSortDropdown(): void {
+    this.sortDropdownOpen.update((value) => !value);
+    this.categoryDropdownOpen.set(false);
+  }
+
+  closeDropdowns(): void {
+    this.categoryDropdownOpen.set(false);
+    this.sortDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+
+    if (!target?.closest('.templates-toolbar__dropdown')) {
+      this.closeDropdowns();
+    }
+  }
 
   private toTemplatesErrorMessage(error: unknown): string {
     const status = this.readErrorStatus(error);

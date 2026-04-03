@@ -100,11 +100,13 @@
             </div>
           }
         </div>
-        <div class="section-footer">
-          <button type="button" class="btn btn-secondary" (click)="openSessionsModal()">
-            {{ 'common.seeMore' | t }}
-          </button>
-        </div>
+        @if (activeSessions.length > 5) {
+          <div class="section-footer">
+            <button type="button" class="btn btn-secondary" (click)="openSessionsModal()">
+              {{ 'common.seeMore' | t }}
+            </button>
+          </div>
+        }
       }
     </div>
   </div>
@@ -253,11 +255,13 @@
             </div>
           }
         </div>
-        <div class="section-footer">
-          <button type="button" class="btn btn-secondary" (click)="openLoginHistoryModal()">
-            {{ 'common.seeMore' | t }}
-          </button>
-        </div>
+        @if (loginHistory.length > 5) {
+          <div class="section-footer">
+            <button type="button" class="btn btn-secondary" (click)="openLoginHistoryModal()">
+              {{ 'common.seeMore' | t }}
+            </button>
+          </div>
+        }
       }
     </div>
   </div>
