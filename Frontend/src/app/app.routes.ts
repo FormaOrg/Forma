@@ -1,101 +1,170 @@
 import { Routes } from '@angular/router';
-import { GuestGuard } from './core/guards/guest.guard';
+
 import { AuthGuard } from './core/guards/auth.guard';
+import { GuestGuard } from './core/guards/guest.guard';
 import { RootRedirectGuard } from './core/guards/root-redirect.guard';
 
-import { LandingPage } from './features/landing-page/landing-page';
-import { Pricing } from './features/pricing/pricing';
-import { TemplateGallery } from './features/template-gallery/template-gallery';
-import { PortfolioShowcase } from './features/templates-pages/portfolio-showcase/portfolio-showcase';
-import { Product } from './features/product/product';
-import { Tutorials } from './features/support/tutorials/tutorials';
-import { Faqs } from './features/support/faqs/faqs';
-import { Contact } from './features/support/contact/contact';
-
-import { LoginComponent } from './features/auth/components/login/login';
-import { RegisterComponent } from './features/auth/components/register/register';
-import { EmailVerificationComponent } from './features/auth/components/email-verification/email-verification';
-import { EmailVerificationRequiredComponent } from './features/auth/components/email-verification-required/email-verification-required';
-import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password';
-import { LoginVerificationComponent } from './features/auth/components/login-verification/login-verification';
-import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password';
-import { BlogShowcase } from './features/templates-pages/blog-showcase/blog-showcase';
-import { EcommerceShowcase } from './features/templates-pages/ecommerce-showcase/ecommerce-showcase';
-import { AuthLayout } from './features/auth/components/auth-layout/auth-layout';
-
-import { Dashboard } from './features/app/dashboard/dashboard';
-import { Billing } from './features/app/dashboard/pages/billing/billing';
-import { Home } from './features/app/dashboard/pages/home/home';
-import { Projects } from './features/app/dashboard/pages/projects/projects';
-import { ProjectsRouteLayout } from './features/app/dashboard/pages/projects/projects-route-layout/projects-route-layout';
-import { ProjectWorkspaceLayout } from './features/app/dashboard/pages/projects/project-workspace-layout/project-workspace-layout';
-import { ProjectRoutePlaceholder } from './features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder';
-import { DashboardStub } from './features/app/dashboard/pages/dashboard-stub/dashboard-stub';
-import { Templates } from './features/app/dashboard/pages/templates/templates';
-import { Settings } from './features/app/dashboard/pages/settings/settings';
-import { SettingsProfile } from './features/app/dashboard/pages/settings/pages/profile/profile';
-import { SettingsSecurity } from './features/app/dashboard/pages/settings/pages/security/security';
-import { SettingsPreferences } from './features/app/dashboard/pages/settings/pages/preferences/preferences';
-import { SettingsActivity } from './features/app/dashboard/pages/settings/pages/activity/activity';
-import { ProjectCreation } from './features/app/dashboard/pages/project-creation/project-creation';
-
 export const routes: Routes = [
-  { path: '', component: LandingPage, canActivate: [RootRedirectGuard] },
-  { path: 'pricing', component: Pricing },
-  { path: 'templates', component: TemplateGallery },
-  { path: 'portfolio-website', component: PortfolioShowcase },
-  { path: 'blog-website', component: BlogShowcase },
-  { path: 'ecommerce-website', component: EcommerceShowcase },
-  { path: 'product', component: Product },
-  { path: 'tutorials', component: Tutorials },
-  { path: 'faqs', component: Faqs },
-  { path: 'contact', component: Contact },
+  {
+    path: '',
+    canActivate: [RootRedirectGuard],
+    loadComponent: () => import('./features/landing-page/landing-page').then((m) => m.LandingPage)
+  },
+  {
+    path: 'pricing',
+    loadComponent: () => import('./features/pricing/pricing').then((m) => m.Pricing)
+  },
+  {
+    path: 'templates',
+    loadComponent: () => import('./features/template-gallery/template-gallery').then((m) => m.TemplateGallery)
+  },
+  {
+    path: 'portfolio-website',
+    loadComponent: () => import('./features/templates-pages/portfolio-showcase/portfolio-showcase').then((m) => m.PortfolioShowcase)
+  },
+  {
+    path: 'blog-website',
+    loadComponent: () => import('./features/templates-pages/blog-showcase/blog-showcase').then((m) => m.BlogShowcase)
+  },
+  {
+    path: 'ecommerce-website',
+    loadComponent: () => import('./features/templates-pages/ecommerce-showcase/ecommerce-showcase').then((m) => m.EcommerceShowcase)
+  },
+  {
+    path: 'product',
+    loadComponent: () => import('./features/product/product').then((m) => m.Product)
+  },
+  {
+    path: 'tutorials',
+    loadComponent: () => import('./features/support/tutorials/tutorials').then((m) => m.Tutorials)
+  },
+  {
+    path: 'faqs',
+    loadComponent: () => import('./features/support/faqs/faqs').then((m) => m.Faqs)
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./features/support/contact/contact').then((m) => m.Contact)
+  },
 
   { path: 'dashboard', redirectTo: '/app/home', pathMatch: 'full' },
 
   {
     path: '',
-    component: AuthLayout,
+    loadComponent: () => import('./features/auth/components/auth-layout/auth-layout').then((m) => m.AuthLayout),
     children: [
-      { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
-      { path: 'login-verification', component: LoginVerificationComponent, canActivate: [GuestGuard] },
-      { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
-      { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
-      { path: 'verify-email', component: EmailVerificationComponent },
-      { path: 'verify-email-required', component: EmailVerificationRequiredComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
+      {
+        path: 'login',
+        canActivate: [GuestGuard],
+        loadComponent: () => import('./features/auth/components/login/login').then((m) => m.LoginComponent)
+      },
+      {
+        path: 'login-verification',
+        canActivate: [GuestGuard],
+        loadComponent: () => import('./features/auth/components/login-verification/login-verification').then((m) => m.LoginVerificationComponent)
+      },
+      {
+        path: 'register',
+        canActivate: [GuestGuard],
+        loadComponent: () => import('./features/auth/components/register/register').then((m) => m.RegisterComponent)
+      },
+      {
+        path: 'forgot-password',
+        canActivate: [GuestGuard],
+        loadComponent: () => import('./features/auth/components/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent)
+      },
+      {
+        path: 'verify-email',
+        loadComponent: () => import('./features/auth/components/email-verification/email-verification').then((m) => m.EmailVerificationComponent)
+      },
+      {
+        path: 'verify-email-required',
+        loadComponent: () => import('./features/auth/components/email-verification-required/email-verification-required').then((m) => m.EmailVerificationRequiredComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./features/auth/components/reset-password/reset-password').then((m) => m.ResetPasswordComponent)
+      }
     ]
   },
 
   {
     path: 'app',
-    component: Dashboard,
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
+    loadComponent: () => import('./features/app/dashboard/dashboard').then((m) => m.Dashboard),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
-      { path: 'home', component: Home, data: { title: 'Home' } },
-      { path: 'create-project', component: ProjectCreation, data: { title: 'Create Project', immersive: true } },
+      {
+        path: 'home',
+        data: { title: 'Home' },
+        loadComponent: () => import('./features/app/dashboard/pages/home/home').then((m) => m.Home)
+      },
+      {
+        path: 'create-project',
+        data: { title: 'Create Project', immersive: true },
+        loadComponent: () => import('./features/app/dashboard/pages/project-creation/project-creation').then((m) => m.ProjectCreation)
+      },
       {
         path: 'projects',
-        component: ProjectsRouteLayout,
         data: { title: 'Projects' },
+        loadComponent: () => import('./features/app/dashboard/pages/projects/projects-route-layout/projects-route-layout').then((m) => m.ProjectsRouteLayout),
         children: [
-          { path: '', component: Projects, data: { title: 'Projects' } },
+          {
+            path: '',
+            data: { title: 'Projects' },
+            loadComponent: () => import('./features/app/dashboard/pages/projects/projects').then((m) => m.Projects)
+          },
           {
             path: ':projectId',
-            component: ProjectWorkspaceLayout,
             data: { title: 'Setup' },
+            loadComponent: () => import('./features/app/dashboard/pages/projects/project-workspace-layout/project-workspace-layout').then((m) => m.ProjectWorkspaceLayout),
             children: [
-              { path: '', component: ProjectRoutePlaceholder, data: { title: 'Setup' } },
-              { path: 'home', component: ProjectRoutePlaceholder, data: { title: 'Home' } },
-              { path: 'sales', component: ProjectRoutePlaceholder, data: { title: 'Sales' } },
-              { path: 'catalog', component: ProjectRoutePlaceholder, data: { title: 'Catalog' } },
-              { path: 'customers', component: ProjectRoutePlaceholder, data: { title: 'Customers' } },
-              { path: 'analytics', component: ProjectRoutePlaceholder, data: { title: 'Analytics' } },
-              { path: 'help', component: ProjectRoutePlaceholder, data: { title: 'Help' } },
-              { path: 'editor', component: ProjectRoutePlaceholder, data: { title: 'Editor' } },
-              { path: 'settings', component: ProjectRoutePlaceholder, data: { title: 'Settings' } },
+              {
+                path: '',
+                data: { title: 'Setup' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'home',
+                data: { title: 'Home' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'sales',
+                data: { title: 'Sales' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-sales-route/project-sales-route').then((m) => m.ProjectSalesRoute)
+              },
+              {
+                path: 'catalog',
+                data: { title: 'Catalog' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'customers',
+                data: { title: 'Customers' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'analytics',
+                data: { title: 'Analytics' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'help',
+                data: { title: 'Help' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'editor',
+                data: { title: 'Editor' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'settings',
+                data: { title: 'Settings' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
               { path: 'overview', redirectTo: 'home', pathMatch: 'full' },
               { path: 'deploy', redirectTo: 'sales', pathMatch: 'full' },
               { path: 'pages', redirectTo: 'catalog', pathMatch: 'full' },
@@ -105,19 +174,47 @@ export const routes: Routes = [
           }
         ]
       },
-      { path: 'templates', component: Templates, data: { title: 'Templates' } },
-      { path: 'profile', component: DashboardStub, data: { title: 'Profile' } },
-      { path: 'billing', component: Billing, data: { title: 'Billing' } },
+      {
+        path: 'templates',
+        data: { title: 'Templates' },
+        loadComponent: () => import('./features/app/dashboard/pages/templates/templates').then((m) => m.Templates)
+      },
+      {
+        path: 'profile',
+        data: { title: 'Profile' },
+        loadComponent: () => import('./features/app/dashboard/pages/dashboard-stub/dashboard-stub').then((m) => m.DashboardStub)
+      },
+      {
+        path: 'billing',
+        data: { title: 'Billing' },
+        loadComponent: () => import('./features/app/dashboard/pages/billing/billing').then((m) => m.Billing)
+      },
       {
         path: 'settings',
-        component: Settings,
         data: { title: 'Settings' },
+        loadComponent: () => import('./features/app/dashboard/pages/settings/settings').then((m) => m.Settings),
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'profile' },
-          { path: 'profile', component: SettingsProfile, data: { title: 'Profile' } },
-          { path: 'security', component: SettingsSecurity, data: { title: 'Security' } },
-          { path: 'preferences', component: SettingsPreferences, data: { title: 'Preferences' } },
-          { path: 'activity', component: SettingsActivity, data: { title: 'Activity' } }
+          {
+            path: 'profile',
+            data: { title: 'Profile' },
+            loadComponent: () => import('./features/app/dashboard/pages/settings/pages/profile/profile').then((m) => m.SettingsProfile)
+          },
+          {
+            path: 'security',
+            data: { title: 'Security' },
+            loadComponent: () => import('./features/app/dashboard/pages/settings/pages/security/security').then((m) => m.SettingsSecurity)
+          },
+          {
+            path: 'preferences',
+            data: { title: 'Preferences' },
+            loadComponent: () => import('./features/app/dashboard/pages/settings/pages/preferences/preferences').then((m) => m.SettingsPreferences)
+          },
+          {
+            path: 'activity',
+            data: { title: 'Activity' },
+            loadComponent: () => import('./features/app/dashboard/pages/settings/pages/activity/activity').then((m) => m.SettingsActivity)
+          }
         ]
       }
     ]
