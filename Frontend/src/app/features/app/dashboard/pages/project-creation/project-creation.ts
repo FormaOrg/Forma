@@ -36,7 +36,7 @@ const TYPE_OPTIONS: TypeOption[] = [
     label: 'Portfolio',
     description: 'Highlight your work, story, and signature style in a refined personal space.',
     tag: 'Creative',
-    previewImage: 'assets/Templates Gallery/Mock Templates/1.jpg',
+    previewImage: 'assets/Portfolio Website Gallery/Templates/Music1.avif',
     accent: '#7566ff',
   },
   {
@@ -44,7 +44,7 @@ const TYPE_OPTIONS: TypeOption[] = [
     label: 'E-commerce',
     description: 'Launch a storefront with product drops, collections, and polished buying flows.',
     tag: 'Store',
-    previewImage: 'assets/Templates Gallery/Mock Templates/4.jpg',
+    previewImage: 'assets/Ecommerce Showcase/Templates/Fashion2.png',
     accent: '#f29d64',
   },
   {
@@ -52,7 +52,7 @@ const TYPE_OPTIONS: TypeOption[] = [
     label: 'Blog',
     description: 'Publish essays, updates, and articles with a clean editorial presence.',
     tag: 'Editorial',
-    previewImage: 'assets/Templates Gallery/Mock Templates/2.jpg',
+    previewImage: 'assets/Blog Showcase/Templates/personal1.png',
     accent: '#59b6d9',
   },
 ];
@@ -104,6 +104,7 @@ export class ProjectCreation implements OnDestroy {
   private readonly dashboardDataService = inject(DashboardDataService);
   private readonly toastService = inject(ToastService);
   private readonly timeouts: number[] = [];
+  private readonly screenActivatedAt = new Map<CreationScreen, number>();
   private readonly handleResize = () => this.scheduleTransitionLineLayout();
   private layoutFrame: number | null = null;
 
@@ -117,11 +118,11 @@ export class ProjectCreation implements OnDestroy {
   readonly selectedGoals = signal<string[]>([]);
   readonly goalsText = signal('');
   readonly isCreating = signal(false);
+  readonly isTransitioning = signal(false);
   readonly launchStepProgress = signal(0);
   readonly customizingLines = signal<string[]>([CUSTOMIZING_TEXT]);
   readonly launchLines = signal<string[]>([]);
-  readonly sceneMotion = signal<'idle' | 'enter' | 'leave'>('idle');
-  readonly sceneAnimationName = signal<'projectCreationSceneCardEnterA' | 'projectCreationSceneCardEnterB'>('projectCreationSceneCardEnterA');
+  readonly sceneMotion = signal<'prep' | 'enter' | 'leave' | 'rest'>('prep');
   readonly typeOptions = TYPE_OPTIONS;
   readonly sceneCards = SCENE_CARDS;
   readonly launchSteps = LAUNCH_STEPS;
@@ -202,6 +203,7 @@ export class ProjectCreation implements OnDestroy {
   });
 
   constructor() {
+    this.markScreenActivated(this.screen());
     window.addEventListener('resize', this.handleResize);
 
     this.queueTimeout(() => {
@@ -210,7 +212,7 @@ export class ProjectCreation implements OnDestroy {
 
     this.queueTimeout(() => {
       if (this.sceneMotion() === 'enter') {
-        this.sceneMotion.set('idle');
+        this.sceneMotion.set('rest');
       }
     }, SCREEN_ENTER_DURATION + 80);
 
@@ -272,6 +274,19 @@ export class ProjectCreation implements OnDestroy {
     return `${index * 1450}ms`;
   }
 
+  shineOffset(screen: CreationScreen): string {
+    if (screen !== 'customizing' && screen !== 'launching') {
+      return '0ms';
+    }
+
+    const activatedAt = this.screenActivatedAt.get(screen);
+    if (!activatedAt) {
+      return '0ms';
+    }
+
+    return `${Math.max(0, Date.now() - activatedAt)}ms`;
+  }
+
   launchStepState(index: number): 'done' | 'loading' | 'pending' {
     const progress = this.launchStepProgress();
     if (index < progress) {
@@ -286,6 +301,10 @@ export class ProjectCreation implements OnDestroy {
   }
 
   goBack(): void {
+    if (this.isTransitioning()) {
+      return;
+    }
+
     switch (this.screen()) {
       case 'name':
         this.setScreen('type');
@@ -299,6 +318,10 @@ export class ProjectCreation implements OnDestroy {
   }
 
   continue(): void {
+    if (this.isTransitioning()) {
+      return;
+    }
+
     switch (this.screen()) {
       case 'type':
         if (!this.selectedType()) {
@@ -322,6 +345,10 @@ export class ProjectCreation implements OnDestroy {
   }
 
   skipCurrentStep(): void {
+    if (this.isTransitioning()) {
+      return;
+    }
+
     switch (this.screen()) {
       case 'name':
         this.siteName.set(this.resolvedSiteName());
@@ -363,13 +390,17 @@ export class ProjectCreation implements OnDestroy {
   }
 
   private startCustomizingTransition(): void {
+    if (this.isTransitioning()) {
+      return;
+    }
+
     this.setScreen('customizing');
     this.queueTimeout(() => this.setScreen('name'), CUSTOMIZING_HOLD_DURATION);
   }
 
   private startProjectCreation(): void {
     const type = this.selectedType();
-    if (!type || this.isCreating()) {
+    if (!type || this.isCreating() || this.isTransitioning()) {
       return;
     }
 
@@ -379,10 +410,12 @@ export class ProjectCreation implements OnDestroy {
     this.launchStepProgress.set(0);
 
     const totalDuration = 5000;
-    const finalStepLead = 2500;
-    this.queueTimeout(() => this.launchStepProgress.set(1), totalDuration * 0.3);
-    this.queueTimeout(() => this.launchStepProgress.set(2), totalDuration * 0.58);
-    this.queueTimeout(() => this.launchStepProgress.set(3), totalDuration - finalStepLead);
+    const firstStepDuration = 1700;
+    const secondStepDuration = 1000;
+    const thirdStepStart = firstStepDuration + secondStepDuration;
+
+    this.queueTimeout(() => this.launchStepProgress.set(1), firstStepDuration);
+    this.queueTimeout(() => this.launchStepProgress.set(2), thirdStepStart);
 
     const startedAt = Date.now();
     this.createProjectWithFallback({
@@ -458,20 +491,17 @@ export class ProjectCreation implements OnDestroy {
 
   private setScreen(next: CreationScreen): void {
     const current = this.screen();
-    if (current === next) {
+    if (current === next || this.isTransitioning()) {
       return;
     }
 
+    this.isTransitioning.set(true);
     this.leavingScreen.set(current);
     this.sceneMotion.set('leave');
-    this.queueTimeout(() => {
-      this.screen.set(next);
-      this.sceneAnimationName.set(
-        this.sceneAnimationName() === 'projectCreationSceneCardEnterA'
-          ? 'projectCreationSceneCardEnterB'
-          : 'projectCreationSceneCardEnterA'
-      );
-      this.sceneMotion.set('idle');
+      this.queueTimeout(() => {
+        this.screen.set(next);
+        this.markScreenActivated(next);
+        this.sceneMotion.set('prep');
 
       this.queueTimeout(() => {
         this.sceneMotion.set('enter');
@@ -481,11 +511,12 @@ export class ProjectCreation implements OnDestroy {
         if (this.leavingScreen() === current) {
           this.leavingScreen.set(null);
         }
+        this.isTransitioning.set(false);
       }, SCREEN_ENTER_DURATION);
 
       this.queueTimeout(() => {
         if (this.sceneMotion() === 'enter') {
-          this.sceneMotion.set('idle');
+          this.sceneMotion.set('rest');
         }
       }, SCREEN_ENTER_DURATION + 32);
     }, SCREEN_EXIT_DELAY);
@@ -596,5 +627,9 @@ export class ProjectCreation implements OnDestroy {
     while (this.timeouts.length) {
       window.clearTimeout(this.timeouts.pop());
     }
+  }
+
+  private markScreenActivated(screen: CreationScreen): void {
+    this.screenActivatedAt.set(screen, Date.now());
   }
 }

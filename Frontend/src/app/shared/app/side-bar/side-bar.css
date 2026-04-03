@@ -422,13 +422,13 @@
   --sb-active-bg: rgba(117, 102, 255, 0.18);
   --sb-active-text: #ffffff;
   --sb-hover-bg: rgba(255, 255, 255, 0.06);
-  background: #121824;
+  background: #171e2a;
   border-right-color: rgba(255, 255, 255, 0.08);
 }
 
 :host-context(.theme-dark) .sidebar__brand {
   border-bottom-color: rgba(255, 255, 255, 0.08);
-  background: #121824;
+  background: #171e2a;
 }
 
 :host-context(.theme-dark) .sidebar__separator {

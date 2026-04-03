@@ -1,9 +1,9 @@
 <section class="project-creation">
   <div
     class="project-creation__scene"
+    [class.project-creation__scene--prep]="sceneMotion() === 'prep'"
     [class.project-creation__scene--enter]="sceneMotion() === 'enter'"
     [class.project-creation__scene--leave]="sceneMotion() === 'leave'"
-    [style.--scene-animation-name]="sceneAnimationName()"
     aria-hidden="true"
   >
     @for (card of sceneCards; track card.image) {
@@ -20,7 +20,20 @@
 
   <header class="project-creation__header">
     <a class="project-creation__brand" routerLink="/app/home">
-      <img src="assets/Logo/FormaLogoOnly.svg" alt="" width="28" height="28" />
+      <img
+        class="project-creation__brand-logo project-creation__brand-logo--light"
+        src="assets/Logo/FormaLogoOnly.svg"
+        alt=""
+        width="28"
+        height="28"
+      />
+      <img
+        class="project-creation__brand-logo project-creation__brand-logo--dark"
+        src="assets/Logo/FormaLogoOnly-white.svg"
+        alt=""
+        width="28"
+        height="28"
+      />
       <span>Forma</span>
     </a>
 
@@ -76,9 +89,6 @@
                     <span class="project-creation__type-preview">
                       <img [src]="option.previewImage" [alt]="option.label + ' preview'" />
                       <span class="project-creation__type-preview-overlay"></span>
-                      <span class="project-creation__type-preview-badge" [style.border-color]="'color-mix(in srgb, ' + option.accent + ' 26%, white)'">
-                        {{ option.label }}
-                      </span>
                     </span>
                     <span class="project-creation__type-meta">
                       <span class="project-creation__type-tag" [style.color]="option.accent" [style.background]="'color-mix(in srgb, ' + option.accent + ' 12%, white)'">
@@ -99,6 +109,7 @@
                   class="project-creation__transition-text project-creation__transition-text--customizing project-creation__transition-text--shine"
                   aria-label="Customizing the next steps for you"
                   [style.--shine-cycle]="transitionCycle(customizingLines().length)"
+                  [style.--shine-offset]="shineOffset(currentScreen)"
                 >
                   <span class="project-creation__transition-measure" #customizingMeasure aria-hidden="true">
                     @for (word of customizingMeasureWords; track $index) {
@@ -185,6 +196,7 @@
                   class="project-creation__transition-text project-creation__transition-text--launch project-creation__transition-text--shine"
                   aria-label="Taking you to your site dashboard"
                   [style.--shine-cycle]="transitionCycle(launchLines().length)"
+                  [style.--shine-offset]="shineOffset(currentScreen)"
                 >
                   <span class="project-creation__transition-measure" #launchMeasure aria-hidden="true">
                     @for (word of launchMeasureWords(); track $index) {

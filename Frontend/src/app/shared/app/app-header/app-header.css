@@ -18,6 +18,7 @@
   gap: 20px;
   padding: 0 20px;
   background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .app-header__left,
@@ -637,6 +638,60 @@
   font-weight: 700;
   font-family: inherit;
   color: rgba(17, 24, 39, 0.64);
+}
+
+:host-context(.theme-dark) .app-header {
+  background: #171e2a;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context(.theme-dark) .app-header__icon-btn,
+:host-context(.theme-dark) .app-header__search,
+:host-context(.theme-dark) .app-header__action--secondary {
+  background: #141c29;
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+:host-context(.theme-dark) .app-header__icon-btn {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .app-header__icon-btn:hover {
+  background: #182131;
+  border-color: rgba(117, 102, 255, 0.24);
+}
+
+:host-context(.theme-dark) .app-header__crumb {
+  color: rgba(226, 231, 244, 0.46);
+}
+
+:host-context(.theme-dark) .app-header__title {
+  color: rgba(244, 247, 255, 0.78);
+}
+
+:host-context(.theme-dark) .app-header__search:hover,
+:host-context(.theme-dark) .app-header__search:focus-visible {
+  border-color: rgba(117, 102, 255, 0.24);
+  background: #182131;
+}
+
+:host-context(.theme-dark) .app-header__search-icon,
+:host-context(.theme-dark) .app-header__search-input,
+:host-context(.theme-dark) .app-header__search-input::placeholder,
+:host-context(.theme-dark) .app-header__kbd,
+:host-context(.theme-dark) .app-header__action--secondary {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .app-header__kbd {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+:host-context(.theme-dark) .app-header__action--secondary:hover {
+  background: #182131;
+  color: #f4f7ff;
+  border-color: rgba(117, 102, 255, 0.24);
 }
 
 @keyframes app-header-command-fade {
