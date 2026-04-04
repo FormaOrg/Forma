@@ -105,7 +105,7 @@
       <div class="project-setup__panel-header">
         <div class="project-setup__panel-copy">
           <span class="project-setup__eyebrow">Project workspace</span>
-          <h1 class="project-setup__title">Let's set up your business</h1>
+          <h1 class="project-setup__title">{{ workspaceConfig().setupTitle }}</h1>
           <div class="project-setup__meta" aria-label="Project setup summary">
             <span class="project-setup__meta-pill">Project #{{ projectId() }}</span>
             @if (nextSetupStep) {
@@ -161,8 +161,8 @@
       <span class="project-placeholder__eyebrow">Project workspace</span>
       <h1 class="project-placeholder__title">{{ title() }}</h1>
       <p class="project-placeholder__copy">
-        The route structure and sidebar navigation for project <strong>#{{ projectId() }}</strong> are ready.
-        The actual {{ title().toLowerCase() }} page can be added here next.
+        Project <strong>#{{ projectId() }}</strong> is using the {{ workspaceConfig().typeLabel.toLowerCase() }} workspace.
+        {{ workspaceConfig().placeholderDescription }}
       </p>
     </div>
   </section>
