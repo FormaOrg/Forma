@@ -11,6 +11,7 @@ import {
   getProjectSetupItems
 } from '../../../../../../shared/app/project-setup/project-setup.data';
 import { ProjectService } from '../../../../../../core/services/project.service';
+import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { ProjectType } from '../../../../../../core/models/project.model';
 import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-workspace/project-workspace.config';
 
@@ -24,6 +25,7 @@ import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-
 export class ProjectRoutePlaceholder {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
+  private readonly projectWorkspaceContextService = inject(ProjectWorkspaceContextService);
 
   readonly title = toSignal(
     this.route.data.pipe(map((data) => String(data['title'] ?? 'Project'))),
@@ -95,9 +97,19 @@ export class ProjectRoutePlaceholder {
       return;
     }
 
-    this.projectService.getProjectById(projectId).subscribe({
-      next: (project) => this.projectType.set(project.type),
-      error: () => this.projectType.set(null),
-    });
+    const cachedType = this.projectWorkspaceContextService.getProjectType(projectId);
+    if (cachedType) {
+      this.projectType.set(cachedType);
+      return;
+    }
+
+    this.projectService.getProjectById(projectId)
+      .subscribe({
+        next: (project) => {
+          this.projectWorkspaceContextService.setProjectType(projectId, project.type);
+          this.projectType.set(project.type);
+        },
+        error: () => this.projectType.set(null),
+      });
   }
 }

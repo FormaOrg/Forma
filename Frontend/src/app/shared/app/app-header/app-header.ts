@@ -13,15 +13,17 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { filter } from 'rxjs';
+import { catchError, filter, of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { DashboardDataService } from '../../../core/services/dashboard-data.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import type { HeaderActionButton, ProfileMenuItem } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
 import type { AppIconName } from '../icons/app-icon';
 import { I18nService } from '../../../features/landing-page/i18n/i18n.service';
 import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
+import type { BillingOverview } from '../../../core/models/dashboard.model';
 
 type CommandGroup = 'Pages' | 'Actions';
 type ResolvedCommandPaletteItem = CommandPaletteItem & { title: string; subtitle: string; hint?: string };
@@ -53,6 +55,7 @@ export class AppHeader {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private dashboardDataService = inject(DashboardDataService);
   private i18n = inject(I18nService);
   private themeService = inject(ThemeService);
 
@@ -218,7 +221,10 @@ export class AppHeader {
 
     this.authService.currentUser$
       .pipe(takeUntilDestroyed())
-      .subscribe(user => this.syncProfileFromAuth(user));
+      .subscribe(user => {
+        this.syncProfileFromAuth(user);
+        this.syncPlanFromBilling(user);
+      });
 
     this.router.events
       .pipe(
@@ -489,7 +495,7 @@ export class AppHeader {
     if (!user) {
       this.profile = {
         name: 'John Doe',
-        role: 'Admin',
+        role: 'Free plan',
         avatar: null
       };
       return;
@@ -498,8 +504,41 @@ export class AppHeader {
     const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
     this.profile = {
       name: fullName || 'Forma user',
-      role: user.role ?? 'STANDARD',
+      role: 'Free plan',
       avatar: user.avatarUrl || null
     };
+  }
+
+  private syncPlanFromBilling(user: { id?: number | string } | null): void {
+    if (!user?.id) {
+      this.profile = {
+        ...this.profile,
+        role: 'Free plan'
+      };
+      return;
+    }
+
+    this.dashboardDataService.getBillingOverview({ useCache: false })
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed()
+      )
+      .subscribe((billing) => {
+        this.profile = {
+          ...this.profile,
+          role: this.toPlanLabel(billing)
+        };
+      });
+  }
+
+  private toPlanLabel(billing: BillingOverview | null): string {
+    const planName = billing?.subscription.planName?.trim();
+    const status = billing?.subscription.status ?? 'inactive';
+
+    if (!planName || status === 'inactive' || status === 'canceled') {
+      return 'Free plan';
+    }
+
+    return planName;
   }
 }

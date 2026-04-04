@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.forma.users.dto.*;
 import tn.forma.users.model.*;
+import tn.forma.users.repository.ProjectCustomerRepository;
 import tn.forma.users.repository.ProjectOrderRepository;
+import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.UserRepository;
 
@@ -34,6 +36,8 @@ public class ProjectSalesService {
 
     private final ProjectRepository projectRepository;
     private final ProjectOrderRepository projectOrderRepository;
+    private final ProjectCustomerRepository projectCustomerRepository;
+    private final ProjectProductRepository projectProductRepository;
     private final UserRepository userRepository;
 
     public ProjectSalesPageDto getSalesPage(
@@ -100,12 +104,106 @@ public class ProjectSalesService {
         return csv.toString().getBytes(StandardCharsets.UTF_8);
     }
 
+    public ProjectSalesOrderEditorDto getOrder(String email, Long projectId, Long orderId) {
+        getOwnedProject(email, projectId);
+        return mapOrderEditorDto(getOwnedOrder(projectId, orderId));
+    }
+
+    @Transactional
+    public ProjectSalesOrderEditorDto createOrder(String email, Long projectId, CreateProjectOrderRequest request) {
+        Project project = getOwnedProject(email, projectId);
+
+        ProjectOrder order = new ProjectOrder();
+        order.setProject(project);
+        applyOrderRequest(order, projectId, request);
+
+        return mapOrderEditorDto(projectOrderRepository.save(order));
+    }
+
+    @Transactional
+    public ProjectSalesOrderEditorDto updateOrder(
+            String email,
+            Long projectId,
+            Long orderId,
+            UpdateProjectOrderRequest request
+    ) {
+        getOwnedProject(email, projectId);
+        ProjectOrder order = getOwnedOrder(projectId, orderId);
+        applyOrderRequest(order, projectId, request);
+        return mapOrderEditorDto(projectOrderRepository.save(order));
+    }
+
     private List<ProjectOrder> loadOrders(Long projectId, ResolvedRange range) {
         return projectOrderRepository.findAllByProjectIdAndPlacedAtGreaterThanEqualAndPlacedAtLessThanOrderByPlacedAtDesc(
                 projectId,
                 range.startInclusive(),
                 range.endExclusive()
         );
+    }
+
+    private void applyOrderRequest(ProjectOrder order, Long projectId, CreateProjectOrderRequest request) {
+        ProjectCustomer customer = request.getCustomerId() != null
+                ? projectCustomerRepository.findByIdAndProjectId(request.getCustomerId(), projectId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"))
+                : null;
+
+        OrderPaymentStatus paymentStatus = parsePaymentStatus(request.getPaymentStatus());
+        OrderFulfillmentStatus fulfillmentStatus = parseFulfillmentStatus(request.getFulfillmentStatus());
+
+        List<ProjectOrderItem> orderItems = new ArrayList<>();
+        BigDecimal subtotal = BigDecimal.ZERO;
+
+        for (ProjectSalesOrderItemInputDto itemRequest : request.getItems()) {
+            if (itemRequest.getQuantity() == null || itemRequest.getQuantity() < 1) {
+                throw new RuntimeException("Each item must include a valid quantity.");
+            }
+            if (itemRequest.getUnitPrice() == null || itemRequest.getUnitPrice().compareTo(BigDecimal.ZERO) < 0) {
+                throw new RuntimeException("Each item must include a valid unit price.");
+            }
+
+            ProjectProduct product = itemRequest.getProductId() != null
+                    ? projectProductRepository.findByIdAndProjectId(itemRequest.getProductId(), projectId)
+                        .orElseThrow(() -> new RuntimeException("Product not found"))
+                    : null;
+
+            String productName = product != null
+                    ? product.getName()
+                    : requireValue(itemRequest.getProductName(), "Each item needs a product name.");
+            String productSku = product != null ? product.getSku() : blankToNull(itemRequest.getProductSku());
+            BigDecimal unitPrice = amount(itemRequest.getUnitPrice());
+            BigDecimal lineTotal = amount(unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
+
+            ProjectOrderItem orderItem = ProjectOrderItem.builder()
+                    .order(order)
+                    .product(product)
+                    .productName(productName)
+                    .productSku(productSku)
+                    .quantity(itemRequest.getQuantity())
+                    .unitPrice(unitPrice)
+                    .lineTotal(lineTotal)
+                    .build();
+
+            orderItems.add(orderItem);
+            subtotal = subtotal.add(lineTotal);
+        }
+
+        BigDecimal deliveryFee = amount(request.getDeliveryFee());
+        BigDecimal total = amount(subtotal.add(deliveryFee));
+
+        order.setCustomer(customer);
+        order.setOrderNumber(requireValue(request.getOrderNumber(), "Order number is required."));
+        order.setPlacedAt(Objects.requireNonNull(request.getPlacedAt(), "Placed date is required."));
+        order.setScheduledFor(request.getScheduledFor());
+        order.setDeliveredAt(request.getDeliveredAt());
+        order.setPaymentStatus(paymentStatus);
+        order.setFulfillmentStatus(fulfillmentStatus);
+        order.setSubtotal(amount(subtotal));
+        order.setDeliveryFee(deliveryFee);
+        order.setTotal(total);
+        order.setDeliveryAddress(blankToNull(request.getDeliveryAddress()));
+        order.setNotes(blankToNull(request.getNotes()));
+        order.getItems().clear();
+        order.getItems().addAll(orderItems);
     }
 
     private ProjectSalesSummaryDto buildSummary(
@@ -374,6 +472,74 @@ public class ProjectSalesService {
         String last = Optional.ofNullable(order.getCustomer().getLastName()).orElse("").trim();
         String fullName = (first + " " + last).trim();
         return fullName.isEmpty() ? "Guest customer" : fullName;
+    }
+
+    private ProjectSalesOrderEditorDto mapOrderEditorDto(ProjectOrder order) {
+        return ProjectSalesOrderEditorDto.builder()
+                .id(order.getId())
+                .customerId(order.getCustomer() != null ? order.getCustomer().getId() : null)
+                .orderNumber(order.getOrderNumber())
+                .customerName(customerName(order))
+                .placedAt(Objects.toString(order.getPlacedAt(), null))
+                .scheduledFor(Objects.toString(order.getScheduledFor(), null))
+                .deliveredAt(Objects.toString(order.getDeliveredAt(), null))
+                .paymentStatus(order.getPaymentStatus().name())
+                .fulfillmentStatus(order.getFulfillmentStatus().name())
+                .subtotal(amount(order.getSubtotal()))
+                .deliveryFee(amount(order.getDeliveryFee()))
+                .total(amount(order.getTotal()))
+                .deliveryAddress(order.getDeliveryAddress())
+                .notes(order.getNotes())
+                .items(order.getItems().stream()
+                        .map(item -> ProjectSalesOrderItemEditorDto.builder()
+                                .id(item.getId())
+                                .productId(item.getProduct() != null ? item.getProduct().getId() : null)
+                                .productName(item.getProductName())
+                                .productSku(item.getProductSku())
+                                .quantity(item.getQuantity())
+                                .unitPrice(amount(item.getUnitPrice()))
+                                .lineTotal(amount(item.getLineTotal()))
+                                .build())
+                        .toList())
+                .build();
+    }
+
+    private ProjectOrder getOwnedOrder(Long projectId, Long orderId) {
+        return projectOrderRepository.findByIdAndProjectId(orderId, projectId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+    }
+
+    private String requireValue(String value, String message) {
+        String trimmed = blankToNull(value);
+        if (trimmed == null) {
+            throw new RuntimeException(message);
+        }
+        return trimmed;
+    }
+
+    private String blankToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private OrderPaymentStatus parsePaymentStatus(String value) {
+        try {
+            return OrderPaymentStatus.valueOf(requireValue(value, "Payment status is required.").toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new RuntimeException("Invalid payment status.");
+        }
+    }
+
+    private OrderFulfillmentStatus parseFulfillmentStatus(String value) {
+        try {
+            return OrderFulfillmentStatus.valueOf(requireValue(value, "Fulfillment status is required.").toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new RuntimeException("Invalid fulfillment status.");
+        }
     }
 
     private String itemKey(ProjectOrderItem item) {
