@@ -9,7 +9,7 @@
 .orders-table__head,
 .orders-table__row {
   display: grid;
-  grid-template-columns: 42px 0.9fr 1.3fr 1.2fr 0.9fr 1fr 0.7fr;
+  grid-template-columns: 42px 0.9fr 1.2fr 1.1fr 0.9fr 1fr 0.7fr 84px;
   align-items: center;
   gap: 10px;
 }
@@ -68,6 +68,26 @@
   align-items: center;
 }
 
+.orders-table__cell--action {
+  justify-self: end;
+}
+
+.orders-table__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 560;
+  cursor: pointer;
+}
+
 .orders-status-pill {
   display: inline-flex;
   align-items: center;
@@ -115,5 +135,9 @@
     gap: 10px 12px;
     padding: 12px 14px;
     min-height: auto;
+  }
+
+  .orders-table__cell--action {
+    justify-self: start;
   }
 }

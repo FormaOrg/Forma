@@ -32,6 +32,7 @@ export class ProjectSidebar implements OnChanges {
 
   readonly iconSize = 20;
   readonly projectType = signal<ProjectType | null>(null);
+  readonly isLoading = signal(true);
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
   readonly workspaceProgress = computed(() => ({
     completed: getCompletedProjectSetupItems(PROJECT_SETUP_ITEMS),
@@ -107,12 +108,20 @@ export class ProjectSidebar implements OnChanges {
 
     if (!Number.isFinite(projectId) || projectId <= 0) {
       this.projectType.set(null);
+      this.isLoading.set(false);
       return;
     }
 
+    this.isLoading.set(true);
     this.projectService.getProjectById(projectId).subscribe({
-      next: (project) => this.projectType.set(project.type),
-      error: () => this.projectType.set(null),
+      next: (project) => {
+        this.projectType.set(project.type);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.projectType.set(null);
+        this.isLoading.set(false);
+      },
     });
   }
 }

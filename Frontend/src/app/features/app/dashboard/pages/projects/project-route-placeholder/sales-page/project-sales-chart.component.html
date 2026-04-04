@@ -15,35 +15,8 @@
 
   @if (trend.length > 0) {
     <div class="sales-chart">
-      <div class="sales-chart__y-axis">
-        @for (marker of tickMarkers; track $index) {
-          <span class="sales-chart__tick" [style.top.px]="marker.offset">{{ marker.value / 1000 }}k</span>
-        }
-      </div>
-
       <div class="sales-chart__canvas">
-        @for (marker of tickMarkers; track $index) {
-          <span class="sales-chart__grid-line" [style.top.px]="marker.offset"></span>
-        }
-
-        <svg viewBox="0 0 640 240" class="sales-chart__svg" preserveAspectRatio="none" aria-hidden="true">
-          <path [attr.d]="areaPathValue" fill="rgba(117, 102, 255, 0.08)"></path>
-          <polyline [attr.points]="polyline" class="sales-chart__line"></polyline>
-          @for (point of points; track point.label) {
-            <circle
-              [attr.cx]="point.x"
-              [attr.cy]="point.y"
-              r="4"
-              class="sales-chart__point"
-            ></circle>
-          }
-        </svg>
-
-        <div class="sales-chart__x-axis">
-          @for (point of trend; track point.label) {
-            <span class="sales-chart__x-label">{{ point.label }}</span>
-          }
-        </div>
+        <canvas #salesTrendCanvas class="sales-chart__canvas-element"></canvas>
       </div>
     </div>
   } @else {
