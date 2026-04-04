@@ -13,6 +13,7 @@ import {
 } from '../../../../../../core/models/project-sales.model';
 import { ProjectSalesService } from '../../../../../../core/services/project-sales.service';
 import { ProjectSalesPageComponent } from '../project-route-placeholder/sales-page/project-sales-page.component';
+import { buildProjectSalesPreviewResponse } from './project-sales-preview-data';
 import {
   SalesDeliveryStatView,
   SalesFocusItem,
@@ -226,12 +227,12 @@ export class ProjectSalesRoute implements OnInit {
 
           const projectId = Number(this.projectId());
           if (!projectId) {
-            return of({ data: null, error: 'Project not found.' });
+            return of({ data: null, error: 'Project not found.', query });
           }
 
           return this.projectSalesService.getSalesPage(projectId, query).pipe(
-            map((data) => ({ data, error: '' })),
-            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error) })),
+            map((data) => ({ data, error: '', query })),
+            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error), query })),
             finalize(() => {
               this.isSalesLoading.set(false);
               this.hasLoadedSales.set(true);
@@ -240,9 +241,9 @@ export class ProjectSalesRoute implements OnInit {
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ data, error }) => {
+      .subscribe(({ data, error, query }) => {
         if (data) {
-          this.salesResponse.set(data);
+          this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
           this.selectedOrderIds.set([]);
           return;
         }
@@ -366,7 +367,7 @@ export class ProjectSalesRoute implements OnInit {
       )
       .subscribe({
         next: (data) => {
-          this.salesResponse.set(data);
+          this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
           this.selectedOrderIds.set([]);
         },
         error: (error) => {
@@ -486,6 +487,14 @@ export class ProjectSalesRoute implements OnInit {
     }
 
     return 'Something went wrong while loading sales data. Please try again.';
+  }
+
+  private hydrateSalesPreviewData(data: ProjectSalesPageResponse, query: ProjectSalesQuery): ProjectSalesPageResponse {
+    if (data.hasData || data.orders.items.length > 0 || data.chartPoints.length > 0 || data.topProducts.length > 0) {
+      return data;
+    }
+
+    return buildProjectSalesPreviewResponse(query);
   }
 
   private downloadBlob(blob: Blob, filename: string): void {
