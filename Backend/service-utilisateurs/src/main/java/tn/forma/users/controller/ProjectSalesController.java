@@ -1,5 +1,6 @@
 package tn.forma.users.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -64,5 +65,46 @@ public class ProjectSalesController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"sales-orders.csv\"")
                 .contentType(new MediaType("text", "csv"))
                 .body(csv);
+    }
+
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<ProjectSalesOrderEditorDto> getOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId,
+            @PathVariable Long orderId
+    ) {
+        return ResponseEntity.ok(projectSalesService.getOrder(
+                userDetails.getUsername(),
+                projectId,
+                orderId
+        ));
+    }
+
+    @PostMapping("/orders")
+    public ResponseEntity<ProjectSalesOrderEditorDto> createOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId,
+            @Valid @RequestBody CreateProjectOrderRequest request
+    ) {
+        return ResponseEntity.ok(projectSalesService.createOrder(
+                userDetails.getUsername(),
+                projectId,
+                request
+        ));
+    }
+
+    @PutMapping("/orders/{orderId}")
+    public ResponseEntity<ProjectSalesOrderEditorDto> updateOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody UpdateProjectOrderRequest request
+    ) {
+        return ResponseEntity.ok(projectSalesService.updateOrder(
+                userDetails.getUsername(),
+                projectId,
+                orderId,
+                request
+        ));
     }
 }

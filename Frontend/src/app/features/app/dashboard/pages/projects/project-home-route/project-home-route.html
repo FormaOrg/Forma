@@ -36,8 +36,41 @@
 
     <section class="project-home-page__metrics">
       @for (metric of metrics(); track metric.label) {
-        <article class="project-home-page__metric project-home-page__panel">
-          <span class="project-home-page__metric-label">{{ metric.label }}</span>
+        <article class="project-home-page__metric project-home-page__panel" [class]="'project-home-page__metric--tone-' + ($index === 0 ? 'violet' : $index === 1 ? 'blue' : $index === 2 ? 'mint' : 'amber')">
+          <div class="project-home-page__metric-top">
+            <span class="project-home-page__metric-icon" aria-hidden="true">
+              @switch ($index) {
+                @case (0) {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2Z" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M2 12H22" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 2C14.5 4.7 16 8.2 16 12C16 15.8 14.5 19.3 12 22C9.5 19.3 8 15.8 8 12C8 8.2 9.5 4.7 12 2Z" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                }
+                @case (1) {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 12L10.8 14.8L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case (2) {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M7 3H14L19 8V21H7V3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M14 3V8H19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M10 12H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M10 16H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+                @default {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+              }
+            </span>
+            <span class="project-home-page__metric-label">{{ metric.label }}</span>
+          </div>
           <strong class="project-home-page__metric-value">{{ metric.value }}</strong>
           <span class="project-home-page__metric-helper">{{ metric.helper }}</span>
         </article>

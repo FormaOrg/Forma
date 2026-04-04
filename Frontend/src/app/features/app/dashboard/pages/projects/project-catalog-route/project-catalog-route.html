@@ -240,6 +240,7 @@
       </header>
 
       <form class="catalog-editor__form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
+        <div class="catalog-editor__body">
         <section class="catalog-editor__section">
           <div class="catalog-editor__section-head">
             <h3>Core details</h3>
@@ -338,6 +339,8 @@
             <input type="text" formControlName="tags" placeholder="featured, launch, bestseller" />
           </label>
         </section>
+
+        </div>
 
         <footer class="catalog-editor__footer">
           <button type="button" class="catalog-editor__secondary" (click)="closeEditor()">Cancel</button>

@@ -14,6 +14,7 @@
     <span class="orders-table__cell">Collection</span>
     <span class="orders-table__cell">Delivery</span>
     <span class="orders-table__cell">Total</span>
+    <span class="orders-table__cell orders-table__cell--action"></span>
   </div>
 
   @for (order of orders; track order.rawId) {
@@ -48,6 +49,12 @@
         </span>
       </span>
       <span class="orders-table__cell">{{ order.amount }}</span>
+      <span class="orders-table__cell orders-table__cell--action">
+        <button type="button" class="orders-table__edit" (click)="onEditOrder(order.rawId)">
+          <app-icon name="pen" [size]="15" />
+          <span>Edit</span>
+        </button>
+      </span>
     </article>
   }
 </div>

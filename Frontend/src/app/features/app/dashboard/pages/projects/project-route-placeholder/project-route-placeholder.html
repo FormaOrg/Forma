@@ -140,9 +140,10 @@
                   <span class="project-setup__task-status">In progress</span>
                 }
               </div>
-              <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">{{ item.description }}</p>
+              <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">
+                {{ item.description }}
+              </p>
             </div>
-
             <button
               type="button"
               class="project-setup__task-action"

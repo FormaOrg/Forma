@@ -1,17 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, distinctUntilChanged, finalize, map, of, switchMap } from 'rxjs';
+import { catchError, distinctUntilChanged, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 
 import {
+  CreateProjectOrderRequest,
   ProjectSalesPageResponse,
   ProjectSalesQuery,
+  ProjectSalesOrderEditor,
+  SalesFulfillmentStatus,
   SalesOrderFilter,
   SalesOrderSort,
+  SalesPaymentStatus,
   SalesRangePreset
 } from '../../../../../../core/models/project-sales.model';
+import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
+import { ProjectCustomer } from '../../../../../../core/models/project-customers.model';
+import { ProjectCatalogService } from '../../../../../../core/services/project-catalog.service';
+import { ProjectCustomersService } from '../../../../../../core/services/project-customers.service';
 import { ProjectSalesService } from '../../../../../../core/services/project-sales.service';
+import { ToastService } from '../../../../../../core/services/toast.service';
 import { ProjectSalesPageComponent } from '../project-route-placeholder/sales-page/project-sales-page.component';
 import { buildProjectSalesPreviewResponse } from './project-sales-preview-data';
 import {
@@ -32,16 +42,22 @@ const SALES_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
 @Component({
   selector: 'app-project-sales-route',
   standalone: true,
-  imports: [CommonModule, ProjectSalesPageComponent],
-  templateUrl: './project-sales-route.html'
+  imports: [CommonModule, ReactiveFormsModule, ProjectSalesPageComponent],
+  templateUrl: './project-sales-route.html',
+  styleUrl: './project-sales-route.css'
 })
 export class ProjectSalesRoute implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly projectSalesService = inject(ProjectSalesService);
+  private readonly projectCustomersService = inject(ProjectCustomersService);
+  private readonly projectCatalogService = inject(ProjectCatalogService);
+  private readonly toastService = inject(ToastService);
 
   private searchTimeout?: number;
+  private salesRequestToken = 0;
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => params.get('projectId') ?? '')),
@@ -67,6 +83,19 @@ export class ProjectSalesRoute implements OnInit {
     { label: 'Due on delivery', value: 'DUE_ON_DELIVERY' }
   ];
   readonly salesResponse = signal<ProjectSalesPageResponse | null>(null);
+  readonly paymentStatusOptions: ReadonlyArray<SalesOption<SalesPaymentStatus>> = [
+    { label: 'Due on delivery', value: 'DUE_ON_DELIVERY' },
+    { label: 'Collected', value: 'COLLECTED' },
+    { label: 'Deposit returned', value: 'DEPOSIT_RETURNED' }
+  ];
+  readonly fulfillmentStatusOptions: ReadonlyArray<SalesOption<SalesFulfillmentStatus>> = [
+    { label: 'New', value: 'NEW' },
+    { label: 'Packing', value: 'PACKING' },
+    { label: 'Scheduled', value: 'SCHEDULED' },
+    { label: 'Out for delivery', value: 'OUT_FOR_DELIVERY' },
+    { label: 'Delivered', value: 'DELIVERED' },
+    { label: 'Cancelled', value: 'CANCELLED' }
+  ];
   readonly salesQuery = signal<ProjectSalesQuery>({
     range: 'LAST_30_DAYS',
     compare: false,
@@ -81,6 +110,12 @@ export class ProjectSalesRoute implements OnInit {
   readonly isSalesLoading = signal(false);
   readonly hasLoadedSales = signal(false);
   readonly isExportingSales = signal(false);
+  readonly isOrderEditorOpen = signal(false);
+  readonly isOrderEditorLoading = signal(false);
+  readonly isOrderSaving = signal(false);
+  readonly editingOrderId = signal<number | null>(null);
+  readonly availableCustomers = signal<ProjectCustomer[]>([]);
+  readonly availableProducts = signal<ProjectCatalogProduct[]>([]);
   readonly selectedOrderIds = signal<number[]>([]);
   readonly salesRangeLabel = computed(
     () => this.salesRangeOptions.find((item) => item.value === this.salesQuery().range)?.label ?? 'Last 30 days'
@@ -213,6 +248,23 @@ export class ProjectSalesRoute implements OnInit {
     const visibleIds = this.salesResponse()?.orders.items.map((item) => item.id) ?? [];
     return visibleIds.length > 0 && visibleIds.every((id) => this.selectedOrderIds().includes(id));
   });
+  readonly orderEditorTitle = computed(() =>
+    this.editingOrderId() ? `Edit ${this.orderForm.controls.orderNumber.value || 'order'}` : 'Add order'
+  );
+
+  readonly orderForm = this.formBuilder.nonNullable.group({
+    customerId: this.formBuilder.control<number | null>(null),
+    orderNumber: this.formBuilder.control('', [Validators.required, Validators.maxLength(60)]),
+    placedAt: this.formBuilder.control('', [Validators.required]),
+    scheduledFor: this.formBuilder.control(''),
+    deliveredAt: this.formBuilder.control(''),
+    paymentStatus: this.formBuilder.control<SalesPaymentStatus>('DUE_ON_DELIVERY', [Validators.required]),
+    fulfillmentStatus: this.formBuilder.control<SalesFulfillmentStatus>('NEW', [Validators.required]),
+    deliveryFee: this.formBuilder.control('0.00', [Validators.required]),
+    deliveryAddress: this.formBuilder.control(''),
+    notes: this.formBuilder.control(''),
+    items: this.formBuilder.array([])
+  });
 
   ngOnInit(): void {
     this.route.queryParamMap
@@ -220,6 +272,7 @@ export class ProjectSalesRoute implements OnInit {
         map((params) => this.parseSalesQuery(params)),
         distinctUntilChanged((left, right) => this.areSalesQueriesEqual(left, right)),
         switchMap((query) => {
+          const requestToken = ++this.salesRequestToken;
           this.salesQuery.set(query);
           this.salesSearchValue.set(query.search ?? '');
           this.salesErrorMessage.set('');
@@ -227,21 +280,27 @@ export class ProjectSalesRoute implements OnInit {
 
           const projectId = Number(this.projectId());
           if (!projectId) {
-            return of({ data: null, error: 'Project not found.', query });
+            return of({ data: null, error: 'Project not found.', query, requestToken });
           }
 
           return this.projectSalesService.getSalesPage(projectId, query).pipe(
-            map((data) => ({ data, error: '', query })),
-            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error), query })),
+            map((data) => ({ data, error: '', query, requestToken })),
+            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error), query, requestToken })),
             finalize(() => {
-              this.isSalesLoading.set(false);
-              this.hasLoadedSales.set(true);
+              if (requestToken === this.salesRequestToken) {
+                this.isSalesLoading.set(false);
+                this.hasLoadedSales.set(true);
+              }
             })
           );
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ data, error, query }) => {
+      .subscribe(({ data, error, query, requestToken }) => {
+        if (requestToken !== this.salesRequestToken) {
+          return;
+        }
+
         if (data) {
           this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
           this.selectedOrderIds.set([]);
@@ -287,6 +346,137 @@ export class ProjectSalesRoute implements OnInit {
       });
   }
 
+  openCreateOrderEditor(): void {
+    this.editingOrderId.set(null);
+    this.resetOrderForm();
+    this.isOrderEditorOpen.set(true);
+    this.loadOrderEditorReferences();
+  }
+
+  openEditOrderEditor(orderId: number): void {
+    const projectId = Number(this.projectId());
+    if (!projectId) {
+      return;
+    }
+
+    this.editingOrderId.set(orderId);
+    this.isOrderEditorOpen.set(true);
+    this.isOrderEditorLoading.set(true);
+
+    forkJoin({
+      customersPage: this.projectCustomersService.getCustomersPage(projectId, {}).pipe(catchError(() => of(null))),
+      catalogPage: this.projectCatalogService.getCatalogPage(projectId, {}).pipe(catchError(() => of(null))),
+      order: this.projectSalesService.getOrder(projectId, orderId)
+    })
+      .pipe(
+        finalize(() => this.isOrderEditorLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: ({ customersPage, catalogPage, order }) => {
+          this.availableCustomers.set(customersPage?.customers ?? []);
+          this.availableProducts.set(catalogPage?.products ?? []);
+          this.fillOrderForm(order);
+        },
+        error: () => {
+          this.toastService.error('Unable to load this order right now.');
+          this.closeOrderEditor();
+        }
+      });
+  }
+
+  closeOrderEditor(): void {
+    if (this.isOrderSaving()) {
+      return;
+    }
+
+    this.isOrderEditorOpen.set(false);
+    this.isOrderEditorLoading.set(false);
+  }
+
+  addOrderItem(): void {
+    this.orderItems.push(this.createOrderItemGroup());
+  }
+
+  removeOrderItem(index: number): void {
+    if (this.orderItems.length <= 1) {
+      return;
+    }
+
+    this.orderItems.removeAt(index);
+  }
+
+  onEditorProductChange(index: number): void {
+    const group = this.orderItems.at(index);
+    const productId = Number(group?.get('productId')?.value ?? NaN);
+    const product = this.availableProducts().find((item) => item.id === productId);
+
+    if (!group) {
+      return;
+    }
+
+    if (!product || Number.isNaN(productId)) {
+      group.patchValue({
+        productId: null
+      });
+      return;
+    }
+
+    group.patchValue({
+      productId,
+      productName: product.name,
+      productSku: product.sku ?? '',
+      unitPrice: this.toDecimalString(product.price)
+    });
+  }
+
+  saveOrder(): void {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      this.orderItems.controls.forEach((control) => control.markAllAsTouched());
+      return;
+    }
+
+    const projectId = Number(this.projectId());
+    if (!projectId) {
+      return;
+    }
+
+    const payload = this.buildOrderPayload();
+    if (!payload) {
+      this.toastService.error('Please review the order values and items before saving.');
+      return;
+    }
+
+    this.isOrderSaving.set(true);
+    const orderId = this.editingOrderId();
+    const request$ = orderId
+      ? this.projectSalesService.updateOrder(projectId, orderId, payload)
+      : this.projectSalesService.createOrder(projectId, payload);
+
+    request$
+      .pipe(
+        finalize(() => this.isOrderSaving.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (order) => {
+          this.toastService.success(orderId ? 'Order updated.' : 'Order created.');
+          this.isOrderSaving.set(false);
+          if (orderId) {
+            this.closeOrderEditor();
+          } else {
+            this.editingOrderId.set(order.id);
+            this.fillOrderForm(order);
+          }
+          this.refreshSalesData();
+        },
+        error: () => {
+          this.toastService.error('Unable to save this order right now.');
+        }
+      });
+  }
+
   onSalesSearchInput(value: string): void {
     this.salesSearchValue.set(value);
     window.clearTimeout(this.searchTimeout);
@@ -326,11 +516,58 @@ export class ProjectSalesRoute implements OnInit {
     this.selectedOrderIds.set(Array.from(current));
   }
 
+  get orderItems(): FormArray {
+    return this.orderForm.controls.items as FormArray;
+  }
+
+  customerLabel(customer: ProjectCustomer): string {
+    return customer.fullName || [customer.firstName, customer.lastName].filter(Boolean).join(' ').trim() || 'Customer';
+  }
+
+  getEditorSubtotal(): string {
+    const subtotal = this.orderItems.controls.reduce((sum, control) => {
+      const quantity = Number(control.get('quantity')?.value ?? 0);
+      const unitPrice = Number(control.get('unitPrice')?.value ?? 0);
+      if (!Number.isFinite(quantity) || !Number.isFinite(unitPrice)) {
+        return sum;
+      }
+
+      return sum + (quantity * unitPrice);
+    }, 0);
+
+    return this.formatCurrency(subtotal);
+  }
+
+  getEditorTotal(): string {
+    const subtotal = this.orderItems.controls.reduce((sum, control) => {
+      const quantity = Number(control.get('quantity')?.value ?? 0);
+      const unitPrice = Number(control.get('unitPrice')?.value ?? 0);
+      return sum + ((Number.isFinite(quantity) ? quantity : 0) * (Number.isFinite(unitPrice) ? unitPrice : 0));
+    }, 0);
+    const deliveryFee = Number(this.orderForm.controls.deliveryFee.value ?? 0);
+    return this.formatCurrency(subtotal + (Number.isFinite(deliveryFee) ? deliveryFee : 0));
+  }
+
+  canSubmitOrder(): boolean {
+    if (this.isOrderSaving() || this.isOrderEditorLoading() || this.orderForm.invalid) {
+      return false;
+    }
+
+    if (this.editingOrderId()) {
+      return this.orderForm.dirty;
+    }
+
+    return true;
+  }
+
   private updateSalesQuery(partial: Partial<ProjectSalesQuery>): void {
     const nextQuery = { ...this.salesQuery(), ...partial };
     if (this.areSalesQueriesEqual(nextQuery, this.salesQuery())) {
       return;
     }
+
+    this.salesQuery.set(nextQuery);
+    this.salesSearchValue.set(nextQuery.search ?? '');
 
     const queryParams: Params = {
       range: nextQuery.range,
@@ -354,27 +591,183 @@ export class ProjectSalesRoute implements OnInit {
       return;
     }
 
+    const requestToken = ++this.salesRequestToken;
+    this.salesQuery.set(query);
     this.salesErrorMessage.set('');
     this.isSalesLoading.set(true);
 
     this.projectSalesService.getSalesPage(projectId, query)
       .pipe(
         finalize(() => {
-          this.isSalesLoading.set(false);
-          this.hasLoadedSales.set(true);
+          if (requestToken === this.salesRequestToken) {
+            this.isSalesLoading.set(false);
+            this.hasLoadedSales.set(true);
+          }
         }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (data) => {
+          if (requestToken !== this.salesRequestToken) {
+            return;
+          }
           this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
           this.selectedOrderIds.set([]);
         },
         error: (error) => {
+          if (requestToken !== this.salesRequestToken) {
+            return;
+          }
           this.salesErrorMessage.set(this.toSalesErrorMessage(error));
           this.salesResponse.set(null);
         }
       });
+  }
+
+  private loadOrderEditorReferences(): void {
+    const projectId = Number(this.projectId());
+    if (!projectId) {
+      return;
+    }
+
+    this.isOrderEditorLoading.set(true);
+    forkJoin({
+      customersPage: this.projectCustomersService.getCustomersPage(projectId, {}).pipe(catchError(() => of(null))),
+      catalogPage: this.projectCatalogService.getCatalogPage(projectId, {}).pipe(catchError(() => of(null)))
+    })
+      .pipe(
+        finalize(() => this.isOrderEditorLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(({ customersPage, catalogPage }) => {
+        this.availableCustomers.set(customersPage?.customers ?? []);
+        this.availableProducts.set(catalogPage?.products ?? []);
+      });
+  }
+
+  private resetOrderForm(): void {
+    this.orderForm.reset({
+      customerId: null,
+      orderNumber: this.generateOrderNumber(),
+      placedAt: this.toDateTimeInputValue(new Date().toISOString()),
+      scheduledFor: '',
+      deliveredAt: '',
+      paymentStatus: 'DUE_ON_DELIVERY',
+      fulfillmentStatus: 'NEW',
+      deliveryFee: '0.00',
+      deliveryAddress: '',
+      notes: ''
+    });
+    this.orderItems.clear();
+    this.orderItems.push(this.createOrderItemGroup());
+  }
+
+  private fillOrderForm(order: ProjectSalesOrderEditor): void {
+    this.orderForm.reset({
+      customerId: order.customerId,
+      orderNumber: order.orderNumber,
+      placedAt: this.toDateTimeInputValue(order.placedAt),
+      scheduledFor: this.toDateTimeInputValue(order.scheduledFor),
+      deliveredAt: this.toDateTimeInputValue(order.deliveredAt),
+      paymentStatus: order.paymentStatus,
+      fulfillmentStatus: order.fulfillmentStatus,
+      deliveryFee: this.toDecimalString(order.deliveryFee),
+      deliveryAddress: order.deliveryAddress ?? '',
+      notes: order.notes ?? ''
+    });
+
+    this.orderItems.clear();
+    order.items.forEach((item) => {
+      this.orderItems.push(this.createOrderItemGroup({
+        productId: item.productId,
+        productName: item.productName,
+        productSku: item.productSku ?? '',
+        quantity: item.quantity,
+        unitPrice: this.toDecimalString(item.unitPrice)
+      }));
+    });
+
+    if (this.orderItems.length === 0) {
+      this.orderItems.push(this.createOrderItemGroup());
+    }
+  }
+
+  private createOrderItemGroup(initial?: {
+    productId?: number | null;
+    productName?: string;
+    productSku?: string;
+    quantity?: number;
+    unitPrice?: string;
+  }) {
+    return this.formBuilder.group({
+      productId: this.formBuilder.control<number | null>(initial?.productId ?? null),
+      productName: this.formBuilder.control(initial?.productName ?? '', [Validators.required, Validators.maxLength(140)]),
+      productSku: this.formBuilder.control(initial?.productSku ?? '', [Validators.maxLength(80)]),
+      quantity: this.formBuilder.control(String(initial?.quantity ?? 1), [Validators.required]),
+      unitPrice: this.formBuilder.control(initial?.unitPrice ?? '0.00', [Validators.required])
+    });
+  }
+
+  private buildOrderPayload(): CreateProjectOrderRequest | null {
+    const raw = this.orderForm.getRawValue();
+    const deliveryFee = Number(raw.deliveryFee);
+    if (!Number.isFinite(deliveryFee) || deliveryFee < 0) {
+      return null;
+    }
+
+    const items = this.orderItems.controls.map((control) => {
+      const productId = control.get('productId')?.value as number | null;
+      const productName = String(control.get('productName')?.value ?? '').trim();
+      const productSku = String(control.get('productSku')?.value ?? '').trim();
+      const quantity = Number(control.get('quantity')?.value ?? 0);
+      const unitPrice = Number(control.get('unitPrice')?.value ?? 0);
+
+      if (!productName || !Number.isFinite(quantity) || quantity < 1 || !Number.isFinite(unitPrice) || unitPrice < 0) {
+        return null;
+      }
+
+      return {
+        productId,
+        productName,
+        productSku: productSku || null,
+        quantity,
+        unitPrice
+      };
+    });
+
+    if (items.some((item) => item == null)) {
+      return null;
+    }
+
+    return {
+      customerId: raw.customerId,
+      orderNumber: String(raw.orderNumber ?? '').trim(),
+      placedAt: String(raw.placedAt ?? ''),
+      scheduledFor: raw.scheduledFor?.trim() ? raw.scheduledFor : null,
+      deliveredAt: raw.deliveredAt?.trim() ? raw.deliveredAt : null,
+      paymentStatus: raw.paymentStatus ?? 'DUE_ON_DELIVERY',
+      fulfillmentStatus: raw.fulfillmentStatus ?? 'NEW',
+      deliveryFee,
+      deliveryAddress: raw.deliveryAddress?.trim() ? raw.deliveryAddress.trim() : null,
+      notes: raw.notes?.trim() ? raw.notes.trim() : null,
+      items: items as CreateProjectOrderRequest['items']
+    };
+  }
+
+  private toDateTimeInputValue(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    return value.slice(0, 16);
+  }
+
+  private toDecimalString(value: number): string {
+    return Number.isInteger(value) ? `${value}.00` : String(value);
+  }
+
+  private generateOrderNumber(): string {
+    return `ORD-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
   }
 
   private parseSalesQuery(params: import('@angular/router').ParamMap): ProjectSalesQuery {
@@ -504,5 +897,12 @@ export class ProjectSalesRoute implements OnInit {
     anchor.download = filename;
     anchor.click();
     URL.revokeObjectURL(objectUrl);
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.isOrderEditorOpen()) {
+      this.closeOrderEditor();
+    }
   }
 }
