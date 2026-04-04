@@ -1,0 +1,137 @@
+<section class="project-categories">
+  @if (isLoading()) {
+    <section class="project-categories__state">
+      <div class="project-categories__skeleton"></div>
+      <div class="project-categories__skeleton"></div>
+      <div class="project-categories__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-categories__state project-categories__state--error" role="alert">
+      <h1>We couldn't load your blog categories</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadProject()">Try again</button>
+    </section>
+  } @else if (project(); as project) {
+    <section class="project-categories__hero project-categories__panel">
+      <div>
+        <p class="project-categories__eyebrow">Content architecture</p>
+        <h1 class="project-categories__title">Organize the archive around clear pillars.</h1>
+        <p class="project-categories__subtitle">
+          Use categories to keep {{ project.name }} readable, balanced, and easier to grow without creating a messy archive.
+        </p>
+      </div>
+
+      <a class="project-categories__hero-action" [routerLink]="['/app/projects', project.id, 'posts']">Review posts</a>
+    </section>
+
+    <section class="project-categories__summary-grid">
+      <article class="project-categories__summary-card project-categories__panel">
+        <span class="project-categories__summary-label">Categories</span>
+        <strong class="project-categories__summary-value">{{ categories().length }}</strong>
+        <span class="project-categories__summary-note">Active editorial pillars</span>
+      </article>
+      <article class="project-categories__summary-card project-categories__panel">
+        <span class="project-categories__summary-label">Published posts</span>
+        <strong class="project-categories__summary-value">{{ totalPosts() }}</strong>
+        <span class="project-categories__summary-note">Already mapped across the archive</span>
+      </article>
+      <article class="project-categories__summary-card project-categories__panel">
+        <span class="project-categories__summary-label">Drafts in taxonomy</span>
+        <strong class="project-categories__summary-value">{{ totalDrafts() }}</strong>
+        <span class="project-categories__summary-note">Waiting for the next publishing cycle</span>
+      </article>
+    </section>
+
+    <section class="project-categories__layout">
+      <article class="project-categories__panel">
+        <div class="project-categories__section-head">
+          <div>
+            <p class="project-categories__section-kicker">Categories</p>
+            <h2>Archive structure</h2>
+          </div>
+          <span class="project-categories__section-badge">{{ categories().length }} pillars</span>
+        </div>
+
+        <div class="project-categories__list">
+          @for (category of categories(); track trackCategory($index, category)) {
+            <button
+              type="button"
+              class="project-categories__row"
+              [class.project-categories__row--active]="selectedCategory()?.id === category.id"
+              (click)="selectCategory(category.id)"
+            >
+              <div class="project-categories__row-main">
+                <div class="project-categories__row-top">
+                  <strong>{{ category.name }}</strong>
+                  <span
+                    class="project-categories__status"
+                    [class.project-categories__status--healthy]="category.state === 'healthy'"
+                    [class.project-categories__status--light]="category.state === 'light'"
+                  >
+                    {{ category.stateLabel }}
+                  </span>
+                </div>
+                <p>{{ category.description }}</p>
+                <div class="project-categories__meta">
+                  <span>{{ category.postCount }} posts</span>
+                  <span>{{ category.draftCount }} drafts</span>
+                  <span>{{ category.shareLabel }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </article>
+
+      <aside class="project-categories__panel">
+        @if (selectedCategory(); as selectedCategory) {
+          <div class="project-categories__section-head">
+            <div>
+              <p class="project-categories__section-kicker">Selected category</p>
+              <h2>{{ selectedCategory.name }}</h2>
+            </div>
+            <span class="project-categories__section-badge project-categories__section-badge--accent">
+              {{ selectedCategory.pillarLabel }}
+            </span>
+          </div>
+
+          <div class="project-categories__detail-card">
+            <p>{{ selectedCategory.description }}</p>
+
+            <div class="project-categories__detail-grid">
+              <div>
+                <span>Cadence</span>
+                <strong>{{ selectedCategory.cadenceLabel }}</strong>
+              </div>
+              <div>
+                <span>Coverage</span>
+                <strong>{{ selectedCategory.shareLabel }}</strong>
+              </div>
+              <div>
+                <span>Published</span>
+                <strong>{{ selectedCategory.postCount }}</strong>
+              </div>
+              <div>
+                <span>Drafts</span>
+                <strong>{{ selectedCategory.draftCount }}</strong>
+              </div>
+            </div>
+
+            <div class="project-categories__checklist">
+              <h3>Next taxonomy move</h3>
+              <ul>
+                <li>Keep future post ideas aligned with this pillar.</li>
+                <li>Check that article tags and homepage placement support the same theme.</li>
+                <li>{{ selectedCategory.nextAngle }}</li>
+              </ul>
+            </div>
+
+            <a class="project-categories__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
+              Edit category content
+            </a>
+          </div>
+        }
+      </aside>
+    </section>
+  }
+</section>

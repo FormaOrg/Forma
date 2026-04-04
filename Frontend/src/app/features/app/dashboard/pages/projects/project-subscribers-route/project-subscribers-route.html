@@ -1,0 +1,148 @@
+<section class="project-subscribers">
+  @if (isLoading()) {
+    <section class="project-subscribers__state">
+      <div class="project-subscribers__skeleton"></div>
+      <div class="project-subscribers__skeleton"></div>
+      <div class="project-subscribers__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-subscribers__state project-subscribers__state--error" role="alert">
+      <h1>We couldn't load your subscribers</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadProject()">Try again</button>
+    </section>
+  } @else if (project(); as project) {
+    <section class="project-subscribers__hero project-subscribers__panel">
+      <div>
+        <p class="project-subscribers__eyebrow">Audience health</p>
+        <h1 class="project-subscribers__title">See who is leaning in and who needs a nudge.</h1>
+        <p class="project-subscribers__subtitle">
+          {{ project.name }} now has a subscriber view that makes engagement, source quality, and reactivation opportunities easier to scan.
+        </p>
+      </div>
+
+      <a class="project-subscribers__hero-action" [routerLink]="['/app/projects', project.id, 'posts']">Open posts</a>
+    </section>
+
+    <section class="project-subscribers__summary-grid">
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">Total subscribers</span>
+        <strong class="project-subscribers__summary-value">{{ subscribers().length }}</strong>
+        <span class="project-subscribers__summary-note">Tracked reader profiles</span>
+      </article>
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">Active readers</span>
+        <strong class="project-subscribers__summary-value">{{ activeSubscribers() }}</strong>
+        <span class="project-subscribers__summary-note">Still receiving your sends</span>
+      </article>
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">High intent</span>
+        <strong class="project-subscribers__summary-value">{{ engagedSubscribers() }}</strong>
+        <span class="project-subscribers__summary-note">Engaged and VIP readers</span>
+      </article>
+    </section>
+
+    <section class="project-subscribers__layout">
+      <article class="project-subscribers__panel">
+        <div class="project-subscribers__section-head">
+          <div>
+            <p class="project-subscribers__section-kicker">Subscribers</p>
+            <h2>Reader list</h2>
+          </div>
+          <span class="project-subscribers__section-badge">{{ filteredSubscribers().length }} visible</span>
+        </div>
+
+        <label class="project-subscribers__search">
+          <span>Search</span>
+          <input
+            type="search"
+            [value]="searchValue()"
+            (input)="updateSearch(($any($event.target).value ?? '').toString())"
+            placeholder="Search readers, emails, or interests"
+          />
+        </label>
+
+        <div class="project-subscribers__list">
+          @for (subscriber of filteredSubscribers(); track trackSubscriber($index, subscriber)) {
+            <button
+              type="button"
+              class="project-subscribers__row"
+              [class.project-subscribers__row--active]="selectedSubscriber()?.id === subscriber.id"
+              (click)="selectSubscriber(subscriber.id)"
+            >
+              <div class="project-subscribers__row-main">
+                <div class="project-subscribers__row-top">
+                  <strong>{{ subscriber.name }}</strong>
+                  <span
+                    class="project-subscribers__status"
+                    [class.project-subscribers__status--vip]="subscriber.status === 'vip'"
+                    [class.project-subscribers__status--paused]="subscriber.status === 'paused'"
+                    [class.project-subscribers__status--new]="subscriber.status === 'new'"
+                  >
+                    {{ subscriber.statusLabel }}
+                  </span>
+                </div>
+                <p>{{ subscriber.email }}</p>
+                <div class="project-subscribers__meta">
+                  <span>{{ subscriber.sourceLabel }}</span>
+                  <span>{{ subscriber.tagLabel }}</span>
+                  <span>{{ subscriber.openRateLabel }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </article>
+
+      <aside class="project-subscribers__panel">
+        @if (selectedSubscriber(); as selectedSubscriber) {
+          <div class="project-subscribers__section-head">
+            <div>
+              <p class="project-subscribers__section-kicker">Selected reader</p>
+              <h2>{{ selectedSubscriber.name }}</h2>
+            </div>
+            <span class="project-subscribers__section-badge project-subscribers__section-badge--accent">
+              {{ selectedSubscriber.tagLabel }}
+            </span>
+          </div>
+
+          <div class="project-subscribers__detail-card">
+            <p>{{ selectedSubscriber.email }}</p>
+
+            <div class="project-subscribers__detail-grid">
+              <div>
+                <span>Status</span>
+                <strong>{{ selectedSubscriber.statusLabel }}</strong>
+              </div>
+              <div>
+                <span>Source</span>
+                <strong>{{ selectedSubscriber.sourceLabel }}</strong>
+              </div>
+              <div>
+                <span>Joined</span>
+                <strong>{{ selectedSubscriber.joinedLabel }}</strong>
+              </div>
+              <div>
+                <span>Recent signal</span>
+                <strong>{{ selectedSubscriber.lastTouchLabel }}</strong>
+              </div>
+            </div>
+
+            <div class="project-subscribers__checklist">
+              <h3>Suggested next action</h3>
+              <ul>
+                <li>Use this reader tag to guide which themes deserve more coverage.</li>
+                <li>Review whether the next newsletter send should spotlight this topic.</li>
+                <li>Check if the current welcome or re-engagement flow matches this status.</li>
+              </ul>
+            </div>
+
+            <a class="project-subscribers__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
+              Edit audience touchpoints
+            </a>
+          </div>
+        }
+      </aside>
+    </section>
+  }
+</section>
