@@ -75,6 +75,8 @@ export class ProjectSalesPageComponent {
   @Output() toggleAllOrders = new EventEmitter<boolean>();
   @Output() toggleOrderSelection = new EventEmitter<SalesOrderSelectionChange>();
   @Output() pageChange = new EventEmitter<number>();
+  @Output() createOrder = new EventEmitter<void>();
+  @Output() editOrder = new EventEmitter<number>();
 
   readonly skeletonCards = [1, 2, 3, 4, 5, 6] as const;
 }

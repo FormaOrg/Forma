@@ -101,59 +101,101 @@
   </section>
 } @else if (title() === 'Setup' || title() === 'Project') {
   <section class="project-setup">
-    <section class="project-setup__panel project-setup__panel--primary">
-      <div class="project-setup__panel-header">
-        <div class="project-setup__panel-copy">
-          <span class="project-setup__eyebrow">Project workspace</span>
-          <h1 class="project-setup__title">{{ workspaceConfig().setupTitle }}</h1>
-          <div class="project-setup__meta" aria-label="Project setup summary">
-            <span class="project-setup__meta-pill">Project #{{ projectId() }}</span>
-            @if (nextSetupStep) {
-              <span class="project-setup__meta-pill">Next: {{ nextSetupStep }}</span>
-            }
-          </div>
-        </div>
-
-        <div class="project-setup__progress">
-          <div class="project-setup__progress-summary">
-            <span class="project-setup__progress-label">Completed tasks</span>
-            <strong>{{ completedSetupItems }}/{{ setupItems.length }}</strong>
-          </div>
-          <div class="project-setup__progress-bar" aria-hidden="true">
-            <span class="project-setup__progress-bar-fill" [style.width.%]="(completedSetupItems / setupItems.length) * 100"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-setup__tasks">
-        @for (item of setupItems; track item.title) {
-          <article
-            class="project-setup__task"
-            [class.project-setup__task--done]="item.status === 'done'"
-            [class.project-setup__task--active]="item.status === 'active'"
-          >
-            <div class="project-setup__task-copy">
-              <div class="project-setup__task-title-row">
-                <span class="project-setup__task-dot" aria-hidden="true"></span>
-                <h3 class="project-setup__task-title" [class.project-setup__task-title--done]="item.status === 'done'">{{ item.title }}</h3>
-                @if (item.status === 'active') {
-                  <span class="project-setup__task-status">In progress</span>
-                }
-              </div>
-              <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">{{ item.description }}</p>
+    @if (isSetupLoading()) {
+      <section class="project-setup__panel project-setup__panel--primary project-setup__panel--skeleton" aria-hidden="true">
+        <div class="project-setup__panel-header">
+          <div class="project-setup__panel-copy">
+            <span class="project-setup__skeleton project-setup__skeleton--eyebrow"></span>
+            <span class="project-setup__skeleton project-setup__skeleton--title"></span>
+            <div class="project-setup__meta">
+              <span class="project-setup__skeleton project-setup__skeleton--pill"></span>
+              <span class="project-setup__skeleton project-setup__skeleton--pill"></span>
             </div>
+          </div>
 
-            <button
-              type="button"
-              class="project-setup__task-action"
-              [class.project-setup__task-action--done]="item.status === 'done'"
+          <div class="project-setup__progress">
+            <div class="project-setup__progress-summary">
+              <span class="project-setup__skeleton project-setup__skeleton--label"></span>
+              <span class="project-setup__skeleton project-setup__skeleton--value"></span>
+            </div>
+            <div class="project-setup__progress-bar" aria-hidden="true">
+              <span class="project-setup__skeleton project-setup__skeleton--progress-fill"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-setup__tasks">
+          @for (_ of [1, 2, 3, 4]; track $index) {
+            <article class="project-setup__task">
+              <div class="project-setup__task-copy">
+                <div class="project-setup__task-title-row">
+                  <span class="project-setup__skeleton project-setup__skeleton--dot"></span>
+                  <span class="project-setup__skeleton project-setup__skeleton--task-title"></span>
+                  <span class="project-setup__skeleton project-setup__skeleton--task-status"></span>
+                </div>
+                <span class="project-setup__skeleton project-setup__skeleton--task-copy"></span>
+                <span class="project-setup__skeleton project-setup__skeleton--task-copy project-setup__skeleton--task-copy-short"></span>
+              </div>
+              <span class="project-setup__skeleton project-setup__skeleton--task-action"></span>
+            </article>
+          }
+        </div>
+      </section>
+    } @else {
+      <section class="project-setup__panel project-setup__panel--primary">
+        <div class="project-setup__panel-header">
+          <div class="project-setup__panel-copy">
+            <span class="project-setup__eyebrow">Project workspace</span>
+            <h1 class="project-setup__title">{{ workspaceConfig().setupTitle }}</h1>
+            <div class="project-setup__meta" aria-label="Project setup summary">
+              <span class="project-setup__meta-pill">Project #{{ projectId() }}</span>
+              @if (nextSetupStep) {
+                <span class="project-setup__meta-pill">Next: {{ nextSetupStep }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="project-setup__progress">
+            <div class="project-setup__progress-summary">
+              <span class="project-setup__progress-label">Completed tasks</span>
+              <strong>{{ completedSetupItems }}/{{ setupItems.length }}</strong>
+            </div>
+            <div class="project-setup__progress-bar" aria-hidden="true">
+              <span class="project-setup__progress-bar-fill" [style.width.%]="(completedSetupItems / setupItems.length) * 100"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-setup__tasks">
+          @for (item of setupItems; track item.title) {
+            <article
+              class="project-setup__task"
+              [class.project-setup__task--done]="item.status === 'done'"
+              [class.project-setup__task--active]="item.status === 'active'"
             >
-              {{ item.actionLabel }}
-            </button>
-          </article>
-        }
-      </div>
-    </section>
+              <div class="project-setup__task-copy">
+                <div class="project-setup__task-title-row">
+                  <span class="project-setup__task-dot" aria-hidden="true"></span>
+                  <h3 class="project-setup__task-title" [class.project-setup__task-title--done]="item.status === 'done'">{{ item.title }}</h3>
+                  @if (item.status === 'active') {
+                    <span class="project-setup__task-status">In progress</span>
+                  }
+                </div>
+                <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">{{ item.description }}</p>
+              </div>
+
+              <button
+                type="button"
+                class="project-setup__task-action"
+                [class.project-setup__task-action--done]="item.status === 'done'"
+              >
+                {{ item.actionLabel }}
+              </button>
+            </article>
+          }
+        </div>
+      </section>
+    }
   </section>
 } @else {
   <section class="project-placeholder">

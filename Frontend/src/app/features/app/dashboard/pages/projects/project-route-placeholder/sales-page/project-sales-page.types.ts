@@ -51,3 +51,7 @@ export interface SalesOrderSelectionChange {
   orderId: number;
   selected: boolean;
 }
+
+export interface SalesOrderEditRequest {
+  orderId: number;
+}

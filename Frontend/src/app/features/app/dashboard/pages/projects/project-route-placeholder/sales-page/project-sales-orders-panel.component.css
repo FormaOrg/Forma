@@ -9,7 +9,7 @@
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.03),
     0 8px 24px rgba(17, 17, 17, 0.03);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .orders-panel--featured {
@@ -22,6 +22,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.orders-panel__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .orders-panel__title {
@@ -39,6 +45,22 @@
   border: none;
   background: #7566ff;
   color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+
+.orders-panel__secondary-action {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -120,10 +142,12 @@
   border: 1px solid rgba(215, 217, 223, 0.95);
   border-radius: 16px;
   background: #ffffff;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .orders-panel__toolbar {
+  position: relative;
+  z-index: 3;
   padding: 10px 12px;
   display: flex;
   align-items: center;
@@ -138,20 +162,102 @@
   gap: 8px;
 }
 
-.orders-panel__toolbar-select {
-  min-height: 30px;
-  padding: 0 32px 0 11px;
-  border-radius: 999px;
+.orders-panel__dropdown {
+  position: relative;
+  min-width: 172px;
+}
+
+.orders-panel__dropdown-trigger {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px 0 13px;
+  border-radius: 14px;
   border: 1px solid rgba(215, 217, 223, 0.95);
   background: #ffffff;
-  color: #4b5060;
-  font: inherit;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.orders-panel__dropdown.is-open .orders-panel__dropdown-trigger {
+  border-color: rgba(117, 102, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.08);
+}
+
+.orders-panel__dropdown-label,
+.orders-panel__dropdown-value {
   font-size: 0.74rem;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.orders-panel__dropdown-label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a91a3;
+}
+
+.orders-panel__dropdown-value {
+  color: #2f3642;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.orders-panel__dropdown-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7f8798;
+}
+
+.orders-panel__dropdown-caret svg {
+  width: 14px;
+  height: 14px;
+}
+
+.orders-panel__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  box-shadow:
+    0 8px 18px rgba(17, 17, 17, 0.08),
+    0 1px 4px rgba(17, 17, 17, 0.03);
+}
+
+.orders-panel__dropdown-item {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 11px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #3c4351;
+  text-align: left;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 520;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.orders-panel__dropdown-item:hover,
+.orders-panel__dropdown-item.is-selected {
+  background: rgba(117, 102, 255, 0.08);
+  color: #7566ff;
 }
 
 .orders-panel__search {
-  min-width: 190px;
+  min-width: 280px;
   height: 32px;
   padding: 0 11px;
   border-radius: 999px;
@@ -160,6 +266,15 @@
   align-items: center;
   gap: 8px;
   background: #ffffff;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.orders-panel__search:focus-within {
+  border-color: rgba(117, 102, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.08);
 }
 
 .orders-panel__search input {
@@ -235,6 +350,7 @@
   .orders-panel__summary-strip,
   .orders-panel__toolbar,
   .orders-panel__header,
+  .orders-panel__header-actions,
   .orders-panel__toolbar-actions,
   .orders-panel__pagination {
     flex-direction: column;
@@ -251,7 +367,7 @@
     min-width: 0;
   }
 
-  .orders-panel__toolbar-select,
+  .orders-panel__dropdown,
   .orders-panel__pagination-btn {
     width: 100%;
   }

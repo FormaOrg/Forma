@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 import { AppIcon } from '../../../../../../../shared/app/icons/app-icon';
 import {
@@ -44,6 +44,11 @@ export class ProjectSalesOrdersPanelComponent {
   @Output() toggleAllOrders = new EventEmitter<boolean>();
   @Output() toggleOrderSelection = new EventEmitter<SalesOrderSelectionChange>();
   @Output() pageChange = new EventEmitter<number>();
+  @Output() createOrder = new EventEmitter<void>();
+  @Output() editOrder = new EventEmitter<number>();
+
+  filterDropdownOpen = false;
+  sortDropdownOpen = false;
 
   onFilterChange(value: string): void {
     this.filterChange.emit(value as SalesOrderFilter);
@@ -57,11 +62,66 @@ export class ProjectSalesOrdersPanelComponent {
     this.searchChange.emit(value);
   }
 
+  toggleFilterDropdown(): void {
+    this.filterDropdownOpen = !this.filterDropdownOpen;
+    if (this.filterDropdownOpen) {
+      this.sortDropdownOpen = false;
+    }
+  }
+
+  toggleSortDropdown(): void {
+    this.sortDropdownOpen = !this.sortDropdownOpen;
+    if (this.sortDropdownOpen) {
+      this.filterDropdownOpen = false;
+    }
+  }
+
+  selectFilter(value: SalesOrderFilter): void {
+    this.filterDropdownOpen = false;
+    this.onFilterChange(value);
+  }
+
+  selectSort(value: SalesOrderSort): void {
+    this.sortDropdownOpen = false;
+    this.onSortChange(value);
+  }
+
+  filterLabel(): string {
+    return this.filterOptions.find((option) => option.value === this.query.filter)?.label ?? 'All orders';
+  }
+
+  sortLabel(): string {
+    return this.sortOptions.find((option) => option.value === this.query.sort)?.label ?? 'Newest first';
+  }
+
+  @HostListener('document:pointerdown', ['$event'])
+  handleDocumentPointerDown(event: PointerEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.orders-panel__dropdown')) {
+      this.filterDropdownOpen = false;
+      this.sortDropdownOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    this.filterDropdownOpen = false;
+    this.sortDropdownOpen = false;
+  }
+
   previousPage(): void {
     this.pageChange.emit(this.page - 1);
   }
 
   nextPage(): void {
     this.pageChange.emit(this.page + 1);
+  }
+
+  openCreateOrder(): void {
+    this.createOrder.emit();
+  }
+
+  openEditOrder(orderId: number): void {
+    this.editOrder.emit(orderId);
   }
 }

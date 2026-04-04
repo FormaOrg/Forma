@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ProjectSalesPageResponse, ProjectSalesQuery } from '../models/project-sales.model';
+import {
+  CreateProjectOrderRequest,
+  ProjectSalesOrderEditor,
+  ProjectSalesPageResponse,
+  ProjectSalesQuery,
+  UpdateProjectOrderRequest
+} from '../models/project-sales.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectSalesService {
@@ -21,6 +27,22 @@ export class ProjectSalesService {
       params: this.buildParams(query, false),
       responseType: 'blob',
     });
+  }
+
+  getOrder(projectId: number, orderId: number): Observable<ProjectSalesOrderEditor> {
+    return this.http.get<ProjectSalesOrderEditor>(`${this.baseUrl}/${projectId}/sales/orders/${orderId}`);
+  }
+
+  createOrder(projectId: number, payload: CreateProjectOrderRequest): Observable<ProjectSalesOrderEditor> {
+    return this.http.post<ProjectSalesOrderEditor>(`${this.baseUrl}/${projectId}/sales/orders`, payload);
+  }
+
+  updateOrder(
+    projectId: number,
+    orderId: number,
+    payload: UpdateProjectOrderRequest
+  ): Observable<ProjectSalesOrderEditor> {
+    return this.http.put<ProjectSalesOrderEditor>(`${this.baseUrl}/${projectId}/sales/orders/${orderId}`, payload);
   }
 
   private buildParams(query: ProjectSalesQuery, includePagination = true): HttpParams {

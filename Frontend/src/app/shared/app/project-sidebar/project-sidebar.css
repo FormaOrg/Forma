@@ -119,6 +119,14 @@
   gap: 6px;
 }
 
+.project-sidebar__skeleton {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.16), rgba(117, 102, 255, 0.08));
+  background-size: 200% 100%;
+  animation: project-sidebar-shimmer 1.4s linear infinite;
+}
+
 .project-sidebar__workspace-card {
   padding: 14px;
   border-radius: 14px;
@@ -127,6 +135,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.project-sidebar__workspace-card--skeleton {
+  pointer-events: none;
 }
 
 .project-sidebar__workspace-card--collapsed {
@@ -261,6 +273,11 @@
     color 0.18s ease;
 }
 
+.project-sidebar__row--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
 .project-sidebar__row--collapsed {
   grid-template-columns: 1fr;
   column-gap: 0;
@@ -300,6 +317,46 @@
   color: inherit;
 }
 
+.project-sidebar__skeleton--icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 8px;
+}
+
+.project-sidebar__skeleton--label {
+  width: 72%;
+  height: 12px;
+  border-radius: 8px;
+}
+
+.project-sidebar__skeleton--workspace-title {
+  width: 82%;
+  height: 14px;
+  border-radius: 8px;
+}
+
+.project-sidebar__skeleton--workspace-copy {
+  width: 64%;
+  height: 11px;
+  border-radius: 8px;
+}
+
+.project-sidebar__skeleton--workspace-copy-short {
+  width: 48%;
+}
+
+.project-sidebar__skeleton--bar-fill {
+  width: 58%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.project-sidebar__skeleton--section-label {
+  width: 58px;
+  height: 10px;
+  border-radius: 8px;
+}
+
 .project-sidebar__row-pad {
   display: block;
 }
@@ -321,6 +378,15 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+@keyframes project-sidebar-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }
 
 .project-sidebar__row--footer {
@@ -374,6 +440,11 @@
 :host-context(.theme-dark) .project-sidebar__workspace-card {
   border-color: rgba(255, 255, 255, 0.06);
   background: #182131;
+}
+
+:host-context(.theme-dark) .project-sidebar__skeleton {
+  background: linear-gradient(90deg, rgba(33, 40, 56, 0.95) 0%, rgba(42, 50, 69, 1) 50%, rgba(33, 40, 56, 0.95) 100%);
+  background-size: 220% 100%;
 }
 
 :host-context(.theme-dark) .project-sidebar__workspace-card--complete {

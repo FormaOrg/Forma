@@ -1,0 +1,462 @@
+.sales-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.26);
+  z-index: 20;
+}
+
+.sales-editor {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+  width: min(520px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 21;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+}
+
+.sales-editor__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 2px 2px;
+}
+
+.sales-editor__header-copy {
+  min-width: 0;
+}
+
+.sales-editor__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+.sales-editor__header h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 640;
+  letter-spacing: -0.04em;
+}
+
+.sales-editor__subtitle {
+  margin: 8px 0 0;
+  color: #6f7480;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.sales-editor__close,
+.sales-editor__secondary,
+.sales-editor__primary,
+.sales-editor__add-item,
+.sales-editor__remove-item {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(117, 102, 255, 0.16);
+  border-radius: 999px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 520;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.sales-editor__primary,
+.sales-editor__add-item {
+  color: #7566ff;
+}
+
+.sales-editor__secondary,
+.sales-editor__close,
+.sales-editor__remove-item {
+  color: #6f7480;
+}
+
+.sales-editor__close:hover,
+.sales-editor__secondary:hover,
+.sales-editor__primary:hover,
+.sales-editor__add-item:hover,
+.sales-editor__remove-item:hover {
+  border-color: rgba(117, 102, 255, 0.32);
+  background: #f7f6ff;
+}
+
+.sales-editor__loading {
+  padding: 18px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 16px;
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sales-editor__skeleton-section {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+  display: grid;
+  gap: 12px;
+}
+
+.sales-editor__skeleton-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sales-editor__skeleton {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(233, 236, 243, 0.9) 0%,
+    rgba(243, 245, 249, 1) 50%,
+    rgba(233, 236, 243, 0.9) 100%
+  );
+  background-size: 220% 100%;
+  animation: salesEditorShimmer 1.25s linear infinite;
+}
+
+.sales-editor__skeleton--title {
+  width: 48%;
+  height: 28px;
+}
+
+.sales-editor__skeleton--copy {
+  width: 82%;
+  height: 14px;
+}
+
+.sales-editor__skeleton--field {
+  height: 46px;
+}
+
+.sales-editor__skeleton--item {
+  height: 136px;
+}
+
+.sales-editor__skeleton--button {
+  width: 120px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.sales-editor__skeleton--button-primary {
+  width: 144px;
+}
+
+.sales-editor__form {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sales-editor__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 2px;
+}
+
+.sales-editor__section {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sales-editor__section-head h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.sales-editor__section-head p {
+  margin: 4px 0 0;
+  color: rgba(11, 11, 18, 0.58);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.sales-editor__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+.sales-editor__form input,
+.sales-editor__form textarea,
+.sales-editor__form select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.sales-editor__form textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+.sales-editor__form input::placeholder,
+.sales-editor__form textarea::placeholder {
+  color: rgba(17, 24, 39, 0.42);
+}
+
+.sales-editor__form input:focus,
+.sales-editor__form textarea:focus,
+.sales-editor__form select:focus {
+  outline: none;
+  border-color: rgba(117, 102, 255, 0.52);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.12);
+}
+
+.sales-editor__split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sales-editor__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sales-editor__item {
+  padding: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sales-editor__item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sales-editor__item-head strong {
+  color: #111111;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.sales-editor__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(225, 227, 236, 0.95);
+  flex-shrink: 0;
+}
+
+.sales-editor__totals {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.sales-editor__totals span {
+  color: rgba(11, 11, 18, 0.54);
+  font-size: 0.76rem;
+}
+
+.sales-editor__totals strong {
+  color: #111111;
+  font-size: 0.94rem;
+}
+
+.sales-editor__footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sales-editor__close:disabled,
+.sales-editor__secondary:disabled,
+.sales-editor__primary:disabled,
+.sales-editor__add-item:disabled,
+.sales-editor__remove-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 900px) {
+  .sales-editor__split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .sales-editor {
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    padding: 16px;
+  }
+
+  .sales-editor__footer,
+  .sales-editor__footer-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .sales-editor__secondary,
+  .sales-editor__primary {
+    flex: 1 1 calc(50% - 4px);
+  }
+}
+
+:host-context(.theme-dark) .sales-editor {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .sales-editor__header h2,
+:host-context(.theme-dark) .sales-editor__section-head h3,
+:host-context(.theme-dark) .sales-editor__item-head strong,
+:host-context(.theme-dark) .sales-editor__totals strong {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .sales-editor__subtitle,
+:host-context(.theme-dark) .sales-editor__loading,
+:host-context(.theme-dark) .sales-editor__form label,
+:host-context(.theme-dark) .sales-editor__section-head p,
+:host-context(.theme-dark) .sales-editor__totals span {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+:host-context(.theme-dark) .sales-editor__loading,
+:host-context(.theme-dark) .sales-editor__section,
+:host-context(.theme-dark) .sales-editor__item,
+:host-context(.theme-dark) .sales-editor__form input,
+:host-context(.theme-dark) .sales-editor__form textarea,
+:host-context(.theme-dark) .sales-editor__form select {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .sales-editor__footer {
+  border-top-color: rgba(226, 231, 244, 0.1);
+}
+
+:host-context(.theme-dark) .sales-editor__skeleton-section {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+}
+
+:host-context(.theme-dark) .sales-editor__skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(34, 43, 61, 0.92) 0%,
+    rgba(43, 54, 76, 1) 50%,
+    rgba(34, 43, 61, 0.92) 100%
+  );
+  background-size: 220% 100%;
+}
+
+:host-context(.theme-dark) .sales-editor__form input::placeholder,
+:host-context(.theme-dark) .sales-editor__form textarea::placeholder {
+  color: rgba(226, 231, 244, 0.36);
+}
+
+:host-context(.theme-dark) .sales-editor__form input:focus,
+:host-context(.theme-dark) .sales-editor__form textarea:focus,
+:host-context(.theme-dark) .sales-editor__form select:focus {
+  border-color: rgba(117, 102, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.14);
+}
+
+:host-context(.theme-dark) .sales-editor__close,
+:host-context(.theme-dark) .sales-editor__secondary,
+:host-context(.theme-dark) .sales-editor__primary,
+:host-context(.theme-dark) .sales-editor__add-item,
+:host-context(.theme-dark) .sales-editor__remove-item {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+}
+
+:host-context(.theme-dark) .sales-editor__primary,
+:host-context(.theme-dark) .sales-editor__add-item {
+  color: #7566ff;
+}
+
+:host-context(.theme-dark) .sales-editor__secondary,
+:host-context(.theme-dark) .sales-editor__close,
+:host-context(.theme-dark) .sales-editor__remove-item {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+:host-context(.theme-dark) .sales-editor__close:hover,
+:host-context(.theme-dark) .sales-editor__secondary:hover,
+:host-context(.theme-dark) .sales-editor__primary:hover,
+:host-context(.theme-dark) .sales-editor__add-item:hover,
+:host-context(.theme-dark) .sales-editor__remove-item:hover {
+  background: rgba(117, 102, 255, 0.12);
+}
+
+@keyframes salesEditorShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -20% 0;
+  }
+}

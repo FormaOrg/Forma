@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { computed, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 
 import {
   getCompletedProjectSetupItems,
@@ -35,6 +36,7 @@ export class ProjectRoutePlaceholder {
     { initialValue: this.route.parent?.snapshot.paramMap.get('projectId') ?? '' }
   );
   readonly projectType = signal<ProjectType | null>(null);
+  readonly isSetupLoading = signal(true);
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
 
   readonly setupItems = PROJECT_SETUP_ITEMS;
@@ -93,12 +95,16 @@ export class ProjectRoutePlaceholder {
 
     if (!Number.isFinite(projectId) || projectId <= 0) {
       this.projectType.set(null);
+      this.isSetupLoading.set(false);
       return;
     }
 
-    this.projectService.getProjectById(projectId).subscribe({
-      next: (project) => this.projectType.set(project.type),
-      error: () => this.projectType.set(null),
-    });
+    this.isSetupLoading.set(true);
+    this.projectService.getProjectById(projectId)
+      .pipe(finalize(() => this.isSetupLoading.set(false)))
+      .subscribe({
+        next: (project) => this.projectType.set(project.type),
+        error: () => this.projectType.set(null),
+      });
   }
 }

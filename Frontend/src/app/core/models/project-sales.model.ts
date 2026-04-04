@@ -1,6 +1,8 @@
 export type SalesRangePreset = 'THIS_WEEK' | 'THIS_MONTH' | 'LAST_30_DAYS' | 'LAST_90_DAYS';
 export type SalesOrderSort = 'PLACED_AT_DESC' | 'PLACED_AT_ASC' | 'TOTAL_DESC' | 'TOTAL_ASC';
 export type SalesOrderFilter = 'ALL' | 'ACTIVE' | 'DELIVERED' | 'DUE_ON_DELIVERY';
+export type SalesPaymentStatus = 'DUE_ON_DELIVERY' | 'COLLECTED' | 'DEPOSIT_RETURNED';
+export type SalesFulfillmentStatus = 'NEW' | 'PACKING' | 'SCHEDULED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
 
 export interface ProjectSalesSummary {
   revenue: number;
@@ -48,6 +50,58 @@ export interface ProjectSalesOrderRow {
   fulfillmentStatus: string;
   total: number;
 }
+
+export interface ProjectSalesOrderEditorItem {
+  id: number | null;
+  productId: number | null;
+  productName: string;
+  productSku: string | null;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+}
+
+export interface ProjectSalesOrderEditor {
+  id: number;
+  customerId: number | null;
+  customerName: string;
+  orderNumber: string;
+  placedAt: string;
+  scheduledFor: string | null;
+  deliveredAt: string | null;
+  paymentStatus: SalesPaymentStatus;
+  fulfillmentStatus: SalesFulfillmentStatus;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  deliveryAddress: string | null;
+  notes: string | null;
+  items: ProjectSalesOrderEditorItem[];
+}
+
+export interface ProjectSalesOrderItemInput {
+  productId?: number | null;
+  productName?: string | null;
+  productSku?: string | null;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface CreateProjectOrderRequest {
+  customerId?: number | null;
+  orderNumber: string;
+  placedAt: string;
+  scheduledFor?: string | null;
+  deliveredAt?: string | null;
+  paymentStatus: SalesPaymentStatus;
+  fulfillmentStatus: SalesFulfillmentStatus;
+  deliveryFee: number;
+  deliveryAddress?: string | null;
+  notes?: string | null;
+  items: ProjectSalesOrderItemInput[];
+}
+
+export type UpdateProjectOrderRequest = CreateProjectOrderRequest;
 
 export interface ProjectSalesOrdersPage {
   items: ProjectSalesOrderRow[];

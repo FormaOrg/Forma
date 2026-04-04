@@ -39,6 +39,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private trendChart?: Chart;
   private viewReady = false;
+  private analyticsRequestToken = 0;
 
   @ViewChild('trendCanvas')
   private readonly trendCanvas?: ElementRef<HTMLCanvasElement>;
@@ -105,7 +106,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setRange(range: AnalyticsRangePreset): void {
-    if (this.selectedRange() === range || this.isLoading()) {
+    if (this.selectedRange() === range) {
       return;
     }
 
@@ -131,6 +132,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const requestToken = ++this.analyticsRequestToken;
     this.isLoading.set(true);
     this.errorMessage.set('');
 
@@ -139,11 +141,17 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
+          if (requestToken !== this.analyticsRequestToken) {
+            return;
+          }
           this.analytics.set(response);
           this.isLoading.set(false);
           this.renderTrendChart();
         },
         error: () => {
+          if (requestToken !== this.analyticsRequestToken) {
+            return;
+          }
           this.analytics.set(null);
           this.isLoading.set(false);
           this.errorMessage.set('We could not load analytics right now.');

@@ -7,6 +7,7 @@ import tn.forma.users.model.ProjectOrder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectOrderRepository extends JpaRepository<ProjectOrder, Long> {
@@ -20,4 +21,7 @@ public interface ProjectOrderRepository extends JpaRepository<ProjectOrder, Long
             LocalDateTime startInclusive,
             LocalDateTime endExclusive
     );
+
+    @EntityGraph(attributePaths = {"customer", "items", "items.product"})
+    Optional<ProjectOrder> findByIdAndProjectId(Long id, Long projectId);
 }
