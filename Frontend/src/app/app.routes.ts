@@ -32,6 +32,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/templates-pages/ecommerce-showcase/ecommerce-showcase').then((m) => m.EcommerceShowcase)
   },
   {
+    path: 'landing-page-website',
+    loadComponent: () => import('./features/templates-pages/landing-showcase/landing-showcase').then((m) => m.LandingShowcase)
+  },
+  {
     path: 'product',
     loadComponent: () => import('./features/product/product').then((m) => m.Product)
   },

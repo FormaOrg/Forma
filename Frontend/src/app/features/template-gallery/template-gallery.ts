@@ -5,7 +5,7 @@ import { HeroSection } from './components/hero-section/hero-section';
 import { TemplateGridLive } from './components/template-grid/template-grid-live';
 import { Footer } from "../../shared/footer/footer";
 import { ProjectService } from '../../core/services/project.service';
-import { TemplateRecord } from '../../core/models/project.model';
+import { ProjectType, TemplateRecord } from '../../core/models/project.model';
 
 export type TemplateItem = {
   id: number | string;
@@ -87,16 +87,20 @@ export class TemplateGallery {
   private toTemplateItem(record: TemplateRecord): TemplateItem {
     const categoryLabel = this.readString(record.category) ?? this.readString(record.label) ?? 'General';
     const tags = Array.isArray(record.tags) ? record.tags.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0) : [];
+    const projectType = this.toProjectType(record.projectType ?? record.type, 'LANDING_PAGE');
 
     return {
       id: record.id,
       name: this.readString(record.name) ?? this.readString(record.title) ?? 'Untitled template',
       image: this.readString(record.previewImageUrl) ?? 'assets/Templates Gallery/Mock Templates/1.jpg',
-      type: this.formatLabel(this.readString(record.projectType) ?? this.readString(record.type) ?? 'LANDING_PAGE'),
+      type: this.formatLabel(projectType),
       industry: tags[0] ?? categoryLabel,
       category: categoryLabel.toLowerCase().includes('blank') ? 'blank' : 'all',
       previewUrl: this.readString(record.previewUrl) ?? null,
-      previewRoute: this.readString(record.previewRoute) ?? this.readString(record.route) ?? null,
+      previewRoute: this.resolvePreviewRoute(
+        this.readString(record.previewRoute) ?? this.readString(record.route),
+        projectType
+      ) ?? null,
       updatedAt: Date.parse(this.readString(record.updatedAt) ?? this.readString(record.createdAt) ?? '') || 0,
       usesCount: typeof record.usesCount === 'number' ? record.usesCount : 0,
     };
@@ -112,5 +116,30 @@ export class TemplateGallery {
       .split('_')
       .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
       .join(' ');
+  }
+
+  private toProjectType(value: unknown, fallback: ProjectType): ProjectType {
+    switch (this.readString(value)?.toUpperCase()) {
+      case 'BLOG':
+        return 'BLOG';
+      case 'BUSINESS':
+        return 'BUSINESS';
+      case 'ECOMMERCE':
+        return 'ECOMMERCE';
+      case 'LANDING_PAGE':
+        return 'LANDING_PAGE';
+      case 'PORTFOLIO':
+        return 'PORTFOLIO';
+      default:
+        return fallback;
+    }
+  }
+
+  private resolvePreviewRoute(route: string | undefined, projectType: ProjectType): string | undefined {
+    if (projectType === 'LANDING_PAGE' && (!route || route === '/product')) {
+      return '/landing-page-website';
+    }
+
+    return route;
   }
 }

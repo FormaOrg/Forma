@@ -1,0 +1,213 @@
+:host {
+  display: block;
+}
+
+.landing-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+.landing-showcase__shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 0 20px 0 24px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.landing-showcase__sidebar {
+  position: sticky;
+  top: 112px;
+  align-self: start;
+  z-index: 70;
+  padding-top: 124px;
+}
+
+.landing-showcase__sidebar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(244, 243, 246, 0.92);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.landing-showcase__sidebar-kicker,
+.landing-showcase__sidebar-title {
+  margin: 0;
+}
+
+.landing-showcase__sidebar-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.45);
+}
+
+.landing-showcase__sidebar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #151821;
+}
+
+.landing-showcase__sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.landing-showcase__sidebar-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: rgba(17, 24, 39, 0.68);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.landing-showcase__sidebar-link:hover,
+.landing-showcase__sidebar-link:focus-visible {
+  background: rgba(17, 24, 39, 0.055);
+  color: #151821;
+  outline: none;
+}
+
+.landing-showcase__content,
+app-header,
+app-footer {
+  width: 100%;
+}
+
+.landing-showcase__content {
+  min-width: 0;
+}
+
+.landing-showcase__section {
+  width: 100%;
+}
+
+.landing-showcase__section app-forma-process-showcase,
+.landing-showcase__section app-forma-overview,
+.landing-showcase__section app-manual-design-section,
+.landing-showcase__section app-template-section,
+.landing-showcase__section app-customizer-section,
+.landing-showcase__section app-steps-section2,
+.landing-showcase__section app-parallax-section,
+.landing-showcase__section app-product-help-deck,
+.landing-showcase__section app-product-cta-wave {
+  width: 100%;
+}
+
+.landing-showcase__section:target {
+  scroll-margin-top: 120px;
+}
+
+.landing-showcase__section app-forma-overview {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.landing-showcase__section app-manual-design-section {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.landing-showcase__section app-template-section {
+  position: relative;
+  z-index: 30;
+}
+
+.landing-showcase__section app-customizer-section {
+  position: relative;
+  z-index: 35;
+}
+
+.landing-showcase__section app-steps-section2 {
+  position: relative;
+  z-index: 36;
+}
+
+.landing-showcase__section app-parallax-section {
+  position: relative;
+  z-index: 37;
+}
+
+.landing-showcase__section app-product-help-deck {
+  position: relative;
+  z-index: 50;
+}
+
+.landing-showcase__section app-product-cta-wave {
+  position: relative;
+  z-index: 40;
+}
+
+app-footer {
+  position: relative;
+  z-index: 60;
+}
+
+@media (max-width: 1080px) {
+  .landing-showcase__shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 0 16px;
+  }
+
+  .landing-showcase__sidebar {
+    position: sticky;
+    top: 96px;
+    padding-top: 112px;
+  }
+
+  .landing-showcase__sidebar-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    overflow: auto;
+  }
+
+  .landing-showcase__sidebar-nav {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .landing-showcase__sidebar-link {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 720px) {
+  .landing-showcase__sidebar {
+    top: 84px;
+    padding-top: 98px;
+  }
+
+  .landing-showcase__sidebar-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  .landing-showcase__sidebar-nav {
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+}

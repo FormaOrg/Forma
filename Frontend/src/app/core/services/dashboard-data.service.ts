@@ -190,8 +190,10 @@ export class DashboardDataService {
     const projectType = this.toTemplateProjectType(record.projectType ?? record.type, 'LANDING_PAGE');
     const creationMethod = this.toTemplateCreationMethod(record.creationMethod, 'DRAG_DROP');
     const previewImageUrl = this.readNonEmptyString(record.previewImageUrl) ?? 'assets/Templates Gallery/Mock Templates/1.jpg';
-    const previewRoute =
-      this.readNonEmptyString(record.previewRoute) ?? this.readNonEmptyString(record.route);
+    const previewRoute = this.resolveTemplatePreviewRoute(
+      this.readNonEmptyString(record.previewRoute) ?? this.readNonEmptyString(record.route),
+      projectType
+    );
     const previewUrl = this.readNonEmptyString(record.previewUrl);
     const updatedAt = this.toTimestamp(record.updatedAt ?? record.createdAt);
     const usesCount =
@@ -300,6 +302,19 @@ export class DashboardDataService {
       default:
         return fallback;
     }
+  }
+
+  private resolveTemplatePreviewRoute(
+    route: string | undefined,
+    projectType: ProjectType
+  ): string | undefined {
+    if (projectType === 'LANDING_PAGE') {
+      if (!route || route === '/product') {
+        return '/landing-page-website';
+      }
+    }
+
+    return route;
   }
 
   private toTimestamp(value: string | null | undefined): number {
