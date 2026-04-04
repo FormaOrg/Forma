@@ -120,6 +120,12 @@ export class ProjectService {
     );
   }
 
+  getPublicTemplates(): Observable<TemplateRecord[]> {
+    return this.http.get<TemplateRecord[]>(`${environment.apiUrl}/templates/public`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   // ── Media ──────────────────────────────────────────────
 
   getProjectMedia(projectId: number): Observable<Media[]> {

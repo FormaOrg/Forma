@@ -9,8 +9,10 @@ import { ActiveFilters } from '../../template-gallery';
   styleUrl: './hero-section.css',
 })
 export class HeroSection implements OnChanges {
-   @Input() searchQuery: string = '';
+  @Input() searchQuery: string = '';
   @Input() activeFilters!: ActiveFilters;
+  @Input() typeOptions: string[] = [];
+  @Input() industryOptions: string[] = [];
  
   @Output() searchChange = new EventEmitter<string>();
   @Output() filtersChange = new EventEmitter<ActiveFilters>();
@@ -20,9 +22,6 @@ export class HeroSection implements OnChanges {
   typeDropdownOpen = signal(false);
   industryDropdownOpen = signal(false);
   collectionsDropdownOpen = signal(false);
- 
-  readonly typeOptions = ['Online Store', 'Portfolio', 'Blog', 'Business', 'Coming Soon', 'Landing Page'];
-  readonly industryOptions = ['Art & Design', 'Beauty & Wellness', 'Education', 'Fashion & Clothing', 'Food & Restaurant', 'Health', 'Music', 'Photography', 'Real Estate', 'Technology', 'Travel'];
  
   constructor(private elRef: ElementRef) {}
  

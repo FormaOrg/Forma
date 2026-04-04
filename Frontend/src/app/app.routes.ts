@@ -128,7 +128,7 @@ export const routes: Routes = [
               {
                 path: 'home',
                 data: { title: 'Home' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-home-route/project-home-route').then((m) => m.ProjectHomeRoute)
               },
               {
                 path: 'sales',
@@ -138,12 +138,12 @@ export const routes: Routes = [
               {
                 path: 'catalog',
                 data: { title: 'Catalog' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-catalog-route/project-catalog-route').then((m) => m.ProjectCatalogRoute)
               },
               {
                 path: 'customers',
                 data: { title: 'Customers' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-customers-route/project-customers-route').then((m) => m.ProjectCustomersRoute)
               },
               {
                 path: 'analytics',

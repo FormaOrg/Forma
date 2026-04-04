@@ -19,6 +19,11 @@ public class TemplateController {
 
     private final TemplateService templateService;
 
+    @GetMapping("/public")
+    public ResponseEntity<List<TemplateDto>> getPublicTemplates() {
+        return ResponseEntity.ok(templateService.getPublicTemplates());
+    }
+
     @GetMapping
     public ResponseEntity<List<TemplateDto>> getTemplates(
             @AuthenticationPrincipal UserDetails userDetails) {

@@ -20,6 +20,13 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
 
+    public List<TemplateDto> getPublicTemplates() {
+        return templateRepository.findAllByOwnerIsNullOrderByFeaturedDescUpdatedAtDesc()
+                .stream()
+                .map(template -> mapToDto(template, null))
+                .toList();
+    }
+
     public List<TemplateDto> getTemplates(String email) {
         User user = getUserByEmail(email);
         return templateRepository.findAllByOwnerIsNullOrOwnerIdOrderByFeaturedDescUpdatedAtDesc(user.getId())
@@ -41,7 +48,9 @@ public class TemplateService {
     }
 
     private TemplateDto mapToDto(Template template, Long currentUserId) {
-        boolean isOwned = template.getOwner() != null && Objects.equals(template.getOwner().getId(), currentUserId);
+        boolean isOwned = currentUserId != null
+                && template.getOwner() != null
+                && Objects.equals(template.getOwner().getId(), currentUserId);
 
         return TemplateDto.builder()
                 .id(template.getId())
