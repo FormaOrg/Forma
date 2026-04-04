@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { GuestGuard } from './core/guards/guest.guard';
+import { ProjectWorkspaceGuard } from './core/guards/project-workspace.guard';
 import { RootRedirectGuard } from './core/guards/root-redirect.guard';
 
 export const routes: Routes = [
@@ -118,6 +119,7 @@ export const routes: Routes = [
           {
             path: ':projectId',
             data: { title: 'Setup' },
+            canActivateChild: [ProjectWorkspaceGuard],
             loadComponent: () => import('./features/app/dashboard/pages/projects/project-workspace-layout/project-workspace-layout').then((m) => m.ProjectWorkspaceLayout),
             children: [
               {
@@ -148,17 +150,17 @@ export const routes: Routes = [
               {
                 path: 'pages',
                 data: { title: 'Pages' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-pages-route/project-pages-route').then((m) => m.ProjectPagesRoute)
               },
               {
                 path: 'media',
                 data: { title: 'Media' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-media-route/project-media-route').then((m) => m.ProjectMediaRoute)
               },
               {
                 path: 'audience',
                 data: { title: 'Inquiries' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-inquiries-route/project-inquiries-route').then((m) => m.ProjectInquiriesRoute)
               },
               {
                 path: 'posts',

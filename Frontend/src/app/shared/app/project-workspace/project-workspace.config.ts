@@ -15,6 +15,7 @@ export interface ProjectWorkspaceNavSection {
 
 export interface ProjectWorkspaceConfig {
   typeLabel: string;
+  defaultPath: string;
   setupTitle: string;
   homeSubtitle: string;
   heroActionLabel: string;
@@ -41,6 +42,7 @@ const SHARED_SUPPORT_SECTION: ProjectWorkspaceNavSection = {
 const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
   ECOMMERCE: {
     typeLabel: 'Ecommerce',
+    defaultPath: 'home',
     setupTitle: "Let's set up your store",
     homeSubtitle: 'Keep products, customers, and orders moving from one workspace.',
     heroActionLabel: 'Open catalog',
@@ -80,6 +82,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
   },
   PORTFOLIO: {
     typeLabel: 'Portfolio',
+    defaultPath: 'home',
     setupTitle: "Let's set up your portfolio",
     homeSubtitle: 'Shape your pages, media, and personal brand presentation from one workspace.',
     heroActionLabel: 'Edit portfolio',
@@ -119,6 +122,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
   },
   BLOG: {
     typeLabel: 'Blog',
+    defaultPath: 'home',
     setupTitle: "Let's set up your blog",
     homeSubtitle: 'Manage posts, categories, and readership growth from one workspace.',
     heroActionLabel: 'Open posts',
@@ -158,6 +162,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
   },
   GENERIC: {
     typeLabel: 'Project',
+    defaultPath: 'home',
     setupTitle: "Let's set up your project",
     homeSubtitle: 'Manage your workspace, edit content, and keep launch tasks moving forward.',
     heroActionLabel: 'Open editor',
@@ -212,4 +217,18 @@ export function getProjectWorkspaceConfig(
   type: ProjectType | string | null | undefined
 ): ProjectWorkspaceConfig {
   return CONFIGS[normalizeProjectWorkspaceType(type)];
+}
+
+export function getProjectWorkspaceAllowedPaths(
+  type: ProjectType | string | null | undefined
+): string[] {
+  const config = getProjectWorkspaceConfig(type);
+  const sectionPaths = config.sections.flatMap((section) => section.items.map((item) => item.path));
+  return Array.from(new Set([...sectionPaths, 'editor']));
+}
+
+export function getProjectWorkspaceDefaultPath(
+  type: ProjectType | string | null | undefined
+): string {
+  return getProjectWorkspaceConfig(type).defaultPath;
 }
