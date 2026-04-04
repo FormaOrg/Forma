@@ -147,7 +147,7 @@ export class AuthService {
     this.lastValidatedToken = null;
     this.lastSessionValidationAt = 0;
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   forgotPassword(email: string): Observable<{ message: string }> {

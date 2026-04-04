@@ -1,0 +1,288 @@
+<section class="project-analytics">
+  <section class="project-analytics__hero project-analytics__panel">
+    <div class="project-analytics__hero-copy">
+      <p class="project-analytics__eyebrow">Analytics overview</p>
+      <h1 class="project-analytics__title">See the signals that actually matter.</h1>
+      <p class="project-analytics__subtitle">
+        One clean overview for project #{{ projectId() }} with the customer, order, revenue, and product signals worth checking first.
+      </p>
+    </div>
+
+    <div class="project-analytics__hero-actions">
+      <div class="project-analytics__range-switch" aria-label="Analytics range">
+        @for (option of rangeOptions; track option.value) {
+          <button
+            type="button"
+            class="project-analytics__range-button"
+            [class.project-analytics__range-button--active]="selectedRange() === option.value"
+            (click)="setRange(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+
+      <button type="button" class="project-analytics__ghost-button">Export report</button>
+    </div>
+  </section>
+
+  <section class="project-analytics__summary-grid">
+    @for (card of summaryCards(); track card.label) {
+      <article class="project-analytics__summary-card project-analytics__panel" [class]="'project-analytics__summary-card--' + card.tone">
+        <div class="project-analytics__summary-top">
+          <span class="project-analytics__summary-icon" aria-hidden="true">
+            @switch (card.icon) {
+              @case ('customers') {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M7.5 13.35C8.94 13.35 10.1 12.19 10.1 10.75C10.1 9.31 8.94 8.15 7.5 8.15C6.06 8.15 4.9 9.31 4.9 10.75C4.9 12.19 6.06 13.35 7.5 13.35Z" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M13.9 11.85C15.26 11.85 16.35 10.76 16.35 9.4C16.35 8.04 15.26 6.95 13.9 6.95C12.54 6.95 11.45 8.04 11.45 9.4C11.45 10.76 12.54 11.85 13.9 11.85Z" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M3.75 18.45C4.3 16.35 6.17 14.85 8.42 14.85H8.57C10.82 14.85 12.69 16.35 13.24 18.45" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M12.5 18.45C12.97 16.79 14.47 15.6 16.24 15.6H16.36C18.13 15.6 19.63 16.79 20.1 18.45" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('orders') {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M7 8.25V6.75C7 4.68 8.68 3 10.75 3H13.25C15.32 3 17 4.68 17 6.75V8.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M5.25 8.25H18.75L17.96 18.64C17.88 19.73 16.97 20.58 15.88 20.58H8.12C7.03 20.58 6.12 19.73 6.04 18.64L5.25 8.25Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  <path d="M9.25 11.5C9.25 12.19 9.81 12.75 10.5 12.75C11.19 12.75 11.75 12.19 11.75 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M12.25 11.5C12.25 12.19 12.81 12.75 13.5 12.75C14.19 12.75 14.75 12.19 14.75 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('revenue') {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M4 17.25L8.3 12.95L11.1 15.75L18.5 8.35" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M15.75 8.25H18.75V11.25" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M4 20H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('average') {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3.9V20.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M15.8 7.15C15.15 6.1 13.85 5.35 12.2 5.35C9.95 5.35 8.35 6.45 8.35 8.12C8.35 9.78 9.7 10.55 12 11.05C14.3 11.55 15.65 12.28 15.65 13.95C15.65 15.68 14.02 16.9 11.75 16.9C9.96 16.9 8.46 16.16 7.75 14.95" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              }
+            }
+          </span>
+          <span class="project-analytics__summary-label">{{ card.label }}</span>
+        </div>
+        <strong class="project-analytics__summary-value">{{ card.value }}</strong>
+        <span class="project-analytics__summary-change">{{ card.change }} vs previous period</span>
+      </article>
+    }
+  </section>
+
+  <section class="project-analytics__content-grid">
+    <article class="project-analytics__panel project-analytics__panel--chart">
+      <div class="project-analytics__section-head">
+        <div>
+          <p class="project-analytics__section-kicker">Performance over time</p>
+          <h2 class="project-analytics__section-title">Main trend</h2>
+        </div>
+
+        <div class="project-analytics__metric-switch" aria-label="Metric selector">
+          <button
+            type="button"
+            class="project-analytics__metric-button"
+            [class.project-analytics__metric-button--active]="selectedMetric() === 'customers'"
+            (click)="setMetric('customers')"
+          >
+            Customers
+          </button>
+          <button
+            type="button"
+            class="project-analytics__metric-button"
+            [class.project-analytics__metric-button--active]="selectedMetric() === 'orders'"
+            (click)="setMetric('orders')"
+          >
+            Orders
+          </button>
+          <button
+            type="button"
+            class="project-analytics__metric-button"
+            [class.project-analytics__metric-button--active]="selectedMetric() === 'revenue'"
+            (click)="setMetric('revenue')"
+          >
+            Revenue
+          </button>
+        </div>
+      </div>
+
+      <div class="project-analytics__chart-layout">
+        <div class="project-analytics__chart-shell">
+          <canvas #trendCanvas class="project-analytics__chart-canvas"></canvas>
+        </div>
+      </div>
+    </article>
+
+    <aside class="project-analytics__panel project-analytics__panel--sources">
+      <div class="project-analytics__section-head project-analytics__section-head--compact">
+        <div>
+          <p class="project-analytics__section-kicker">Acquisition</p>
+          <h2 class="project-analytics__section-title">Customer zones</h2>
+        </div>
+      </div>
+
+      <div class="project-analytics__sources-list">
+        @if (analytics()?.zoneBreakdown?.length) {
+          @for (source of analytics()!.zoneBreakdown; track source.label) {
+            <article class="project-analytics__source-row">
+              <div class="project-analytics__source-top">
+                <strong>{{ source.label }}</strong>
+                <span>{{ source.percentage }}%</span>
+              </div>
+              <div class="project-analytics__source-track" aria-hidden="true">
+                <span [style.width.%]="source.percentage"></span>
+              </div>
+              <p>{{ source.note }}</p>
+            </article>
+          }
+        } @else {
+          <article class="project-analytics__source-row">
+            <div class="project-analytics__source-top">
+              <strong>No customer zones yet</strong>
+              <span>0%</span>
+            </div>
+            <div class="project-analytics__source-track" aria-hidden="true">
+              <span style="width: 0%"></span>
+            </div>
+            <p>Zone insights will appear once customers and orders start collecting location details.</p>
+          </article>
+        }
+      </div>
+    </aside>
+  </section>
+
+  <section class="project-analytics__lower-grid">
+    <article class="project-analytics__panel">
+      <div class="project-analytics__section-head project-analytics__section-head--compact">
+        <div>
+          <p class="project-analytics__section-kicker">Customer performance</p>
+          <h2 class="project-analytics__section-title">Top customers</h2>
+        </div>
+      </div>
+
+      <div class="project-analytics__rank-list">
+        @if (analytics()?.topCustomers?.length) {
+          @for (item of analytics()!.topCustomers; track item.name) {
+            <article class="project-analytics__rank-card">
+              <div>
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.zoneLabel }}</p>
+              </div>
+              <div class="project-analytics__rank-side">
+                <strong>{{ item.revenue | number:'1.0-2' }} TND</strong>
+                <span>{{ item.orders }} orders · {{ item.growthPercent >= 0 ? '+' : '' }}{{ item.growthPercent | number:'1.0-1' }}%</span>
+              </div>
+            </article>
+          }
+        } @else {
+          <article class="project-analytics__rank-card">
+            <div>
+              <h3>No customer leaders yet</h3>
+              <p>Top customers will appear once orders are recorded.</p>
+            </div>
+            <div class="project-analytics__rank-side">
+              <strong>0 TND</strong>
+              <span>0 orders</span>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+
+    <article class="project-analytics__panel">
+      <div class="project-analytics__section-head project-analytics__section-head--compact">
+        <div>
+          <p class="project-analytics__section-kicker">Commerce snapshot</p>
+          <h2 class="project-analytics__section-title">Top products</h2>
+        </div>
+      </div>
+
+      <div class="project-analytics__rank-list">
+        @if (analytics()?.topProducts?.length) {
+          @for (item of analytics()!.topProducts; track item.name) {
+            <article class="project-analytics__rank-card">
+              <div>
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.sku || 'No SKU' }}</p>
+              </div>
+              <div class="project-analytics__rank-side">
+                <strong>{{ item.revenue | number:'1.0-2' }} TND</strong>
+                <span>{{ item.units }} units · {{ item.growthPercent >= 0 ? '+' : '' }}{{ item.growthPercent | number:'1.0-1' }}%</span>
+              </div>
+            </article>
+          }
+        } @else {
+          <article class="project-analytics__rank-card">
+            <div>
+              <h3>No product movement yet</h3>
+              <p>Top products will appear once order items are saved.</p>
+            </div>
+            <div class="project-analytics__rank-side">
+              <strong>0 TND</strong>
+              <span>0 units</span>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="project-analytics__insights project-analytics__panel">
+    <div class="project-analytics__section-head project-analytics__section-head--compact">
+      <div>
+        <p class="project-analytics__section-kicker">Key takeaways</p>
+        <h2 class="project-analytics__section-title">What stands out right now</h2>
+      </div>
+    </div>
+
+    <div class="project-analytics__insights-grid">
+      @if (analytics()?.insights?.length) {
+        @for (insight of analytics()!.insights; track insight.title) {
+          <article class="project-analytics__insight-card">
+            <div class="project-analytics__insight-icon" aria-hidden="true">
+              @switch ($index) {
+                @case (0) {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M4 18.5H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M6.25 15.25L10 11.5L13 13.85L17.75 8.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15.2 8.9H17.75V11.45" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case (1) {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="5.75" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M15.35 15.35L19 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M8.75 11H13.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M11 8.75V13.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+                @default {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 10.5H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M8 14H12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+              }
+            </div>
+            <h3>{{ insight.title }}</h3>
+            <p>{{ insight.body }}</p>
+          </article>
+        }
+      } @else {
+        <article class="project-analytics__insight-card">
+          <div class="project-analytics__insight-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 8.5V12.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="12" cy="15.7" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Analytics will appear as data lands</h3>
+          <p>Once this project collects customers, orders, and products, this page will turn those records into readable insights.</p>
+        </article>
+      }
+    </div>
+  </section>
+</section>
