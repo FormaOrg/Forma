@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
@@ -49,12 +49,23 @@ export class Projects implements OnInit {
   readonly searchTerm = signal('');
   readonly activeFilter = signal<ProjectFilter>('all');
   readonly activeSort = signal<ProjectSort>('last-edited');
+  readonly sortDropdownOpen = signal(false);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
 
   readonly totalProjects = computed(() => this.projects().length);
   readonly publishedProjects = computed(() => this.projects().filter((project) => project.status === 'published').length);
   readonly draftProjects = computed(() => this.projects().filter((project) => project.status === 'draft').length);
+  readonly activeSortLabel = computed(() => {
+    switch (this.activeSort()) {
+      case 'name':
+        return 'Name';
+      case 'recently-created':
+        return 'Recently created';
+      default:
+        return 'Last edited';
+    }
+  });
 
   readonly mostRecentProject = computed(() =>
     [...this.projects()].sort((left, right) => right.lastEditedAt - left.lastEditedAt)[0] ?? null
@@ -149,10 +160,29 @@ export class Projects implements OnInit {
 
   updateFilter(filter: ProjectFilter): void {
     this.activeFilter.set(filter);
+    this.closeDropdowns();
   }
 
   updateSort(sort: ProjectSort): void {
     this.activeSort.set(sort);
+    this.sortDropdownOpen.set(false);
+  }
+
+  toggleSortDropdown(): void {
+    this.sortDropdownOpen.update((value) => !value);
+  }
+
+  closeDropdowns(): void {
+    this.sortDropdownOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+
+    if (!target?.closest('.projects-toolbar__dropdown')) {
+      this.closeDropdowns();
+    }
   }
 
   trackByProject = (_: number, project: DashboardProjectItem): string => project.id;

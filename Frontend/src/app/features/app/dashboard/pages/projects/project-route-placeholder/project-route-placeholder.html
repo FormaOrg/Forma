@@ -115,7 +115,10 @@
         </div>
 
         <div class="project-setup__progress">
-          <strong>{{ completedSetupItems }}/{{ setupItems.length }} completed</strong>
+          <div class="project-setup__progress-summary">
+            <span class="project-setup__progress-label">Completed tasks</span>
+            <strong>{{ completedSetupItems }}/{{ setupItems.length }}</strong>
+          </div>
           <div class="project-setup__progress-bar" aria-hidden="true">
             <span class="project-setup__progress-bar-fill" [style.width.%]="(completedSetupItems / setupItems.length) * 100"></span>
           </div>
@@ -132,12 +135,12 @@
             <div class="project-setup__task-copy">
               <div class="project-setup__task-title-row">
                 <span class="project-setup__task-dot" aria-hidden="true"></span>
-                <h3 class="project-setup__task-title">{{ item.title }}</h3>
+                <h3 class="project-setup__task-title" [class.project-setup__task-title--done]="item.status === 'done'">{{ item.title }}</h3>
                 @if (item.status === 'active') {
                   <span class="project-setup__task-status">In progress</span>
                 }
               </div>
-              <p class="project-setup__task-description">{{ item.description }}</p>
+              <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">{{ item.description }}</p>
             </div>
 
             <button

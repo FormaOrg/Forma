@@ -41,7 +41,7 @@
     </article>
   </section>
 
-  <section class="catalog-toolbar">
+  <section class="catalog-toolbar" (click)="closeDropdowns()">
     <label class="catalog-toolbar__search">
       <span class="catalog-toolbar__search-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
@@ -71,15 +71,44 @@
       }
     </div>
 
-    <label class="catalog-toolbar__category">
-      <span>Category</span>
-      <select [value]="selectedCategory()" (change)="updateCategory(categorySelect.value)" #categorySelect>
-        <option value="ALL">All categories</option>
-        @for (category of categories(); track category) {
-          <option [value]="category">{{ category }}</option>
-        }
-      </select>
-    </label>
+    <div
+      class="catalog-toolbar__dropdown catalog-toolbar__dropdown--category"
+      [class.is-open]="categoryDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="catalog-toolbar__dropdown-trigger" (click)="toggleCategoryDropdown()">
+        <span class="catalog-toolbar__dropdown-label">Category</span>
+        <span class="catalog-toolbar__dropdown-value">{{ selectedCategoryLabel() }}</span>
+        <span class="catalog-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (categoryDropdownOpen()) {
+        <div class="catalog-toolbar__dropdown-menu">
+          <button
+            type="button"
+            class="catalog-toolbar__dropdown-item"
+            [class.is-selected]="selectedCategory() === 'ALL'"
+            (click)="updateCategory('ALL')"
+          >
+            All categories
+          </button>
+          @for (category of categories(); track category) {
+            <button
+              type="button"
+              class="catalog-toolbar__dropdown-item"
+              [class.is-selected]="selectedCategory() === category"
+              (click)="updateCategory(category)"
+            >
+              {{ category }}
+            </button>
+          }
+        </div>
+      }
+    </div>
   </section>
 
   @if (isLoading()) {
@@ -202,91 +231,113 @@
     <section class="catalog-editor-backdrop" (click)="closeEditor()"></section>
     <aside class="catalog-editor">
       <header class="catalog-editor__header">
-        <div>
+        <div class="catalog-editor__header-copy">
           <p class="catalog-editor__eyebrow">Catalog editor</p>
           <h2>{{ editorTitle() }}</h2>
+          <p class="catalog-editor__subtitle">Keep the product details concise, structured, and ready for publishing.</p>
         </div>
         <button type="button" class="catalog-editor__close" (click)="closeEditor()">Close</button>
       </header>
 
       <form class="catalog-editor__form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
-        <label>
-          <span>Name</span>
-          <input type="text" formControlName="name" placeholder="Forma starter kit" />
-        </label>
-
-        <label>
-          <span>Description</span>
-          <textarea rows="4" formControlName="description" placeholder="Describe what the customer receives."></textarea>
-        </label>
-
-        <div class="catalog-editor__split">
-          <label>
-            <span>SKU</span>
-            <input type="text" formControlName="sku" placeholder="KIT-001" />
-          </label>
-          <label>
-            <span>Category</span>
-            <input type="text" formControlName="category" placeholder="Bundles" />
-          </label>
-        </div>
-
-        <div class="catalog-editor__split">
-          <label>
-            <span>Type</span>
-            <select formControlName="productType">
-              @for (option of productTypeOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
-          <label>
-            <span>Status</span>
-            <select formControlName="status">
-              @for (option of productStatusOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
-        </div>
-
-        <div class="catalog-editor__split">
-          <label>
-            <span>Price</span>
-            <input type="number" step="0.01" min="0" formControlName="price" />
-          </label>
-          <label>
-            <span>Compare-at price</span>
-            <input type="number" step="0.01" min="0" formControlName="compareAtPrice" />
-          </label>
-        </div>
-
-        <label>
-          <span>Inventory quantity</span>
-          <input type="number" min="0" step="1" formControlName="inventoryQuantity" />
-        </label>
-
-        <div class="catalog-editor__upload">
-          <label>
-            <span>Cover image URL</span>
-            <input type="url" formControlName="imageUrl" placeholder="https://..." />
-          </label>
-          <label class="catalog-editor__upload-button">
-            <span>{{ isUploadingImage() ? 'Uploading image...' : 'Upload image' }}</span>
-            <input type="file" accept="image/*" (change)="uploadCoverImage($event)" />
-          </label>
-        </div>
-
-        @if (productForm.controls.imageUrl.value) {
-          <div class="catalog-editor__preview">
-            <img [src]="productForm.controls.imageUrl.value" alt="Product cover preview" />
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Core details</h3>
+            <p>Set the name, description, and classification first.</p>
           </div>
-        }
 
-        <label>
-          <span>Tags</span>
-          <input type="text" formControlName="tags" placeholder="featured, launch, bestseller" />
-        </label>
+          <label>
+            <span>Name</span>
+            <input type="text" formControlName="name" placeholder="Forma starter kit" />
+          </label>
+
+          <label>
+            <span>Description</span>
+            <textarea rows="4" formControlName="description" placeholder="Describe what the customer receives."></textarea>
+          </label>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>SKU</span>
+              <input type="text" formControlName="sku" placeholder="KIT-001" />
+            </label>
+            <label>
+              <span>Category</span>
+              <input type="text" formControlName="category" placeholder="Bundles" />
+            </label>
+          </div>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>Type</span>
+              <select formControlName="productType">
+                @for (option of productTypeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select formControlName="status">
+                @for (option of productStatusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Pricing and stock</h3>
+            <p>Make the commercial details easy to review at a glance.</p>
+          </div>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>Price</span>
+              <input type="number" step="0.01" min="0" formControlName="price" />
+            </label>
+            <label>
+              <span>Compare-at price</span>
+              <input type="number" step="0.01" min="0" formControlName="compareAtPrice" />
+            </label>
+          </div>
+
+          <label>
+            <span>Inventory quantity</span>
+            <input type="number" min="0" step="1" formControlName="inventoryQuantity" />
+          </label>
+        </section>
+
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Media and discovery</h3>
+            <p>Add a cover image and tags so the listing feels complete.</p>
+          </div>
+
+          <div class="catalog-editor__upload">
+            <label>
+              <span>Cover image URL</span>
+              <input type="url" formControlName="imageUrl" placeholder="https://..." />
+            </label>
+            <label class="catalog-editor__upload-button">
+              <span>{{ isUploadingImage() ? 'Uploading image...' : 'Upload image' }}</span>
+              <input type="file" accept="image/*" (change)="uploadCoverImage($event)" />
+            </label>
+          </div>
+
+          @if (productForm.controls.imageUrl.value) {
+            <div class="catalog-editor__preview">
+              <img [src]="productForm.controls.imageUrl.value" alt="Product cover preview" />
+            </div>
+          }
+
+          <label>
+            <span>Tags</span>
+            <input type="text" formControlName="tags" placeholder="featured, launch, bestseller" />
+          </label>
+        </section>
 
         <footer class="catalog-editor__footer">
           <button type="button" class="catalog-editor__secondary" (click)="closeEditor()">Cancel</button>
