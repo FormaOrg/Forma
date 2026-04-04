@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ProjectCustomerRepository extends JpaRepository<ProjectCustomer, Long> {
     List<ProjectCustomer> findAllByProjectIdOrderByCreatedAtDesc(Long projectId);
+    java.util.Optional<ProjectCustomer> findByIdAndProjectId(Long id, Long projectId);
 }

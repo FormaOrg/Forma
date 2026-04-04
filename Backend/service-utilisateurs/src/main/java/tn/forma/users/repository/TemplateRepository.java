@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface TemplateRepository extends JpaRepository<Template, Long> {
+    List<Template> findAllByOwnerIsNullOrderByFeaturedDescUpdatedAtDesc();
     List<Template> findAllByOwnerIsNullOrOwnerIdOrderByFeaturedDescUpdatedAtDesc(Long ownerId);
 }

@@ -12,6 +12,9 @@ import java.util.List;
 public interface ProjectOrderRepository extends JpaRepository<ProjectOrder, Long> {
 
     @EntityGraph(attributePaths = {"customer", "items", "items.product"})
+    List<ProjectOrder> findAllByProjectIdOrderByPlacedAtDesc(Long projectId);
+
+    @EntityGraph(attributePaths = {"customer", "items", "items.product"})
     List<ProjectOrder> findAllByProjectIdAndPlacedAtGreaterThanEqualAndPlacedAtLessThanOrderByPlacedAtDesc(
             Long projectId,
             LocalDateTime startInclusive,

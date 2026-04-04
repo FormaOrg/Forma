@@ -44,10 +44,40 @@ public class ProjectProduct {
     @Column(length = 120)
     private String category;
 
+    @Size(max = 2000)
+    @Column(length = 2000)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 24)
+    @Builder.Default
+    private ProjectProductType productType = ProjectProductType.PHYSICAL;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 24)
+    @Builder.Default
+    private ProjectProductStatus status = ProjectProductStatus.DRAFT;
+
     @NotNull
     @DecimalMin("0.00")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
+
+    @DecimalMin("0.00")
+    @Column(precision = 12, scale = 2)
+    private BigDecimal compareAtPrice;
+
+    @Column
+    @Builder.Default
+    private Integer inventoryQuantity = 0;
+
+    @Size(max = 1024)
+    @Column(length = 1024)
+    private String imageUrl;
+
+    @Size(max = 500)
+    @Column(length = 500)
+    private String tagsCsv;
 
     @Column(nullable = false)
     @Builder.Default
