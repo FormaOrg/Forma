@@ -3,13 +3,16 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { inject } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 
 import {
   getCompletedProjectSetupItems,
   getProjectSetupNextStep,
   PROJECT_SETUP_ITEMS
 } from '../../../../../../shared/app/project-setup/project-setup.data';
+import { ProjectService } from '../../../../../../core/services/project.service';
+import { ProjectType } from '../../../../../../core/models/project.model';
+import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-workspace/project-workspace.config';
 
 @Component({
   selector: 'app-project-route-placeholder',
@@ -20,6 +23,7 @@ import {
 })
 export class ProjectRoutePlaceholder {
   private readonly route = inject(ActivatedRoute);
+  private readonly projectService = inject(ProjectService);
 
   readonly title = toSignal(
     this.route.data.pipe(map((data) => String(data['title'] ?? 'Project'))),
@@ -30,6 +34,8 @@ export class ProjectRoutePlaceholder {
     this.route.parent!.paramMap.pipe(map((params) => params.get('projectId') ?? '')),
     { initialValue: this.route.parent?.snapshot.paramMap.get('projectId') ?? '' }
   );
+  readonly projectType = signal<ProjectType | null>(null);
+  readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
 
   readonly setupItems = PROJECT_SETUP_ITEMS;
   readonly completedSetupItems = getCompletedProjectSetupItems(this.setupItems);
@@ -77,4 +83,22 @@ export class ProjectRoutePlaceholder {
       actionLabel: 'Connect'
     }
   ] as const;
+
+  constructor() {
+    this.loadProjectType();
+  }
+
+  private loadProjectType(): void {
+    const projectId = Number(this.projectId());
+
+    if (!Number.isFinite(projectId) || projectId <= 0) {
+      this.projectType.set(null);
+      return;
+    }
+
+    this.projectService.getProjectById(projectId).subscribe({
+      next: (project) => this.projectType.set(project.type),
+      error: () => this.projectType.set(null),
+    });
+  }
 }

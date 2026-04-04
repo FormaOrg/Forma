@@ -43,7 +43,7 @@
     ></app-data-card>
   </div>
 
-  <section class="projects-toolbar">
+  <section class="projects-toolbar" (click)="closeDropdowns()">
     <div class="projects-toolbar__search">
       <span class="projects-toolbar__search-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
@@ -87,18 +87,50 @@
       </button>
     </div>
 
-    <label class="projects-toolbar__sort">
-      <span class="projects-toolbar__sort-label">Sort</span>
-      <select
-        class="projects-toolbar__sort-select"
-        [ngModel]="activeSort()"
-        (ngModelChange)="updateSort($event)"
-      >
-        <option value="last-edited">Last edited</option>
-        <option value="name">Name</option>
-        <option value="recently-created">Recently created</option>
-      </select>
-    </label>
+    <div
+      class="projects-toolbar__dropdown projects-toolbar__dropdown--sort"
+      [class.is-open]="sortDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="projects-toolbar__dropdown-trigger" (click)="toggleSortDropdown()">
+        <span class="projects-toolbar__dropdown-label">Sort</span>
+        <span class="projects-toolbar__dropdown-value">{{ activeSortLabel() }}</span>
+        <span class="projects-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (sortDropdownOpen()) {
+        <div class="projects-toolbar__dropdown-menu">
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeSort() === 'last-edited'"
+            (click)="updateSort('last-edited')"
+          >
+            Last edited
+          </button>
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeSort() === 'name'"
+            (click)="updateSort('name')"
+          >
+            Name
+          </button>
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeSort() === 'recently-created'"
+            (click)="updateSort('recently-created')"
+          >
+            Recently created
+          </button>
+        </div>
+      }
+    </div>
   </section>
 
   <section class="projects-panel">

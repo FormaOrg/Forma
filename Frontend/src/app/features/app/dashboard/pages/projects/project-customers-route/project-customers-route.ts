@@ -7,6 +7,7 @@ import { finalize, map } from 'rxjs';
 import {
   CreateProjectCustomerRequest,
   ProjectCustomer,
+  ProjectCustomersPage,
   UpdateProjectCustomerRequest,
 } from '../../../../../../core/models/project-customers.model';
 import { ProjectCustomersService } from '../../../../../../core/services/project-customers.service';
@@ -33,7 +34,7 @@ export class ProjectCustomersRoute {
     { initialValue: Number(this.route.parent?.snapshot.paramMap.get('projectId') ?? '0') }
   );
 
-  readonly page = signal<{ summary: any; customers: ProjectCustomer[]; zones: string[] } | null>(null);
+  readonly page = signal<ProjectCustomersPage | null>(null);
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
   readonly isDeleting = signal<number | null>(null);
@@ -56,6 +57,53 @@ export class ProjectCustomersRoute {
   readonly customers = computed(() => this.page()?.customers ?? []);
   readonly zones = computed(() => this.page()?.zones ?? []);
   readonly editorTitle = computed(() => this.editingCustomer() ? 'Edit customer' : 'Add customer');
+  readonly visibleCustomersLabel = computed(() => {
+    const count = this.customers().length;
+    return `${count} customer${count === 1 ? '' : 's'}`;
+  });
+  readonly hasFilters = computed(() => this.searchValue().trim().length > 0 || this.selectedZone() !== 'ALL');
+  readonly totalRevenue = computed(() =>
+    this.customers().reduce((sum, customer) => sum + customer.totalSpent, 0)
+  );
+  readonly averageCustomerValue = computed(() => {
+    const customers = this.customers();
+    if (!customers.length) {
+      return 0;
+    }
+
+    return this.totalRevenue() / customers.length;
+  });
+  readonly returnRate = computed(() => {
+    const summary = this.summary();
+    if (!summary?.totalCustomers) {
+      return 0;
+    }
+
+    return (summary.repeatCustomers / summary.totalCustomers) * 100;
+  });
+  readonly topZone = computed(() => {
+    const counts = new Map<string, number>();
+
+    for (const customer of this.customers()) {
+      const zone = customer.zoneLabel?.trim();
+      if (!zone) {
+        continue;
+      }
+
+      counts.set(zone, (counts.get(zone) ?? 0) + 1);
+    }
+
+    let topZone = 'No zones yet';
+    let topCount = 0;
+    for (const [zone, count] of counts.entries()) {
+      if (count > topCount) {
+        topZone = zone;
+        topCount = count;
+      }
+    }
+
+    return topZone;
+  });
 
   constructor() {
     this.loadCustomers();
@@ -201,6 +249,22 @@ export class ProjectCustomersRoute {
       day: 'numeric',
       year: 'numeric',
     });
+  }
+
+  formatCompactMoney(value: number): string {
+    return new Intl.NumberFormat('en-US', {
+      notation: 'compact',
+      maximumFractionDigits: value >= 1000 ? 1 : 0,
+    }).format(value);
+  }
+
+  formatPercent(value: number): string {
+    return `${Math.round(value)}%`;
+  }
+
+  getCustomerInitials(customer: ProjectCustomer): string {
+    const initials = `${customer.firstName.charAt(0)}${customer.lastName.charAt(0)}`.trim();
+    return initials.toUpperCase() || 'CU';
   }
 
   trackByCustomer = (_: number, customer: ProjectCustomer): number => customer.id;
