@@ -15,6 +15,7 @@
   --sb-active-bg: rgba(117, 102, 255, 0.14);
   --sb-active-text: #3e4fb8;
   --sb-hover-bg: rgba(17, 24, 39, 0.045);
+  --sb-hover-text: rgba(0, 0, 0, 0.72);
 
   position: fixed;
   top: 0;
@@ -216,11 +217,11 @@
 
 .settings-sidebar__row:hover:not(.settings-sidebar__row--active) {
   background: var(--sb-hover-bg);
-  color: rgba(0, 0, 0, 0.72);
+  color: var(--sb-hover-text);
 }
 
 .settings-sidebar__row:hover:not(.settings-sidebar__row--active) .settings-sidebar__icon {
-  color: rgba(0, 0, 0, 0.72);
+  color: var(--sb-hover-text);
 }
 
 .settings-sidebar__row--active {
@@ -263,6 +264,7 @@
   --sb-active-bg: rgba(117, 102, 255, 0.18);
   --sb-active-text: #ffffff;
   --sb-hover-bg: rgba(255, 255, 255, 0.06);
+  --sb-hover-text: #f4f7ff;
   background: #171e2a;
   border-right-color: rgba(255, 255, 255, 0.08);
 }
@@ -290,11 +292,11 @@
 
 :host-context(.theme-dark) .settings-sidebar__row:hover:not(.settings-sidebar__row--active) {
   background: var(--sb-hover-bg);
-  color: #f4f7ff;
+  color: var(--sb-hover-text);
 }
 
 :host-context(.theme-dark) .settings-sidebar__row:hover:not(.settings-sidebar__row--active) .settings-sidebar__icon {
-  color: #f4f7ff;
+  color: var(--sb-hover-text);
 }
 
 :host-context(.theme-dark) .settings-sidebar__row--active {

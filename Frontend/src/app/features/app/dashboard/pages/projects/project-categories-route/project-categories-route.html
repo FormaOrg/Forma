@@ -57,7 +57,7 @@
             <button
               type="button"
               class="project-categories__row"
-              [class.project-categories__row--active]="selectedCategory()?.id === category.id"
+              [class.project-categories__row--active]="selectedCategory().id === category.id"
               (click)="selectCategory(category.id)"
             >
               <div class="project-categories__row-main">

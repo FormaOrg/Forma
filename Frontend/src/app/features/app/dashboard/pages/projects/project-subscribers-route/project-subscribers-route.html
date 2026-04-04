@@ -67,7 +67,7 @@
             <button
               type="button"
               class="project-subscribers__row"
-              [class.project-subscribers__row--active]="selectedSubscriber()?.id === subscriber.id"
+              [class.project-subscribers__row--active]="selectedSubscriber().id === subscriber.id"
               (click)="selectSubscriber(subscriber.id)"
             >
               <div class="project-subscribers__row-main">

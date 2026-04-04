@@ -82,7 +82,7 @@
             <button
               type="button"
               class="project-posts__row"
-              [class.project-posts__row--active]="selectedPost()?.id === post.id"
+              [class.project-posts__row--active]="selectedPost().id === post.id"
               (click)="selectPost(post.id)"
             >
               <div class="project-posts__row-main">

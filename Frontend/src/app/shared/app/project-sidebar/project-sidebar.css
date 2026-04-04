@@ -18,6 +18,7 @@
   --sb-active-bg: #eef2ff;
   --sb-active-text: #3e4fb8;
   --sb-hover-bg: rgba(17, 24, 39, 0.045);
+  --sb-hover-text: rgba(0, 0, 0, 0.72);
   --sb-progress-track: #e8ebf4;
   --sb-progress-fill: #7566ff;
 
@@ -304,9 +305,13 @@
   display: block;
 }
 
-.project-sidebar__row:hover {
+.project-sidebar__row:hover:not(.project-sidebar__row--active) {
   background: var(--sb-hover-bg);
-  color: var(--sb-text-strong);
+  color: var(--sb-hover-text);
+}
+
+.project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
+  color: var(--sb-hover-text);
 }
 
 .project-sidebar__row--active {
@@ -357,6 +362,7 @@
   --sb-active-bg: rgba(117, 102, 255, 0.18);
   --sb-active-text: #ffffff;
   --sb-hover-bg: rgba(255, 255, 255, 0.06);
+  --sb-hover-text: #f4f7ff;
   --sb-progress-track: rgba(255, 255, 255, 0.08);
   background: var(--sb-surface);
   border-right-color: var(--sb-border);
@@ -393,8 +399,12 @@
   color: var(--sb-text);
 }
 
-:host-context(.theme-dark) .project-sidebar__row:hover {
-  color: var(--sb-text-strong);
+:host-context(.theme-dark) .project-sidebar__row:hover:not(.project-sidebar__row--active) {
+  color: var(--sb-hover-text);
+}
+
+:host-context(.theme-dark) .project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
+  color: var(--sb-hover-text);
 }
 
 :host-context(.theme-dark) .project-sidebar__separator {
