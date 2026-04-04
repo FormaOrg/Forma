@@ -4,12 +4,13 @@ import { RouterModule } from '@angular/router';
 import { AppIcon, AppIconName } from '../icons/app-icon';
 import { ThemeService } from '../../../core/services/theme.service';
 import { ProjectService } from '../../../core/services/project.service';
+import { ProjectWorkspaceContextService } from '../../../core/services/project-workspace-context.service';
 import { ProjectType } from '../../../core/models/project.model';
 import type { SidebarItem, SidebarSection } from '../dashboard-nav.types';
 import {
   getCompletedProjectSetupItems,
   getProjectSetupNextStep,
-  PROJECT_SETUP_ITEMS
+  getProjectSetupItems
 } from '../project-setup/project-setup.data';
 import { getProjectWorkspaceConfig } from '../project-workspace/project-workspace.config';
 
@@ -29,14 +30,16 @@ export class ProjectSidebar implements OnChanges {
 
   private readonly themeService = inject(ThemeService);
   private readonly projectService = inject(ProjectService);
+  private readonly projectWorkspaceContextService = inject(ProjectWorkspaceContextService);
 
   readonly iconSize = 20;
   readonly projectType = signal<ProjectType | null>(null);
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
+  readonly setupItems = computed(() => getProjectSetupItems(this.projectType()));
   readonly workspaceProgress = computed(() => ({
-    completed: getCompletedProjectSetupItems(PROJECT_SETUP_ITEMS),
-    total: PROJECT_SETUP_ITEMS.length,
-    nextStep: getProjectSetupNextStep(PROJECT_SETUP_ITEMS)
+    completed: getCompletedProjectSetupItems(this.setupItems()),
+    total: this.setupItems().length,
+    nextStep: getProjectSetupNextStep(this.setupItems())
   }));
   readonly isWorkspaceComplete = computed(
     () => this.workspaceProgress().completed >= this.workspaceProgress().total
@@ -110,8 +113,17 @@ export class ProjectSidebar implements OnChanges {
       return;
     }
 
+    const cachedType = this.projectWorkspaceContextService.getProjectType(projectId);
+    if (cachedType) {
+      this.projectType.set(cachedType);
+      return;
+    }
+
     this.projectService.getProjectById(projectId).subscribe({
-      next: (project) => this.projectType.set(project.type),
+      next: (project) => {
+        this.projectWorkspaceContextService.setProjectType(projectId, project.type);
+        this.projectType.set(project.type);
+      },
       error: () => this.projectType.set(null),
     });
   }

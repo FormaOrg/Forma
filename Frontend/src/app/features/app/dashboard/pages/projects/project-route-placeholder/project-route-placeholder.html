@@ -108,8 +108,8 @@
           <h1 class="project-setup__title">{{ workspaceConfig().setupTitle }}</h1>
           <div class="project-setup__meta" aria-label="Project setup summary">
             <span class="project-setup__meta-pill">Project #{{ projectId() }}</span>
-            @if (nextSetupStep) {
-              <span class="project-setup__meta-pill">Next: {{ nextSetupStep }}</span>
+            @if (nextSetupStep()) {
+              <span class="project-setup__meta-pill">Next: {{ nextSetupStep() }}</span>
             }
           </div>
         </div>
@@ -117,16 +117,16 @@
         <div class="project-setup__progress">
           <div class="project-setup__progress-summary">
             <span class="project-setup__progress-label">Completed tasks</span>
-            <strong>{{ completedSetupItems }}/{{ setupItems.length }}</strong>
+            <strong>{{ completedSetupItems() }}/{{ setupItems().length }}</strong>
           </div>
           <div class="project-setup__progress-bar" aria-hidden="true">
-            <span class="project-setup__progress-bar-fill" [style.width.%]="(completedSetupItems / setupItems.length) * 100"></span>
+            <span class="project-setup__progress-bar-fill" [style.width.%]="(completedSetupItems() / setupItems().length) * 100"></span>
           </div>
         </div>
       </div>
 
       <div class="project-setup__tasks">
-        @for (item of setupItems; track item.title) {
+        @for (item of setupItems(); track item.title) {
           <article
             class="project-setup__task"
             [class.project-setup__task--done]="item.status === 'done'"

@@ -8,7 +8,7 @@ import { computed, inject, signal } from '@angular/core';
 import {
   getCompletedProjectSetupItems,
   getProjectSetupNextStep,
-  PROJECT_SETUP_ITEMS
+  getProjectSetupItems
 } from '../../../../../../shared/app/project-setup/project-setup.data';
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { ProjectType } from '../../../../../../core/models/project.model';
@@ -36,10 +36,9 @@ export class ProjectRoutePlaceholder {
   );
   readonly projectType = signal<ProjectType | null>(null);
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
-
-  readonly setupItems = PROJECT_SETUP_ITEMS;
-  readonly completedSetupItems = getCompletedProjectSetupItems(this.setupItems);
-  readonly nextSetupStep = getProjectSetupNextStep(this.setupItems);
+  readonly setupItems = computed(() => getProjectSetupItems(this.projectType()));
+  readonly completedSetupItems = computed(() => getCompletedProjectSetupItems(this.setupItems()));
+  readonly nextSetupStep = computed(() => getProjectSetupNextStep(this.setupItems()));
   readonly ownerName = 'Ismail';
   readonly projectStatusItems = [
     { label: 'Free plan', accent: false },
