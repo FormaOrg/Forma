@@ -148,7 +148,7 @@ export const routes: Routes = [
               {
                 path: 'analytics',
                 data: { title: 'Analytics' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-analytics-route/project-analytics-route').then((m) => m.ProjectAnalyticsRoute)
               },
               {
                 path: 'help',
@@ -223,3 +223,4 @@ export const routes: Routes = [
   { path: '**', redirectTo: '' }
 ];
 
+  

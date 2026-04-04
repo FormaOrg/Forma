@@ -253,12 +253,12 @@
   transform: rotate(180deg);
 }
 
-.sidebar__row:hover {
+.sidebar__row:hover:not(.sidebar__row--active) {
   background: var(--sb-hover-bg);
   color: rgba(0, 0, 0, 0.72);
 }
 
-.sidebar__row:hover .sidebar__icon {
+.sidebar__row:hover:not(.sidebar__row--active) .sidebar__icon {
   color: rgba(0, 0, 0, 0.72);
 }
 
@@ -448,12 +448,12 @@
   color: rgba(219, 226, 242, 0.54);
 }
 
-:host-context(.theme-dark) .sidebar__row:hover {
+:host-context(.theme-dark) .sidebar__row:hover:not(.sidebar__row--active) {
   background: var(--sb-hover-bg);
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .sidebar__row:hover .sidebar__icon {
+:host-context(.theme-dark) .sidebar__row:hover:not(.sidebar__row--active) .sidebar__icon {
   color: #f4f7ff;
 }
 

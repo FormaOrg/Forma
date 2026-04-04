@@ -214,12 +214,12 @@
   border: 0;
 }
 
-.settings-sidebar__row:hover {
+.settings-sidebar__row:hover:not(.settings-sidebar__row--active) {
   background: var(--sb-hover-bg);
   color: rgba(0, 0, 0, 0.72);
 }
 
-.settings-sidebar__row:hover .settings-sidebar__icon {
+.settings-sidebar__row:hover:not(.settings-sidebar__row--active) .settings-sidebar__icon {
   color: rgba(0, 0, 0, 0.72);
 }
 
@@ -288,12 +288,12 @@
   color: rgba(219, 226, 242, 0.54);
 }
 
-:host-context(.theme-dark) .settings-sidebar__row:hover {
+:host-context(.theme-dark) .settings-sidebar__row:hover:not(.settings-sidebar__row--active) {
   background: var(--sb-hover-bg);
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .settings-sidebar__row:hover .settings-sidebar__icon {
+:host-context(.theme-dark) .settings-sidebar__row:hover:not(.settings-sidebar__row--active) .settings-sidebar__icon {
   color: #f4f7ff;
 }
 

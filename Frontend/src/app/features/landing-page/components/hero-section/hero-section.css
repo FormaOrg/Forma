@@ -93,3 +93,131 @@ link-button {
     30%, 60% { transform: translateX(-30px)   scale(1.25);}
     90%, 100% { transform: translateX(0px) scale(1); }
 }
+
+@media (max-width: 1200px) {
+    :host::before {
+        top: 180px;
+        height: 980px;
+        filter: blur(190px);
+    }
+
+    .top {
+        margin-top: 150px;
+        padding: 0 28px;
+    }
+
+    .title {
+        font-size: 4.8em;
+    }
+
+    .subtitle {
+        font-size: 1.35em;
+        max-width: 760px;
+    }
+
+    .bottom {
+        width: 100%;
+        padding: 0 28px;
+    }
+
+    .bottom .img1 {
+        width: 100%;
+        max-width: 980px;
+        height: auto;
+    }
+
+    .moving-animation {
+        left: 8%;
+        bottom: 8%;
+    }
+}
+
+@media (max-width: 768px) {
+    :host::before {
+        top: 120px;
+        height: 760px;
+        filter: blur(150px);
+    }
+
+    .top {
+        margin-top: 110px;
+        padding: 0 20px;
+    }
+
+    .title {
+        font-size: 3.3em;
+        line-height: 1.02;
+        margin-bottom: 0;
+    }
+
+    .subtitle {
+        font-size: 1.08em;
+        line-height: 1.55;
+        max-width: 560px;
+        margin-top: 14px;
+    }
+
+    link-button {
+        margin-top: 32px;
+    }
+
+    .bottom {
+        width: 100%;
+        margin-top: 26px;
+        padding: 0 16px;
+    }
+
+    .bottom .img1 {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .moving-animation {
+        left: 7%;
+        bottom: 9%;
+        width: 34%;
+    }
+
+    .moving-animation .img2 {
+        width: 100%;
+        height: auto;
+    }
+
+    .cursor {
+        width: 42px;
+        right: -18px;
+        bottom: 18px;
+    }
+
+    @keyframes cardMove {
+        0%, 30% { transform: translateX(0px); }
+        50%, 100% { transform: translateX(42px); }
+    }
+}
+
+@media (max-width: 480px) {
+    .top {
+        margin-top: 96px;
+    }
+
+    .title {
+        font-size: 2.7em;
+    }
+
+    .subtitle {
+        font-size: 0.98em;
+    }
+
+    .moving-animation {
+        left: 6%;
+        bottom: 8%;
+        width: 38%;
+    }
+
+    .cursor {
+        width: 34px;
+        right: -14px;
+        bottom: 14px;
+    }
+}

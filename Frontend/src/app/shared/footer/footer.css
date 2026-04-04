@@ -1,6 +1,8 @@
 :host {
   display: block;
   width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 *,
@@ -11,18 +13,27 @@
 
 .forma-footer {
   width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+  height: auto;
   background: #ffffff;
   color: #111111;
 }
 
 .forma-footer__inner {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 74px 56px 28px;
+  height: auto;
+  overflow: visible;
 }
 
 .forma-footer__top {
   padding-bottom: 34px;
+  height: auto;
+  overflow: visible;
 }
 
 .forma-footer__grid {
@@ -30,6 +41,10 @@
   grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(260px, 330px);
   gap: 56px;
   align-items: start;
+  align-content: start;
+  grid-template-areas: "product solutions learn support brand";
+  height: auto;
+  overflow: visible;
 }
 
 .forma-footer__heading {
@@ -70,6 +85,44 @@
 .forma-footer__brand {
   justify-self: end;
   max-width: 300px;
+  grid-area: brand;
+}
+
+.forma-footer__grid > .forma-footer__col:nth-child(2) { grid-area: product; }
+.forma-footer__grid > .forma-footer__col:nth-child(3) { grid-area: solutions; }
+.forma-footer__grid > .forma-footer__col:nth-child(4) { grid-area: learn; }
+.forma-footer__grid > .forma-footer__col:nth-child(5) { grid-area: support; }
+
+.forma-footer__summary {
+  list-style: none;
+  cursor: default;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.forma-footer__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forma-footer__chevron {
+  display: none;
+}
+
+.forma-footer__col > .forma-footer__list {
+  display: block;
+}
+
+.forma-footer__panel {
+  display: block;
+}
+
+.forma-footer__panel-inner {
+  display: block;
 }
 
 .forma-footer__logo {
@@ -110,6 +163,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  height: auto;
+  overflow: visible;
 }
 
 .forma-footer__socials {
@@ -153,12 +208,15 @@
 @media (max-width: 1100px) {
   .forma-footer__grid {
     grid-template-columns: repeat(2, minmax(160px, 1fr));
+    grid-template-areas:
+      "brand brand"
+      "product solutions"
+      "learn support";
   }
 
   .forma-footer__brand {
     justify-self: start;
     max-width: 420px;
-    grid-column: 1 / -1;
   }
 
   .forma-footer__bottom {
@@ -172,28 +230,136 @@
   }
 }
 
+@media (max-width: 900px) {
+  .forma-footer__grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "brand"
+      "product"
+      "solutions"
+      "learn"
+      "support";
+    gap: 28px;
+  }
+
+  .forma-footer__brand {
+    max-width: none;
+  }
+}
+
 @media (max-width: 640px) {
   .forma-footer__inner {
-    padding: 48px 20px 22px;
+    padding: 48px 20px 34px;
   }
 
   .forma-footer__grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    grid-template-areas:
+      "brand"
+      "product"
+      "solutions"
+      "learn"
+      "support";
+    gap: 0;
   }
 
   .forma-footer__brand {
-    grid-column: auto;
     max-width: none;
+    padding-bottom: 28px;
+  }
+
+  .forma-footer__col {
+    border-top: 1px solid #d8d8d8;
+  }
+
+  .forma-footer__summary {
+    cursor: pointer;
+    padding: 22px 0;
+  }
+
+  .forma-footer__heading {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .forma-footer__chevron {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 1.6px solid #111111;
+    border-bottom: 1.6px solid #111111;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    margin-right: 6px;
+  }
+
+  .forma-footer__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: 0;
+  }
+
+  .forma-footer__panel-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .forma-footer__panel .forma-footer__list {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0s, transform 0s;
+  }
+
+  .forma-footer__col.open > .forma-footer__panel {
+    grid-template-rows: 1fr;
+    padding-bottom: 20px;
+  }
+
+  .forma-footer__col.open .forma-footer__panel .forma-footer__list {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s ease 0.35s, transform 0.25s ease 0.35s;
+  }
+
+  .forma-footer__col.open .forma-footer__chevron {
+    transform: rotate(225deg);
   }
 
   .forma-footer__bottom {
     gap: 18px;
+    padding-top: 24px;
+    padding-bottom: 26px;
+    width: 100%;
   }
 
   .forma-footer__legal {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    width: 100%;
+  }
+
+  .forma-footer__legal span {
+    display: block;
+    width: 100%;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 420px) {
+  .forma-footer__list li + li {
+    margin-top: 8px;
+  }
+
+  .forma-footer__list a {
+    font-size: 0.93rem;
+  }
+
+  .forma-footer__description {
+    font-size: 0.98rem;
+    line-height: 1.7;
   }
 }
