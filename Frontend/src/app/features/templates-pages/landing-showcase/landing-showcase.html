@@ -8,54 +8,206 @@
         <h2 class="landing-showcase__sidebar-title">Quick jump</h2>
 
         <nav class="landing-showcase__sidebar-nav">
-          <a class="landing-showcase__sidebar-link" href="#hero">Hero</a>
-          <a class="landing-showcase__sidebar-link" href="#overview">Overview</a>
-          <a class="landing-showcase__sidebar-link" href="#templates">Templates</a>
-          <a class="landing-showcase__sidebar-link" href="#customize">Customize</a>
-          <a class="landing-showcase__sidebar-link" href="#steps">Steps</a>
-          <a class="landing-showcase__sidebar-link" href="#cta">CTA</a>
+          @for (link of jumpLinks; track link.href) {
+            <a class="landing-showcase__sidebar-link" [href]="link.href">{{ link.label }}</a>
+          }
         </nav>
       </div>
     </aside>
 
     <div class="landing-showcase__content">
-      <section id="hero" class="landing-showcase__section">
-        <app-forma-process-showcase />
+      <section id="hero" class="landing-showcase__section landing-showcase__section--hero">
+        <div class="landing-showcase__hero">
+          <div class="landing-showcase__hero-copy">
+            <span class="landing-showcase__eyebrow">Landing Page Template</span>
+            <h1>Launch one focused page that turns attention into action.</h1>
+            <p class="landing-showcase__lead">
+              This showcase is built for offers that need clarity, speed, and a clean conversion path. No extra pages.
+              No overloaded navigation. Just a sharp message, strong proof, and a CTA that feels natural.
+            </p>
+
+            <div class="landing-showcase__hero-actions">
+              <a class="landing-showcase__button landing-showcase__button--primary" [routerLink]="['/app/create-project']">
+                Start from this layout
+              </a>
+              <a class="landing-showcase__button landing-showcase__button--secondary" [routerLink]="['/templates']">
+                Browse all templates
+              </a>
+            </div>
+
+            <div class="landing-showcase__pill-row">
+              @for (pill of heroPills; track pill) {
+                <span class="landing-showcase__pill">{{ pill }}</span>
+              }
+            </div>
+
+            <div class="landing-showcase__stats">
+              @for (stat of heroStats; track stat.label) {
+                <article class="landing-showcase__stat">
+                  <strong>{{ stat.value }}</strong>
+                  <span>{{ stat.label }}</span>
+                </article>
+              }
+            </div>
+          </div>
+
+          <div class="landing-showcase__hero-preview">
+            <div class="landing-showcase__browser">
+              <div class="landing-showcase__browser-bar">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="landing-showcase__browser-body">
+                <div class="landing-showcase__preview-badge">New launch</div>
+                <h2>Make the value feel immediate.</h2>
+                <p>
+                  Present your product or offer with one headline, one proof strip, and one call to action that keeps the page focused.
+                </p>
+                <div class="landing-showcase__preview-actions">
+                  <span class="landing-showcase__preview-button landing-showcase__preview-button--solid">Join waitlist</span>
+                  <span class="landing-showcase__preview-button">See preview</span>
+                </div>
+                <div class="landing-showcase__preview-proof">
+                  <span>Trusted by 250+ teams</span>
+                  <span>4.9/5 average rating</span>
+                  <span>Fast setup</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section id="overview" class="landing-showcase__section">
-        <app-forma-overview />
+      <section id="benefits" class="landing-showcase__section">
+        <div class="landing-showcase__section-heading">
+          <span class="landing-showcase__eyebrow">Benefits</span>
+          <h2>Everything stays centered on the action you want visitors to take.</h2>
+          <p>Landing pages work best when the structure is tight. This template keeps the page persuasive without making it busy.</p>
+        </div>
+
+        <div class="landing-showcase__benefits-grid">
+          @for (benefit of benefits; track benefit.title) {
+            <article class="landing-showcase__card">
+              <h3>{{ benefit.title }}</h3>
+              <p>{{ benefit.body }}</p>
+            </article>
+          }
+        </div>
       </section>
 
-      <section class="landing-showcase__section">
-        <app-manual-design-section />
+      <section id="proof" class="landing-showcase__section">
+        <div class="landing-showcase__section-heading">
+          <span class="landing-showcase__eyebrow">Social Proof</span>
+          <h2>Add trust without slowing the page down.</h2>
+        </div>
+
+        <div class="landing-showcase__proof-strip">
+          @for (logo of proofLogos; track logo) {
+            <span class="landing-showcase__logo-pill">{{ logo }}</span>
+          }
+        </div>
+
+        <div class="landing-showcase__testimonial-grid">
+          @for (testimonial of testimonials; track testimonial.author) {
+            <article class="landing-showcase__testimonial">
+              <p class="landing-showcase__testimonial-quote">"{{ testimonial.quote }}"</p>
+              <div>
+                <strong>{{ testimonial.author }}</strong>
+                <span>{{ testimonial.role }}</span>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div class="landing-showcase__metrics-row">
+          @for (metric of proofMetrics; track metric.label) {
+            <article class="landing-showcase__metric">
+              <strong>{{ metric.value }}</strong>
+              <span>{{ metric.label }}</span>
+            </article>
+          }
+        </div>
       </section>
 
-      <section id="templates" class="landing-showcase__section">
-        <app-template-section />
+      <section id="features" class="landing-showcase__section">
+        <div class="landing-showcase__section-heading">
+          <span class="landing-showcase__eyebrow">Feature Blocks</span>
+          <h2>A layout sequence that feels intentional from top to bottom.</h2>
+        </div>
+
+        <div class="landing-showcase__feature-stack">
+          @for (feature of featureBlocks; track feature.title) {
+            <article class="landing-showcase__feature-card">
+              <div class="landing-showcase__feature-copy">
+                <span class="landing-showcase__feature-kicker">{{ feature.eyebrow }}</span>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.body }}</p>
+              </div>
+
+              <ul class="landing-showcase__feature-list">
+                @for (bullet of feature.bullets; track bullet) {
+                  <li>{{ bullet }}</li>
+                }
+              </ul>
+            </article>
+          }
+        </div>
       </section>
 
-      <section id="customize" class="landing-showcase__section">
-        <app-customizer-section />
-      </section>
+      <section id="pricing" class="landing-showcase__section">
+        <div class="landing-showcase__section-heading">
+          <span class="landing-showcase__eyebrow">Simple Offer</span>
+          <h2>Keep the pricing moment short, clear, and easy to say yes to.</h2>
+        </div>
 
-      <section id="steps" class="landing-showcase__section">
-        <app-steps-section2 />
-      </section>
+        <article class="landing-showcase__pricing-card">
+          <div class="landing-showcase__pricing-copy">
+            <span class="landing-showcase__pricing-tag">Recommended setup</span>
+            <h3>Single-page launch package</h3>
+            <p>
+              One polished landing page for a campaign, product drop, waitlist, or offer validation flow. Enough structure to convert, without extra complexity.
+            </p>
+          </div>
 
-      <section class="landing-showcase__section">
-        <app-parallax-section />
-      </section>
+          <div class="landing-showcase__pricing-panel">
+            <strong class="landing-showcase__pricing-value">$49</strong>
+            <span class="landing-showcase__pricing-note">from your template catalog</span>
 
-      <section class="landing-showcase__section">
-        <app-product-help-deck />
+            <ul class="landing-showcase__pricing-list">
+              @for (item of pricingItems; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+
+            <a class="landing-showcase__button landing-showcase__button--primary landing-showcase__pricing-action" [routerLink]="['/app/create-project']">
+              Use this offer layout
+            </a>
+          </div>
+        </article>
       </section>
 
       <section id="cta" class="landing-showcase__section">
-        <app-product-cta-wave />
+        <article class="landing-showcase__cta-card">
+          <span class="landing-showcase__eyebrow">Call To Action</span>
+          <h2>Turn your next campaign into a page that feels sharp from the first screen.</h2>
+          <p>
+            Start with a focused landing-page layout, then customize the messaging, proof, and offer around your launch.
+          </p>
+
+          <div class="landing-showcase__hero-actions">
+            <a class="landing-showcase__button landing-showcase__button--primary" [routerLink]="['/app/create-project']">
+              Create landing page
+            </a>
+            <a class="landing-showcase__button landing-showcase__button--secondary" [routerLink]="['/app/templates']">
+              Use from dashboard
+            </a>
+          </div>
+        </article>
       </section>
     </div>
   </div>
 
   <app-footer />
 </main>
+
