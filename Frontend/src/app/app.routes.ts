@@ -165,17 +165,17 @@ export const routes: Routes = [
               {
                 path: 'posts',
                 data: { title: 'Posts' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-posts-route/project-posts-route').then((m) => m.ProjectPostsRoute)
               },
               {
                 path: 'categories',
                 data: { title: 'Categories' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-categories-route/project-categories-route').then((m) => m.ProjectCategoriesRoute)
               },
               {
                 path: 'subscribers',
                 data: { title: 'Subscribers' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-subscribers-route/project-subscribers-route').then((m) => m.ProjectSubscribersRoute)
               },
               {
                 path: 'analytics',
