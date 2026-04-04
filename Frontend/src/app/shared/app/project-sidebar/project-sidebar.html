@@ -36,7 +36,7 @@
       aria-label="Project workspace overview"
     >
       <div class="project-sidebar__workspace-copy">
-        <p class="project-sidebar__workspace-title">Project workspace</p>
+        <p class="project-sidebar__workspace-title">{{ workspaceTitle() }}</p>
         <p class="project-sidebar__workspace-progress">
           {{ workspaceProgress().completed }}/{{ workspaceProgress().total }} completed
         </p>
@@ -56,7 +56,7 @@
     </section>
 
     <nav class="project-sidebar__nav" aria-label="Project navigation">
-      @for (section of sections; track trackSectionId($index, section)) {
+      @for (section of sections(); track trackSectionId($index, section)) {
         @if (!$first) {
           <div class="project-sidebar__separator" aria-hidden="true"></div>
         }

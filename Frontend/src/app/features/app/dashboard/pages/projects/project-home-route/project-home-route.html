@@ -17,11 +17,13 @@
         <p class="project-home-page__eyebrow">Project workspace</p>
         <h1 class="project-home-page__title">Welcome back, <span>{{ page.ownerName }}</span>.</h1>
         <p class="project-home-page__subtitle">
-          {{ page.projectName }} is now powered by your real project, catalog, customer, and order data.
+          {{ workspaceConfig().homeSubtitle }}
         </p>
       </div>
 
-      <a class="project-home-page__hero-action" [routerLink]="['/app/projects', page.projectId, 'catalog']">Open catalog</a>
+      <a class="project-home-page__hero-action" [routerLink]="['/app/projects', page.projectId, workspaceConfig().heroActionPath]">
+        {{ workspaceConfig().heroActionLabel }}
+      </a>
     </section>
 
     <section class="project-home-page__status project-home-page__panel">
@@ -47,9 +49,11 @@
         <div class="project-home-page__section-head">
           <div>
             <h2>Recent activity</h2>
-            <p>Events loaded from your persisted project, catalog, customer, and sales data.</p>
+            <p>{{ workspaceConfig().activityDescription }}</p>
           </div>
-          <a [routerLink]="['/app/projects', page.projectId, 'sales']">View sales</a>
+          <a [routerLink]="['/app/projects', page.projectId, workspaceConfig().activityLinkPath]">
+            {{ workspaceConfig().activityLinkLabel }}
+          </a>
         </div>
 
         @if (activities().length) {
@@ -71,7 +75,7 @@
         } @else {
           <div class="project-home-page__empty">
             <h3>No activity yet</h3>
-            <p>As soon as this project starts accumulating real catalog, customer, or sales events, they will appear here.</p>
+            <p>{{ workspaceConfig().emptyActivityDescription }}</p>
           </div>
         }
       </article>

@@ -5,6 +5,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { ProjectHomeService } from '../../../../../../core/services/project-home.service';
 import { ProjectHomePage } from '../../../../../../core/models/project-home.model';
+import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-workspace/project-workspace.config';
 
 @Component({
   selector: 'app-project-home-route',
@@ -26,6 +27,7 @@ export class ProjectHomeRoute {
   readonly page = signal<ProjectHomePage | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
+  readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.page()?.projectType));
   readonly metrics = computed(() => this.page()?.metrics ?? []);
   readonly activities = computed(() => this.page()?.recentActivities ?? []);
   readonly actions = computed(() => this.page()?.suggestedActions ?? []);

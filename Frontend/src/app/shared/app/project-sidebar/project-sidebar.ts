@@ -1,14 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppIcon, AppIconName } from '../icons/app-icon';
 import { ThemeService } from '../../../core/services/theme.service';
+import { ProjectService } from '../../../core/services/project.service';
+import { ProjectType } from '../../../core/models/project.model';
 import type { SidebarItem, SidebarSection } from '../dashboard-nav.types';
 import {
   getCompletedProjectSetupItems,
   getProjectSetupNextStep,
   PROJECT_SETUP_ITEMS
 } from '../project-setup/project-setup.data';
+import { getProjectWorkspaceConfig } from '../project-workspace/project-workspace.config';
 
 type ProjectSidebarItem = SidebarItem & { path: string };
 
@@ -19,14 +22,17 @@ type ProjectSidebarItem = SidebarItem & { path: string };
   templateUrl: './project-sidebar.html',
   styleUrl: './project-sidebar.css'
 })
-export class ProjectSidebar {
+export class ProjectSidebar implements OnChanges {
   @Input({ required: true }) projectId!: string;
   @Input() collapsed = false;
   @Input() showBrand = true;
 
   private readonly themeService = inject(ThemeService);
+  private readonly projectService = inject(ProjectService);
 
   readonly iconSize = 20;
+  readonly projectType = signal<ProjectType | null>(null);
+  readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.projectType()));
   readonly workspaceProgress = computed(() => ({
     completed: getCompletedProjectSetupItems(PROJECT_SETUP_ITEMS),
     total: PROJECT_SETUP_ITEMS.length,
@@ -35,41 +41,17 @@ export class ProjectSidebar {
   readonly isWorkspaceComplete = computed(
     () => this.workspaceProgress().completed >= this.workspaceProgress().total
   );
-
-  readonly sections: Array<SidebarSection & { items: ProjectSidebarItem[] }> = [
-    {
-      id: 'setup',
-      label: 'Setup',
-      items: [
-        { label: 'Setup', icon: 'rocket', path: '', route: '', hasDropdown: false }
-      ]
-    },
-    {
-      id: 'workspace',
-      label: 'Workspace',
-      items: [
-        { label: 'Home', icon: 'home', path: 'home', route: 'home', hasDropdown: false },
-        { label: 'Sales', icon: 'dollar-sign', path: 'sales', route: 'sales', hasDropdown: false },
-        { label: 'Catalog', icon: 'package', path: 'catalog', route: 'catalog', hasDropdown: false }
-      ]
-    },
-    {
-      id: 'audience',
-      label: 'Audience',
-      items: [
-        { label: 'Customers', icon: 'users', path: 'customers', route: 'customers', hasDropdown: false },
-        { label: 'Analytics', icon: 'bar-chart', path: 'analytics', route: 'analytics', hasDropdown: false }
-      ]
-    },
-    {
-      id: 'support',
-      label: 'Support',
-      items: [
-        { label: 'Help', icon: 'help-circle', path: 'help', route: 'help', hasDropdown: false },
-        { label: 'Settings', icon: 'settings', path: 'settings', route: 'settings', hasDropdown: false }
-      ]
-    }
-  ];
+  readonly workspaceTitle = computed(() => `${this.workspaceConfig().typeLabel} workspace`);
+  readonly sections = computed<Array<SidebarSection & { items: ProjectSidebarItem[] }>>(() =>
+    this.workspaceConfig().sections.map((section) => ({
+      ...section,
+      items: section.items.map((item) => ({
+        ...item,
+        route: item.path,
+        hasDropdown: false,
+      })),
+    }))
+  );
 
   readonly footerItems: ProjectSidebarItem[] = [
     {
@@ -87,6 +69,12 @@ export class ProjectSidebar {
       hasDropdown: false
     }
   ];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('projectId' in changes) {
+      this.loadProjectType();
+    }
+  }
 
   logoSrc(): string {
     return this.themeService.resolvedTheme() === 'dark'
@@ -112,5 +100,19 @@ export class ProjectSidebar {
 
   projectRoute(path: string): string[] {
     return path ? ['/app/projects', this.projectId, path] : this.projectBaseRoute();
+  }
+
+  private loadProjectType(): void {
+    const projectId = Number(this.projectId);
+
+    if (!Number.isFinite(projectId) || projectId <= 0) {
+      this.projectType.set(null);
+      return;
+    }
+
+    this.projectService.getProjectById(projectId).subscribe({
+      next: (project) => this.projectType.set(project.type),
+      error: () => this.projectType.set(null),
+    });
   }
 }

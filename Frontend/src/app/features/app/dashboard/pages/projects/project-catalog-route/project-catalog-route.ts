@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -50,6 +50,7 @@ export class ProjectCatalogRoute {
   readonly searchValue = signal('');
   readonly selectedStatus = signal<CatalogStatusFilter>('ALL');
   readonly selectedCategory = signal('ALL');
+  readonly categoryDropdownOpen = signal(false);
   readonly isEditorOpen = signal(false);
   readonly editingProduct = signal<ProjectCatalogProduct | null>(null);
 
@@ -90,6 +91,9 @@ export class ProjectCatalogRoute {
   readonly products = computed(() => this.catalogPage()?.products ?? []);
   readonly categories = computed(() => this.catalogPage()?.categories ?? []);
   readonly readyProductsCount = computed(() => this.products().filter((product) => product.readyToPublish).length);
+  readonly selectedCategoryLabel = computed(() =>
+    this.selectedCategory() === 'ALL' ? 'All categories' : this.selectedCategory()
+  );
   readonly editorTitle = computed(() => {
     const product = this.editingProduct();
     return product ? `Edit ${product.name}` : 'Add product';
@@ -134,12 +138,22 @@ export class ProjectCatalogRoute {
 
   updateStatus(status: CatalogStatusFilter): void {
     this.selectedStatus.set(status);
+    this.closeDropdowns();
     this.loadCatalog();
   }
 
   updateCategory(category: string): void {
     this.selectedCategory.set(category);
+    this.categoryDropdownOpen.set(false);
     this.loadCatalog();
+  }
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen.update((value) => !value);
+  }
+
+  closeDropdowns(): void {
+    this.categoryDropdownOpen.set(false);
   }
 
   openCreateEditor(): void {
@@ -293,6 +307,15 @@ export class ProjectCatalogRoute {
   }
 
   trackByProduct = (_: number, product: ProjectCatalogProduct): number => product.id;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+
+    if (!target?.closest('.catalog-toolbar__dropdown')) {
+      this.closeDropdowns();
+    }
+  }
 
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('en-US', {

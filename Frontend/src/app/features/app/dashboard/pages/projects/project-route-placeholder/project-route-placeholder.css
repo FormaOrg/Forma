@@ -401,7 +401,7 @@
 .project-setup__panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .project-setup__panel--primary {
@@ -411,7 +411,7 @@
 .project-setup__panel-copy {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px;
 }
 
 .project-setup__title,
@@ -441,17 +441,32 @@
 }
 
 .project-setup__progress {
-  min-width: 144px;
+  min-width: 184px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.project-setup__progress-summary {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(117, 102, 255, 0.14);
+  background: #f8f7ff;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.project-setup__progress-label {
   font-size: 0.74rem;
+  font-weight: 600;
   color: rgba(11, 11, 18, 0.64);
 }
 
 .project-setup__progress strong {
-  font-size: 0.8rem;
-  line-height: 1.2;
+  font-size: 1rem;
+  line-height: 1;
   color: #111111;
 }
 
@@ -472,18 +487,18 @@
 .project-setup__tasks {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .project-setup__task {
   border: 1px solid rgba(225, 227, 236, 0.95);
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 15px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   background: #ffffff;
   transition:
     border-color 160ms ease,
@@ -507,7 +522,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .project-setup__task-title-row {
@@ -536,6 +551,12 @@
   color: #111111;
 }
 
+.project-setup__task-title--done {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(29, 138, 93, 0.7);
+}
+
 .project-setup__task-status {
   display: inline-flex;
   align-items: center;
@@ -555,6 +576,12 @@
   font-size: 0.76rem;
   line-height: 1.42;
   color: rgba(11, 11, 18, 0.62);
+}
+
+.project-setup__task-description--done {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(29, 138, 93, 0.55);
 }
 
 .project-setup__task-action {
@@ -652,6 +679,15 @@
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(117, 102, 255, 0.14);
   color: rgba(226, 231, 244, 0.7);
+}
+
+:host-context(.theme-dark) .project-setup__progress-summary {
+  background: rgba(117, 102, 255, 0.08);
+  border-color: rgba(117, 102, 255, 0.18);
+}
+
+:host-context(.theme-dark) .project-setup__progress-label {
+  color: rgba(226, 231, 244, 0.68);
 }
 
 :host-context(.theme-dark) .project-setup__task-title {

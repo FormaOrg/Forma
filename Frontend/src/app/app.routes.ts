@@ -146,6 +146,36 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/app/dashboard/pages/projects/project-customers-route/project-customers-route').then((m) => m.ProjectCustomersRoute)
               },
               {
+                path: 'pages',
+                data: { title: 'Pages' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'media',
+                data: { title: 'Media' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'audience',
+                data: { title: 'Inquiries' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'posts',
+                data: { title: 'Posts' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'categories',
+                data: { title: 'Categories' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
+                path: 'subscribers',
+                data: { title: 'Subscribers' },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+              },
+              {
                 path: 'analytics',
                 data: { title: 'Analytics' },
                 loadComponent: () => import('./features/app/dashboard/pages/projects/project-analytics-route/project-analytics-route').then((m) => m.ProjectAnalyticsRoute)
@@ -167,8 +197,6 @@ export const routes: Routes = [
               },
               { path: 'overview', redirectTo: 'home', pathMatch: 'full' },
               { path: 'deploy', redirectTo: 'sales', pathMatch: 'full' },
-              { path: 'pages', redirectTo: 'catalog', pathMatch: 'full' },
-              { path: 'media', redirectTo: 'customers', pathMatch: 'full' },
               { path: 'preview', redirectTo: 'analytics', pathMatch: 'full' }
             ]
           }
