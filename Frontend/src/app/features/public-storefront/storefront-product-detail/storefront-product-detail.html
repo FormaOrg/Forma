@@ -1,0 +1,80 @@
+@if (isLoading()) {
+  <section class="storefront-product__state">
+    <p>Loading product...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-product__state storefront-product__state--error">
+    <h1>Product unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else if (product(); as product) {
+  <div class="storefront-product">
+    <header class="storefront-product__header">
+      <a class="storefront-product__brand" [routerLink]="['/store', projectId()]">
+        {{ storefront()?.storeName || 'Storefront' }}
+      </a>
+
+      <nav class="storefront-product__nav" aria-label="Store navigation">
+        <a [routerLink]="['/store', projectId()]">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+      </nav>
+    </header>
+
+    <main class="storefront-product__content">
+      <a class="storefront-product__back" [routerLink]="['/store', projectId(), 'products']">
+        Back to products
+      </a>
+
+      <section class="storefront-product__card">
+        <div class="storefront-product__media">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" />
+          } @else {
+            <div class="storefront-product__placeholder">{{ product.name.slice(0, 1) }}</div>
+          }
+        </div>
+
+        <div class="storefront-product__copy">
+          <p class="storefront-product__category">{{ product.category || 'Product' }}</p>
+          <h1>{{ product.name }}</h1>
+
+          <div class="storefront-product__pricing">
+            <strong>{{ product.price | currency:'USD':'symbol':'1.0-2' }}</strong>
+            @if (product.compareAtPrice) {
+              <span>{{ product.compareAtPrice | currency:'USD':'symbol':'1.0-2' }}</span>
+            }
+          </div>
+
+          @if (product.description) {
+            <p class="storefront-product__description">{{ product.description }}</p>
+          }
+
+          <dl class="storefront-product__facts">
+            <div>
+              <dt>Type</dt>
+              <dd>{{ product.productType || 'PHYSICAL' }}</dd>
+            </div>
+            <div>
+              <dt>Availability</dt>
+              <dd>{{ product.inventoryQuantity }} in stock</dd>
+            </div>
+            @if (product.sku) {
+              <div>
+                <dt>SKU</dt>
+                <dd>{{ product.sku }}</dd>
+              </div>
+            }
+          </dl>
+
+          @if (product.tags.length) {
+            <div class="storefront-product__tags">
+              @for (tag of product.tags; track tag) {
+                <span>{{ tag }}</span>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    </main>
+  </div>
+}
