@@ -29,7 +29,7 @@ export class ProjectHomeRoute {
   readonly errorMessage = signal('');
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.page()?.projectType));
   readonly metrics = computed(() => this.page()?.metrics ?? []);
-  readonly activities = computed(() => this.page()?.recentActivities ?? []);
+  readonly activities = computed(() => (this.page()?.recentActivities ?? []).slice(0, 5));
   readonly actions = computed(() => this.page()?.suggestedActions ?? []);
   readonly statusPills = computed(() => {
     const page = this.page();
