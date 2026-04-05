@@ -26,7 +26,6 @@ export type ProjectCardItem = {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-card.html',
-  styleUrl: './project-card.css',
 })
 export class ProjectCard {
   @Input({ required: true }) project!: ProjectCardItem;

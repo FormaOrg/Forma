@@ -33,7 +33,6 @@ interface ProjectHomeMetricCard {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-home-route.html',
-  styleUrl: './project-home-route.css',
 })
 export class ProjectHomeRoute {
   private readonly route = inject(ActivatedRoute);

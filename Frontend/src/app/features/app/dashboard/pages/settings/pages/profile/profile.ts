@@ -25,7 +25,6 @@ import { GoogleLinkOauthService } from '../../../../../../../core/services/googl
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, AppIcon, TranslatePipe],
   templateUrl: './profile.html',
-  styleUrl: './profile.css'
 })
 export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private fb = inject(FormBuilder);

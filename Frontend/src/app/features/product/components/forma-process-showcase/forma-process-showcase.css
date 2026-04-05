@@ -1,4 +1,4 @@
-:host {
+app-forma-process-showcase {
   display: block;
   width: 100%;
 }
@@ -7,7 +7,7 @@
    SECTION
    ========================================= */
 
-.forma-process {
+app-forma-process-showcase .forma-process {
   position: relative;
   z-index: 3;
   height: 340vh;
@@ -15,14 +15,14 @@
   overflow: clip;
 }
 
-.forma-process__sticky {
+app-forma-process-showcase .forma-process__sticky {
   position: sticky;
   top: 0;
   height: 100vh;
   overflow: hidden;
 }
 
-.forma-process__hero {
+app-forma-process-showcase .forma-process__hero {
   position: absolute;
   top: 7vh;
   left: 50%;
@@ -33,7 +33,7 @@
   pointer-events: none;
 }
 
-.forma-process__eyebrow {
+app-forma-process-showcase .forma-process__eyebrow {
   display: inline-flex;
   margin-bottom: 16px;
   padding: 8px 14px;
@@ -47,7 +47,7 @@
   color: #5e5a65;
 }
 
-.forma-process__title {
+app-forma-process-showcase .forma-process__title {
   margin: 0;
   margin-top: 120px;
   font-size: clamp(2.8rem, 6vw, 6rem);
@@ -56,7 +56,7 @@
   color: #111111;
 }
 
-.forma-process__title > span {
+app-forma-process-showcase .forma-process__title > span {
   background: linear-gradient(90deg, #5f4dff, #bab2ff);
   -webkit-background-clip: text;
   background-clip: text;
@@ -64,7 +64,7 @@
   color: transparent;
 }
 
-.forma-process__subtitle {
+app-forma-process-showcase .forma-process__subtitle {
   width: min(860px, 100%);
   margin: 22px auto 0;
   font-size: clamp(1rem, 1.4vw, 1.3rem);
@@ -76,7 +76,7 @@
    CANVAS
    ========================================= */
 
-.forma-canvas {
+app-forma-process-showcase .forma-canvas {
   --p: var(--progress, 0);
   --draft-v: var(--draft, 1);
   --structure-v: var(--structure, 0);
@@ -87,7 +87,7 @@
   height: 100%;
 }
 
-.forma-grid {
+app-forma-process-showcase .forma-grid {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -104,7 +104,7 @@
   );
 }
 
-.forma-stage-labels {
+app-forma-process-showcase .forma-stage-labels {
   position: absolute;
   top: 30px;
   left: 32px;
@@ -113,7 +113,7 @@
   gap: 8px;
 }
 
-.forma-stage-labels span {
+app-forma-process-showcase .forma-stage-labels span {
   padding: 9px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
@@ -127,7 +127,7 @@
     border-color 0.2s ease;
 }
 
-.forma-stage-labels span.is-active {
+app-forma-process-showcase .forma-stage-labels span.is-active {
   background: #111111;
   color: #ffffff;
   border-color: #111111;
@@ -137,14 +137,14 @@
    MOCKUP BASE
    ========================================= */
 
-.mockup {
+app-forma-process-showcase .mockup {
   position: absolute;
   border-radius: 28px;
   overflow: hidden;
   will-change: transform, opacity, filter;
 }
 
-.mockup--left {
+app-forma-process-showcase .mockup--left {
   left: 2%;
   bottom: -1%;
   width: 22%;
@@ -153,7 +153,7 @@
     rotate(calc(-1.4deg * (1 - var(--draft-v)))) scale(calc(0.94 + 0.06 * var(--polish-v)));
 }
 
-.mockup--center {
+app-forma-process-showcase .mockup--center {
   left: 24%;
   bottom: -2%;
   width: 52%;
@@ -162,7 +162,7 @@
     scale(calc(0.96 + 0.04 * var(--polish-v)));
 }
 
-.mockup--right {
+app-forma-process-showcase .mockup--right {
   right: 2%;
   bottom: 0%;
   width: 21%;
@@ -175,7 +175,7 @@
    OUTLINES / EDITOR STATE
    ========================================= */
 
-.editor-outline {
+app-forma-process-showcase .editor-outline {
   position: absolute;
   inset: 8px;
   border: 2px solid rgba(44, 66, 212, 0.85);
@@ -186,12 +186,12 @@
   transform: scale(calc(1 - 0.01 * var(--polish-v)));
 }
 
-.editor-outline--center {
+app-forma-process-showcase .editor-outline--center {
   inset: 42px 36px 130px 36px;
   border-radius: 12px;
 }
 
-.handle {
+app-forma-process-showcase .handle {
   position: absolute;
   width: 12px;
   height: 12px;
@@ -200,38 +200,38 @@
   border-radius: 999px;
 }
 
-.handle--tl {
+app-forma-process-showcase .handle--tl {
   top: -7px;
   left: -7px;
 }
-.handle--tr {
+app-forma-process-showcase .handle--tr {
   top: -7px;
   right: -7px;
 }
-.handle--bl {
+app-forma-process-showcase .handle--bl {
   bottom: -7px;
   left: -7px;
 }
-.handle--br {
+app-forma-process-showcase .handle--br {
   bottom: -7px;
   right: -7px;
 }
-.handle--tm {
+app-forma-process-showcase .handle--tm {
   top: -7px;
   left: 50%;
   transform: translateX(-50%);
 }
-.handle--bm {
+app-forma-process-showcase .handle--bm {
   bottom: -7px;
   left: 50%;
   transform: translateX(-50%);
 }
-.handle--ml {
+app-forma-process-showcase .handle--ml {
   top: 50%;
   left: -7px;
   transform: translateY(-50%);
 }
-.handle--mr {
+app-forma-process-showcase .handle--mr {
   top: 50%;
   right: -7px;
   transform: translateY(-50%);
@@ -241,19 +241,19 @@
    LAYER TRANSITION
    ========================================= */
 
-.draft-layer,
-.final-layer {
+app-forma-process-showcase .draft-layer,
+app-forma-process-showcase .final-layer {
   position: absolute;
   inset: 0;
 }
 
-.draft-layer {
+app-forma-process-showcase .draft-layer {
   opacity: calc(1 - var(--structure-v));
   filter: blur(calc(4px * var(--polish-v))) saturate(calc(0.5 + (0.22 * var(--structure-v))));
   transform: scale(calc(1 - 0.02 * var(--polish-v))) translateY(calc(-6px * var(--polish-v)));
 }
 
-.final-layer {
+app-forma-process-showcase .final-layer {
   opacity: calc(var(--structure-v) * 0.55 + var(--polish-v) * 0.45);
   filter: blur(calc(10px * (1 - var(--polish-v)))) saturate(calc(0.6 + 0.4 * var(--polish-v)));
   transform: scale(calc(0.975 + 0.025 * var(--polish-v)))
@@ -264,35 +264,35 @@
    DRAFT: LEFT
    ========================================= */
 
-.draft-topbar {
+app-forma-process-showcase .draft-topbar {
   display: flex;
   gap: 8px;
   padding: 16px 16px 8px;
 }
 
-.draft-pill {
+app-forma-process-showcase .draft-pill {
   width: 96px;
   height: 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.65);
 }
 
-.draft-pill.short {
+app-forma-process-showcase .draft-pill.short {
   width: 58px;
 }
 
-.draft-image {
+app-forma-process-showcase .draft-image {
   margin: 6px 16px 0;
   border-radius: 22px;
   background: linear-gradient(180deg, #88afd3 0%, #6f9bc3 60%, #6b88af 100%);
 }
 
-.draft-image--pear {
+app-forma-process-showcase .draft-image--pear {
   height: 62%;
   position: relative;
 }
 
-.draft-image--pear::before {
+app-forma-process-showcase .draft-image--pear::before {
   content: '';
   position: absolute;
   left: 18%;
@@ -307,7 +307,7 @@
     64px 6px 0 0 rgba(0, 0, 0, 0.04);
 }
 
-.draft-image--pear::after {
+app-forma-process-showcase .draft-image--pear::after {
   content: '';
   position: absolute;
   left: 22%;
@@ -319,21 +319,21 @@
   filter: blur(10px);
 }
 
-.draft-lines {
+app-forma-process-showcase .draft-lines {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 16px;
 }
 
-.draft-lines span {
+app-forma-process-showcase .draft-lines span {
   display: block;
   height: 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.42);
 }
 
-.draft-lines span.short {
+app-forma-process-showcase .draft-lines span.short {
   width: 62%;
 }
 
@@ -341,33 +341,33 @@
    DRAFT: CENTER
    ========================================= */
 
-.draft-center-top {
+app-forma-process-showcase .draft-center-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 18px 6px;
 }
 
-.draft-logo {
+app-forma-process-showcase .draft-logo {
   width: 42px;
   height: 20px;
   border-radius: 10px;
   background: rgba(255, 133, 48, 0.6);
 }
 
-.draft-mini-nav {
+app-forma-process-showcase .draft-mini-nav {
   display: flex;
   gap: 10px;
 }
 
-.draft-mini-nav span {
+app-forma-process-showcase .draft-mini-nav span {
   width: 44px;
   height: 10px;
   border-radius: 999px;
   background: rgba(255, 133, 48, 0.22);
 }
 
-.draft-title-box {
+app-forma-process-showcase .draft-title-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -375,63 +375,63 @@
   padding-top: 44px;
 }
 
-.draft-title {
+app-forma-process-showcase .draft-title {
   width: 36%;
   height: 58px;
   border-radius: 14px;
   background: rgba(255, 115, 36, 0.9);
 }
 
-.draft-subtitle {
+app-forma-process-showcase .draft-subtitle {
   width: 22%;
   height: 18px;
   border-radius: 999px;
   background: rgba(255, 115, 36, 0.42);
 }
 
-.draft-center-content {
+app-forma-process-showcase .draft-center-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   padding: 28px 22px 18px;
 }
 
-.draft-photo {
+app-forma-process-showcase .draft-photo {
   border-radius: 26px;
   min-height: 220px;
 }
 
-.draft-photo--hands {
+app-forma-process-showcase .draft-photo--hands {
   background: linear-gradient(180deg, #dddf94 0%, #d0d780 40%, #f0c426 40%, #d7a90a 100%);
 }
 
-.draft-photo--portrait {
+app-forma-process-showcase .draft-photo--portrait {
   background: linear-gradient(180deg, #d7b39f 0%, #d3a894 42%, #d88639 42%, #e77123 100%);
 }
 
-.draft-swatches {
+app-forma-process-showcase .draft-swatches {
   display: flex;
   justify-content: center;
   gap: 14px;
   padding-bottom: 20px;
 }
 
-.draft-swatches span {
+app-forma-process-showcase .draft-swatches span {
   width: 22px;
   height: 22px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.58);
 }
 
-.draft-swatches span:nth-child(2) {
+app-forma-process-showcase .draft-swatches span:nth-child(2) {
   background: rgba(100, 130, 255, 0.7);
 }
 
-.draft-swatches span:nth-child(3) {
+app-forma-process-showcase .draft-swatches span:nth-child(3) {
   background: rgba(255, 120, 50, 0.7);
 }
 
-.draft-swatches span:nth-child(4) {
+app-forma-process-showcase .draft-swatches span:nth-child(4) {
   background: rgba(255, 206, 55, 0.75);
 }
 
@@ -439,21 +439,21 @@
    DRAFT: RIGHT
    ========================================= */
 
-.draft-right-card {
+app-forma-process-showcase .draft-right-card {
   position: absolute;
   inset: 18px;
   border-radius: 28px;
   background: rgba(232, 245, 177, 0.85);
 }
 
-.draft-right-shape {
+app-forma-process-showcase .draft-right-shape {
   position: absolute;
   inset: 16px;
   border-radius: 46px;
   background: linear-gradient(180deg, #bad24e 0%, #b7cd51 100%);
 }
 
-.draft-mug {
+app-forma-process-showcase .draft-mug {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -468,7 +468,7 @@
     54px 8px 0 0 #2f53d4;
 }
 
-.draft-mug::before {
+app-forma-process-showcase .draft-mug::before {
   content: '';
   position: absolute;
   bottom: -18px;
@@ -479,7 +479,7 @@
   background: linear-gradient(180deg, #ef8a58 0%, #cb5339 100%);
 }
 
-.draft-play {
+app-forma-process-showcase .draft-play {
   position: absolute;
   left: 50%;
   top: 49%;
@@ -490,7 +490,7 @@
   background: rgba(255, 255, 255, 0.58);
 }
 
-.draft-play::before {
+app-forma-process-showcase .draft-play::before {
   content: '';
   position: absolute;
   left: 23px;
@@ -504,7 +504,7 @@
    FINAL CARDS
    ========================================= */
 
-.final-card {
+app-forma-process-showcase .final-card {
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(17, 17, 17, 0.05);
   box-shadow:
@@ -514,24 +514,24 @@
 
 /* LEFT FINAL */
 
-.final-card--left {
+app-forma-process-showcase .final-card--left {
   background: linear-gradient(180deg, #f1f0ee 0 16%, #d6ebef 16% 72%, #efd9b5 72% 100%);
 }
 
-.final-nav {
+app-forma-process-showcase .final-nav {
   display: flex;
   justify-content: center;
   gap: 18px;
   padding-top: 16px;
 }
 
-.final-nav a {
+app-forma-process-showcase .final-nav a {
   font-size: 12px;
   color: #ff5d1c;
   text-decoration: none;
 }
 
-.final-left-image {
+app-forma-process-showcase .final-left-image {
   position: absolute;
   inset: 56px 18px 18px;
   border-radius: 22px;
@@ -549,7 +549,7 @@
   overflow: hidden;
 }
 
-.final-left-image::before {
+app-forma-process-showcase .final-left-image::before {
   content: '';
   position: absolute;
   left: 18%;
@@ -561,7 +561,7 @@
   box-shadow: 78px -6px 0 0 #efd76c;
 }
 
-.final-left-image::after {
+app-forma-process-showcase .final-left-image::after {
   content: '';
   position: absolute;
   left: 26%;
@@ -575,18 +575,18 @@
 
 /* CENTER FINAL */
 
-.final-card--center {
+app-forma-process-showcase .final-card--center {
   background: #dde7a6;
 }
 
-.final-center-top {
+app-forma-process-showcase .final-center-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 20px 10px;
 }
 
-.final-brand-mark {
+app-forma-process-showcase .final-brand-mark {
   font-size: 36px;
   line-height: 1;
   font-weight: 700;
@@ -594,23 +594,23 @@
   color: #ff651f;
 }
 
-.final-center-nav {
+app-forma-process-showcase .final-center-nav {
   display: flex;
   gap: 18px;
 }
 
-.final-center-nav a {
+app-forma-process-showcase .final-center-nav a {
   text-decoration: none;
   font-size: 13px;
   color: #ff651f;
 }
 
-.final-brand-lockup {
+app-forma-process-showcase .final-brand-lockup {
   padding: 32px 22px 0;
   text-align: center;
 }
 
-.final-brand-lockup h2 {
+app-forma-process-showcase .final-brand-lockup h2 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 4.6rem);
   line-height: 0.95;
@@ -619,14 +619,14 @@
   color: #ff651f;
 }
 
-.final-brand-lockup p {
+app-forma-process-showcase .final-brand-lockup p {
   margin: 14px 0 0;
   font-size: 16px;
   letter-spacing: 0.06em;
   color: #ff651f;
 }
 
-.final-center-grid {
+app-forma-process-showcase .final-center-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
@@ -634,43 +634,43 @@
   align-items: end;
 }
 
-.final-center-image {
+app-forma-process-showcase .final-center-image {
   border-radius: 26px;
   min-height: 240px;
   box-shadow: 0 18px 35px rgba(17, 17, 17, 0.06);
 }
 
-.final-center-image--hands {
+app-forma-process-showcase .final-center-image--hands {
   background:
     radial-gradient(circle at 20% 15%, #2f38b8 0%, #2f38b8 18%, transparent 19%),
     linear-gradient(180deg, #f0c521 0%, #dca80b 100%);
 }
 
-.final-center-image--portrait {
+app-forma-process-showcase .final-center-image--portrait {
   background: linear-gradient(180deg, #dab39d 0%, #d1a28d 56%, #f1d7c6 56% 70%, #ef7b2f 70% 100%);
 }
 
 /* RIGHT FINAL */
 
-.final-card--right {
+app-forma-process-showcase .final-card--right {
   background: #f2f1ee;
 }
 
-.final-right-top {
+app-forma-process-showcase .final-right-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 18px 8px;
 }
 
-.final-menu-lines {
+app-forma-process-showcase .final-menu-lines {
   position: relative;
   width: 22px;
   height: 14px;
 }
 
-.final-menu-lines::before,
-.final-menu-lines::after {
+app-forma-process-showcase .final-menu-lines::before,
+app-forma-process-showcase .final-menu-lines::after {
   content: '';
   position: absolute;
   left: 0;
@@ -680,15 +680,15 @@
   background: #ff651f;
 }
 
-.final-menu-lines::before {
+app-forma-process-showcase .final-menu-lines::before {
   top: 2px;
 }
 
-.final-menu-lines::after {
+app-forma-process-showcase .final-menu-lines::after {
   bottom: 2px;
 }
 
-.final-product-card {
+app-forma-process-showcase .final-product-card {
   position: relative;
   height: calc(100% - 86px);
   margin: 0 16px;
@@ -696,14 +696,14 @@
   overflow: hidden;
 }
 
-.final-product-shape {
+app-forma-process-showcase .final-product-shape {
   position: absolute;
   inset: 0;
   border-radius: 48px;
   background: #b7cf4e;
 }
 
-.final-product-mug {
+app-forma-process-showcase .final-product-mug {
   position: absolute;
   left: 50%;
   top: 48%;
@@ -718,7 +718,7 @@
     54px 8px 0 0 #3552cf;
 }
 
-.final-product-mug::before {
+app-forma-process-showcase .final-product-mug::before {
   content: '';
   position: absolute;
   bottom: -18px;
@@ -729,37 +729,37 @@
   background: linear-gradient(180deg, #ef8c58 0%, #c74f37 100%);
 }
 
-.final-product-meta {
+app-forma-process-showcase .final-product-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px 14px;
 }
 
-.final-product-meta span {
+app-forma-process-showcase .final-product-meta span {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #a55430;
 }
 
-.final-product-dots {
+app-forma-process-showcase .final-product-dots {
   display: flex;
   gap: 7px;
 }
 
-.final-product-dots span {
+app-forma-process-showcase .final-product-dots span {
   width: 10px;
   height: 10px;
   border-radius: 999px;
   background: #3552cf;
 }
 
-.final-product-dots span:nth-child(2) {
+app-forma-process-showcase .final-product-dots span:nth-child(2) {
   background: #f58a56;
 }
 
-.final-product-dots span:nth-child(3) {
+app-forma-process-showcase .final-product-dots span:nth-child(3) {
   background: #d4edf3;
   border: 1px solid rgba(17, 17, 17, 0.12);
 }
@@ -768,7 +768,7 @@
    FLOATING CHIPS
    ========================================= */
 
-.floating-chip {
+app-forma-process-showcase .floating-chip {
   position: absolute;
   z-index: 4;
   padding: 10px 14px;
@@ -782,14 +782,14 @@
   pointer-events: none;
 }
 
-.floating-chip--ai {
+app-forma-process-showcase .floating-chip--ai {
   left: 3%;
   top: 53%;
   opacity: calc(1 - var(--structure-v));
   transform: translateY(calc(-10px * var(--p))) scale(calc(1 - 0.1 * var(--structure-v)));
 }
 
-.floating-chip--tag {
+app-forma-process-showcase .floating-chip--tag {
   right: 5%;
   top: 56%;
   opacity: calc(0.9 - var(--polish-v));
@@ -800,7 +800,7 @@
    GLOBAL REFINEMENT
    ========================================= */
 
-.mockup::after {
+app-forma-process-showcase .mockup::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -809,7 +809,7 @@
   opacity: calc(0.2 * var(--polish-v));
 }
 
-.mockup {
+app-forma-process-showcase .mockup {
   filter: saturate(calc(0.65 + 0.35 * var(--polish-v))) contrast(calc(0.9 + 0.1 * var(--polish-v)));
 }
 
@@ -818,69 +818,69 @@
    ========================================= */
 
 @media (max-width: 1200px) {
-  .mockup--left {
+  app-forma-process-showcase .mockup--left {
     width: 24%;
   }
 
-  .mockup--center {
+  app-forma-process-showcase .mockup--center {
     width: 48%;
     left: 26%;
   }
 
-  .mockup--right {
+  app-forma-process-showcase .mockup--right {
     width: 22%;
   }
 }
 
 @media (max-width: 980px) {
-  .forma-process {
+  app-forma-process-showcase .forma-process {
     height: 360vh;
   }
 
-  .forma-process__hero {
+  app-forma-process-showcase .forma-process__hero {
     top: 6vh;
   }
 
-  .mockup--left {
+  app-forma-process-showcase .mockup--left {
     left: 4%;
     width: 27%;
     height: 38%;
   }
 
-  .mockup--center {
+  app-forma-process-showcase .mockup--center {
     left: 18%;
     width: 64%;
     height: 42%;
   }
 
-  .mockup--right {
+  app-forma-process-showcase .mockup--right {
     right: 4%;
     width: 27%;
     height: 37%;
   }
 
-  .final-center-nav,
-  .final-nav,
-  .draft-mini-nav {
+  app-forma-process-showcase .final-center-nav,
+  app-forma-process-showcase .final-nav,
+  app-forma-process-showcase .draft-mini-nav {
     display: none;
   }
 }
 
 @media (max-width: 768px) {
-  .forma-process {
+  app-forma-process-showcase .forma-process {
     height: 420vh;
   }
 
-  .forma-process__title {
+  app-forma-process-showcase .forma-process__title {
     font-size: clamp(2.3rem, 10vw, 4.4rem);
   }
 
-  .forma-process__subtitle {
+  app-forma-process-showcase .forma-process__subtitle {
     font-size: 1rem;
     width: min(90%, 640px);
   }
 
-  .forma-stage-labels {
+  app-forma-process-showcase .forma-stage-labels {
     top: 18px;
     left: 16px;
     right: 16px;
@@ -888,66 +888,66 @@
     flex-wrap: wrap;
   }
 
-  .mockup--left {
+  app-forma-process-showcase .mockup--left {
     left: 4%;
     width: 34%;
     height: 34%;
     bottom: 8%;
   }
 
-  .mockup--center {
+  app-forma-process-showcase .mockup--center {
     left: 8%;
     width: 84%;
     height: 39%;
     bottom: 6%;
   }
 
-  .mockup--right {
+  app-forma-process-showcase .mockup--right {
     display: none;
   }
 
-  .floating-chip--tag {
+  app-forma-process-showcase .floating-chip--tag {
     display: none;
   }
 }
 
 @media (max-width: 560px) {
-  .forma-process {
+  app-forma-process-showcase .forma-process {
     height: 440vh;
   }
 
-  .forma-process__hero {
+  app-forma-process-showcase .forma-process__hero {
     width: calc(100% - 28px);
   }
 
-  .mockup--left {
+  app-forma-process-showcase .mockup--left {
     width: 38%;
     height: 28%;
     left: 2%;
     bottom: 7%;
   }
 
-  .mockup--center {
+  app-forma-process-showcase .mockup--center {
     width: 92%;
     left: 4%;
     height: 36%;
     bottom: 4%;
   }
 
-  .final-brand-lockup h2 {
+  app-forma-process-showcase .final-brand-lockup h2 {
     font-size: clamp(1.8rem, 9vw, 3rem);
   }
 
-  .final-center-image {
+  app-forma-process-showcase .final-center-image {
     min-height: 150px;
   }
 
-  .draft-title {
+  app-forma-process-showcase .draft-title {
     width: 54%;
     height: 42px;
   }
 
-  .draft-subtitle {
+  app-forma-process-showcase .draft-subtitle {
     width: 32%;
   }
 }

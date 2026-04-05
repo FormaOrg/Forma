@@ -1,8 +1,8 @@
-:host {
+app-project-sidebar {
   display: block;
 }
 
-.project-sidebar {
+app-project-sidebar .project-sidebar {
   --sb-header-h: 56px;
   --sb-row-h: 44px;
   --sb-pad-x: 14px;
@@ -36,15 +36,15 @@
   transition: width var(--sb-dur) var(--sb-ease);
 }
 
-.project-sidebar--collapsed {
+app-project-sidebar .project-sidebar--collapsed {
   width: 72px;
 }
 
-.project-sidebar--brandless {
+app-project-sidebar .project-sidebar--brandless {
   padding-top: var(--sb-header-h);
 }
 
-.project-sidebar__brand {
+app-project-sidebar .project-sidebar__brand {
   height: var(--sb-header-h);
   box-sizing: border-box;
   flex-shrink: 0;
@@ -56,7 +56,7 @@
   background: inherit;
 }
 
-.project-sidebar__mark {
+app-project-sidebar .project-sidebar__mark {
   width: 32px;
   height: 32px;
   flex: 0 0 32px;
@@ -69,14 +69,14 @@
   border: 1px solid rgba(117, 102, 255, 0.08);
 }
 
-.project-sidebar__mark img {
+app-project-sidebar .project-sidebar__mark img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
 }
 
-.project-sidebar__wordmark {
+app-project-sidebar .project-sidebar__wordmark {
   font-size: 18px;
   font-weight: 600;
   color: var(--sb-brand-wordmark);
@@ -90,19 +90,19 @@
     margin 0.2s ease;
 }
 
-.project-sidebar--collapsed .project-sidebar__brand {
+app-project-sidebar .project-sidebar--collapsed .project-sidebar__brand {
   justify-content: center;
   padding: 0;
   gap: 0;
 }
 
-.project-sidebar--collapsed .project-sidebar__wordmark {
+app-project-sidebar .project-sidebar--collapsed .project-sidebar__wordmark {
   max-width: 0;
   opacity: 0;
   margin: 0;
 }
 
-.project-sidebar__body {
+app-project-sidebar .project-sidebar__body {
   flex: 1;
   min-height: 0;
   overflow-x: hidden;
@@ -114,13 +114,13 @@
   gap: 18px;
 }
 
-.project-sidebar__top-action {
+app-project-sidebar .project-sidebar__top-action {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.project-sidebar__workspace-card {
+app-project-sidebar .project-sidebar__workspace-card {
   padding: 14px;
   border-radius: 14px;
   background: var(--sb-surface-soft);
@@ -130,47 +130,47 @@
   gap: 10px;
 }
 
-.project-sidebar__workspace-card--collapsed {
+app-project-sidebar .project-sidebar__workspace-card--collapsed {
   padding: 12px 10px;
   align-items: center;
 }
 
-.project-sidebar__workspace-card--complete {
+app-project-sidebar .project-sidebar__workspace-card--complete {
   background: #f6faf7;
   border-color: rgba(34, 160, 107, 0.12);
 }
 
-.project-sidebar__workspace-card--collapsed .project-sidebar__workspace-copy {
+app-project-sidebar .project-sidebar__workspace-card--collapsed .project-sidebar__workspace-copy {
   display: none;
 }
 
-.project-sidebar__workspace-copy {
+app-project-sidebar .project-sidebar__workspace-copy {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.project-sidebar__workspace-title,
-.project-sidebar__workspace-progress,
-.project-sidebar__workspace-id {
+app-project-sidebar .project-sidebar__workspace-title,
+app-project-sidebar .project-sidebar__workspace-progress,
+app-project-sidebar .project-sidebar__workspace-id {
   margin: 0;
 }
 
-.project-sidebar__workspace-title {
+app-project-sidebar .project-sidebar__workspace-title {
   color: var(--sb-text-strong);
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.3;
 }
 
-.project-sidebar__workspace-progress,
-.project-sidebar__workspace-id {
+app-project-sidebar .project-sidebar__workspace-progress,
+app-project-sidebar .project-sidebar__workspace-id {
   color: var(--sb-text-muted);
   font-size: 0.76rem;
   line-height: 1.4;
 }
 
-.project-sidebar__workspace-bar {
+app-project-sidebar .project-sidebar__workspace-bar {
   height: 6px;
   border-radius: 999px;
   overflow: hidden;
@@ -180,31 +180,31 @@
     height 180ms ease;
 }
 
-.project-sidebar__workspace-bar--hidden {
+app-project-sidebar .project-sidebar__workspace-bar--hidden {
   height: 0;
   opacity: 0;
 }
 
-.project-sidebar__workspace-bar-fill {
+app-project-sidebar .project-sidebar__workspace-bar-fill {
   display: block;
   height: 100%;
   border-radius: inherit;
   background: var(--sb-progress-fill);
 }
 
-.project-sidebar__nav {
+app-project-sidebar .project-sidebar__nav {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.project-sidebar__separator {
+app-project-sidebar .project-sidebar__separator {
   height: 1px;
   margin: 4px 6px 2px;
   background: var(--sb-border);
 }
 
-.project-sidebar__section-label {
+app-project-sidebar .project-sidebar__section-label {
   height: 20px;
   display: flex;
   align-items: flex-end;
@@ -212,7 +212,7 @@
   box-sizing: border-box;
 }
 
-.project-sidebar__section-label-text {
+app-project-sidebar .project-sidebar__section-label-text {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -222,11 +222,11 @@
   transition: opacity 0.2s ease;
 }
 
-.project-sidebar--collapsed .project-sidebar__section-label-text {
+app-project-sidebar .project-sidebar--collapsed .project-sidebar__section-label-text {
   opacity: 0;
 }
 
-.project-sidebar__list {
+app-project-sidebar .project-sidebar__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -235,11 +235,11 @@
   gap: 6px;
 }
 
-.project-sidebar__item {
+app-project-sidebar .project-sidebar__item {
   list-style: none;
 }
 
-.project-sidebar__row {
+app-project-sidebar .project-sidebar__row {
   position: relative;
   box-sizing: border-box;
   width: 100%;
@@ -262,15 +262,15 @@
     color 0.18s ease;
 }
 
-.project-sidebar__row--collapsed {
+app-project-sidebar .project-sidebar__row--collapsed {
   grid-template-columns: 1fr;
   column-gap: 0;
   padding: 0;
   justify-items: center;
 }
 
-.project-sidebar__row--collapsed .project-sidebar__label,
-.project-sidebar__row--collapsed .project-sidebar__row-pad {
+app-project-sidebar .project-sidebar__row--collapsed .project-sidebar__label,
+app-project-sidebar .project-sidebar__row--collapsed .project-sidebar__row-pad {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -282,7 +282,7 @@
   border: 0;
 }
 
-.project-sidebar__icon {
+app-project-sidebar .project-sidebar__icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,7 +292,7 @@
   transition: color 0.18s ease;
 }
 
-.project-sidebar__label {
+app-project-sidebar .project-sidebar__label {
   min-width: 0;
   font-size: 14px;
   font-weight: 500;
@@ -301,26 +301,26 @@
   color: inherit;
 }
 
-.project-sidebar__row-pad {
+app-project-sidebar .project-sidebar__row-pad {
   display: block;
 }
 
-.project-sidebar__row:hover:not(.project-sidebar__row--active) {
+app-project-sidebar .project-sidebar__row:hover:not(.project-sidebar__row--active) {
   background: var(--sb-hover-bg);
   color: var(--sb-hover-text);
 }
 
-.project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
+app-project-sidebar .project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
   color: var(--sb-hover-text);
 }
 
-.project-sidebar__row--active {
+app-project-sidebar .project-sidebar__row--active {
   background: var(--sb-active-bg);
   color: var(--sb-active-text);
   font-weight: 600;
 }
 
-.project-sidebar__footer {
+app-project-sidebar .project-sidebar__footer {
   flex-shrink: 0;
   padding: 14px var(--sb-pad-x) 16px;
   display: flex;
@@ -328,7 +328,7 @@
   gap: 12px;
 }
 
-.project-sidebar__row--footer {
+app-project-sidebar .project-sidebar__row--footer {
   margin-top: 2px;
   justify-self: center;
   width: calc(100% - 8px);
@@ -338,20 +338,20 @@
   margin-right: auto;
 }
 
-.project-sidebar--collapsed .project-sidebar__workspace-bar {
+app-project-sidebar .project-sidebar--collapsed .project-sidebar__workspace-bar {
   width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-sidebar,
-  .project-sidebar__wordmark,
-  .project-sidebar__row {
+  app-project-sidebar .project-sidebar,
+  app-project-sidebar .project-sidebar__wordmark,
+  app-project-sidebar .project-sidebar__row {
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
   }
 }
 
-:host-context(.theme-dark) .project-sidebar {
+.theme-dark app-project-sidebar .project-sidebar {
   --sb-brand-wordmark: #f4f7ff;
   --sb-text: rgba(219, 226, 242, 0.7);
   --sb-text-strong: #f4f7ff;
@@ -368,45 +368,45 @@
   border-right-color: var(--sb-border);
 }
 
-:host-context(.theme-dark) .project-sidebar__brand {
+.theme-dark app-project-sidebar .project-sidebar__brand {
   border-bottom-color: var(--sb-border);
 }
 
-:host-context(.theme-dark) .project-sidebar__mark {
+.theme-dark app-project-sidebar .project-sidebar__mark {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.06);
 }
 
-:host-context(.theme-dark) .project-sidebar__workspace-card {
+.theme-dark app-project-sidebar .project-sidebar__workspace-card {
   border-color: rgba(255, 255, 255, 0.06);
   background: #182131;
 }
 
-:host-context(.theme-dark) .project-sidebar__workspace-card--complete {
+.theme-dark app-project-sidebar .project-sidebar__workspace-card--complete {
   background: #16221e;
   border-color: rgba(34, 160, 107, 0.16);
 }
 
-:host-context(.theme-dark) .project-sidebar__workspace-title {
+.theme-dark app-project-sidebar .project-sidebar__workspace-title {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .project-sidebar__section-label-text {
+.theme-dark app-project-sidebar .project-sidebar__section-label-text {
   color: rgba(219, 226, 242, 0.46);
 }
 
-:host-context(.theme-dark) .project-sidebar__row {
+.theme-dark app-project-sidebar .project-sidebar__row {
   color: var(--sb-text);
 }
 
-:host-context(.theme-dark) .project-sidebar__row:hover:not(.project-sidebar__row--active) {
+.theme-dark app-project-sidebar .project-sidebar__row:hover:not(.project-sidebar__row--active) {
   color: var(--sb-hover-text);
 }
 
-:host-context(.theme-dark) .project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
+.theme-dark app-project-sidebar .project-sidebar__row:hover:not(.project-sidebar__row--active) .project-sidebar__icon {
   color: var(--sb-hover-text);
 }
 
-:host-context(.theme-dark) .project-sidebar__separator {
+.theme-dark app-project-sidebar .project-sidebar__separator {
   background: var(--sb-border);
 }

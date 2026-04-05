@@ -1,26 +1,26 @@
-:host {
+app-project-route-placeholder {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-.project-home,
-.project-setup,
-.project-placeholder {
+app-project-route-placeholder .project-home,
+app-project-route-placeholder .project-setup,
+app-project-route-placeholder .project-placeholder {
   max-width: 1400px;
   width: 100%;
   padding: 28px 32px 36px;
 }
 
-.project-home {
+app-project-route-placeholder .project-home {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.project-home__panel,
-.project-setup__panel,
-.project-placeholder__card {
+app-project-route-placeholder .project-home__panel,
+app-project-route-placeholder .project-setup__panel,
+app-project-route-placeholder .project-placeholder__card {
   padding: 18px 20px;
   border-radius: 16px;
   border: 1px solid rgba(215, 217, 223, 0.95);
@@ -30,19 +30,19 @@
     0 6px 18px rgba(17, 17, 17, 0.03);
 }
 
-.project-home__hero,
-.project-home__section-head,
-.project-home__activity-row,
-.project-setup__panel-header {
+app-project-route-placeholder .project-home__hero,
+app-project-route-placeholder .project-home__section-head,
+app-project-route-placeholder .project-home__activity-row,
+app-project-route-placeholder .project-setup__panel-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
 }
 
-.project-home__eyebrow,
-.project-setup__eyebrow,
-.project-placeholder__eyebrow {
+app-project-route-placeholder .project-home__eyebrow,
+app-project-route-placeholder .project-setup__eyebrow,
+app-project-route-placeholder .project-placeholder__eyebrow {
   margin: 0;
   font-size: 0.74rem;
   font-weight: 700;
@@ -51,11 +51,11 @@
   color: #7566ff;
 }
 
-.project-home__eyebrow {
+app-project-route-placeholder .project-home__eyebrow {
   margin-bottom: 4px;
 }
 
-.project-home__title {
+app-project-route-placeholder .project-home__title {
   margin: 0;
   font-size: 2rem;
   line-height: 1.05;
@@ -63,19 +63,19 @@
   color: #111111;
 }
 
-.project-home__title span {
+app-project-route-placeholder .project-home__title span {
   color: #7566ff;
 }
 
-.project-home__hero-action,
-.project-home__primary-cta,
-.project-home__ghost-cta,
-.project-home__activity-link,
-.project-home__section-link {
+app-project-route-placeholder .project-home__hero-action,
+app-project-route-placeholder .project-home__primary-cta,
+app-project-route-placeholder .project-home__ghost-cta,
+app-project-route-placeholder .project-home__activity-link,
+app-project-route-placeholder .project-home__section-link {
   text-decoration: none;
 }
 
-.project-home__hero-action {
+app-project-route-placeholder .project-home__hero-action {
   min-height: 40px;
   padding: 0 16px;
   border-radius: 999px;
@@ -89,14 +89,14 @@
   background: #ffffff;
 }
 
-.project-home__status {
+app-project-route-placeholder .project-home__status {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
 }
 
-.project-home__status-pill {
+app-project-route-placeholder .project-home__status-pill {
   min-height: 28px;
   padding: 0 10px;
   border-radius: 999px;
@@ -109,11 +109,11 @@
   color: rgba(11, 11, 18, 0.72);
 }
 
-.project-home__status-pill--accent {
+app-project-route-placeholder .project-home__status-pill--accent {
   color: #7566ff;
 }
 
-.project-home__section-title {
+app-project-route-placeholder .project-home__section-title {
   margin: 0;
   font-size: 1.35rem;
   line-height: 1.12;
@@ -121,27 +121,27 @@
   color: #111111;
 }
 
-.project-home__section-copy {
+app-project-route-placeholder .project-home__section-copy {
   margin: 6px 0 0;
   font-size: 0.82rem;
   line-height: 1.45;
   color: rgba(11, 11, 18, 0.64);
 }
 
-.project-home__section-link {
+app-project-route-placeholder .project-home__section-link {
   font-size: 0.78rem;
   font-weight: 600;
   color: #7566ff;
 }
 
-.project-home__stats-grid {
+app-project-route-placeholder .project-home__stats-grid {
   margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
-.project-home__stat-card {
+app-project-route-placeholder .project-home__stat-card {
   min-height: 112px;
   padding: 16px;
   border-radius: 14px;
@@ -152,42 +152,42 @@
   gap: 6px;
 }
 
-.project-home__stat-label,
-.project-home__stat-helper {
+app-project-route-placeholder .project-home__stat-label,
+app-project-route-placeholder .project-home__stat-helper {
   margin: 0;
 }
 
-.project-home__stat-label {
+app-project-route-placeholder .project-home__stat-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: rgba(11, 11, 18, 0.72);
 }
 
-.project-home__stat-value {
+app-project-route-placeholder .project-home__stat-value {
   font-size: 1.6rem;
   line-height: 1;
   color: #111111;
 }
 
-.project-home__stat-helper {
+app-project-route-placeholder .project-home__stat-helper {
   font-size: 0.76rem;
   color: rgba(11, 11, 18, 0.54);
 }
 
-.project-home__workspace {
+app-project-route-placeholder .project-home__workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.85fr);
   gap: 14px;
   align-items: start;
 }
 
-.project-home__panel--activity,
-.project-home__panel--suggested {
+app-project-route-placeholder .project-home__panel--activity,
+app-project-route-placeholder .project-home__panel--suggested {
   display: flex;
   flex-direction: column;
 }
 
-.project-home__activity-feature {
+app-project-route-placeholder .project-home__activity-feature {
   margin-top: 14px;
   padding: 26px 18px;
   border-radius: 16px;
@@ -200,32 +200,32 @@
   gap: 10px;
 }
 
-.project-home__activity-title,
-.project-home__activity-row-title,
-.project-home__suggested-title {
+app-project-route-placeholder .project-home__activity-title,
+app-project-route-placeholder .project-home__activity-row-title,
+app-project-route-placeholder .project-home__suggested-title {
   margin: 0;
   color: #111111;
 }
 
-.project-home__activity-title {
+app-project-route-placeholder .project-home__activity-title {
   font-size: 1.02rem;
   font-weight: 700;
 }
 
-.project-home__activity-copy,
-.project-home__activity-row-copy,
-.project-home__suggested-copy {
+app-project-route-placeholder .project-home__activity-copy,
+app-project-route-placeholder .project-home__activity-row-copy,
+app-project-route-placeholder .project-home__suggested-copy {
   margin: 0;
   color: rgba(11, 11, 18, 0.64);
 }
 
-.project-home__activity-copy {
+app-project-route-placeholder .project-home__activity-copy {
   max-width: 54ch;
   font-size: 0.82rem;
   line-height: 1.5;
 }
 
-.project-home__primary-cta {
+app-project-route-placeholder .project-home__primary-cta {
   min-height: 36px;
   padding: 0 16px;
   border-radius: 999px;
@@ -238,14 +238,14 @@
   font-weight: 600;
 }
 
-.project-home__activity-list {
+app-project-route-placeholder .project-home__activity-list {
   margin-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.project-home__activity-row {
+app-project-route-placeholder .project-home__activity-row {
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid rgba(225, 227, 236, 0.95);
@@ -253,7 +253,7 @@
   align-items: center;
 }
 
-.project-home__activity-dot {
+app-project-route-placeholder .project-home__activity-dot {
   width: 10px;
   height: 10px;
   border-radius: 999px;
@@ -261,7 +261,7 @@
   flex-shrink: 0;
 }
 
-.project-home__activity-body {
+app-project-route-placeholder .project-home__activity-body {
   min-width: 0;
   flex: 1;
   display: flex;
@@ -269,30 +269,30 @@
   gap: 4px;
 }
 
-.project-home__activity-row-title {
+app-project-route-placeholder .project-home__activity-row-title {
   font-size: 0.88rem;
   font-weight: 600;
 }
 
-.project-home__activity-row-copy {
+app-project-route-placeholder .project-home__activity-row-copy {
   font-size: 0.76rem;
   line-height: 1.45;
 }
 
-.project-home__activity-side {
+app-project-route-placeholder .project-home__activity-side {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
 }
 
-.project-home__activity-time {
+app-project-route-placeholder .project-home__activity-time {
   font-size: 0.72rem;
   color: rgba(11, 11, 18, 0.46);
 }
 
-.project-home__activity-link,
-.project-home__ghost-cta {
+app-project-route-placeholder .project-home__activity-link,
+app-project-route-placeholder .project-home__ghost-cta {
   min-height: 32px;
   padding: 0 12px;
   border-radius: 999px;
@@ -306,14 +306,14 @@
   background: #ffffff;
 }
 
-.project-home__suggested-list {
+app-project-route-placeholder .project-home__suggested-list {
   margin-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.project-home__suggested-card {
+app-project-route-placeholder .project-home__suggested-card {
   padding: 14px;
   border-radius: 14px;
   border: 1px solid rgba(225, 227, 236, 0.95);
@@ -324,7 +324,7 @@
   align-items: start;
 }
 
-.project-home__suggested-icon {
+app-project-route-placeholder .project-home__suggested-icon {
   width: 40px;
   height: 40px;
   border-radius: 12px;
@@ -334,58 +334,58 @@
   position: relative;
 }
 
-.project-home__suggested-icon::before,
-.project-home__suggested-icon::after {
+app-project-route-placeholder .project-home__suggested-icon::before,
+app-project-route-placeholder .project-home__suggested-icon::after {
   content: '';
   position: absolute;
   border-radius: 999px;
   background: rgba(117, 102, 255, 0.7);
 }
 
-.project-home__suggested-icon::before {
+app-project-route-placeholder .project-home__suggested-icon::before {
   width: 16px;
   height: 4px;
   top: 12px;
   left: 12px;
 }
 
-.project-home__suggested-icon::after {
+app-project-route-placeholder .project-home__suggested-icon::after {
   width: 22px;
   height: 4px;
   top: 21px;
   left: 9px;
 }
 
-.project-home__suggested-body {
+app-project-route-placeholder .project-home__suggested-body {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.project-home__suggested-title {
+app-project-route-placeholder .project-home__suggested-title {
   font-size: 0.88rem;
   font-weight: 600;
 }
 
-.project-home__suggested-copy {
+app-project-route-placeholder .project-home__suggested-copy {
   font-size: 0.76rem;
   line-height: 1.5;
 }
 
-.project-setup {
+app-project-route-placeholder .project-setup {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.project-setup__meta {
+app-project-route-placeholder .project-setup__meta {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
   margin-top: 2px;
 }
 
-.project-setup__meta-pill {
+app-project-route-placeholder .project-setup__meta-pill {
   display: inline-flex;
   align-items: center;
   min-height: 26px;
@@ -398,17 +398,17 @@
   color: rgba(11, 11, 18, 0.68);
 }
 
-.project-setup__panel {
+app-project-route-placeholder .project-setup__panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.project-setup__panel--skeleton .project-setup__task {
+app-project-route-placeholder .project-setup__panel--skeleton .project-setup__task {
   pointer-events: none;
 }
 
-.project-setup__skeleton {
+app-project-route-placeholder .project-setup__skeleton {
   display: block;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.18), rgba(117, 102, 255, 0.08));
@@ -416,85 +416,85 @@
   animation: project-home-page-shimmer 1.4s linear infinite;
 }
 
-.project-setup__skeleton--eyebrow {
+app-project-route-placeholder .project-setup__skeleton--eyebrow {
   width: 118px;
   height: 12px;
 }
 
-.project-setup__skeleton--title {
+app-project-route-placeholder .project-setup__skeleton--title {
   width: min(420px, 76%);
   height: 34px;
   border-radius: 12px;
 }
 
-.project-setup__skeleton--pill {
+app-project-route-placeholder .project-setup__skeleton--pill {
   width: 112px;
   height: 26px;
 }
 
-.project-setup__skeleton--label {
+app-project-route-placeholder .project-setup__skeleton--label {
   width: 104px;
   height: 12px;
 }
 
-.project-setup__skeleton--value {
+app-project-route-placeholder .project-setup__skeleton--value {
   width: 48px;
   height: 18px;
   border-radius: 8px;
 }
 
-.project-setup__skeleton--progress-fill {
+app-project-route-placeholder .project-setup__skeleton--progress-fill {
   width: 58%;
   height: 100%;
   border-radius: inherit;
 }
 
-.project-setup__skeleton--dot {
+app-project-route-placeholder .project-setup__skeleton--dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   flex-shrink: 0;
 }
 
-.project-setup__skeleton--task-title {
+app-project-route-placeholder .project-setup__skeleton--task-title {
   width: 42%;
   height: 14px;
   border-radius: 8px;
 }
 
-.project-setup__skeleton--task-status {
+app-project-route-placeholder .project-setup__skeleton--task-status {
   width: 88px;
   height: 22px;
 }
 
-.project-setup__skeleton--task-copy {
+app-project-route-placeholder .project-setup__skeleton--task-copy {
   width: 88%;
   height: 12px;
   border-radius: 8px;
 }
 
-.project-setup__skeleton--task-copy-short {
+app-project-route-placeholder .project-setup__skeleton--task-copy-short {
   width: 62%;
 }
 
-.project-setup__skeleton--task-action {
+app-project-route-placeholder .project-setup__skeleton--task-action {
   width: 92px;
   min-height: 32px;
   border-radius: 999px;
 }
 
-.project-setup__panel--primary {
+app-project-route-placeholder .project-setup__panel--primary {
   min-height: 100%;
 }
 
-.project-setup__panel-copy {
+app-project-route-placeholder .project-setup__panel-copy {
   display: flex;
   flex-direction: column;
   gap: 9px;
 }
 
-.project-setup__title,
-.project-placeholder__title {
+app-project-route-placeholder .project-setup__title,
+app-project-route-placeholder .project-placeholder__title {
   margin: 0;
   font-size: 1.36rem;
   line-height: 1.12;
@@ -502,8 +502,8 @@
   color: #111111;
 }
 
-.project-setup__copy,
-.project-placeholder__copy {
+app-project-route-placeholder .project-setup__copy,
+app-project-route-placeholder .project-placeholder__copy {
   margin: 0;
   max-width: 62ch;
   font-size: 0.84rem;
@@ -511,7 +511,7 @@
   color: rgba(11, 11, 18, 0.72);
 }
 
-.project-placeholder__card {
+app-project-route-placeholder .project-placeholder__card {
   min-height: 320px;
   display: flex;
   flex-direction: column;
@@ -519,14 +519,14 @@
   gap: 12px;
 }
 
-.project-setup__progress {
+app-project-route-placeholder .project-setup__progress {
   min-width: 184px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.project-setup__progress-summary {
+app-project-route-placeholder .project-setup__progress-summary {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(117, 102, 255, 0.14);
@@ -537,40 +537,40 @@
   gap: 12px;
 }
 
-.project-setup__progress-label {
+app-project-route-placeholder .project-setup__progress-label {
   font-size: 0.74rem;
   font-weight: 600;
   color: rgba(11, 11, 18, 0.64);
 }
 
-.project-setup__progress strong {
+app-project-route-placeholder .project-setup__progress strong {
   font-size: 1rem;
   line-height: 1;
   color: #111111;
 }
 
-.project-setup__progress-bar {
+app-project-route-placeholder .project-setup__progress-bar {
   height: 6px;
   border-radius: 999px;
   background: rgba(117, 102, 255, 0.12);
   overflow: hidden;
 }
 
-.project-setup__progress-bar-fill {
+app-project-route-placeholder .project-setup__progress-bar-fill {
   display: block;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #7566ff, #5aa6ff);
 }
 
-.project-setup__tasks {
+app-project-route-placeholder .project-setup__tasks {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: 8px;
 }
 
-.project-setup__task {
+app-project-route-placeholder .project-setup__task {
   border: 1px solid rgba(225, 227, 236, 0.95);
   border-radius: 12px;
   padding: 15px 16px;
@@ -586,32 +586,32 @@
     box-shadow 160ms ease;
 }
 
-.project-setup__task--active {
+app-project-route-placeholder .project-setup__task--active {
   border-color: rgba(117, 102, 255, 0.45);
   background: linear-gradient(180deg, rgba(117, 102, 255, 0.04), rgba(255, 255, 255, 1));
   box-shadow: 0 10px 24px rgba(117, 102, 255, 0.06);
 }
 
-.project-setup__task:hover {
+app-project-route-placeholder .project-setup__task:hover {
   border-color: rgba(117, 102, 255, 0.2);
   transform: translateY(-1px);
 }
 
-.project-setup__task-copy {
+app-project-route-placeholder .project-setup__task-copy {
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.project-setup__task-title-row {
+app-project-route-placeholder .project-setup__task-title-row {
   display: flex;
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
 }
 
-.project-setup__task-dot {
+app-project-route-placeholder .project-setup__task-dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -619,24 +619,24 @@
   flex-shrink: 0;
 }
 
-.project-setup__task--done .project-setup__task-dot {
+app-project-route-placeholder .project-setup__task--done .project-setup__task-dot {
   background: #22a06b;
 }
 
-.project-setup__task-title {
+app-project-route-placeholder .project-setup__task-title {
   margin: 0;
   font-size: 0.86rem;
   font-weight: 600;
   color: #111111;
 }
 
-.project-setup__task-title--done {
+app-project-route-placeholder .project-setup__task-title--done {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
   text-decoration-color: rgba(29, 138, 93, 0.7);
 }
 
-.project-setup__task-status {
+app-project-route-placeholder .project-setup__task-status {
   display: inline-flex;
   align-items: center;
   min-height: 22px;
@@ -650,20 +650,20 @@
   color: #f08a00;
 }
 
-.project-setup__task-description {
+app-project-route-placeholder .project-setup__task-description {
   margin: 0;
   font-size: 0.76rem;
   line-height: 1.42;
   color: rgba(11, 11, 18, 0.62);
 }
 
-.project-setup__task-description--done {
+app-project-route-placeholder .project-setup__task-description--done {
   text-decoration: line-through;
   text-decoration-thickness: 1px;
   text-decoration-color: rgba(29, 138, 93, 0.55);
 }
 
-.project-setup__task-action {
+app-project-route-placeholder .project-setup__task-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -684,145 +684,145 @@
     color 160ms ease;
 }
 
-.project-setup__task-action:hover {
+app-project-route-placeholder .project-setup__task-action:hover {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.34);
 }
 
-.project-setup__task-action--done {
+app-project-route-placeholder .project-setup__task-action--done {
   border-color: rgba(34, 160, 107, 0.18);
   color: #1d8a5d;
   background: rgba(34, 160, 107, 0.06);
 }
 
-:host-context(.theme-dark) .project-home__panel,
-:host-context(.theme-dark) .project-placeholder__card {
+.theme-dark app-project-route-placeholder .project-home__panel,
+.theme-dark app-project-route-placeholder .project-placeholder__card {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;
   box-shadow: none;
 }
 
-:host-context(.theme-dark) .project-setup__panel,
-:host-context(.theme-dark) .project-setup__task {
+.theme-dark app-project-route-placeholder .project-setup__panel,
+.theme-dark app-project-route-placeholder .project-setup__task {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;
   box-shadow: none;
 }
 
-:host-context(.theme-dark) .project-setup__skeleton {
+.theme-dark app-project-route-placeholder .project-setup__skeleton {
   background: linear-gradient(90deg, rgba(33, 40, 56, 0.95) 0%, rgba(42, 50, 69, 1) 50%, rgba(33, 40, 56, 0.95) 100%);
   background-size: 220% 100%;
 }
 
-:host-context(.theme-dark) .project-home__title,
-:host-context(.theme-dark) .project-home__section-title,
-:host-context(.theme-dark) .project-home__activity-title,
-:host-context(.theme-dark) .project-home__activity-row-title,
-:host-context(.theme-dark) .project-home__suggested-title,
-:host-context(.theme-dark) .project-home__stat-value,
-:host-context(.theme-dark) .project-setup__title,
-:host-context(.theme-dark) .project-placeholder__title {
+.theme-dark app-project-route-placeholder .project-home__title,
+.theme-dark app-project-route-placeholder .project-home__section-title,
+.theme-dark app-project-route-placeholder .project-home__activity-title,
+.theme-dark app-project-route-placeholder .project-home__activity-row-title,
+.theme-dark app-project-route-placeholder .project-home__suggested-title,
+.theme-dark app-project-route-placeholder .project-home__stat-value,
+.theme-dark app-project-route-placeholder .project-setup__title,
+.theme-dark app-project-route-placeholder .project-placeholder__title {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .project-home__status-pill,
-:host-context(.theme-dark) .project-home__stat-card,
-:host-context(.theme-dark) .project-home__activity-row,
-:host-context(.theme-dark) .project-home__suggested-card {
+.theme-dark app-project-route-placeholder .project-home__status-pill,
+.theme-dark app-project-route-placeholder .project-home__stat-card,
+.theme-dark app-project-route-placeholder .project-home__activity-row,
+.theme-dark app-project-route-placeholder .project-home__suggested-card {
   background: #171e2a;
   border-color: rgba(226, 231, 244, 0.1);
 }
 
-:host-context(.theme-dark) .project-home__activity-feature {
+.theme-dark app-project-route-placeholder .project-home__activity-feature {
   background: linear-gradient(180deg, #1a2231, #151c29);
   border-color: rgba(226, 231, 244, 0.1);
 }
 
-:host-context(.theme-dark) .project-home__section-copy,
-:host-context(.theme-dark) .project-home__stat-label,
-:host-context(.theme-dark) .project-home__stat-helper,
-:host-context(.theme-dark) .project-home__activity-copy,
-:host-context(.theme-dark) .project-home__activity-row-copy,
-:host-context(.theme-dark) .project-home__suggested-copy,
-:host-context(.theme-dark) .project-home__activity-time,
-:host-context(.theme-dark) .project-home__status-pill,
-:host-context(.theme-dark) .project-setup__copy,
-:host-context(.theme-dark) .project-setup__task-description,
-:host-context(.theme-dark) .project-placeholder__copy {
+.theme-dark app-project-route-placeholder .project-home__section-copy,
+.theme-dark app-project-route-placeholder .project-home__stat-label,
+.theme-dark app-project-route-placeholder .project-home__stat-helper,
+.theme-dark app-project-route-placeholder .project-home__activity-copy,
+.theme-dark app-project-route-placeholder .project-home__activity-row-copy,
+.theme-dark app-project-route-placeholder .project-home__suggested-copy,
+.theme-dark app-project-route-placeholder .project-home__activity-time,
+.theme-dark app-project-route-placeholder .project-home__status-pill,
+.theme-dark app-project-route-placeholder .project-setup__copy,
+.theme-dark app-project-route-placeholder .project-setup__task-description,
+.theme-dark app-project-route-placeholder .project-placeholder__copy {
   color: rgba(226, 231, 244, 0.68);
 }
 
-:host-context(.theme-dark) .project-home__hero-action,
-:host-context(.theme-dark) .project-home__activity-link,
-:host-context(.theme-dark) .project-home__ghost-cta,
-:host-context(.theme-dark) .project-setup__task-action {
+.theme-dark app-project-route-placeholder .project-home__hero-action,
+.theme-dark app-project-route-placeholder .project-home__activity-link,
+.theme-dark app-project-route-placeholder .project-home__ghost-cta,
+.theme-dark app-project-route-placeholder .project-setup__task-action {
   background: rgba(255, 255, 255, 0.03);
 }
 
-:host-context(.theme-dark) .project-setup__meta-pill {
+.theme-dark app-project-route-placeholder .project-setup__meta-pill {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(117, 102, 255, 0.14);
   color: rgba(226, 231, 244, 0.7);
 }
 
-:host-context(.theme-dark) .project-setup__progress-summary {
+.theme-dark app-project-route-placeholder .project-setup__progress-summary {
   background: rgba(117, 102, 255, 0.08);
   border-color: rgba(117, 102, 255, 0.18);
 }
 
-:host-context(.theme-dark) .project-setup__progress-label {
+.theme-dark app-project-route-placeholder .project-setup__progress-label {
   color: rgba(226, 231, 244, 0.68);
 }
 
-:host-context(.theme-dark) .project-setup__task-title {
+.theme-dark app-project-route-placeholder .project-setup__task-title {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .project-setup__task--active {
+.theme-dark app-project-route-placeholder .project-setup__task--active {
   background: linear-gradient(180deg, rgba(117, 102, 255, 0.1), rgba(23, 30, 42, 1));
 }
 
-:host-context(.theme-dark) .project-setup__task-action--done {
+.theme-dark app-project-route-placeholder .project-setup__task-action--done {
   background: rgba(34, 160, 107, 0.12);
   border-color: rgba(34, 160, 107, 0.2);
   color: #7fe2af;
 }
 
 @media (max-width: 900px) {
-  .project-home__workspace {
+  app-project-route-placeholder .project-home__workspace {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .project-home,
-  .project-setup,
-  .project-placeholder {
+  app-project-route-placeholder .project-home,
+  app-project-route-placeholder .project-setup,
+  app-project-route-placeholder .project-placeholder {
     padding: 18px 14px 20px;
   }
 
-  .project-home__hero,
-  .project-home__section-head,
-  .project-home__activity-row,
-  .project-setup__panel-header,
-  .project-setup__task {
+  app-project-route-placeholder .project-home__hero,
+  app-project-route-placeholder .project-home__section-head,
+  app-project-route-placeholder .project-home__activity-row,
+  app-project-route-placeholder .project-setup__panel-header,
+  app-project-route-placeholder .project-setup__task {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .project-home__stats-grid {
+  app-project-route-placeholder .project-home__stats-grid {
     grid-template-columns: 1fr;
   }
 
-  .project-home__activity-side {
+  app-project-route-placeholder .project-home__activity-side {
     align-items: stretch;
   }
 
-  .project-setup__progress {
+  app-project-route-placeholder .project-setup__progress {
     min-width: 0;
   }
 
-  .project-setup__task-action {
+  app-project-route-placeholder .project-setup__task-action {
     width: 100%;
     justify-content: center;
   }

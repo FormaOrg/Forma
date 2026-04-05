@@ -24,7 +24,6 @@ type CatalogStatusFilter = 'ALL' | ProjectCatalogStatus;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './project-catalog-route.html',
-  styleUrl: './project-catalog-route.css',
 })
 export class ProjectCatalogRoute {
   private static readonly editorTransitionMs = 220;

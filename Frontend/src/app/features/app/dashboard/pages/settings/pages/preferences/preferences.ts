@@ -14,7 +14,6 @@ import { AuthService } from '../../../../../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './preferences.html',
-  styleUrl: './preferences.css'
 })
 export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;

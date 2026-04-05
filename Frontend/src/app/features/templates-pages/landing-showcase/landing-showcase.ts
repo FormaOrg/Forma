@@ -14,7 +14,6 @@ import { Header } from '../../../shared/header/header';
     Footer,
   ],
   templateUrl: './landing-showcase.html',
-  styleUrl: './landing-showcase.css',
 })
 export class LandingShowcase {
   readonly jumpLinks = [

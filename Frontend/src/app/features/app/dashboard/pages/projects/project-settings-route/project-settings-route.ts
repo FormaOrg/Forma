@@ -32,7 +32,6 @@ type SettingsFormValue = {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './project-settings-route.html',
-  styleUrl: './project-settings-route.css',
 })
 export class ProjectSettingsRoute {
   private readonly route = inject(ActivatedRoute);
