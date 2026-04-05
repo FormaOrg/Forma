@@ -13,6 +13,7 @@
             <div class="project-home-page__skeleton project-home-page__skeleton--pill project-home-page__skeleton--pill-wide"></div>
           </div>
         </div>
+        <div class="project-home-page__skeleton project-home-page__skeleton--hero-action"></div>
       </section>
 
       <section class="project-home-page__metrics">
@@ -87,11 +88,9 @@
   } @else if (page(); as page) {
     <section class="project-home-page__hero project-home-page__panel">
       <div class="project-home-page__hero-copy">
-        <p class="project-home-page__eyebrow">Project workspace</p>
-        <h1 class="project-home-page__title">Welcome back, <span>{{ page.ownerName }}</span>.</h1>
-        <p class="project-home-page__subtitle">
-          {{ workspaceConfig().homeSubtitle }}
-        </p>
+        <p class="project-home-page__eyebrow">{{ heroEyebrow() }}</p>
+        <h1 class="project-home-page__title">{{ heroTitle() }}</h1>
+        <p class="project-home-page__subtitle">{{ heroSubtitle() }}</p>
         <div class="project-home-page__status project-home-page__status--hero">
           @for (item of statusPills(); track item.label) {
             <span class="project-home-page__status-pill" [class.project-home-page__status-pill--accent]="item.accent">
@@ -100,28 +99,63 @@
           }
         </div>
       </div>
+      @if (heroAction(); as heroAction) {
+        <a class="project-home-page__hero-action" [routerLink]="heroAction.route">
+          {{ heroAction.label }}
+        </a>
+      }
     </section>
 
     <section class="project-home-page__metrics">
-      @for (metric of metrics(); track metric.label) {
-        <article class="project-home-page__metric project-home-page__panel" [class]="'project-home-page__metric--tone-' + ($index === 0 ? 'violet' : $index === 1 ? 'blue' : $index === 2 ? 'mint' : 'amber')">
+      @for (metric of displayMetricCards(); track metric.label) {
+        <article class="project-home-page__metric project-home-page__panel" [class]="'project-home-page__metric--tone-' + metric.tone">
           <div class="project-home-page__metric-top">
             <span class="project-home-page__metric-icon" aria-hidden="true">
-              @switch ($index) {
-                @case (0) {
+              @switch (metric.icon) {
+                @case ('pages') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="5" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="13" y="5" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="4" y="13" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="13" y="13" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                }
+                @case ('media') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case ('audience') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="9" cy="9" r="2.7" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M4.5 18C5.1 15.9 6.95 14.5 9.15 14.5H9.85C12.05 14.5 13.9 15.9 14.5 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <circle cx="16.75" cy="10" r="2.1" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M14.8 18C15.2 16.45 16.5 15.35 18.05 15.35H18.35C19.9 15.35 21.2 16.45 21.6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('sections') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="5" width="16" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="4" y="10.5" width="12" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="4" y="16" width="9" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                }
+                @case ('catalog') {
                   <svg viewBox="0 0 24 24" fill="none">
                     <path d="M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2Z" stroke="currentColor" stroke-width="1.8"/>
                     <path d="M2 12H22" stroke="currentColor" stroke-width="1.8"/>
                     <path d="M12 2C14.5 4.7 16 8.2 16 12C16 15.8 14.5 19.3 12 22C9.5 19.3 8 15.8 8 12C8 8.2 9.5 4.7 12 2Z" stroke="currentColor" stroke-width="1.8"/>
                   </svg>
                 }
-                @case (1) {
+                @case ('customer') {
                   <svg viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
                     <path d="M8 12L10.8 14.8L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 }
-                @case (2) {
+                @case ('order') {
                   <svg viewBox="0 0 24 24" fill="none">
                     <path d="M7 3H14L19 8V21H7V3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                     <path d="M14 3V8H19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
@@ -129,7 +163,7 @@
                     <path d="M10 16H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                   </svg>
                 }
-                @default {
+                @case ('revenue') {
                   <svg viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
                     <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -151,27 +185,58 @@
       <article class="project-home-page__panel">
         <div class="project-home-page__section-head">
           <div>
-            <h2>Recent activity</h2>
-            <p>{{ workspaceConfig().activityDescription }}</p>
+            <h2>{{ activityHeading() }}</h2>
+            <p>{{ activityDescription() }}</p>
           </div>
           <a class="project-home-page__view-all" [routerLink]="['/app/projects', page.projectId, workspaceConfig().activityLinkPath]">
             {{ workspaceConfig().activityLinkLabel }}
           </a>
         </div>
 
-        @if (activities().length) {
+        @if (displayActivities().length) {
           <div class="project-home-page__activity-list">
-            @for (activity of activities(); track activity.title + activity.occurredAt) {
+            @for (activity of displayActivities(); track activity.title + activity.occurredAt) {
               <a class="project-home-page__activity-row" [routerLink]="activity.route">
                 <span
                   class="project-home-page__activity-icon"
-                  [class.project-home-page__activity-icon--catalog]="activityTone(activity.title) === 'catalog'"
-                  [class.project-home-page__activity-icon--customer]="activityTone(activity.title) === 'customer'"
-                  [class.project-home-page__activity-icon--order]="activityTone(activity.title) === 'order'"
-                  [class.project-home-page__activity-icon--project]="activityTone(activity.title) === 'project'"
+                  [class.project-home-page__activity-icon--page]="activityTone(activity) === 'page'"
+                  [class.project-home-page__activity-icon--media]="activityTone(activity) === 'media'"
+                  [class.project-home-page__activity-icon--audience]="activityTone(activity) === 'audience'"
+                  [class.project-home-page__activity-icon--launch]="activityTone(activity) === 'launch'"
+                  [class.project-home-page__activity-icon--catalog]="activityTone(activity) === 'catalog'"
+                  [class.project-home-page__activity-icon--customer]="activityTone(activity) === 'customer'"
+                  [class.project-home-page__activity-icon--order]="activityTone(activity) === 'order'"
+                  [class.project-home-page__activity-icon--project]="activityTone(activity) === 'project'"
                   aria-hidden="true"
                 >
-                  @switch (activityTone(activity.title)) {
+                  @switch (activityTone(activity)) {
+                    @case ('page') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('media') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                        <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @case ('audience') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 6.5H19V17.5H5V6.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M7 9L12 12.5L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @case ('launch') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      </svg>
+                    }
                     @case ('catalog') {
                       <svg viewBox="0 0 24 24" fill="none">
                         <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
@@ -227,22 +292,45 @@
         <div class="project-home-page__section-head">
           <div>
             <h2>Suggested next steps</h2>
-            <p>Actions derived from the current persisted state of this project.</p>
+            <p>{{ suggestedDescription() }}</p>
           </div>
         </div>
 
         <div class="project-home-page__suggested-list">
-          @for (action of actions(); track action.title) {
+          @for (action of displayActions(); track action.title) {
             <article class="project-home-page__suggested-card">
               <div
                 class="project-home-page__suggested-icon"
-                [class.project-home-page__suggested-icon--setup]="suggestedActionTone(action.title) === 'setup'"
-                [class.project-home-page__suggested-icon--catalog]="suggestedActionTone(action.title) === 'catalog'"
-                [class.project-home-page__suggested-icon--customer]="suggestedActionTone(action.title) === 'customer'"
-                [class.project-home-page__suggested-icon--launch]="suggestedActionTone(action.title) === 'launch'"
+                [class.project-home-page__suggested-icon--page]="suggestedActionTone(action) === 'page'"
+                [class.project-home-page__suggested-icon--media]="suggestedActionTone(action) === 'media'"
+                [class.project-home-page__suggested-icon--audience]="suggestedActionTone(action) === 'audience'"
+                [class.project-home-page__suggested-icon--setup]="suggestedActionTone(action) === 'setup'"
+                [class.project-home-page__suggested-icon--catalog]="suggestedActionTone(action) === 'catalog'"
+                [class.project-home-page__suggested-icon--customer]="suggestedActionTone(action) === 'customer'"
+                [class.project-home-page__suggested-icon--launch]="suggestedActionTone(action) === 'launch'"
                 aria-hidden="true"
               >
-                @switch (suggestedActionTone(action.title)) {
+                @switch (suggestedActionTone(action)) {
+                  @case ('page') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('media') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                      <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
+                  @case ('audience') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M5 6.5H19V17.5H5V6.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M7 9L12 12.5L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
                   @case ('catalog') {
                     <svg viewBox="0 0 24 24" fill="none">
                       <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />

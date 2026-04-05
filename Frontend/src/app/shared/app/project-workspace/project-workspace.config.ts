@@ -84,11 +84,11 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
     defaultPath: 'home',
     setupTitle: "Let's set up your portfolio",
     homeSubtitle: 'Shape your pages, media, and personal brand presentation from one workspace.',
-    heroActionLabel: 'Edit portfolio',
-    heroActionPath: 'editor',
+    heroActionLabel: 'Review pages',
+    heroActionPath: 'pages',
     activityDescription: 'Recent page changes, media updates, and publishing tasks for this portfolio.',
-    activityLinkLabel: 'Open editor',
-    activityLinkPath: 'editor',
+    activityLinkLabel: 'Review pages',
+    activityLinkPath: 'pages',
     emptyActivityDescription:
       'As soon as you update your portfolio pages, media, or launch settings, activity will appear here.',
     placeholderDescription:
