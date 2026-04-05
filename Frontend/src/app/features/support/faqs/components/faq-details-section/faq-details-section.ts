@@ -34,7 +34,6 @@ const COLOR_MAP: Record<string, string> = {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './faq-details-section.html',
-  styleUrls: ['./faq-details-section.css']
 })
 export class FaqDetailsSection implements AfterViewInit {
   @ViewChildren('faqSection') faqSections!: QueryList<ElementRef<HTMLElement>>;

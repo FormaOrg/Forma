@@ -1,13 +1,13 @@
 /* Security question selects — width + ellipsis */
-.security-question-select.form-input,
-.security-question-select {
+app-settings-security .security-question-select.form-input,
+app-settings-security .security-question-select {
   padding-right: 40px !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.security-question-select {
+app-settings-security .security-question-select {
   width: 400px;
   min-width: 220px;
   max-width: 100%;
@@ -15,24 +15,24 @@
   padding-right: 80px !important;
 }
 
-.security-question-select option {
+app-settings-security .security-question-select option {
   padding-right: 40px;
 }
 
-:host {
+app-settings-security {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-.profile-container {
+app-settings-security .profile-container {
   width: 100%;
   max-width: 920px;
   margin: 0;
   padding: 18px 16px 40px;
 }
 
-.profile-header {
+app-settings-security .profile-header {
   margin: 0 0 20px;
   padding: 0 4px;
   position: relative;
@@ -40,11 +40,11 @@
   background: transparent;
 }
 
-.profile-header__text {
+app-settings-security .profile-header__text {
   min-width: 0;
 }
 
-.profile-title {
+app-settings-security .profile-title {
   font-size: 28px;
   font-weight: 700;
   color: #0b0b12;
@@ -52,25 +52,25 @@
   letter-spacing: -0.02em;
 }
 
-.profile-subtitle {
+app-settings-security .profile-subtitle {
   font-size: 14px;
   color: rgba(11, 11, 18, 0.74);
   margin: 0;
 }
 
-.profile-form {
+app-settings-security .profile-form {
   display: flex;
   flex-direction: column;
   gap: 26px;
 }
 
-.profile-section {
+app-settings-security .profile-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.section-title {
+app-settings-security .section-title {
   font-size: 13px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.82);
@@ -79,7 +79,7 @@
   margin: 0;
 }
 
-.section-content {
+app-settings-security .section-content {
   padding: 20px;
   background: #ffffff;
   border: 1px solid rgba(215, 217, 223, 0.95);
@@ -92,7 +92,7 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
-:host-context(.theme-dark) .section-content {
+.theme-dark app-settings-security .section-content {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
     #171e2a;
@@ -102,45 +102,45 @@
     0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
-.security-skeleton-line,
-.security-skeleton-box {
+app-settings-security .security-skeleton-line,
+app-settings-security .security-skeleton-box {
   border-radius: 12px;
   background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
   background-size: 220% 100%;
   animation: securitySkeletonShimmer 1.25s linear infinite;
 }
 
-.security-skeleton-line {
+app-settings-security .security-skeleton-line {
   height: 13px;
 }
 
-.security-skeleton-line--label {
+app-settings-security .security-skeleton-line--label {
   width: 110px;
 }
 
-.security-skeleton-line--wide {
+app-settings-security .security-skeleton-line--wide {
   width: 100%;
   max-width: 440px;
 }
 
-.security-skeleton-grid {
+app-settings-security .security-skeleton-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-.security-skeleton-field {
+app-settings-security .security-skeleton-field {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.security-skeleton-box--input {
+app-settings-security .security-skeleton-box--input {
   width: 100%;
   height: 44px;
 }
 
-.security-skeleton-box--button {
+app-settings-security .security-skeleton-box--button {
   width: 150px;
   height: 44px;
   margin-left: auto;
@@ -151,39 +151,39 @@
   100% { background-position: -20% 0; }
 }
 
-.section-intro {
+app-settings-security .section-intro {
   margin: 0 0 -8px;
   font-size: 13px;
   line-height: 1.55;
   color: rgba(11, 11, 18, 0.62);
 }
 
-.form-row {
+app-settings-security .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
 @media (max-width: 640px) {
-  .form-row {
+  app-settings-security .form-row {
     grid-template-columns: 1fr;
   }
 }
 
-.form-group {
+app-settings-security .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-label {
+app-settings-security .form-label {
   font-size: 14px;
   font-weight: 600;
   color: rgba(11, 11, 18, 0.88);
 }
 
-.form-input,
-select {
+app-settings-security .form-input,
+app-settings-security select {
   padding: 10px 12px;
   border: 1px solid rgba(15, 23, 42, 0.14);
   border-radius: 12px;
@@ -195,34 +195,34 @@ select {
   transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
-.form-input:focus,
-select:focus {
+app-settings-security .form-input:focus,
+app-settings-security select:focus {
   outline: none;
   border-color: rgba(117, 102, 255, 0.65);
   box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.14);
 }
 
-.form-input--disabled {
+app-settings-security .form-input--disabled {
   background: rgba(15, 23, 42, 0.04);
   color: rgba(11, 11, 18, 0.58);
 }
 
-.form-input--error {
+app-settings-security .form-input--error {
   border-color: #ef4444;
 }
 
-.form-input--error:focus {
+app-settings-security .form-input--error:focus {
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
-.form-error {
+app-settings-security .form-error {
   font-size: 12px;
   color: #ef4444;
 }
 
-select,
-select.form-input,
-select.form-select {
+app-settings-security select,
+app-settings-security select.form-input,
+app-settings-security select.form-select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -233,16 +233,16 @@ select.form-select {
   padding-right: 16px !important;
 }
 
-select::-ms-expand {
+app-settings-security select::-ms-expand {
   display: none;
 }
 
 /* Password fields + eye toggle */
-.input-box {
+app-settings-security .input-box {
   position: relative;
 }
 
-.input-box input {
+app-settings-security .input-box input {
   width: 100%;
   padding: 12px 40px 12px 14px;
   border-radius: 12px;
@@ -255,23 +255,23 @@ select::-ms-expand {
   box-sizing: border-box;
 }
 
-.input-box input:focus {
+app-settings-security .input-box input:focus {
   border-color: rgba(117, 102, 255, 0.65);
   background: #fff;
   box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.14);
 }
 
-.input-box input::placeholder {
+app-settings-security .input-box input::placeholder {
   font-size: 13px;
   color: rgba(11, 11, 18, 0.4);
 }
 
-.input-box.invalid input {
+app-settings-security .input-box.invalid input {
   border-color: #ef4444;
   background: rgba(254, 242, 242, 0.5);
 }
 
-.right-icon {
+app-settings-security .right-icon {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -283,27 +283,27 @@ select::-ms-expand {
   transition: opacity 0.2s;
 }
 
-.right-icon:hover {
+app-settings-security .right-icon:hover {
   opacity: 0.85;
 }
 
-.icon-eye {
+app-settings-security .icon-eye {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') center/contain no-repeat;
 }
 
-.icon-eye-off {
+app-settings-security .icon-eye-off {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>') center/contain no-repeat;
 }
 
-.password-group {
+app-settings-security .password-group {
   position: relative;
 }
 
-.password-field-shell {
+app-settings-security .password-field-shell {
   position: relative;
 }
 
-.password-strength-popover {
+app-settings-security .password-strength-popover {
   position: absolute;
   top: 50%;
   right: calc(100% + 18px);
@@ -320,41 +320,41 @@ select::-ms-expand {
   z-index: 8;
 }
 
-.password-strength-title,
-.password-strength-subtitle {
+app-settings-security .password-strength-title,
+app-settings-security .password-strength-subtitle {
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
 }
 
-.password-strength-title {
+app-settings-security .password-strength-title {
   color: rgba(11, 11, 18, 0.82);
 }
 
-.password-strength-subtitle {
+app-settings-security .password-strength-subtitle {
   margin-top: 12px;
   color: rgba(11, 11, 18, 0.62);
 }
 
-.password-strength-bars {
+app-settings-security .password-strength-bars {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
 
-.password-strength-bar {
+app-settings-security .password-strength-bar {
   height: 4px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.10);
   transition: background-color 180ms ease, transform 180ms ease;
 }
 
-.password-strength-bar.is-active {
+app-settings-security .password-strength-bar.is-active {
   background: #7566ff;
 }
 
-.password-strength-list {
+app-settings-security .password-strength-list {
   margin: 10px 0 0;
   padding-left: 18px;
   display: flex;
@@ -364,16 +364,16 @@ select::-ms-expand {
   font-size: 13px;
 }
 
-.password-strength-list li {
+app-settings-security .password-strength-list li {
   transition: color 180ms ease;
 }
 
-.password-strength-list li.is-met {
+app-settings-security .password-strength-list li.is-met {
   color: #2b8a57;
 }
 
 /* 2-step verification row */
-.verify-login-row {
+app-settings-security .verify-login-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -383,14 +383,14 @@ select::-ms-expand {
   border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.verify-login-left {
+app-settings-security .verify-login-left {
   display: flex;
   align-items: center;
   gap: 14px;
   min-width: 0;
 }
 
-.verify-login-icon {
+app-settings-security .verify-login-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -403,25 +403,25 @@ select::-ms-expand {
   box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.15);
 }
 
-.verify-login-copy {
+app-settings-security .verify-login-copy {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.verify-login-label {
+app-settings-security .verify-login-label {
   font-size: 15px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.9);
 }
 
-.verify-login-hint {
+app-settings-security .verify-login-hint {
   font-size: 13px;
   color: rgba(11, 11, 18, 0.52);
 }
 
-.verify-login-btn {
+app-settings-security .verify-login-btn {
   flex-shrink: 0;
   background: rgba(117, 102, 255, 0.1);
   color: #5d4fd6;
@@ -434,28 +434,28 @@ select::-ms-expand {
   transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
 }
 
-.verify-login-btn:hover {
+app-settings-security .verify-login-btn:hover {
   background: rgba(117, 102, 255, 0.16);
   border-color: rgba(117, 102, 255, 0.6);
 }
 
-.verify-login-btn:active {
+app-settings-security .verify-login-btn:active {
   transform: scale(0.98);
 }
 
-.verify-login-btn--off {
+app-settings-security .verify-login-btn--off {
   color: #dc2626;
   border-color: rgba(239, 68, 68, 0.4);
   background: rgba(239, 68, 68, 0.06);
 }
 
-.verify-login-btn--off:hover {
+app-settings-security .verify-login-btn--off:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.55);
 }
 
 /* Modals */
-.modal-overlay {
+app-settings-security .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(23, 20, 53, 0.6);
@@ -467,7 +467,7 @@ select::-ms-expand {
   animation: securityFadeIn 180ms ease;
 }
 
-.modal-content {
+app-settings-security .modal-content {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(11, 11, 18, 0.12);
@@ -478,7 +478,7 @@ select::-ms-expand {
   animation: securitySlideUp 200ms ease;
 }
 
-.modal-header {
+app-settings-security .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -486,14 +486,14 @@ select::-ms-expand {
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.modal-title {
+app-settings-security .modal-title {
   font-size: 1.25rem;
   font-weight: 700;
   color: #0b0b12;
   margin: 0;
 }
 
-.modal-close {
+app-settings-security .modal-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -506,37 +506,37 @@ select::-ms-expand {
   transition: background 0.15s, color 0.15s;
 }
 
-.modal-close:hover {
+app-settings-security .modal-close:hover {
   background: rgba(15, 23, 42, 0.06);
   color: #0b0b12;
 }
 
-.modal-close svg {
+app-settings-security .modal-close svg {
   width: 22px;
   height: 22px;
 }
 
-.modal-divider {
+app-settings-security .modal-divider {
   height: 1px;
   background: rgba(15, 23, 42, 0.08);
   margin: 0;
 }
 
-.modal-body {
+app-settings-security .modal-body {
   padding: 22px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.modal-description {
+app-settings-security .modal-description {
   font-size: 14px;
   color: rgba(11, 11, 18, 0.7);
   line-height: 1.6;
   margin: 0;
 }
 
-.modal-footer {
+app-settings-security .modal-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -545,21 +545,21 @@ select::-ms-expand {
   padding: 16px 24px 22px;
 }
 
-.modal-footer--spread {
+app-settings-security .modal-footer--spread {
   justify-content: space-between;
 }
 
-.modal-footer--actions-right {
+app-settings-security .modal-footer--actions-right {
   justify-content: flex-end;
 }
 
-.modal-footer__actions {
+app-settings-security .modal-footer__actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.modal-inline-link {
+app-settings-security .modal-inline-link {
   margin-right: auto;
   color: #7566ff;
   text-decoration: underline;
@@ -569,23 +569,23 @@ select::-ms-expand {
   cursor: pointer;
 }
 
-.modal-inline-link:hover {
+app-settings-security .modal-inline-link:hover {
   color: #5d4fd6;
 }
 
-.pdb {
+app-settings-security .pdb {
   padding-bottom: 8px;
 }
 
 /* Buttons */
-.form-actions {
+app-settings-security .form-actions {
   display: flex;
   gap: 12px;
   margin-top: 8px;
   justify-content: flex-end;
 }
 
-.btn {
+app-settings-security .btn {
   padding: 12px 22px;
   border: none;
   border-radius: 12px;
@@ -599,45 +599,45 @@ select::-ms-expand {
   gap: 8px;
 }
 
-.btn-primary {
+app-settings-security .btn-primary {
   background: #7566ff;
   color: #fff;
   border: 1px solid #7566ff;
 }
 
-.btn-primary:hover:not(:disabled) {
+app-settings-security .btn-primary:hover:not(:disabled) {
   background: #5d4fd6;
   border-color: #5d4fd6;
 }
 
-.btn-secondary {
+app-settings-security .btn-secondary {
   background: rgba(255, 255, 255, 0.95);
   color: rgba(11, 11, 18, 0.9);
   border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
-.btn-secondary:hover:not(:disabled) {
+app-settings-security .btn-secondary:hover:not(:disabled) {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.35);
 }
 
-.btn-danger {
+app-settings-security .btn-danger {
   background: #ef4444;
   color: #fff;
   border: 1px solid #ef4444;
 }
 
-.btn-danger:hover:not(:disabled) {
+app-settings-security .btn-danger:hover:not(:disabled) {
   background: #dc2626;
   border-color: #dc2626;
 }
 
-.btn:disabled {
+app-settings-security .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.btn-save {
+app-settings-security .btn-save {
   background: #8375ff;
   padding: 0.7em 1em;
   padding-left: 3.2em;
@@ -649,15 +649,15 @@ select::-ms-expand {
   box-shadow: 0 10px 24px rgba(117, 102, 255, 0.22);
 }
 
-.btn-save:hover:not(:disabled) {
+app-settings-security .btn-save:hover:not(:disabled) {
   background: #6a5edb;
 }
 
-.btn-save:active:not(:disabled) {
+app-settings-security .btn-save:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.svg-wrapper-1 {
+app-settings-security .svg-wrapper-1 {
   display: inline-flex;
   align-items: center;
   position: absolute;
@@ -665,12 +665,12 @@ select::-ms-expand {
   transition: all 0.2s ease-in-out;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper-1 {
+app-settings-security .btn-save:hover:not(:disabled) .svg-wrapper-1 {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.svg-wrapper {
+app-settings-security .svg-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -680,48 +680,48 @@ select::-ms-expand {
   height: 24px;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper:not(.loading-spinner) {
+app-settings-security .btn-save:hover:not(:disabled) .svg-wrapper:not(.loading-spinner) {
   transform: scale(1.2);
 }
 
-.btn-save:hover:not(:disabled) span {
+app-settings-security .btn-save:hover:not(:disabled) span {
   opacity: 0;
 }
 
-.btn-save:disabled .svg-wrapper-1 {
+app-settings-security .btn-save:disabled .svg-wrapper-1 {
   left: 12px;
 }
 
-.btn-save.is-loading .svg-wrapper-1 {
+app-settings-security .btn-save.is-loading .svg-wrapper-1 {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.btn-save.is-loading span {
+app-settings-security .btn-save.is-loading span {
   opacity: 0;
 }
 
-.btn-save span {
+app-settings-security .btn-save span {
   transition: opacity 0.2s ease-in-out;
 }
 
-.icon {
+app-settings-security .icon {
   display: block;
   width: 24px;
   height: 24px;
 }
 
-.icon-save {
+app-settings-security .icon-save {
   fill: currentColor;
 }
 
-.icon-loading {
+app-settings-security .icon-loading {
   width: 3.25em;
   transform-origin: center;
   animation: rotate4 2s linear infinite;
 }
 
-.icon-loading circle {
+app-settings-security .icon-loading circle {
   fill: none;
   stroke: white;
   stroke-width: 4;
@@ -767,63 +767,63 @@ select::-ms-expand {
 
 
 @media (max-width: 640px) {
-  .security-skeleton-grid {
+  app-settings-security .security-skeleton-grid {
     grid-template-columns: 1fr;
   }
 
-  .security-skeleton-box--button {
+  app-settings-security .security-skeleton-box--button {
     width: 100%;
   }
 
-  .profile-container {
+  app-settings-security .profile-container {
     padding: 12px 12px 28px;
   }
 
-  .profile-title {
+  app-settings-security .profile-title {
     font-size: 24px;
   }
 
-  .profile-form {
+  app-settings-security .profile-form {
     gap: 22px;
   }
 
-  .verify-login-row {
+  app-settings-security .verify-login-row {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .verify-login-btn {
+  app-settings-security .verify-login-btn {
     width: 100%;
   }
 
-  .modal-footer--spread {
+  app-settings-security .modal-footer--spread {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .modal-inline-link {
+  app-settings-security .modal-inline-link {
     margin-right: 0;
     order: 1;
   }
 
-  .modal-footer__actions {
+  app-settings-security .modal-footer__actions {
     width: 100%;
     justify-content: stretch;
   }
 
-  .modal-footer__actions .btn {
+  app-settings-security .modal-footer__actions .btn {
     flex: 1;
   }
 
-  .form-actions {
+  app-settings-security .form-actions {
     flex-direction: column-reverse;
   }
 
-  .form-actions .btn {
+  app-settings-security .form-actions .btn {
     width: 100%;
   }
 
-  .password-strength-popover {
+  app-settings-security .password-strength-popover {
     position: static;
     transform: none;
     width: 100%;

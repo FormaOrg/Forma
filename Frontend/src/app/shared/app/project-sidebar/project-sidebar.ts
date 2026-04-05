@@ -21,7 +21,6 @@ type ProjectSidebarItem = SidebarItem & { path: string };
   standalone: true,
   imports: [CommonModule, RouterModule, AppIcon],
   templateUrl: './project-sidebar.html',
-  styleUrl: './project-sidebar.css'
 })
 export class ProjectSidebar implements OnChanges {
   @Input({ required: true }) projectId!: string;

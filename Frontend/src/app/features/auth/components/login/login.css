@@ -1,11 +1,11 @@
-:host {
+app-login {
   display: block;
   width: 100%;
   font-family: 'Poppins', sans-serif;
 }
 
 /* ========== LOGO ========== */
-.logo-section {
+app-login .logo-section {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,17 +13,17 @@
   margin-bottom: 34px;
 }
 
-.logo-icon {
+app-login .logo-icon {
   height: 25px;
 }
 
-.logo-icon img {
+app-login .logo-icon img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.logo {
+app-login .logo {
   font-size: 1.15em;
   font-weight: 700;
   color: #0f172a;
@@ -31,12 +31,12 @@
 }
 
 /* ========== HEADER ========== */
-.login-header {
+app-login .login-header {
   text-align: center;
   margin-bottom: 28px;
 }
 
-.login-header h2 {
+app-login .login-header h2 {
   font-size: 3.35em;
   font-weight: 600;
   color: #000000;
@@ -44,14 +44,14 @@
   line-height: 1;
 }
 
-.login-header p {
+app-login .login-header p {
   font-size: 0.82em;
   color: #94a3b8;
   line-height: 1.4;
 }
 
 /* ========== BANNER ========== */
-.unverified-banner {
+app-login .unverified-banner {
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -63,7 +63,7 @@
   animation: fadeIn 0.3s ease;
 }
 
-.login-verification-banner {
+app-login .login-verification-banner {
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -86,7 +86,7 @@
   }
 }
 
-.unverified-banner-icon {
+app-login .unverified-banner-icon {
   flex-shrink: 0;
   width: 20px;
   height: 20px;
@@ -94,7 +94,7 @@
   margin-top: 1px;
 }
 
-.login-verification-banner-icon {
+app-login .login-verification-banner-icon {
   flex-shrink: 0;
   width: 20px;
   height: 20px;
@@ -102,64 +102,64 @@
   margin-top: 2px;
 }
 
-.unverified-banner-icon svg {
+app-login .unverified-banner-icon svg {
   width: 100%;
   height: 100%;
 }
 
-.login-verification-banner-icon svg {
+app-login .login-verification-banner-icon svg {
   width: 100%;
   height: 100%;
 }
 
-.unverified-banner-body {
+app-login .unverified-banner-body {
   flex: 1;
 }
 
-.login-verification-banner-body {
+app-login .login-verification-banner-body {
   flex: 1;
 }
 
-.unverified-banner-title {
+app-login .unverified-banner-title {
   font-size: 0.82em;
   font-weight: 700;
   color: #92400e;
   margin-bottom: 3px;
 }
 
-.login-verification-title {
+app-login .login-verification-title {
   font-size: 0.82em;
   font-weight: 700;
   color: #1d4ed8;
   margin-bottom: 4px;
 }
 
-.unverified-banner-sub {
+app-login .unverified-banner-sub {
   font-size: 0.76em;
   color: #78350f;
   line-height: 1.5;
   margin-bottom: 10px;
 }
 
-.login-verification-sub {
+app-login .login-verification-sub {
   font-size: 0.76em;
   color: #1e3a8a;
   line-height: 1.5;
   margin-bottom: 12px;
 }
 
-.verification-inline-form {
+app-login .verification-inline-form {
   display: flex;
   gap: 10px;
   align-items: stretch;
   margin-bottom: 10px;
 }
 
-.verification-code-input {
+app-login .verification-code-input {
   flex: 1;
 }
 
-.verification-code-input input {
+app-login .verification-code-input input {
   width: 100%;
   padding: 11px 14px;
   border-radius: 8px;
@@ -172,12 +172,12 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.verification-code-input input:focus {
+app-login .verification-code-input input:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.verify-login-btn {
+app-login .verify-login-btn {
   border: none;
   border-radius: 8px;
   background: #2563eb;
@@ -191,23 +191,23 @@
   white-space: nowrap;
 }
 
-.verify-login-btn:hover:not(:disabled) {
+app-login .verify-login-btn:hover:not(:disabled) {
   background: #1d4ed8;
 }
 
-.verify-login-btn:disabled {
+app-login .verify-login-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.verification-actions {
+app-login .verification-actions {
   display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.cancel-verification-btn {
+app-login .cancel-verification-btn {
   border: none;
   background: transparent;
   color: #1d4ed8;
@@ -218,11 +218,11 @@
   padding: 0;
 }
 
-.cancel-verification-btn:hover {
+app-login .cancel-verification-btn:hover {
   color: #1e3a8a;
 }
 
-.resend-success {
+app-login .resend-success {
   font-size: 0.75em;
   color: #166534;
   background: #f0fdf4;
@@ -232,7 +232,7 @@
   margin-bottom: 8px;
 }
 
-.resend-error {
+app-login .resend-error {
   font-size: 0.75em;
   color: #991b1b;
   background: #fef2f2;
@@ -242,7 +242,7 @@
   margin-bottom: 8px;
 }
 
-.resend-btn {
+app-login .resend-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -258,16 +258,16 @@
   transition: background 0.2s;
 }
 
-.resend-btn:hover:not(:disabled) {
+app-login .resend-btn:hover:not(:disabled) {
   background: #1e293b;
 }
 
-.resend-btn:disabled {
+app-login .resend-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-spinner {
+app-login .btn-spinner {
   width: 11px;
   height: 11px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -284,17 +284,17 @@
 }
 
 /* ========== FORM ========== */
-form {
+app-login form {
   width: 100%;
 }
 
-.input-form {
+app-login .input-form {
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
 }
 
-.input-form label {
+app-login .input-form label {
   display: block;
   font-size: 0.8em;
   font-weight: 600;
@@ -302,11 +302,11 @@ form {
   margin-bottom: 6px;
 }
 
-.input-box {
+app-login .input-box {
   position: relative;
 }
 
-.input-box input {
+app-login .input-box input {
   width: 100%;
   padding: 12px 38px 12px 14px;
   border-radius: 8px;
@@ -319,23 +319,23 @@ form {
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.input-box input:focus {
+app-login .input-box input:focus {
   border-color: #0f172a;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.07);
 }
 
-.input-box input::placeholder {
+app-login .input-box input::placeholder {
   color: #c4cdd8;
   font-size: 13px;
 }
 
-.input-box.invalid input {
+app-login .input-box.invalid input {
   border-color: #ef4444;
   background: #fef2f2;
 }
 
-.error {
+app-login .error {
   color: #ef4444;
   font-size: 12px;
   margin-top: 4px;
@@ -345,11 +345,11 @@ form {
   visibility: hidden;
 }
 
-.error.visible {
+app-login .error.visible {
   visibility: visible;
 }
 
-.form-error-slot {
+app-login .form-error-slot {
   min-height: 20px;
   margin-bottom: 14px;
   display: flex;
@@ -357,12 +357,12 @@ form {
   justify-content: center;
 }
 
-.form-error {
+app-login .form-error {
   text-align: center;
   margin-top: 0;
 }
 
-.right-icon {
+app-login .right-icon {
   position: absolute;
   right: 13px;
   top: 50%;
@@ -374,20 +374,20 @@ form {
   transition: opacity 0.2s;
 }
 
-.right-icon:hover {
+app-login .right-icon:hover {
   opacity: 0.7;
 }
 
-.icon-eye {
+app-login .icon-eye {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') center/contain no-repeat;
 }
 
-.icon-eye-off {
+app-login .icon-eye-off {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>') center/contain no-repeat;
 }
 
 /* ========== REMEMBER / FORGOT ========== */
-.remember-forgot {
+app-login .remember-forgot {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -395,7 +395,7 @@ form {
   gap: 12px;
 }
 
-.remember-me {
+app-login .remember-me {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -404,26 +404,26 @@ form {
   cursor: pointer;
 }
 
-.remember-me input[type="checkbox"] {
+app-login .remember-me input[type="checkbox"] {
   width: 14px;
   height: 14px;
   accent-color: #0f172a;
   cursor: pointer;
 }
 
-.forgot-password {
+app-login .forgot-password {
   font-size: 0.82em;
   color: #0f172a;
   font-weight: 500;
   text-decoration: none;
 }
 
-.forgot-password:hover {
+app-login .forgot-password:hover {
   color: #334155;
 }
 
 /* ========== SUBMIT ========== */
-button[type="submit"] {
+app-login button[type="submit"] {
   width: 100%;
   background: #0f172a;
   color: #fff;
@@ -439,27 +439,27 @@ button[type="submit"] {
   letter-spacing: 0.01em;
 }
 
-button[type="submit"]:hover {
+app-login button[type="submit"]:hover {
   background: #1e293b;
 }
 
-button[type="submit"]:disabled {
+app-login button[type="submit"]:disabled {
   background: #1e293b;
   cursor: not-allowed;
 }
 
 /* ========== GOOGLE ========== */
-.alternative {
+app-login .alternative {
   width: 100%;
 }
 
-.social-buttons {
+app-login .social-buttons {
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
 }
 
-.social-btn {
+app-login .social-btn {
   width: 100%;
   min-height: 44px;
   display: flex;
@@ -479,59 +479,59 @@ button[type="submit"]:disabled {
   box-sizing: border-box;
 }
 
-.social-btn:hover:not(:disabled) {
+app-login .social-btn:hover:not(:disabled) {
   background: #f8fafc;
   border-color: #94a3b8;
 }
 
-.social-btn:disabled {
+app-login .social-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-.icon {
+app-login .icon {
   width: 18px;
   height: 18px;
   display: block;
   flex-shrink: 0;
 }
 
-.icon-google {
+app-login .icon-google {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%234285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="%2334A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="%23FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="%23EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>') center/contain no-repeat;
 }
 
 /* ========== SIGN UP ========== */
-.signup-link {
+app-login .signup-link {
   text-align: center;
   font-size: 0.82em;
   color: #64748b;
 }
 
-.signup-link a {
+app-login .signup-link a {
   color: #0f172a;
   text-decoration: none;
   margin-left: 3px;
 }
 
-.signup-link strong {
+app-login .signup-link strong {
   font-weight: 700;
 }
 
 @media (max-width: 650px) {
-  .login-header h2 {
+  app-login .login-header h2 {
     font-size: 2.2em;
   }
 
-  .remember-forgot {
+  app-login .remember-forgot {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .verification-inline-form {
+  app-login .verification-inline-form {
     flex-direction: column;
   }
 
-  .verify-login-btn {
+  app-login .verify-login-btn {
     min-height: 42px;
   }
 }

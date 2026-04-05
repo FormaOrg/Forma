@@ -20,7 +20,6 @@ import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './project-route-placeholder.html',
-  styleUrl: './project-route-placeholder.css'
 })
 export class ProjectRoutePlaceholder {
   private readonly route = inject(ActivatedRoute);
