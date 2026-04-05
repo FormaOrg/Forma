@@ -46,11 +46,14 @@ export interface StorefrontSection<TProps = Record<string, unknown>> {
   props: TProps;
 }
 
-export type StorefrontHomepageSection =
-  | StorefrontSection<StorefrontAnnouncementBarProps>
-  | StorefrontSection<StorefrontHeroProps>
-  | StorefrontSection<StorefrontFeaturedProductsProps>
-  | StorefrontSection<StorefrontFooterProps>;
+export type StorefrontHomepageSectionProps =
+  | StorefrontAnnouncementBarProps
+  | StorefrontHeroProps
+  | StorefrontFeaturedProductsProps
+  | StorefrontFooterProps
+  | Record<string, unknown>;
+
+export type StorefrontHomepageSection = StorefrontSection<StorefrontHomepageSectionProps>;
 
 export interface StorefrontHomepageDocument {
   version: number;

@@ -1,0 +1,408 @@
+@if (isLoading()) {
+  <section class="storefront-editor storefront-editor--state">
+    <div class="storefront-editor__state-card">
+      <p class="storefront-editor__state-eyebrow">Storefront editor</p>
+      <h1 class="storefront-editor__state-title">Loading your store...</h1>
+      <p class="storefront-editor__state-copy">Pulling your current homepage draft, publication state, and catalog into the editor.</p>
+    </div>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-editor storefront-editor--state">
+    <div class="storefront-editor__state-card storefront-editor__state-card--error">
+      <p class="storefront-editor__state-eyebrow">Storefront editor</p>
+      <h1 class="storefront-editor__state-title">We couldn't open this editor.</h1>
+      <p class="storefront-editor__state-copy">{{ errorMessage() }}</p>
+      <a class="storefront-editor__state-link" [routerLink]="['/app/projects', projectId(), 'home']">Back to project</a>
+    </div>
+  </section>
+} @else if (!isEcommerceProject()) {
+  <section class="storefront-editor storefront-editor--state">
+    <div class="storefront-editor__state-card">
+      <p class="storefront-editor__state-eyebrow">Storefront editor</p>
+      <h1 class="storefront-editor__state-title">This editor is only available for ecommerce projects.</h1>
+      <p class="storefront-editor__state-copy">Other project types can keep using their current workspace until their dedicated editors are ready.</p>
+      <a class="storefront-editor__state-link" [routerLink]="['/app/projects', projectId(), 'home']">Back to project</a>
+    </div>
+  </section>
+} @else if (workingStorefront(); as storefront) {
+  <section class="storefront-editor">
+    <header class="storefront-editor__header">
+      <div class="storefront-editor__header-main">
+        <a class="storefront-editor__back-link" [routerLink]="['/app/projects', projectId(), 'home']">
+          <app-icon name="arrow-left" [size]="16"></app-icon>
+          Back to project
+        </a>
+
+        <div class="storefront-editor__title-wrap">
+          <p class="storefront-editor__eyebrow">Storefront editor</p>
+          <h1 class="storefront-editor__title">{{ storeName() }}</h1>
+          <p class="storefront-editor__subtitle">A structured homepage editor with live preview, reusable sections, and draft/publish controls.</p>
+        </div>
+      </div>
+
+      <div class="storefront-editor__header-actions">
+        <div class="storefront-editor__viewport-toggle" aria-label="Preview size">
+          <button
+            type="button"
+            class="storefront-editor__viewport-button"
+            [class.storefront-editor__viewport-button--active]="viewport() === 'desktop'"
+            (click)="setViewport('desktop')"
+          >
+            Desktop
+          </button>
+          <button
+            type="button"
+            class="storefront-editor__viewport-button"
+            [class.storefront-editor__viewport-button--active]="viewport() === 'mobile'"
+            (click)="setViewport('mobile')"
+          >
+            Mobile
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="storefront-editor__action storefront-editor__action--ghost"
+          (click)="saveDraft()"
+          [disabled]="!hasUnsavedChanges() || isSaving() || isPublishing()"
+        >
+          {{ isSaving() ? 'Saving...' : 'Save draft' }}
+        </button>
+
+        @if (storefront.storeStatus === 'PUBLISHED') {
+          <button
+            type="button"
+            class="storefront-editor__action storefront-editor__action--ghost"
+            (click)="unpublishStorefront()"
+            [disabled]="isUnpublishing() || isPublishing()"
+          >
+            {{ isUnpublishing() ? 'Unpublishing...' : 'Unpublish' }}
+          </button>
+        }
+
+        <button
+          type="button"
+          class="storefront-editor__action storefront-editor__action--primary"
+          (click)="publishStorefront()"
+          [disabled]="isPublishing() || isUnpublishing()"
+        >
+          {{ isPublishing() ? 'Publishing...' : storefront.storeStatus === 'PUBLISHED' ? 'Republish' : 'Publish storefront' }}
+        </button>
+      </div>
+    </header>
+
+    <div class="storefront-editor__layout">
+      <aside class="storefront-editor__sidebar storefront-editor__sidebar--left">
+        <div class="storefront-editor__sidebar-card">
+          <div class="storefront-editor__sidebar-head">
+            <div>
+              <p class="storefront-editor__sidebar-label">Pages</p>
+              <h2 class="storefront-editor__sidebar-title">Storefront</h2>
+            </div>
+            <span class="storefront-editor__badge">{{ storefront.storeStatus }}</span>
+          </div>
+
+          <button
+            type="button"
+            class="storefront-editor__page-button"
+            [class.storefront-editor__page-button--active]="pageSettingsSelected()"
+            (click)="selectPageSettings()"
+          >
+            <span class="storefront-editor__page-icon">
+              <app-icon name="home" [size]="16"></app-icon>
+            </span>
+            <span class="storefront-editor__page-copy">
+              <strong>Home</strong>
+              <small>Page settings and SEO</small>
+            </span>
+          </button>
+        </div>
+
+        <div class="storefront-editor__sidebar-card">
+          <div class="storefront-editor__sidebar-head">
+            <div>
+              <p class="storefront-editor__sidebar-label">Sections</p>
+              <h2 class="storefront-editor__sidebar-title">Homepage layout</h2>
+            </div>
+          </div>
+
+          <div class="storefront-editor__section-list">
+            @for (section of sections(); track trackSection($index, section)) {
+              <button
+                type="button"
+                class="storefront-editor__section-button"
+                [class.storefront-editor__section-button--active]="selectedSectionId() === section.id"
+                (click)="selectSection(section.id)"
+              >
+                <span class="storefront-editor__section-icon">
+                  <app-icon [name]="section.type === 'featured-products' ? 'package' : section.type === 'footer' ? 'settings' : 'layout-grid'" [size]="16"></app-icon>
+                </span>
+                <span class="storefront-editor__section-copy">
+                  <strong>{{ sectionLabel(section) }}</strong>
+                  <small>{{ sectionDescription(section) || 'No content yet' }}</small>
+                </span>
+                <span
+                  class="storefront-editor__section-status"
+                  [class.storefront-editor__section-status--disabled]="!section.enabled"
+                >
+                  {{ section.enabled ? 'On' : 'Off' }}
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+      </aside>
+
+      <main class="storefront-editor__canvas-wrap">
+        <div class="storefront-editor__canvas-meta">
+          <div>
+            <p class="storefront-editor__canvas-label">Live preview</p>
+            <h2 class="storefront-editor__canvas-title">{{ previewTitle() }}</h2>
+            <p class="storefront-editor__canvas-copy">
+              @if (hasUnsavedChanges()) {
+                You have unsaved changes in this draft.
+              } @else if (storefront.storeStatus === 'PUBLISHED') {
+                This draft matches the published storefront.
+              } @else {
+                Save your draft, then publish when the homepage feels ready.
+              }
+            </p>
+          </div>
+          <span class="storefront-editor__canvas-chip">{{ viewport() === 'desktop' ? 'Desktop preview' : 'Mobile preview' }}</span>
+        </div>
+
+        <div
+          class="storefront-editor__canvas-frame"
+          [class.storefront-editor__canvas-frame--mobile]="viewport() === 'mobile'"
+        >
+          <div class="storefront-editor__canvas">
+            @for (section of sections(); track trackSection($index, section)) {
+              @if (section.enabled) {
+                @switch (section.type) {
+                  @case ('announcement-bar') {
+                    <section class="preview-announcement">
+                      <div class="preview-announcement__inner">
+                        <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
+                        @if (readStringProp(section, 'linkLabel')) {
+                          <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'linkLabel') }}</a>
+                        }
+                      </div>
+                    </section>
+                  }
+                  @case ('hero') {
+                    <section class="preview-hero">
+                      <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</p>
+                      <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || 'Your headline goes here' }}</h3>
+                      <p class="preview-hero__copy">{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</p>
+                      <div class="preview-hero__actions">
+                        <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}</a>
+                        <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}</button>
+                      </div>
+                    </section>
+                  }
+                  @case ('featured-products') {
+                    <section class="preview-products" id="featured">
+                      <div class="preview-products__head">
+                        <div>
+                          <p class="preview-products__eyebrow">Catalog</p>
+                          <h3 class="preview-products__title">{{ readStringProp(section, 'title') || 'Featured products' }}</h3>
+                        </div>
+                        <span class="preview-products__helper">{{ featuredProductsPreview().length }} selected</span>
+                      </div>
+
+                      @if (featuredProductsPreview().length) {
+                        <div class="preview-products__grid">
+                          @for (product of featuredProductsPreview(); track trackProduct($index, product)) {
+                            <article class="preview-products__card">
+                              <div class="preview-products__thumb">
+                                @if (product.imageUrl) {
+                                  <img [src]="product.imageUrl" [alt]="product.name" />
+                                } @else {
+                                  <span>No image</span>
+                                }
+                              </div>
+                              <div class="preview-products__body">
+                                <h4>{{ product.name }}</h4>
+                                <p>{{ product.category || 'General' }}</p>
+                                <strong>{{ product.price | number: '1.2-2' }} TND</strong>
+                              </div>
+                            </article>
+                          }
+                        </div>
+                      } @else {
+                        <div class="preview-products__empty">Choose products in the inspector to feature them here.</div>
+                      }
+                    </section>
+                  }
+                  @case ('footer') {
+                    <footer class="preview-footer">
+                      <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
+                      <div class="preview-footer__meta">
+                        <span>{{ readStringProp(section, 'contactEmail') || 'store@example.com' }}</span>
+                        <span>{{ readStringProp(section, 'contactPhone') || '+216 00 000 000' }}</span>
+                      </div>
+                    </footer>
+                  }
+                }
+              }
+            }
+          </div>
+        </div>
+      </main>
+
+      <aside class="storefront-editor__sidebar storefront-editor__sidebar--right">
+        <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--inspector">
+          @if (pageSettingsSelected()) {
+            <div class="storefront-editor__inspector-head">
+              <p class="storefront-editor__sidebar-label">Page settings</p>
+              <h2 class="storefront-editor__sidebar-title">Homepage identity</h2>
+            </div>
+
+            <label class="storefront-editor__field">
+              <span>Store name</span>
+              <input
+                type="text"
+                [ngModel]="storefront.storeName || ''"
+                (ngModelChange)="updateStoreName($event)"
+                placeholder="Bell & Co."
+              />
+            </label>
+
+            <label class="storefront-editor__field">
+              <span>SEO title</span>
+              <input
+                type="text"
+                [ngModel]="storefront.draftHomepage.seo.title"
+                (ngModelChange)="updateSeoField('title', $event)"
+                placeholder="Store title for search previews"
+              />
+            </label>
+
+            <label class="storefront-editor__field">
+              <span>SEO description</span>
+              <textarea
+                rows="4"
+                [ngModel]="storefront.draftHomepage.seo.description"
+                (ngModelChange)="updateSeoField('description', $event)"
+                placeholder="Short summary for search previews"
+              ></textarea>
+            </label>
+          } @else if (selectedSection(); as section) {
+            <div class="storefront-editor__inspector-head">
+              <div>
+                <p class="storefront-editor__sidebar-label">Section inspector</p>
+                <h2 class="storefront-editor__sidebar-title">{{ sectionLabel(section) }}</h2>
+              </div>
+            </div>
+
+            <p class="storefront-editor__inspector-copy">Update the content and order for this homepage section. Structured editing keeps the layout reliable while still letting you customize the store.</p>
+
+            <label class="storefront-editor__toggle">
+              <input
+                type="checkbox"
+                [ngModel]="section.enabled"
+                (ngModelChange)="toggleSelectedSectionEnabled($event)"
+              />
+              <span>Section enabled</span>
+            </label>
+
+            <div class="storefront-editor__stack-actions">
+              <button type="button" class="storefront-editor__mini-action" (click)="moveSelectedSection('up')">Move up</button>
+              <button type="button" class="storefront-editor__mini-action" (click)="moveSelectedSection('down')">Move down</button>
+            </div>
+
+            @switch (section.type) {
+              @case ('announcement-bar') {
+                <label class="storefront-editor__field">
+                  <span>Text</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'text')" (ngModelChange)="updateSelectedStringProp('text', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Link label</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'linkLabel')" (ngModelChange)="updateSelectedStringProp('linkLabel', $event)" />
+                </label>
+              }
+              @case ('hero') {
+                <label class="storefront-editor__field">
+                  <span>Eyebrow</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'eyebrow')" (ngModelChange)="updateSelectedStringProp('eyebrow', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Title</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'title')" (ngModelChange)="updateSelectedStringProp('title', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Description</span>
+                  <textarea rows="5" [ngModel]="readStringProp(section, 'description')" (ngModelChange)="updateSelectedStringProp('description', $event)"></textarea>
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Primary CTA label</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'primaryCtaLabel')" (ngModelChange)="updateSelectedStringProp('primaryCtaLabel', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Secondary CTA label</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'secondaryCtaLabel')" (ngModelChange)="updateSelectedStringProp('secondaryCtaLabel', $event)" />
+                </label>
+              }
+              @case ('featured-products') {
+                <label class="storefront-editor__field">
+                  <span>Section title</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'title')" (ngModelChange)="updateSelectedStringProp('title', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Max items</span>
+                  <input type="number" min="1" max="8" [ngModel]="readNumberProp(section, 'maxItems', 4)" (ngModelChange)="updateSelectedNumberProp('maxItems', $event)" />
+                </label>
+
+                <div class="storefront-editor__product-picker">
+                  <p class="storefront-editor__field-label">Featured products</p>
+                  @if (products().length) {
+                    <div class="storefront-editor__product-list">
+                      @for (product of products(); track trackProduct($index, product)) {
+                        <label class="storefront-editor__product-option">
+                          <input
+                            type="checkbox"
+                            [checked]="isFeaturedProductSelected(product.id)"
+                            (change)="toggleFeaturedProduct(product.id, $any($event.target).checked)"
+                          />
+                          <span class="storefront-editor__product-option-copy">
+                            <strong>{{ product.name }}</strong>
+                            <small>{{ product.price | number: '1.2-2' }} TND</small>
+                          </span>
+                        </label>
+                      }
+                    </div>
+                  } @else {
+                    <p class="storefront-editor__hint">Add products in the catalog first, then feature them here.</p>
+                  }
+                </div>
+              }
+              @case ('footer') {
+                <label class="storefront-editor__field">
+                  <span>Brand text</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'brandText')" (ngModelChange)="updateSelectedStringProp('brandText', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Contact email</span>
+                  <input type="email" [ngModel]="readStringProp(section, 'contactEmail')" (ngModelChange)="updateSelectedStringProp('contactEmail', $event)" />
+                </label>
+
+                <label class="storefront-editor__field">
+                  <span>Contact phone</span>
+                  <input type="text" [ngModel]="readStringProp(section, 'contactPhone')" (ngModelChange)="updateSelectedStringProp('contactPhone', $event)" />
+                </label>
+              }
+            }
+          }
+        </div>
+      </aside>
+    </div>
+  </section>
+}
