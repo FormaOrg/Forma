@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -26,7 +27,9 @@ import { ThemeService } from '../../../core/services/theme.service';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
+  private static readonly stylesheetId = 'dashboard-overrides-styles';
   private sidebarStateService = inject(SidebarStateService);
+  private document = inject(DOCUMENT);
   private router = inject(Router);
   private themeService = inject(ThemeService);
   readonly appBootstrapService = inject(AppBootstrapService);
@@ -37,6 +40,7 @@ export class Dashboard implements OnInit {
   sidebarMotionReady = false;
 
   constructor() {
+    this.ensureDashboardStylesheet();
     this.syncShellRouteState(this.router.url);
 
     this.router.events
@@ -98,5 +102,17 @@ export class Dashboard implements OnInit {
     }
 
     return Boolean(current.data[key]);
+  }
+
+  private ensureDashboardStylesheet(): void {
+    if (this.document.getElementById(Dashboard.stylesheetId)) {
+      return;
+    }
+
+    const link = this.document.createElement('link');
+    link.id = Dashboard.stylesheetId;
+    link.rel = 'stylesheet';
+    link.href = '/dashboard-overrides.css';
+    this.document.head.appendChild(link);
   }
 }

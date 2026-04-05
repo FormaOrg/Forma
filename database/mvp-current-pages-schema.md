@@ -2,7 +2,7 @@
 
 This is the database scope for the pages and flows already present in the current frontend.
 
-It intentionally does not include the full future editor/deployment/e-commerce model yet.
+It now includes the minimum ecommerce storefront content model needed for the first editor MVP.
 
 ## Current scope
 
@@ -16,6 +16,7 @@ The current frontend needs data for:
 - activity log
 - email verification
 - password reset
+- ecommerce storefront draft/publish content
 
 ## Recommended MVP tables
 
@@ -31,6 +32,11 @@ The current frontend needs data for:
 
 - `templates`
 - `projects`
+- `project_customers`
+- `project_products`
+- `project_orders`
+- `project_order_items`
+- `project_storefronts`
 
 ## Why this MVP is enough for now
 
@@ -46,6 +52,7 @@ It supports:
 - preference gating for premium users
 - dashboard project list
 - template selection for project creation
+- ecommerce catalog, customers, orders, and storefront draft/publish state
 
 ## Table summary
 
@@ -223,6 +230,31 @@ Possible `status` values:
 - `PUBLISHED`
 - `ARCHIVED`
 
+### `project_storefronts`
+
+Stores the editable and published ecommerce homepage for an ecommerce project.
+
+Recommended columns:
+
+- `id`
+- `project_id`
+- `store_name`
+- `store_status`
+- `theme_key`
+- `active_page_key`
+- `draft_homepage_json`
+- `published_homepage_json`
+- `published_at`
+- `created_at`
+- `updated_at`
+
+Notes:
+
+- one ecommerce project should have at most one storefront record
+- keep `draft_homepage_json` required so the editor always has an editable document
+- `published_homepage_json` stays null until the first publish
+- `store_status` should remain `DRAFT` until content is published
+
 ## Recommended implementation order
 
 1. `users`
@@ -232,6 +264,11 @@ Possible `status` values:
 5. `audit_logs`
 6. `templates`
 7. `projects`
+8. `project_customers`
+9. `project_products`
+10. `project_orders`
+11. `project_order_items`
+12. `project_storefronts`
 
 ## Service split recommendation
 
@@ -246,6 +283,11 @@ If you keep the microservice structure from the report:
 - Project service:
   - `templates`
   - `projects`
+  - `project_customers`
+  - `project_products`
+  - `project_orders`
+  - `project_order_items`
+  - `project_storefronts`
 
 ## Important design note
 
