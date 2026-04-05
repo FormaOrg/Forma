@@ -186,3 +186,21 @@ create table if not exists project_order_items (
 
 create index if not exists idx_project_order_items_order_id on project_order_items(order_id);
 create index if not exists idx_project_order_items_product_id on project_order_items(product_id);
+
+create table if not exists project_storefronts (
+    id bigserial primary key,
+    project_id bigint not null unique references projects(id) on delete cascade,
+    store_name varchar(160),
+    store_status varchar(20) not null default 'DRAFT',
+    theme_key varchar(80),
+    active_page_key varchar(80) not null default 'home',
+    draft_homepage_json jsonb not null,
+    published_homepage_json jsonb,
+    published_at timestamp,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
+    constraint chk_project_storefronts_status
+        check (store_status in ('DRAFT', 'PUBLISHED'))
+);
+
+create index if not exists idx_project_storefronts_project_id on project_storefronts(project_id);
