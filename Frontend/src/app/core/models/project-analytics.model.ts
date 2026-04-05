@@ -1,22 +1,37 @@
 export type AnalyticsRangePreset = 'LAST_7_DAYS' | 'LAST_30_DAYS' | 'LAST_90_DAYS';
 
-export interface ProjectAnalyticsSummary {
-  customers: number;
-  customersChangePercent: number;
-  orders: number;
-  ordersChangePercent: number;
-  revenue: number;
-  revenueChangePercent: number;
-  averageOrderValue: number;
-  averageOrderValueChangePercent: number;
+export type ProjectAnalyticsKind = 'ECOMMERCE' | 'PORTFOLIO';
+export type ProjectAnalyticsMetricFormat = 'NUMBER' | 'CURRENCY' | 'PERCENT';
+
+export interface ProjectAnalyticsSummaryCard {
+  key: string;
+  label: string;
+  formattedValue: string;
+  changePercent: number;
+  tone: string;
+  icon: string;
+}
+
+export interface ProjectAnalyticsMetricOption {
+  key: string;
+  label: string;
+  format: ProjectAnalyticsMetricFormat;
+}
+
+export interface ProjectAnalyticsMetricValue {
+  key: string;
+  value: number;
 }
 
 export interface ProjectAnalyticsChartPoint {
   isoDate: string;
   label: string;
-  customers: number;
-  orders: number;
-  revenue: number;
+  metrics: ProjectAnalyticsMetricValue[];
+}
+
+export interface ProjectAnalyticsSectionHeading {
+  kicker: string;
+  title: string;
 }
 
 export interface ProjectAnalyticsBreakdownItem {
@@ -26,22 +41,11 @@ export interface ProjectAnalyticsBreakdownItem {
   note: string;
 }
 
-export interface ProjectAnalyticsTopCustomer {
-  customerId: number | null;
-  name: string;
-  zoneLabel: string;
-  orders: number;
-  revenue: number;
-  growthPercent: number;
-}
-
-export interface ProjectAnalyticsTopProduct {
-  productId: number | null;
-  name: string;
-  sku: string | null;
-  revenue: number;
-  units: number;
-  growthPercent: number;
+export interface ProjectAnalyticsRankItem {
+  title: string;
+  subtitle: string;
+  value: string;
+  meta: string;
 }
 
 export interface ProjectAnalyticsInsight {
@@ -50,14 +54,21 @@ export interface ProjectAnalyticsInsight {
 }
 
 export interface ProjectAnalyticsPageResponse {
+  kind: ProjectAnalyticsKind;
   rangePreset: AnalyticsRangePreset;
   rangeStart: string;
   rangeEndExclusive: string;
-  summary: ProjectAnalyticsSummary;
+  summaryCards: ProjectAnalyticsSummaryCard[];
+  metricOptions: ProjectAnalyticsMetricOption[];
+  chartHeading: ProjectAnalyticsSectionHeading;
   chartPoints: ProjectAnalyticsChartPoint[];
-  zoneBreakdown: ProjectAnalyticsBreakdownItem[];
-  topCustomers: ProjectAnalyticsTopCustomer[];
-  topProducts: ProjectAnalyticsTopProduct[];
+  breakdownHeading: ProjectAnalyticsSectionHeading;
+  breakdownItems: ProjectAnalyticsBreakdownItem[];
+  primaryListHeading: ProjectAnalyticsSectionHeading;
+  primaryListItems: ProjectAnalyticsRankItem[];
+  secondaryListHeading: ProjectAnalyticsSectionHeading;
+  secondaryListItems: ProjectAnalyticsRankItem[];
+  insightsHeading: ProjectAnalyticsSectionHeading;
   insights: ProjectAnalyticsInsight[];
   hasData: boolean;
 }

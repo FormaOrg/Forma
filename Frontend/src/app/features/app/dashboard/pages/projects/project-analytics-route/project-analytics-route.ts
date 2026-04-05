@@ -13,10 +13,13 @@ import {
   PointElement,
   Tooltip
 } from 'chart.js';
-import { AnalyticsRangePreset, ProjectAnalyticsPageResponse } from '../../../../../../core/models/project-analytics.model';
+import {
+  AnalyticsRangePreset,
+  ProjectAnalyticsMetricFormat,
+  ProjectAnalyticsMetricOption,
+  ProjectAnalyticsPageResponse
+} from '../../../../../../core/models/project-analytics.model';
 import { ProjectAnalyticsService } from '../../../../../../core/services/project-analytics.service';
-
-type AnalyticsMetric = 'customers' | 'orders' | 'revenue';
 
 const RANGE_OPTIONS: ReadonlyArray<{ label: string; value: AnalyticsRangePreset }> = [
   { label: '7 days', value: 'LAST_7_DAYS' },
@@ -46,45 +49,27 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
 
   readonly rangeOptions = RANGE_OPTIONS;
   readonly selectedRange = signal<AnalyticsRangePreset>('LAST_30_DAYS');
-  readonly selectedMetric = signal<AnalyticsMetric>('customers');
+  readonly selectedMetric = signal<string>('customers');
   readonly projectId = signal<number | null>(this.parseProjectId(this.route.parent?.snapshot.paramMap.get('projectId')));
   readonly analytics = signal<ProjectAnalyticsPageResponse | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
 
-  readonly summaryCards = computed(() => {
-    const summary = this.analytics()?.summary;
+  readonly summaryCards = computed(() => this.analytics()?.summaryCards ?? []);
+  readonly metricOptions = computed(() => this.analytics()?.metricOptions ?? []);
+  readonly activeMetric = computed(() => this.metricOptions().find((option) => option.key === this.selectedMetric()) ?? this.metricOptions()[0] ?? null);
+  readonly heroTitle = computed(() =>
+    this.analytics()?.kind === 'PORTFOLIO'
+      ? 'See how your portfolio is pulling people in.'
+      : 'See the signals that actually matter.'
+  );
+  readonly heroSubtitle = computed(() => {
+    const projectId = this.projectId();
+    if (this.analytics()?.kind === 'PORTFOLIO') {
+      return `One clean overview for project #${projectId ?? '—'} with the visitor, page, and inquiry signals worth checking first.`;
+    }
 
-    return [
-      {
-        label: 'Customers',
-        value: this.formatInteger(summary?.customers ?? 0),
-        change: this.formatPercentDelta(summary?.customersChangePercent ?? 0),
-        tone: 'violet',
-        icon: 'customers'
-      },
-      {
-        label: 'Orders',
-        value: this.formatInteger(summary?.orders ?? 0),
-        change: this.formatPercentDelta(summary?.ordersChangePercent ?? 0),
-        tone: 'blue',
-        icon: 'orders'
-      },
-      {
-        label: 'Revenue',
-        value: this.formatCurrency(summary?.revenue ?? 0),
-        change: this.formatPercentDelta(summary?.revenueChangePercent ?? 0),
-        tone: 'mint',
-        icon: 'revenue'
-      },
-      {
-        label: 'Average order value',
-        value: this.formatCurrency(summary?.averageOrderValue ?? 0),
-        change: this.formatPercentDelta(summary?.averageOrderValueChangePercent ?? 0),
-        tone: 'amber',
-        icon: 'average'
-      }
-    ] as const;
+    return `One clean overview for project #${projectId ?? '—'} with the customer, order, revenue, and product signals worth checking first.`;
   });
 
   ngOnInit(): void {
@@ -114,7 +99,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     this.loadAnalytics();
   }
 
-  setMetric(metric: AnalyticsMetric): void {
+  setMetric(metric: string): void {
     if (this.selectedMetric() === metric) {
       return;
     }
@@ -144,7 +129,14 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
           if (requestToken !== this.analyticsRequestToken) {
             return;
           }
+
           this.analytics.set(response);
+          const currentMetric = this.selectedMetric();
+          const availableMetrics = response.metricOptions.map((option) => option.key);
+          if (!availableMetrics.includes(currentMetric)) {
+            this.selectedMetric.set(availableMetrics[0] ?? '');
+          }
+
           this.isLoading.set(false);
           this.renderTrendChart();
         },
@@ -163,7 +155,8 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   private renderTrendChart(): void {
     const canvas = this.trendCanvas?.nativeElement;
     const analytics = this.analytics();
-    if (!this.viewReady || !canvas || !analytics) {
+    const activeMetric = this.activeMetric();
+    if (!this.viewReady || !canvas || !analytics || !activeMetric) {
       return;
     }
 
@@ -179,8 +172,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
 
     const labels = analytics.chartPoints.map((point) => point.label);
     const data = analytics.chartPoints.map((point) =>
-      this.selectedMetric() === 'customers' ? point.customers :
-        this.selectedMetric() === 'orders' ? point.orders : point.revenue
+      point.metrics.find((metric) => metric.key === activeMetric.key)?.value ?? 0
     );
 
     const strokeGradient = context.createLinearGradient(0, 0, canvas.width || 600, 0);
@@ -234,7 +226,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
             bodyColor: '#dfe7fb',
             displayColors: false,
             callbacks: {
-              label: (contextItem) => this.formatTooltipValue(contextItem.parsed.y ?? 0)
+              label: (contextItem) => this.formatTooltipValue(contextItem.parsed.y ?? 0, activeMetric)
             }
           }
         },
@@ -265,7 +257,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
             ticks: {
               color: isDarkTheme ? 'rgba(226, 231, 244, 0.62)' : 'rgba(11, 11, 18, 0.42)',
               padding: 12,
-              callback: (value) => this.formatAxisTick(Number(value))
+              callback: (value) => this.formatAxisTick(Number(value), activeMetric)
             }
           }
         }
@@ -285,6 +277,10 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
   }
 
+  formatPercentDelta(value: number): string {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+  }
+
   private formatCurrency(value: number): string {
     return `${new Intl.NumberFormat('en-US', {
       minimumFractionDigits: value % 1 === 0 ? 0 : 2,
@@ -292,12 +288,8 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     }).format(value)} TND`;
   }
 
-  private formatPercentDelta(value: number): string {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
-  }
-
-  private formatAxisTick(value: number): string {
-    if (this.selectedMetric() === 'revenue') {
+  private formatAxisTick(value: number, metric: ProjectAnalyticsMetricOption): string {
+    if (metric.format === 'CURRENCY') {
       if (value >= 1000) {
         return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`;
       }
@@ -312,15 +304,15 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     return String(Math.round(value));
   }
 
-  private formatTooltipValue(value: number): string {
-    if (this.selectedMetric() === 'revenue') {
+  private formatTooltipValue(value: number, metric: ProjectAnalyticsMetricOption): string {
+    if (metric.format === 'CURRENCY') {
       return this.formatCurrency(value);
     }
 
-    if (this.selectedMetric() === 'orders') {
-      return `${this.formatInteger(value)} orders`;
+    if (metric.format === 'PERCENT') {
+      return `${value.toFixed(1)}%`;
     }
 
-    return `${this.formatInteger(value)} customers`;
+    return `${this.formatInteger(value)} ${metric.label.toLowerCase()}`;
   }
 }
