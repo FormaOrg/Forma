@@ -286,7 +286,9 @@
 }
 
 .templates-toolbar__dropdown--category {
-  width: 252px;
+  width: fit-content;
+  min-width: 272px;
+  max-width: 340px;
 }
 
 .templates-toolbar__dropdown--sort {
@@ -580,7 +582,9 @@
   }
 
   .templates-toolbar__dropdown--category {
-    width: 252px;
+    width: fit-content;
+    min-width: 272px;
+    max-width: 340px;
   }
 
   .templates-toolbar__dropdown--sort {

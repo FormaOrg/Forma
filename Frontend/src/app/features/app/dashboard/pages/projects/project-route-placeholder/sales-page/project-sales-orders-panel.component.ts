@@ -36,8 +36,12 @@ export class ProjectSalesOrdersPanelComponent {
   @Input({ required: true }) page = 0;
   @Input({ required: true }) totalPages = 0;
   @Input({ required: true }) totalElements = 0;
+  @Input({ required: true }) isExporting = false;
+  @Input({ required: true }) isDeleting = false;
 
   @Output() refresh = new EventEmitter<void>();
+  @Output() export = new EventEmitter<void>();
+  @Output() deleteSelected = new EventEmitter<void>();
   @Output() filterChange = new EventEmitter<SalesOrderFilter>();
   @Output() sortChange = new EventEmitter<SalesOrderSort>();
   @Output() searchChange = new EventEmitter<string>();
@@ -49,6 +53,14 @@ export class ProjectSalesOrdersPanelComponent {
 
   filterDropdownOpen = false;
   sortDropdownOpen = false;
+
+  get selectedCount(): number {
+    return this.selectedOrderIds.length;
+  }
+
+  get hasSelection(): boolean {
+    return this.selectedCount > 0;
+  }
 
   onFilterChange(value: string): void {
     this.filterChange.emit(value as SalesOrderFilter);
@@ -123,5 +135,21 @@ export class ProjectSalesOrdersPanelComponent {
 
   openEditOrder(orderId: number): void {
     this.editOrder.emit(orderId);
+  }
+
+  toggleSelectionState(): void {
+    this.toggleAllOrders.emit(!this.allVisibleOrdersSelected);
+  }
+
+  clearSelection(): void {
+    this.toggleAllOrders.emit(false);
+  }
+
+  exportSelection(): void {
+    this.export.emit();
+  }
+
+  deleteSelection(): void {
+    this.deleteSelected.emit();
   }
 }

@@ -667,6 +667,15 @@ function paginateOrders(orders: PreviewOrder[], query: ProjectSalesQuery) {
   const totalPages = orders.length === 0 ? 0 : Math.ceil(orders.length / safeSize);
   const safePage = totalPages === 0 ? 0 : Math.min(Math.max(query.page, 0), totalPages - 1);
   const fromIndex = safePage * safeSize;
+  const allItems = orders.map((order) => ({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    placedAt: order.placedAt,
+    paymentStatus: order.paymentStatus,
+    fulfillmentStatus: order.fulfillmentStatus,
+    total: order.total
+  }));
   const items = orders.slice(fromIndex, fromIndex + safeSize).map((order) => ({
     id: order.id,
     orderNumber: order.orderNumber,
@@ -678,6 +687,7 @@ function paginateOrders(orders: PreviewOrder[], query: ProjectSalesQuery) {
   }));
 
   return {
+    allItems,
     items,
     page: safePage,
     size: safeSize,

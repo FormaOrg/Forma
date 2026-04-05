@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProjectSalesOrdersPageDto {
+    private List<ProjectSalesOrderRowDto> allItems;
     private List<ProjectSalesOrderRowDto> items;
     private int page;
     private int size;

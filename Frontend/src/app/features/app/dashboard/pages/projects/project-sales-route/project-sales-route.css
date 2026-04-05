@@ -3,6 +3,7 @@
   inset: 0;
   background: rgba(15, 23, 42, 0.26);
   z-index: 20;
+  animation: salesEditorBackdropIn 220ms ease;
 }
 
 .sales-editor {
@@ -23,6 +24,23 @@
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.03),
     0 8px 24px rgba(17, 17, 17, 0.03);
+  transform-origin: right center;
+  animation: salesEditorSlideIn 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.sales-editor-backdrop.is-closing {
+  animation: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.sales-editor.is-closing {
+  animation: none;
+  opacity: 0;
+  transform: translateX(100%);
 }
 
 .sales-editor__header {
@@ -260,6 +278,28 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+@keyframes salesEditorBackdropIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes salesEditorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .sales-editor__items {

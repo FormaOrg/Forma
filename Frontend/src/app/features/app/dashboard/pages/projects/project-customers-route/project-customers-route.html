@@ -4,9 +4,6 @@
       <p class="customers-page__eyebrow">Project workspace</p>
       <div class="customers-page__title-row">
         <h1 class="customers-page__title">Customers</h1>
-        @if (customers().length) {
-          <span class="customers-page__results-pill">{{ visibleCustomersLabel() }}</span>
-        }
       </div>
       <p class="customers-page__subtitle">
         Keep the customer directory tidy, review repeat buyers, and make every contact easier to scan at a glance.
@@ -15,7 +12,7 @@
 
     <div class="customers-page__hero-actions">
       <button type="button" class="customers-page__hero-action customers-page__hero-action--secondary" (click)="loadCustomers()">Refresh</button>
-      <button type="button" class="customers-page__hero-action" (click)="openCreateEditor()">Add customer</button>
+      <button type="button" class="customers-page__hero-action customers-page__hero-action--primary" (click)="openCreateEditor()">Add customer</button>
     </div>
   </section>
 
@@ -113,12 +110,10 @@
 
                 <div class="customers-page__card-main">
                   <div class="customers-page__card-head">
-                    <div class="customers-page__card-title-group">
+                  <div class="customers-page__card-title-group">
                       <h3>{{ customer.fullName }}</h3>
                       <p>{{ customer.email || customer.phone || 'No direct contact saved yet' }}</p>
                     </div>
-
-                    <button type="button" class="customers-page__edit" (click)="openEditEditor(customer)">Edit</button>
                   </div>
 
                   <div class="customers-page__badges">
@@ -158,10 +153,28 @@
                   <span>Created</span>
                   <strong>{{ formatDate(customer.createdAt) }}</strong>
                 </div>
+                <div class="customers-page__card-actions">
+                  <button type="button" class="customers-page__edit" (click)="openEditEditor(customer)">
+                    <span class="customers-page__action-icon" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none">
+                        <path d="M3.5 13.9L3.9 16.1L6.1 16.5L14.8 7.8L12.2 5.2L3.5 13.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                        <path d="M11.4 6L14 8.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                      </svg>
+                    </span>
+                    Edit
+                  </button>
 
-                <button type="button" class="customers-page__danger" [disabled]="isDeleting() === customer.id" (click)="deleteCustomer(customer)">
-                  {{ isDeleting() === customer.id ? 'Deleting...' : 'Delete' }}
-                </button>
+                  <button type="button" class="customers-page__danger" [disabled]="isDeleting() === customer.id" (click)="deleteCustomer(customer)">
+                    <span class="customers-page__action-icon" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none">
+                        <path d="M5.8 6.2L6.3 15.5H13.7L14.2 6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M4.8 5.2H15.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M8 5.2V3.9H12V5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </span>
+                    {{ isDeleting() === customer.id ? 'Deleting...' : 'Delete' }}
+                  </button>
+                </div>
               </div>
             </article>
           }
@@ -198,8 +211,8 @@
   </section>
 
   @if (isEditorOpen()) {
-    <section class="customers-page__backdrop" (click)="closeEditor()"></section>
-    <aside class="customers-page__editor customers-page__panel">
+    <section class="customers-page__backdrop" [class.is-closing]="isEditorClosing()" (click)="closeEditor()"></section>
+    <aside class="customers-page__editor customers-page__panel" [class.is-closing]="isEditorClosing()">
       <header class="customers-page__editor-head">
         <div class="customers-page__editor-copy">
           <p class="customers-page__section-label">Customer editor</p>
@@ -210,58 +223,60 @@
       </header>
 
       <form class="customers-page__form" [formGroup]="customerForm" (ngSubmit)="saveCustomer()">
-        <section class="customers-page__editor-section">
-          <div class="customers-page__editor-section-head">
-            <h3>Identity</h3>
-            <p>Start with the basic profile details used across the workspace.</p>
-          </div>
+        <div class="customers-page__editor-body">
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>Identity</h3>
+              <p>Start with the basic profile details used across the workspace.</p>
+            </div>
 
-          <div class="customers-page__form-split">
+            <div class="customers-page__form-split">
+              <label>
+                <span>First name</span>
+                <input type="text" formControlName="firstName" placeholder="Sarra" />
+              </label>
+              <label>
+                <span>Last name</span>
+                <input type="text" formControlName="lastName" placeholder="Ben Ali" />
+              </label>
+            </div>
+          </section>
+
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>Contact</h3>
+              <p>Add the channels you want available when reviewing the customer later.</p>
+            </div>
+
+            <div class="customers-page__form-split">
+              <label>
+                <span>Email</span>
+                <input type="email" formControlName="email" placeholder="sarra@example.com" />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input type="text" formControlName="phone" placeholder="+216..." />
+              </label>
+            </div>
+          </section>
+
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>Location</h3>
+              <p>Keep delivery and segmentation details clean and easy to scan.</p>
+            </div>
+
             <label>
-              <span>First name</span>
-              <input type="text" formControlName="firstName" placeholder="Sarra" />
+              <span>Address</span>
+              <input type="text" formControlName="address" placeholder="Lac 2, Tunis" />
             </label>
+
             <label>
-              <span>Last name</span>
-              <input type="text" formControlName="lastName" placeholder="Ben Ali" />
+              <span>Zone</span>
+              <input type="text" formControlName="zoneLabel" placeholder="Tunis Nord" />
             </label>
-          </div>
-        </section>
-
-        <section class="customers-page__editor-section">
-          <div class="customers-page__editor-section-head">
-            <h3>Contact</h3>
-            <p>Add the channels you want available when reviewing the customer later.</p>
-          </div>
-
-          <div class="customers-page__form-split">
-            <label>
-              <span>Email</span>
-              <input type="email" formControlName="email" placeholder="sarra@example.com" />
-            </label>
-            <label>
-              <span>Phone</span>
-              <input type="text" formControlName="phone" placeholder="+216..." />
-            </label>
-          </div>
-        </section>
-
-        <section class="customers-page__editor-section">
-          <div class="customers-page__editor-section-head">
-            <h3>Location</h3>
-            <p>Keep delivery and segmentation details clean and easy to scan.</p>
-          </div>
-
-          <label>
-            <span>Address</span>
-            <input type="text" formControlName="address" placeholder="Lac 2, Tunis" />
-          </label>
-
-          <label>
-            <span>Zone</span>
-            <input type="text" formControlName="zoneLabel" placeholder="Tunis Nord" />
-          </label>
-        </section>
+          </section>
+        </div>
 
         <footer class="customers-page__editor-footer">
           <button type="button" class="customers-page__secondary" (click)="closeEditor()">Cancel</button>

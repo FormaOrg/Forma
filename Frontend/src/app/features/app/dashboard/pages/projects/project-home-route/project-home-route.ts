@@ -92,4 +92,40 @@ export class ProjectHomeRoute {
     const days = Math.round(hours / 24);
     return formatter.format(days, 'day');
   }
+
+  activityTone(title: string): 'catalog' | 'customer' | 'order' | 'project' {
+    const normalized = title.toLowerCase();
+
+    if (normalized.includes('customer')) {
+      return 'customer';
+    }
+
+    if (normalized.includes('order') || normalized.includes('sale')) {
+      return 'order';
+    }
+
+    if (normalized.includes('catalog') || normalized.includes('product')) {
+      return 'catalog';
+    }
+
+    return 'project';
+  }
+
+  suggestedActionTone(title: string): 'setup' | 'catalog' | 'customer' | 'launch' {
+    const normalized = title.toLowerCase();
+
+    if (normalized.includes('catalog') || normalized.includes('product')) {
+      return 'catalog';
+    }
+
+    if (normalized.includes('customer')) {
+      return 'customer';
+    }
+
+    if (normalized.includes('publish') || normalized.includes('launch') || normalized.includes('storefront')) {
+      return 'launch';
+    }
+
+    return 'setup';
+  }
 }

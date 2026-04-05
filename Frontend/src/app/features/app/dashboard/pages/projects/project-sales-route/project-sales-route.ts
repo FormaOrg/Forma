@@ -47,6 +47,7 @@ const SALES_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
   styleUrl: './project-sales-route.css'
 })
 export class ProjectSalesRoute implements OnInit {
+  private static readonly orderEditorTransitionMs = 220;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -58,6 +59,7 @@ export class ProjectSalesRoute implements OnInit {
 
   private searchTimeout?: number;
   private salesRequestToken = 0;
+  private orderEditorCloseTimeout?: number;
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => params.get('projectId') ?? '')),
@@ -110,13 +112,16 @@ export class ProjectSalesRoute implements OnInit {
   readonly isSalesLoading = signal(false);
   readonly hasLoadedSales = signal(false);
   readonly isExportingSales = signal(false);
+  readonly isDeletingOrders = signal(false);
   readonly isOrderEditorOpen = signal(false);
+  readonly isOrderEditorClosing = signal(false);
   readonly isOrderEditorLoading = signal(false);
   readonly isOrderSaving = signal(false);
   readonly editingOrderId = signal<number | null>(null);
   readonly availableCustomers = signal<ProjectCustomer[]>([]);
   readonly availableProducts = signal<ProjectCatalogProduct[]>([]);
   readonly selectedOrderIds = signal<number[]>([]);
+  readonly cachedSalesOrders = signal<ProjectSalesPageResponse['orders']['allItems']>([]);
   readonly salesRangeLabel = computed(
     () => this.salesRangeOptions.find((item) => item.value === this.salesQuery().range)?.label ?? 'Last 30 days'
   );
@@ -228,8 +233,59 @@ export class ProjectSalesRoute implements OnInit {
       }
     ];
   });
+  readonly filteredSalesOrderRows = computed(() => {
+    const query = this.salesQuery();
+    const normalizedSearch = (query.search ?? '').trim().toLowerCase();
+    const filtered = this.cachedSalesOrders().filter((order) => {
+      const matchesSearch = !normalizedSearch
+        || order.orderNumber.toLowerCase().includes(normalizedSearch)
+        || order.customerName.toLowerCase().includes(normalizedSearch);
+
+      const matchesFilter = (() => {
+        switch (query.filter) {
+          case 'ACTIVE':
+            return order.fulfillmentStatus !== 'DELIVERED' && order.fulfillmentStatus !== 'CANCELLED';
+          case 'DELIVERED':
+            return order.fulfillmentStatus === 'DELIVERED';
+          case 'DUE_ON_DELIVERY':
+            return order.paymentStatus === 'DUE_ON_DELIVERY';
+          default:
+            return true;
+        }
+      })();
+
+      return matchesSearch && matchesFilter;
+    });
+
+    const sorted = [...filtered].sort((left, right) => {
+      switch (query.sort) {
+        case 'PLACED_AT_ASC':
+          return this.toComparableDate(left.placedAt) - this.toComparableDate(right.placedAt);
+        case 'TOTAL_DESC':
+          return right.total - left.total;
+        case 'TOTAL_ASC':
+          return left.total - right.total;
+        case 'PLACED_AT_DESC':
+        default:
+          return this.toComparableDate(right.placedAt) - this.toComparableDate(left.placedAt);
+      }
+    });
+
+    return sorted;
+  });
+  readonly salesOrdersPage = computed(() => {
+    const totalPages = this.salesOrdersTotalPages();
+    return totalPages === 0 ? 0 : Math.min(this.salesQuery().page, totalPages - 1);
+  });
+  readonly pagedSalesOrderRows = computed(() => {
+    const page = this.salesOrdersPage();
+    const size = this.salesQuery().size;
+    const rows = this.filteredSalesOrderRows();
+    const start = page * size;
+    return rows.slice(start, start + size);
+  });
   readonly salesOrders = computed<SalesOrderView[]>(() =>
-    this.salesResponse()?.orders.items.map((order) => ({
+    this.pagedSalesOrderRows().map((order) => ({
       rawId: order.id,
       id: order.orderNumber,
       customer: order.customerName,
@@ -240,12 +296,15 @@ export class ProjectSalesRoute implements OnInit {
     })) ?? []
   );
   readonly salesHasData = computed(() => this.salesResponse()?.hasData ?? false);
-  readonly salesHasOrders = computed(() => (this.salesResponse()?.orders.items.length ?? 0) > 0);
-  readonly salesOrdersPage = computed(() => this.salesResponse()?.orders.page ?? 0);
-  readonly salesOrdersTotalPages = computed(() => this.salesResponse()?.orders.totalPages ?? 0);
-  readonly salesOrdersTotalElements = computed(() => this.salesResponse()?.orders.totalElements ?? 0);
+  readonly salesHasOrders = computed(() => this.filteredSalesOrderRows().length > 0);
+  readonly salesOrdersTotalPages = computed(() => {
+    const total = this.filteredSalesOrderRows().length;
+    const size = this.salesQuery().size;
+    return total === 0 ? 0 : Math.ceil(total / size);
+  });
+  readonly salesOrdersTotalElements = computed(() => this.filteredSalesOrderRows().length);
   readonly allVisibleOrdersSelected = computed(() => {
-    const visibleIds = this.salesResponse()?.orders.items.map((item) => item.id) ?? [];
+    const visibleIds = this.pagedSalesOrderRows().map((item) => item.id);
     return visibleIds.length > 0 && visibleIds.every((id) => this.selectedOrderIds().includes(id));
   });
   readonly orderEditorTitle = computed(() =>
@@ -272,20 +331,27 @@ export class ProjectSalesRoute implements OnInit {
         map((params) => this.parseSalesQuery(params)),
         distinctUntilChanged((left, right) => this.areSalesQueriesEqual(left, right)),
         switchMap((query) => {
+          const previousQuery = this.salesQuery();
           const requestToken = ++this.salesRequestToken;
           this.salesQuery.set(query);
           this.salesSearchValue.set(query.search ?? '');
           this.salesErrorMessage.set('');
+
+          if (this.hasLoadedSales() && !this.isSalesDataQueryChanged(previousQuery, query)) {
+            this.selectedOrderIds.set([]);
+            return of({ data: this.salesResponse(), error: '', query, requestToken, skipFetch: true });
+          }
+
           this.isSalesLoading.set(true);
 
           const projectId = Number(this.projectId());
           if (!projectId) {
-            return of({ data: null, error: 'Project not found.', query, requestToken });
+            return of({ data: null, error: 'Project not found.', query, requestToken, skipFetch: false });
           }
 
           return this.projectSalesService.getSalesPage(projectId, query).pipe(
-            map((data) => ({ data, error: '', query, requestToken })),
-            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error), query, requestToken })),
+            map((data) => ({ data, error: '', query, requestToken, skipFetch: false })),
+            catchError((error) => of({ data: null, error: this.toSalesErrorMessage(error), query, requestToken, skipFetch: false })),
             finalize(() => {
               if (requestToken === this.salesRequestToken) {
                 this.isSalesLoading.set(false);
@@ -296,18 +362,23 @@ export class ProjectSalesRoute implements OnInit {
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ data, error, query, requestToken }) => {
+      .subscribe(({ data, error, query, requestToken, skipFetch }) => {
         if (requestToken !== this.salesRequestToken) {
           return;
         }
 
         if (data) {
-          this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
+          const hydrated = this.hydrateSalesPreviewData(data, query);
+          this.salesResponse.set(hydrated);
+          if (!skipFetch) {
+            this.cachedSalesOrders.set(hydrated.orders.allItems ?? []);
+          }
           this.selectedOrderIds.set([]);
           return;
         }
 
         this.salesResponse.set(null);
+        this.cachedSalesOrders.set([]);
         this.salesErrorMessage.set(error || 'Something went wrong while loading sales data.');
       });
   }
@@ -347,8 +418,10 @@ export class ProjectSalesRoute implements OnInit {
   }
 
   openCreateOrderEditor(): void {
+    this.reopenOrderEditorIfClosing();
     this.editingOrderId.set(null);
     this.resetOrderForm();
+    this.isOrderEditorClosing.set(false);
     this.isOrderEditorOpen.set(true);
     this.loadOrderEditorReferences();
   }
@@ -359,7 +432,9 @@ export class ProjectSalesRoute implements OnInit {
       return;
     }
 
+    this.reopenOrderEditorIfClosing();
     this.editingOrderId.set(orderId);
+    this.isOrderEditorClosing.set(false);
     this.isOrderEditorOpen.set(true);
     this.isOrderEditorLoading.set(true);
 
@@ -386,12 +461,17 @@ export class ProjectSalesRoute implements OnInit {
   }
 
   closeOrderEditor(): void {
-    if (this.isOrderSaving()) {
+    if (this.isOrderSaving() || !this.isOrderEditorOpen() || this.isOrderEditorClosing()) {
       return;
     }
 
-    this.isOrderEditorOpen.set(false);
-    this.isOrderEditorLoading.set(false);
+    this.isOrderEditorClosing.set(true);
+    window.clearTimeout(this.orderEditorCloseTimeout);
+    this.orderEditorCloseTimeout = window.setTimeout(() => {
+      this.isOrderEditorOpen.set(false);
+      this.isOrderEditorClosing.set(false);
+      this.isOrderEditorLoading.set(false);
+    }, ProjectSalesRoute.orderEditorTransitionMs);
   }
 
   addOrderItem(): void {
@@ -444,7 +524,7 @@ export class ProjectSalesRoute implements OnInit {
 
     const payload = this.buildOrderPayload();
     if (!payload) {
-      this.toastService.error('Please review the order values and items before saving.');
+      this.toastService.error('Please review the order values and products before saving.');
       return;
     }
 
@@ -460,17 +540,21 @@ export class ProjectSalesRoute implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: (order) => {
-          this.toastService.success(orderId ? 'Order updated.' : 'Order created.');
-          this.isOrderSaving.set(false);
-          if (orderId) {
-            this.closeOrderEditor();
-          } else {
-            this.editingOrderId.set(order.id);
-            this.fillOrderForm(order);
-          }
-          this.refreshSalesData();
-        },
+          next: (order) => {
+            this.toastService.success(orderId ? 'Order updated.' : 'Order created.');
+            this.isOrderSaving.set(false);
+            if (orderId) {
+              this.closeOrderEditor();
+            } else {
+              this.editingOrderId.set(order.id);
+              this.fillOrderForm(order);
+              window.clearTimeout(this.orderEditorCloseTimeout);
+              this.isOrderEditorOpen.set(false);
+              this.isOrderEditorClosing.set(false);
+              this.isOrderEditorLoading.set(false);
+            }
+            this.refreshSalesData();
+          },
         error: () => {
           this.toastService.error('Unable to save this order right now.');
         }
@@ -502,7 +586,7 @@ export class ProjectSalesRoute implements OnInit {
   }
 
   toggleAllOrders(selected: boolean): void {
-    const visibleIds = this.salesResponse()?.orders.items.map((item) => item.id) ?? [];
+    const visibleIds = this.pagedSalesOrderRows().map((item) => item.id);
     this.selectedOrderIds.set(selected ? [...visibleIds] : []);
   }
 
@@ -514,6 +598,31 @@ export class ProjectSalesRoute implements OnInit {
       current.delete(orderId);
     }
     this.selectedOrderIds.set(Array.from(current));
+  }
+
+  deleteSelectedOrders(): void {
+    const projectId = Number(this.projectId());
+    const orderIds = this.selectedOrderIds();
+    if (!projectId || orderIds.length === 0 || this.isDeletingOrders()) {
+      return;
+    }
+
+    this.isDeletingOrders.set(true);
+    this.projectSalesService.deleteOrders(projectId, orderIds)
+      .pipe(
+        finalize(() => this.isDeletingOrders.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: () => {
+          this.selectedOrderIds.set([]);
+          this.toastService.success(orderIds.length === 1 ? 'Order deleted.' : 'Orders deleted.');
+          this.refreshSalesData();
+        },
+        error: () => {
+          this.toastService.error('Unable to delete the selected orders right now.');
+        }
+      });
   }
 
   get orderItems(): FormArray {
@@ -611,7 +720,9 @@ export class ProjectSalesRoute implements OnInit {
           if (requestToken !== this.salesRequestToken) {
             return;
           }
-          this.salesResponse.set(this.hydrateSalesPreviewData(data, query));
+          const hydrated = this.hydrateSalesPreviewData(data, query);
+          this.salesResponse.set(hydrated);
+          this.cachedSalesOrders.set(hydrated.orders.allItems ?? []);
           this.selectedOrderIds.set([]);
         },
         error: (error) => {
@@ -620,6 +731,7 @@ export class ProjectSalesRoute implements OnInit {
           }
           this.salesErrorMessage.set(this.toSalesErrorMessage(error));
           this.salesResponse.set(null);
+          this.cachedSalesOrders.set([]);
         }
       });
   }
@@ -815,6 +927,10 @@ export class ProjectSalesRoute implements OnInit {
       && left.size === right.size;
   }
 
+  private isSalesDataQueryChanged(left: ProjectSalesQuery, right: ProjectSalesQuery): boolean {
+    return left.range !== right.range || left.compare !== right.compare;
+  }
+
   private trendFromNumber(value: number): 'up' | 'down' | 'neutral' {
     if (value > 0) {
       return 'up';
@@ -866,6 +982,11 @@ export class ProjectSalesRoute implements OnInit {
     return value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
+  private toComparableDate(value: string): number {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
   private toSalesErrorMessage(error: unknown): string {
     const status = typeof error === 'object' && error && 'status' in error
       ? (error as { status?: number }).status
@@ -904,5 +1025,14 @@ export class ProjectSalesRoute implements OnInit {
     if (this.isOrderEditorOpen()) {
       this.closeOrderEditor();
     }
+  }
+
+  private reopenOrderEditorIfClosing(): void {
+    if (!this.isOrderEditorClosing()) {
+      return;
+    }
+
+    window.clearTimeout(this.orderEditorCloseTimeout);
+    this.isOrderEditorClosing.set(false);
   }
 }

@@ -22,6 +22,8 @@
   [ordersPage]="salesOrdersPage()"
   [ordersTotalPages]="salesOrdersTotalPages()"
   [ordersTotalElements]="salesOrdersTotalElements()"
+  [ordersExporting]="isExportingSales()"
+  [ordersDeleting]="isDeletingOrders()"
   (rangeChange)="setSalesRange($event)"
   (compareToggle)="toggleComparePeriod()"
   (refresh)="refreshSalesData()"
@@ -32,19 +34,20 @@
   (searchChange)="onSalesSearchInput($event)"
   (toggleAllOrders)="toggleAllOrders($event)"
   (toggleOrderSelection)="toggleOrderSelection($event.orderId, $event.selected)"
+  (deleteSelectedOrders)="deleteSelectedOrders()"
   (pageChange)="goToOrdersPage($event)"
   (createOrder)="openCreateOrderEditor()"
   (editOrder)="openEditOrderEditor($event)"
 ></app-project-sales-page>
 
 @if (isOrderEditorOpen()) {
-  <section class="sales-editor-backdrop" (click)="closeOrderEditor()"></section>
-  <aside class="sales-editor">
+  <section class="sales-editor-backdrop" [class.is-closing]="isOrderEditorClosing()" (click)="closeOrderEditor()"></section>
+  <aside class="sales-editor" [class.is-closing]="isOrderEditorClosing()">
     <header class="sales-editor__header">
       <div class="sales-editor__header-copy">
         <p class="sales-editor__eyebrow">Sales editor</p>
         <h2>{{ orderEditorTitle() }}</h2>
-        <p class="sales-editor__subtitle">Add or update a local order, assign a customer, and keep item totals aligned with the order flow.</p>
+        <p class="sales-editor__subtitle">Add or update a local order, assign a customer, and keep product totals aligned with the order flow.</p>
       </div>
       <button type="button" class="sales-editor__close" (click)="closeOrderEditor()">Close</button>
     </header>
@@ -144,7 +147,7 @@
 
           <section class="sales-editor__section">
             <div class="sales-editor__section-head">
-              <h3>Items</h3>
+              <h3>Products</h3>
               <p>Build the order basket and let the total recalculate from what you add.</p>
             </div>
 
@@ -152,7 +155,7 @@
               @for (item of orderItems.controls; track $index) {
                 <div class="sales-editor__item" [formGroupName]="$index">
                   <div class="sales-editor__item-head">
-                    <strong>Item {{ $index + 1 }}</strong>
+                    <strong>Product {{ $index + 1 }}</strong>
                     @if (orderItems.length > 1) {
                       <button type="button" class="sales-editor__remove-item" (click)="removeOrderItem($index)">Remove</button>
                     }
@@ -161,7 +164,7 @@
                   <label>
                     <span>Product</span>
                     <select formControlName="productId" (change)="onEditorProductChange($index)">
-                      <option [ngValue]="null">Custom item</option>
+                      <option [ngValue]="null">Custom product</option>
                       @for (product of availableProducts(); track product.id) {
                         <option [ngValue]="product.id">{{ product.name }}</option>
                       }
@@ -195,7 +198,7 @@
               }
             </div>
 
-            <button type="button" class="sales-editor__add-item" (click)="addOrderItem()">Add another item</button>
+            <button type="button" class="sales-editor__add-item" (click)="addOrderItem()">Add another product</button>
           </section>
 
           <section class="sales-editor__section">
