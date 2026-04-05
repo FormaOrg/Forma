@@ -1,17 +1,17 @@
-:host {
+app-settings-profile {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-.profile-container {
+app-settings-profile .profile-container {
   width: 100%;
   max-width: 920px;
   margin: 0;
   padding: 18px 16px 40px;
 }
 
-.profile-header {
+app-settings-profile .profile-header {
   margin: 0 0 20px;
   padding: 0 4px;
   position: relative;
@@ -19,25 +19,25 @@
   background: transparent;
 }
 
-.profile-header__content {
+app-settings-profile .profile-header__content {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
 }
 
-.profile-header__text {
+app-settings-profile .profile-header__text {
   min-width: 0;
 }
 
-.profile-header__actions {
+app-settings-profile .profile-header__actions {
   display: flex;
   gap: 10px;
   flex-shrink: 0;
   align-items: center;
 }
 
-.profile-title {
+app-settings-profile .profile-title {
   font-size: 28px;
   font-weight: 700;
   color: #0b0b12;
@@ -45,25 +45,25 @@
   letter-spacing: -0.02em;
 }
 
-.profile-subtitle {
+app-settings-profile .profile-subtitle {
   font-size: 14px;
   color: rgba(11, 11, 18, 0.74);
   margin: 0;
 }
 
-.profile-form {
+app-settings-profile .profile-form {
   display: flex;
   flex-direction: column;
   gap: 26px;
 }
 
-.profile-section {
+app-settings-profile .profile-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.section-title {
+app-settings-profile .section-title {
   font-size: 13px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.82);
@@ -72,7 +72,7 @@
   margin: 0;
 }
 
-.section-content {
+app-settings-profile .section-content {
   padding: 20px;
   background: #ffffff;
   border: 1px solid rgba(215, 217, 223, 0.95);
@@ -85,7 +85,7 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
-:host-context(.theme-dark) .section-content {
+.theme-dark app-settings-profile .section-content {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
     #171e2a;
@@ -95,7 +95,7 @@
     0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
-.profile-skeleton {
+app-settings-profile .profile-skeleton {
   position: relative;
   overflow: hidden;
   border-radius: 12px;
@@ -104,69 +104,69 @@
   animation: profileSkeletonShimmer 1.25s linear infinite;
 }
 
-.profile-skeleton--avatar {
+app-settings-profile .profile-skeleton--avatar {
   width: 112px;
   height: 112px;
   border-radius: 16px;
   flex-shrink: 0;
 }
 
-.profile-skeleton--title {
+app-settings-profile .profile-skeleton--title {
   width: 180px;
   height: 18px;
 }
 
-.profile-skeleton--text {
+app-settings-profile .profile-skeleton--text {
   width: 100%;
   height: 13px;
 }
 
-.profile-skeleton--text-lg {
+app-settings-profile .profile-skeleton--text-lg {
   max-width: 280px;
 }
 
-.profile-skeleton--text-sm {
+app-settings-profile .profile-skeleton--text-sm {
   max-width: 180px;
 }
 
-.profile-skeleton--button {
+app-settings-profile .profile-skeleton--button {
   width: 126px;
   height: 42px;
   border-radius: 12px;
 }
 
-.profile-skeleton--label {
+app-settings-profile .profile-skeleton--label {
   width: 96px;
   height: 12px;
 }
 
-.profile-skeleton--input {
+app-settings-profile .profile-skeleton--input {
   width: 100%;
   height: 44px;
   border-radius: 12px;
 }
 
-.profile-skeleton--social-icon {
+app-settings-profile .profile-skeleton--social-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
   flex-shrink: 0;
 }
 
-.profile-skeleton--chip {
+app-settings-profile .profile-skeleton--chip {
   width: 92px;
   height: 34px;
   border-radius: 10px;
   flex-shrink: 0;
 }
 
-.profile-skeleton-avatar {
+app-settings-profile .profile-skeleton-avatar {
   display: flex;
   gap: 24px;
   align-items: flex-start;
 }
 
-.profile-skeleton-avatar__copy {
+app-settings-profile .profile-skeleton-avatar__copy {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -175,19 +175,19 @@
   padding-top: 4px;
 }
 
-.profile-skeleton-grid {
+app-settings-profile .profile-skeleton-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-.profile-skeleton-field {
+app-settings-profile .profile-skeleton-field {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.profile-skeleton-social {
+app-settings-profile .profile-skeleton-social {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -196,11 +196,11 @@
   border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.profile-skeleton-social:first-of-type {
+app-settings-profile .profile-skeleton-social:first-of-type {
   margin-top: 4px;
 }
 
-.profile-skeleton-social__left {
+app-settings-profile .profile-skeleton-social__left {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -208,7 +208,7 @@
   flex: 1;
 }
 
-.profile-skeleton-social__copy {
+app-settings-profile .profile-skeleton-social__copy {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -225,13 +225,13 @@
 }
 
 /* Avatar Section */
-.avatar-section {
+app-settings-profile .avatar-section {
   display: flex;
   gap: 24px;
   align-items: flex-start;
 }
 
-.avatar-preview {
+app-settings-profile .avatar-preview {
   width: 112px;
   height: 112px;
   border-radius: 16px;
@@ -246,22 +246,22 @@
   position: relative;
 }
 
-.avatar-preview--has-image {
+app-settings-profile .avatar-preview--has-image {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.10);
   background: rgba(0, 0, 0, 0.03);
 }
 
-.avatar-preview--has-image:hover {
+app-settings-profile .avatar-preview--has-image:hover {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.18);
 }
 
-.avatar-image {
+app-settings-profile .avatar-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.avatar-remove-overlay {
+app-settings-profile .avatar-remove-overlay {
   position: absolute;
   inset: 0;
   border: none;
@@ -277,7 +277,7 @@
   transition: opacity 180ms ease, transform 180ms ease, background-color 180ms ease;
 }
 
-.avatar-remove-overlay svg {
+app-settings-profile .avatar-remove-overlay svg {
   width: 26px;
   height: 26px;
   fill: none;
@@ -288,48 +288,48 @@
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
-.avatar-preview--has-image:hover .avatar-remove-overlay {
+app-settings-profile .avatar-preview--has-image:hover .avatar-remove-overlay {
   opacity: 1;
   transform: scale(1);
 }
 
-.avatar-remove-overlay:hover {
+app-settings-profile .avatar-remove-overlay:hover {
   background: rgba(8, 11, 22, 0.46);
 }
 
-.avatar-placeholder {
+app-settings-profile .avatar-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
   color: #7f8494;
 }
 
-.avatar-actions {
+app-settings-profile .avatar-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 240px;
 }
 
-.avatar-meta {
+app-settings-profile .avatar-meta {
   display: flex;
   flex-direction: column;
   gap: 2px;
   margin-bottom: 4px;
 }
 
-.avatar-meta__title {
+app-settings-profile .avatar-meta__title {
   font-size: 14px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.86);
 }
 
-.avatar-meta__hint {
+app-settings-profile .avatar-meta__hint {
   font-size: 12px;
   color: rgba(11, 11, 18, 0.68);
 }
 
-.upload-button {
+app-settings-profile .upload-button {
   padding: 10px 16px;
   border: 1px solid rgba(117, 102, 255, 0.28);
   border-radius: 12px;
@@ -342,51 +342,51 @@
   width: fit-content;
 }
 
-.upload-button:hover {
+app-settings-profile .upload-button:hover {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.55);
 }
 
 /* Form Fields */
-.form-row {
+app-settings-profile .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
 @media (max-width: 640px) {
-  .form-row {
+  app-settings-profile .form-row {
     grid-template-columns: 1fr;
   }
 }
 
-.form-group {
+app-settings-profile .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-label-row {
+app-settings-profile .form-label-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
 }
 
-.form-label {
+app-settings-profile .form-label {
   font-size: 14px;
   font-weight: 650;
   color: rgba(11, 11, 18, 0.88);
 }
 
-.form-hint {
+app-settings-profile .form-hint {
   font-size: 12px;
   color: rgba(11, 11, 18, 0.62);
   white-space: nowrap;
 }
 
-.form-input,
-select {
+app-settings-profile .form-input,
+app-settings-profile select {
   padding: 10px 12px;
   border: 1px solid rgba(15, 23, 42, 0.14);
   border-radius: 12px;
@@ -398,44 +398,44 @@ select {
   transition: all 200ms ease;
 }
 
-.form-input:focus,
-select:focus {
+app-settings-profile .form-input:focus,
+app-settings-profile select:focus {
   outline: none;
   border-color: rgba(117, 102, 255, 0.65);
   box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.14);
 }
 
-.form-input--disabled {
+app-settings-profile .form-input--disabled {
   background: rgba(15, 23, 42, 0.04);
   color: rgba(11, 11, 18, 0.58);
 }
 
-.form-input--error {
+app-settings-profile .form-input--error {
   border-color: #ef4444;
 }
 
-.form-input--error:focus {
+app-settings-profile .form-input--error:focus {
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
-.form-error {
+app-settings-profile .form-error {
   font-size: 12px;
   color: #ef4444;
 }
 
 /* Email Field */
-.email-field-wrapper {
+app-settings-profile .email-field-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.email-field-wrapper .form-input {
+app-settings-profile .email-field-wrapper .form-input {
   flex: 1;
   padding-right: 70px;
 }
 
-.email-edit-btn {
+app-settings-profile .email-edit-btn {
   position: absolute;
   right: 12px;
   background: none;
@@ -449,11 +449,11 @@ select:focus {
   transition: color 200ms ease;
 }
 
-.email-edit-btn:hover {
+app-settings-profile .email-edit-btn:hover {
   color: #5d4fd6;
 }
 
-.email-status {
+app-settings-profile .email-status {
   font-size: 12px;
   font-weight: 500;
   padding: 4px 8px;
@@ -461,20 +461,20 @@ select:focus {
   white-space: nowrap;
 }
 
-.email-status.verified {
+app-settings-profile .email-status.verified {
   background: rgba(34, 197, 94, 0.1);
   color: #22c55e;
 }
 
 /* Social logins — row list (no card boxes) */
-.social-logins-intro {
+app-settings-profile .social-logins-intro {
   margin: 0;
   font-size: 13px;
   line-height: 1.55;
   color: rgba(11, 11, 18, 0.62);
 }
 
-.social-logins {
+app-settings-profile .social-logins {
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -482,7 +482,7 @@ select:focus {
   border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.social-login-row {
+app-settings-profile .social-login-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -492,11 +492,11 @@ select:focus {
   transition: background-color 150ms ease;
 }
 
-.social-login-row:last-child {
+app-settings-profile .social-login-row:last-child {
   border-bottom: none;
 }
 
-.social-login-row__left {
+app-settings-profile .social-login-row__left {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -504,7 +504,7 @@ select:focus {
   min-width: 0;
 }
 
-.social-login-row__icon {
+app-settings-profile .social-login-row__icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -515,33 +515,33 @@ select:focus {
   background: rgba(15, 23, 42, 0.04);
 }
 
-.social-login-row__icon-img {
+app-settings-profile .social-login-row__icon-img {
   width: 22px;
   height: 22px;
   object-fit: contain;
 }
 
-.social-login-row__text {
+app-settings-profile .social-login-row__text {
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.social-login-row__title-line {
+app-settings-profile .social-login-row__title-line {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.social-login-row__title {
+app-settings-profile .social-login-row__title {
   font-size: 15px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.9);
 }
 
-.social-login-row__status {
+app-settings-profile .social-login-row__status {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -549,21 +549,21 @@ select:focus {
   color: rgba(11, 11, 18, 0.45);
 }
 
-.social-login-row__status--on {
+app-settings-profile .social-login-row__status--on {
   color: #16a34a;
 }
 
-.social-login-row__status--off {
+app-settings-profile .social-login-row__status--off {
   color: rgba(11, 11, 18, 0.42);
 }
 
-.social-login-row__meta {
+app-settings-profile .social-login-row__meta {
   margin: 0;
   font-size: 13px;
   color: rgba(11, 11, 18, 0.55);
 }
 
-.social-login-row__btn {
+app-settings-profile .social-login-row__btn {
   flex-shrink: 0;
   padding: 8px 14px;
   border-radius: 10px;
@@ -574,28 +574,28 @@ select:focus {
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.social-login-row__btn--connect {
+app-settings-profile .social-login-row__btn--connect {
   border-color: rgba(117, 102, 255, 0.4);
   background: rgba(117, 102, 255, 0.08);
   color: #5d4fd6;
 }
 
-.social-login-row__btn--connect:hover {
+app-settings-profile .social-login-row__btn--connect:hover {
   background: rgba(117, 102, 255, 0.14);
   border-color: rgba(117, 102, 255, 0.55);
 }
 
-.social-login-row__btn--disconnect {
+app-settings-profile .social-login-row__btn--disconnect {
   border-color: rgba(239, 68, 68, 0.3);
   background: transparent;
   color: #dc2626;
 }
 
-.social-login-row__btn--disconnect:hover {
+app-settings-profile .social-login-row__btn--disconnect:hover {
   background: rgba(239, 68, 68, 0.06);
 }
 
-.social-login-note {
+app-settings-profile .social-login-note {
   font-size: 12px;
   line-height: 1.5;
   color: rgba(11, 11, 18, 0.52);
@@ -604,11 +604,11 @@ select:focus {
 }
 
 /* Form Actions */
-.form-actions-spacer {
+app-settings-profile .form-actions-spacer {
   height: 10px;
 }
 
-.btn {
+app-settings-profile .btn {
   padding: 12px 24px;
   border: none;
   border-radius: 12px;
@@ -622,33 +622,33 @@ select:focus {
   gap: 8px;
 }
 
-.btn-primary {
+app-settings-profile .btn-primary {
   background: #000;
   color: #fff;
 }
 
-.btn-primary:hover:not(:disabled) {
+app-settings-profile .btn-primary:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.9);
 }
 
-.btn-secondary {
+app-settings-profile .btn-secondary {
   background: rgba(255, 255, 255, 0.9);
   color: rgba(11, 11, 18, 0.92);
   border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
-.btn-secondary:hover:not(:disabled) {
+app-settings-profile .btn-secondary:hover:not(:disabled) {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.35);
 }
 
-.btn:disabled {
+app-settings-profile .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* Save Button with Icon Animation */
-.btn-save {
+app-settings-profile .btn-save {
   background: #8375ff;
   padding: 0.7em 1em;
   padding-left: 3.2em;
@@ -659,15 +659,15 @@ select:focus {
   box-shadow: 0 14px 30px rgba(117, 102, 255, 0.22);
 }
 
-.btn-save:hover:not(:disabled) {
+app-settings-profile .btn-save:hover:not(:disabled) {
   background: #6a5edb;
 }
 
-.btn-save:active:not(:disabled) {
+app-settings-profile .btn-save:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.svg-wrapper-1 {
+app-settings-profile .svg-wrapper-1 {
   display: inline-flex;
   align-items: center;
   position: absolute;
@@ -675,12 +675,12 @@ select:focus {
   transition: all 0.2s ease-in-out;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper-1 {
+app-settings-profile .btn-save:hover:not(:disabled) .svg-wrapper-1 {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.svg-wrapper {
+app-settings-profile .svg-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -690,52 +690,52 @@ select:focus {
   height: 24px;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper:not(.loading-spinner) {
+app-settings-profile .btn-save:hover:not(:disabled) .svg-wrapper:not(.loading-spinner) {
   transform: scale(1.2);
   transition: 0.2s ease-in-out;
 }
 
-.btn-save:hover:not(:disabled) span {
+app-settings-profile .btn-save:hover:not(:disabled) span {
   opacity: 0;
   transition: 0.2s ease-in-out;
 }
 
-.btn-save:disabled .svg-wrapper-1 {
+app-settings-profile .btn-save:disabled .svg-wrapper-1 {
   left: 12px;
 }
 
-.btn-save.is-loading .svg-wrapper-1 {
+app-settings-profile .btn-save.is-loading .svg-wrapper-1 {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.btn-save.is-loading span {
+app-settings-profile .btn-save.is-loading span {
   opacity: 0;
 }
 
-.btn-save span {
+app-settings-profile .btn-save span {
   transition: opacity 0.2s ease-in-out;
 }
 
-.icon {
+app-settings-profile .icon {
   display: block;
   width: 24px;
   height: 24px;
   transition: all 0.3s ease-in-out;
 }
 
-.icon-save {
+app-settings-profile .icon-save {
   fill: currentColor;
 }
 
 /* Loading Spinner Animation */
-.icon-loading {
+app-settings-profile .icon-loading {
   width: 3.25em;
   transform-origin: center;
   animation: rotate4 2s linear infinite;
 }
 
-.icon-loading circle {
+app-settings-profile .icon-loading circle {
   fill: none;
   stroke: white;
   stroke-width: 4;
@@ -767,7 +767,7 @@ select:focus {
 
 
 /* Modal Styles (copied from preferences.css for consistency) */
-.modal-overlay {
+app-settings-profile .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -781,7 +781,7 @@ select:focus {
   animation: fadeIn 200ms ease;
 }
 
-.modal-content {
+app-settings-profile .modal-content {
   background: #fff;
   border-radius: 12px;
   width: 90%;
@@ -790,7 +790,7 @@ select:focus {
   animation: slideUp 200ms ease;
 }
 
-.modal-header {
+app-settings-profile .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -798,23 +798,23 @@ select:focus {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.modal-header-text {
+app-settings-profile .modal-header-text {
   flex: 1;
 }
 
-.modal-title {
+app-settings-profile .modal-title {
   font-size: 1.3em;
   font-weight: 600;
   color: #000;
 }
 
-.modal-subtitle {
+app-settings-profile .modal-subtitle {
   font-size: 13px;
   color: rgba(0, 0, 0, 0.6);
   margin: 0;
 }
 
-.modal-close {
+app-settings-profile .modal-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -825,30 +825,30 @@ select:focus {
   justify-content: center;
 }
 
-.modal-close svg {
+app-settings-profile .modal-close svg {
   width: 30px;
   height: 30px;
 }
 
-.modal-close:hover {
+app-settings-profile .modal-close:hover {
   opacity: 0.7;
 }
 
-.modal-body {
+app-settings-profile .modal-body {
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.modal-description {
+app-settings-profile .modal-description {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.7);
   line-height: 1.6;
   margin: 0;
 }
 
-.modal-footer {
+app-settings-profile .modal-footer {
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
@@ -856,7 +856,7 @@ select:focus {
   padding: 16px 24px 24px;
 }
 
-.modal-footer .btn {
+app-settings-profile .modal-footer .btn {
   height: auto;
   min-height: 40px;
 }
@@ -879,73 +879,73 @@ select:focus {
 
 /* Responsive */
 @media (max-width: 640px) {
-  .profile-skeleton-grid {
+  app-settings-profile .profile-skeleton-grid {
     grid-template-columns: 1fr;
   }
 
-  .profile-skeleton-avatar {
+  app-settings-profile .profile-skeleton-avatar {
     flex-direction: column;
     align-items: center;
   }
 
-  .profile-skeleton-avatar__copy {
+  app-settings-profile .profile-skeleton-avatar__copy {
     width: 100%;
     min-width: 0;
   }
 
-  .profile-container {
+  app-settings-profile .profile-container {
     padding: 12px 12px 28px;
   }
 
-  .profile-title {
+  app-settings-profile .profile-title {
     font-size: 24px;
   }
 
-  .profile-header__content {
+  app-settings-profile .profile-header__content {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .profile-header__actions {
+  app-settings-profile .profile-header__actions {
     width: 100%;
   }
 
-  .profile-header__actions .btn {
+  app-settings-profile .profile-header__actions .btn {
     flex: 1;
   }
 
-  .avatar-section {
+  app-settings-profile .avatar-section {
     flex-direction: column;
     align-items: center;
   }
 
-  .profile-form {
+  app-settings-profile .profile-form {
     gap: 22px;
   }
 
-  .social-login-row {
+  app-settings-profile .social-login-row {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
 
-  .social-login-row__btn {
+  app-settings-profile .social-login-row__btn {
     width: 100%;
     align-self: flex-end;
   }
 
-  .form-label-row {
+  app-settings-profile .form-label-row {
     align-items: flex-start;
   }
 
-  .form-hint {
+  app-settings-profile .form-hint {
     white-space: normal;
     text-align: right;
   }
 }
 
 /* Forgot Password link */
-.forgot-password-link a {
+app-settings-profile .forgot-password-link a {
   color: #7566ff;
   font-size: 14px;
   font-weight: 500;
@@ -953,12 +953,12 @@ select:focus {
   cursor: pointer;
   transition: color 0.2s;
 }
-.forgot-password-link a:hover {
+app-settings-profile .forgot-password-link a:hover {
   color: #4f46e5;
 }
 
 /* Reset password message (success and error) */
-.reset-password-msg {
+app-settings-profile .reset-password-msg {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -969,18 +969,18 @@ select:focus {
   gap: 12px;
   border: 1px solid transparent;
 }
-.reset-password-msg.success {
+app-settings-profile .reset-password-msg.success {
   background: #e6f7ec;
   color: #1a7f37;
   border-color: #b7ebc6;
 }
-.reset-password-msg.error {
+app-settings-profile .reset-password-msg.error {
   background: #ffeaea;
   color: #d32f2f;
   border-color: #ffbdbd;
 }
 
-.msg-close-btn {
+app-settings-profile .msg-close-btn {
   background: none;
   border: none;
   color: inherit;
@@ -992,25 +992,25 @@ select:focus {
   opacity: 0.7;
   transition: opacity 0.2s;
 }
-.msg-close-btn:hover {
+app-settings-profile .msg-close-btn:hover {
   opacity: 1;
 }
 
 /* Next/Submit button color */
-.btn-primary,
-.modal-footer .btn-primary {
+app-settings-profile .btn-primary,
+app-settings-profile .modal-footer .btn-primary {
   background: #7566ff;
   color: #fff;
   border: 1px solid #7566ff;
 }
-.btn-primary:hover:not(:disabled),
-.modal-footer .btn-primary:hover:not(:disabled) {
+app-settings-profile .btn-primary:hover:not(:disabled),
+app-settings-profile .modal-footer .btn-primary:hover:not(:disabled) {
   background: #5d4fd6;
   border-color: #5d4fd6;
 }
 
 /* Resend code link */
-.resend-code-link a {
+app-settings-profile .resend-code-link a {
   color: #7566ff;
   font-size: 14px;
   font-weight: 500;
@@ -1018,63 +1018,63 @@ select:focus {
   cursor: pointer;
   transition: color 0.2s;
 }
-.resend-code-link a:hover {
+app-settings-profile .resend-code-link a:hover {
   color: #4f46e5;
 }
 
 /* Cancel/Back/Red buttons in 3rd popup */
-.btn-danger {
+app-settings-profile .btn-danger {
   background: #ef4444;
   color: #fff;
   border: 1px solid #ef4444;
 }
-.btn-danger:hover:not(:disabled) {
+app-settings-profile .btn-danger:hover:not(:disabled) {
   background: #d32f2f;
   border-color: #d32f2f;
 }
 
-.modal-footer .btn-secondary {
+app-settings-profile .modal-footer .btn-secondary {
   border: 1px solid #7566ff;
   color: #7566ff;
   background: #fff;
 }
 
-.modal-footer .btn-secondary-red {
+app-settings-profile .modal-footer .btn-secondary-red {
   border: 1px solid #ef4444;
   color: #ef4444;
   background: #fff;
 }
 
-.modal-footer .btn-secondary:hover:not(:disabled) {
+app-settings-profile .modal-footer .btn-secondary:hover:not(:disabled) {
   background: #f4f3ff;
   border-color: #5d4fd6;
   color: #5d4fd6;
 }
 
 /* Back button in cancel modal (red border) */
-.showCancelConfirmModal .modal-footer .btn-secondary {
+app-settings-profile .showCancelConfirmModal .modal-footer .btn-secondary {
   border: 1.5px solid #ef4444;
   color: #ef4444;
 }
-.showCancelConfirmModal .modal-footer .btn-secondary:hover {
+app-settings-profile .showCancelConfirmModal .modal-footer .btn-secondary:hover {
   background: #fff0f0;
   color: #d32f2f;
   border-color: #d32f2f;
 }
 
 /* Fix select dropdown icon spacing */
-select,
-select.form-input,
-select.form-select {
+app-settings-profile select,
+app-settings-profile select.form-input,
+app-settings-profile select.form-select {
   padding-right: 16px !important;
   background-position: right 8px center !important;
   background-repeat: no-repeat;
 }
 
 /* Custom select arrow styling for all browsers */
-select,
-select.form-input,
-select.form-select {
+app-settings-profile select,
+app-settings-profile select.form-input,
+app-settings-profile select.form-select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1086,6 +1086,6 @@ select.form-select {
 }
 
 /* Remove default arrow in IE/Edge */
-select::-ms-expand {
+app-settings-profile select::-ms-expand {
   display: none;
 }

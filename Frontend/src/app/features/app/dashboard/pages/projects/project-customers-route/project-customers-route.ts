@@ -18,7 +18,6 @@ import { ToastService } from '../../../../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './project-customers-route.html',
-  styleUrl: './project-customers-route.css',
 })
 export class ProjectCustomersRoute {
   private static readonly editorTransitionMs = 220;

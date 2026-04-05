@@ -2,11 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { Media } from '../../../../../../core/models/project.model';
+import { finalize, map } from 'rxjs';
 import { ProjectHomePage } from '../../../../../../core/models/project-home.model';
 import { ProjectHomeService } from '../../../../../../core/services/project-home.service';
-import { ProjectService } from '../../../../../../core/services/project.service';
 import {
   getProjectWorkspaceConfig,
   normalizeProjectWorkspaceType,
@@ -19,9 +17,8 @@ type ProjectHomeMetricIcon =
   | 'order'
   | 'revenue'
   | 'pages'
-  | 'media'
   | 'audience'
-  | 'sections';
+  | 'launch';
 
 interface ProjectHomeMetricCard {
   label: string;
@@ -36,13 +33,11 @@ interface ProjectHomeMetricCard {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-home-route.html',
-  styleUrl: './project-home-route.css',
 })
 export class ProjectHomeRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectHomeService = inject(ProjectHomeService);
-  private readonly projectService = inject(ProjectService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -52,7 +47,6 @@ export class ProjectHomeRoute {
   readonly page = signal<ProjectHomePage | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
-  readonly portfolioMedia = signal<Media[]>([]);
   readonly workspaceConfig = computed(() => getProjectWorkspaceConfig(this.page()?.projectType));
   readonly metrics = computed(() => this.page()?.metrics ?? []);
   readonly activities = computed(() => (this.page()?.recentActivities ?? []).slice(0, 5));
@@ -82,12 +76,7 @@ export class ProjectHomeRoute {
     }
 
     if (this.isPortfolioWorkspace()) {
-      const mediaCount = this.portfolioMedia().length;
-      if (mediaCount > 0) {
-        return `Keep your pages, ${mediaCount} uploaded assets, and inquiry flow aligned while you refine the story this portfolio tells.`;
-      }
-
-      return 'Keep your page structure, media library, and inquiry flow aligned as you shape a stronger first impression.';
+      return 'Keep your page structure, inquiry flow, and launch state aligned as you shape a stronger first impression.';
     }
 
     return this.workspaceConfig().homeSubtitle;
@@ -116,12 +105,12 @@ export class ProjectHomeRoute {
   );
   readonly activityDescription = computed(() =>
     this.isPortfolioWorkspace()
-      ? 'Recent motion across page structure, media uploads, and the inquiry experience.'
+      ? 'Recent motion across page structure, inquiry flow, and launch readiness.'
       : this.workspaceConfig().activityDescription
   );
   readonly suggestedDescription = computed(() =>
     this.isPortfolioWorkspace()
-      ? 'Recommended focus areas based on your current pages, assets, and inquiry flow.'
+      ? 'Recommended focus areas based on your current pages, inquiry flow, and launch state.'
       : 'Actions derived from the current persisted state of this project.'
   );
   readonly displayMetricCards = computed(() =>
@@ -165,32 +154,11 @@ export class ProjectHomeRoute {
 
     this.projectHomeService
       .getHomePage(projectId)
-      .pipe(
-        switchMap((page) => {
-          this.page.set(page);
-
-          if (normalizeProjectWorkspaceType(page.projectType) !== 'PORTFOLIO') {
-            this.portfolioMedia.set([]);
-            return of(page);
-          }
-
-          return forkJoin({
-            media: this.projectService
-              .getProjectMedia(projectId)
-              .pipe(catchError(() => of([] as Media[]))),
-          }).pipe(
-            tap(({ media }) => this.portfolioMedia.set(media)),
-            map(() => page)
-          );
-        }),
-        finalize(() => this.isLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => undefined,
+        next: (page) => this.page.set(page),
         error: () => {
           this.page.set(null);
-          this.portfolioMedia.set([]);
           this.errorMessage.set('Unable to load this project workspace right now.');
         },
       });
@@ -219,7 +187,7 @@ export class ProjectHomeRoute {
     return formatter.format(days, 'day');
   }
 
-  activityTone(activity: { title: string; description: string; route: string }): 'page' | 'media' | 'audience' | 'launch' | 'catalog' | 'customer' | 'order' | 'project' {
+  activityTone(activity: { title: string; description: string; route: string }): 'page' | 'audience' | 'launch' | 'catalog' | 'customer' | 'order' | 'project' {
     const normalized = `${activity.title} ${activity.description} ${activity.route}`.toLowerCase();
 
     if (
@@ -229,15 +197,6 @@ export class ProjectHomeRoute {
       normalized.includes('homepage')
     ) {
       return 'page';
-    }
-
-    if (
-      normalized.includes('/media') ||
-      normalized.includes('media') ||
-      normalized.includes('image') ||
-      normalized.includes('visual')
-    ) {
-      return 'media';
     }
 
     if (
@@ -272,7 +231,7 @@ export class ProjectHomeRoute {
     return 'project';
   }
 
-  suggestedActionTone(action: { title: string; description: string; route: string }): 'page' | 'media' | 'audience' | 'setup' | 'catalog' | 'customer' | 'launch' {
+  suggestedActionTone(action: { title: string; description: string; route: string }): 'page' | 'audience' | 'setup' | 'catalog' | 'customer' | 'launch' {
     const normalized = `${action.title} ${action.description} ${action.route}`.toLowerCase();
 
     if (
@@ -281,14 +240,6 @@ export class ProjectHomeRoute {
       normalized.includes('case stud')
     ) {
       return 'page';
-    }
-
-    if (
-      normalized.includes('/media') ||
-      normalized.includes('media') ||
-      normalized.includes('visual')
-    ) {
-      return 'media';
     }
 
     if (
@@ -326,9 +277,6 @@ export class ProjectHomeRoute {
   }
 
   private buildPortfolioMetricCards(): ProjectHomeMetricCard[] {
-    const totalMedia = this.portfolioMedia().length;
-    const imageCount = this.portfolioMedia().filter((item) => item.type === 'IMAGE').length;
-
     return [
       {
         label: 'Pages',
@@ -338,28 +286,25 @@ export class ProjectHomeRoute {
         icon: 'pages',
       },
       {
-        label: 'Assets',
-        value: String(totalMedia),
-        helper:
-          totalMedia > 0
-            ? `${imageCount} images ready for featured sections`
-            : 'Upload visuals to start building the media library',
-        tone: 'blue',
-        icon: 'media',
-      },
-      {
         label: 'Inquiries',
         value: '3',
         helper: '1 new lead, 2 active conversations',
-        tone: 'mint',
+        tone: 'blue',
         icon: 'audience',
       },
       {
-        label: 'Sections',
-        value: '18',
-        helper: 'Across home, about, projects, and contact',
+        label: 'Published',
+        value: '2',
+        helper: 'Home and About are ready for visitors',
+        tone: 'mint',
+        icon: 'launch',
+      },
+      {
+        label: 'Launch state',
+        value: 'Draft',
+        helper: 'Keep refining Projects and Contact before going live',
         tone: 'amber',
-        icon: 'sections',
+        icon: 'launch',
       },
     ];
   }
@@ -370,36 +315,30 @@ export class ProjectHomeRoute {
       return [];
     }
 
-    const latestMedia = [...this.portfolioMedia()].sort((left, right) =>
-      right.uploadedAt.localeCompare(left.uploadedAt)
-    )[0];
-
     return [
-      {
-        title: latestMedia ? 'Media uploaded' : 'Media library waiting',
-        description: latestMedia
-          ? `${latestMedia.fileName} is ready to place across your featured portfolio sections.`
-          : 'Upload your first visuals so featured work can feel more complete and intentional.',
-        occurredAt: latestMedia?.uploadedAt ?? this.minutesAgo(45),
-        route: this.projectRoute('media'),
-      },
       {
         title: 'Page map reviewed',
         description: `${page.projectName} now covers home, about, projects, and contact in the current structure.`,
-        occurredAt: this.minutesAgo(120),
+        occurredAt: this.minutesAgo(45),
         route: this.projectRoute('pages'),
       },
       {
         title: 'Inquiry flow checked',
         description: 'Your contact experience is ready to capture new leads and keep active conversations visible.',
-        occurredAt: this.minutesAgo(210),
+        occurredAt: this.minutesAgo(120),
         route: this.projectRoute('audience'),
+      },
+      {
+        title: 'Homepage polish in progress',
+        description: 'Your core pages are aligned around a clearer first impression and a stronger creative narrative.',
+        occurredAt: this.minutesAgo(210),
+        route: this.projectRoute('pages'),
       },
       {
         title: page.published ? 'Portfolio published' : 'Draft polish in progress',
         description: page.published
-          ? 'The live portfolio is ready to share while you keep refining media and case studies.'
-          : 'The portfolio stays private while you finish the final visual and messaging polish.',
+          ? 'The live portfolio is ready to share while you keep refining pages and lead capture.'
+          : 'The portfolio stays private while you finish the final page and inquiry-flow polish.',
         occurredAt: this.minutesAgo(360),
         route: page.published ? this.projectRoute('analytics') : this.projectRoute('pages'),
       },
@@ -412,8 +351,6 @@ export class ProjectHomeRoute {
       return [];
     }
 
-    const hasMedia = this.portfolioMedia().length > 0;
-
     return [
       {
         title: 'Refine homepage and case studies',
@@ -422,20 +359,18 @@ export class ProjectHomeRoute {
         actionLabel: 'Review pages',
       },
       {
-        title: hasMedia ? 'Curate your media library' : 'Upload portfolio visuals',
-        description: hasMedia
-          ? 'Keep only the visuals you want to reuse across featured work, supporting sections, and case studies.'
-          : 'Add images so your featured work and supporting sections feel complete.',
-        route: this.projectRoute('media'),
-        actionLabel: hasMedia ? 'Manage media' : 'Open media',
+        title: 'Tighten the contact flow',
+        description: 'Make the contact page and inquiry path feel clear before the portfolio goes live.',
+        route: this.projectRoute('audience'),
+        actionLabel: 'View inquiries',
       },
       {
         title: page.published ? 'Check portfolio analytics' : 'Tighten the contact flow',
         description: page.published
           ? 'Watch how visitors engage with the portfolio once traffic starts landing.'
-          : 'Make the contact page and inquiry path feel clear before the portfolio goes live.',
-        route: page.published ? this.projectRoute('analytics') : this.projectRoute('audience'),
-        actionLabel: page.published ? 'Open analytics' : 'View inquiries',
+          : 'Review launch readiness and make sure your page structure feels complete before publishing.',
+        route: page.published ? this.projectRoute('analytics') : this.projectRoute('pages'),
+        actionLabel: page.published ? 'Open analytics' : 'Review pages',
       },
     ];
   }

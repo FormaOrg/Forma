@@ -82,10 +82,10 @@ const PORTFOLIO_SETUP_ITEMS: readonly ProjectSetupItem[] = [
     actionLabel: 'Completed'
   },
   {
-    title: 'Upload portfolio media',
-    description: 'Prepare images and presentation assets that support your best work without slowing the site down.',
+    title: 'Refine your project presentation',
+    description: 'Review how featured work, supporting visuals, and case-study structure come together across the portfolio.',
     status: 'pending',
-    actionLabel: 'Add media'
+    actionLabel: 'Review presentation'
   },
   {
     title: 'Refine your inquiry flow',

@@ -1,22 +1,22 @@
-:host {
+app-project-settings-route {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-.project-settings-container {
+app-project-settings-route .project-settings-container {
   width: 100%;
   max-width: 920px;
   margin: 0;
   padding: 18px 16px 40px;
 }
 
-.project-settings-header {
+app-project-settings-route .project-settings-header {
   margin: 0 0 20px;
   padding: 0 4px;
 }
 
-.project-settings-title {
+app-project-settings-route .project-settings-title {
   font-size: 28px;
   font-weight: 700;
   color: #0b0b12;
@@ -24,21 +24,21 @@
   letter-spacing: -0.02em;
 }
 
-.project-settings-subtitle {
+app-project-settings-route .project-settings-subtitle {
   font-size: 14px;
   color: rgba(11, 11, 18, 0.74);
   margin: 0;
 }
 
-.project-settings-meta {
+app-project-settings-route .project-settings-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
 }
 
-.project-settings-meta__pill,
-.project-settings-meta__item {
+app-project-settings-route .project-settings-meta__pill,
+app-project-settings-route .project-settings-meta__item {
   display: inline-flex;
   align-items: center;
   min-height: 30px;
@@ -51,25 +51,25 @@
   color: rgba(11, 11, 18, 0.7);
 }
 
-.project-settings-meta__pill {
+app-project-settings-route .project-settings-meta__pill {
   border-color: rgba(117, 102, 255, 0.18);
   color: #7566ff;
   background: rgba(117, 102, 255, 0.06);
 }
 
-.project-settings-form {
+app-project-settings-route .project-settings-form {
   display: flex;
   flex-direction: column;
   gap: 26px;
 }
 
-.project-settings-section {
+app-project-settings-route .project-settings-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.section-title {
+app-project-settings-route .section-title {
   font-size: 13px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.82);
@@ -78,14 +78,14 @@
   margin: 0;
 }
 
-.section-intro {
+app-project-settings-route .section-intro {
   margin: 0;
   font-size: 13px;
   line-height: 1.55;
   color: rgba(11, 11, 18, 0.62);
 }
 
-.section-content {
+app-project-settings-route .section-content {
   padding: 20px;
   background: #ffffff;
   border: 1px solid rgba(215, 217, 223, 0.95);
@@ -98,13 +98,13 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
-.project-settings-logo-section {
+app-project-settings-route .project-settings-logo-section {
   display: flex;
   gap: 24px;
   align-items: flex-start;
 }
 
-.project-settings-logo-preview {
+app-project-settings-route .project-settings-logo-preview {
   width: 112px;
   height: 112px;
   border-radius: 16px;
@@ -118,18 +118,18 @@
   flex-shrink: 0;
 }
 
-.project-settings-logo-preview--has-image {
+app-project-settings-route .project-settings-logo-preview--has-image {
   background: rgba(0, 0, 0, 0.03);
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
 }
 
-.project-settings-logo-image {
+app-project-settings-route .project-settings-logo-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.project-settings-logo-placeholder {
+app-project-settings-route .project-settings-logo-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,7 +141,7 @@
   letter-spacing: -0.03em;
 }
 
-.project-settings-logo-remove {
+app-project-settings-route .project-settings-logo-remove {
   position: absolute;
   inset: 0;
   border: none;
@@ -157,7 +157,7 @@
   transition: opacity 180ms ease, transform 180ms ease, background-color 180ms ease;
 }
 
-.project-settings-logo-remove svg {
+app-project-settings-route .project-settings-logo-remove svg {
   width: 26px;
   height: 26px;
   fill: none;
@@ -168,43 +168,43 @@
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
-.project-settings-logo-preview--has-image:hover .project-settings-logo-remove {
+app-project-settings-route .project-settings-logo-preview--has-image:hover .project-settings-logo-remove {
   opacity: 1;
   transform: scale(1);
 }
 
-.project-settings-logo-remove:hover {
+app-project-settings-route .project-settings-logo-remove:hover {
   background: rgba(8, 11, 22, 0.46);
 }
 
-.project-settings-logo-actions {
+app-project-settings-route .project-settings-logo-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 240px;
 }
 
-.project-settings-logo-meta {
+app-project-settings-route .project-settings-logo-meta {
   display: flex;
   flex-direction: column;
   gap: 2px;
   margin-bottom: 4px;
 }
 
-.project-settings-logo-meta__title {
+app-project-settings-route .project-settings-logo-meta__title {
   font-size: 14px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.86);
 }
 
-.project-settings-logo-meta__hint {
+app-project-settings-route .project-settings-logo-meta__hint {
   font-size: 12px;
   color: rgba(11, 11, 18, 0.68);
   line-height: 1.5;
   max-width: 340px;
 }
 
-.project-settings-upload-button {
+app-project-settings-route .project-settings-upload-button {
   padding: 10px 16px;
   border: 1px solid rgba(117, 102, 255, 0.28);
   border-radius: 12px;
@@ -217,36 +217,36 @@
   width: fit-content;
 }
 
-.project-settings-upload-button:hover {
+app-project-settings-route .project-settings-upload-button:hover {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.55);
 }
 
-.form-row {
+app-project-settings-route .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-.form-group {
+app-project-settings-route .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-label {
+app-project-settings-route .form-label {
   font-size: 14px;
   font-weight: 650;
   color: rgba(11, 11, 18, 0.88);
 }
 
-.form-label--social {
+app-project-settings-route .form-label--social {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.form-label__icon {
+app-project-settings-route .form-label__icon {
   width: 16px;
   height: 16px;
   display: inline-flex;
@@ -256,19 +256,19 @@
   flex-shrink: 0;
 }
 
-.form-label__icon svg {
+app-project-settings-route .form-label__icon svg {
   width: 16px;
   height: 16px;
 }
 
-.form-label__icon img {
+app-project-settings-route .form-label__icon img {
   width: 16px;
   height: 16px;
   object-fit: contain;
   display: block;
 }
 
-.form-input {
+app-project-settings-route .form-input {
   padding: 10px 12px;
   border: 1px solid rgba(15, 23, 42, 0.14);
   border-radius: 12px;
@@ -280,34 +280,34 @@
   transition: all 200ms ease;
 }
 
-.form-input::placeholder {
+app-project-settings-route .form-input::placeholder {
   color: rgba(11, 11, 18, 0.42);
 }
 
-.form-input:focus {
+app-project-settings-route .form-input:focus {
   outline: none;
   border-color: rgba(117, 102, 255, 0.65);
   box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.14);
 }
 
-.form-textarea {
+app-project-settings-route .form-textarea {
   resize: vertical;
   min-height: 120px;
 }
 
-.form-actions {
+app-project-settings-route .form-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   align-items: center;
 }
 
-.form-actions .btn {
+app-project-settings-route .form-actions .btn {
   min-height: 46px;
   white-space: nowrap;
 }
 
-.btn {
+app-project-settings-route .btn {
   padding: 12px 22px;
   border: none;
   border-radius: 12px;
@@ -321,18 +321,18 @@
   gap: 8px;
 }
 
-.btn-primary {
+app-project-settings-route .btn-primary {
   background: #7566ff;
   color: #fff;
   border: 1px solid #7566ff;
 }
 
-.btn-primary:hover:not(:disabled) {
+app-project-settings-route .btn-primary:hover:not(:disabled) {
   background: #5d4fd6;
   border-color: #5d4fd6;
 }
 
-.btn-save {
+app-project-settings-route .btn-save {
   background: #8375ff;
   padding: 0.7em 1em;
   padding-right: 1.2em;
@@ -345,16 +345,16 @@
   overflow: hidden;
 }
 
-.btn-save:hover:not(:disabled) {
+app-project-settings-route .btn-save:hover:not(:disabled) {
   background: #6a5edb;
   border-color: #6a5edb;
 }
 
-.btn-save:active:not(:disabled) {
+app-project-settings-route .btn-save:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.svg-wrapper-1 {
+app-project-settings-route .svg-wrapper-1 {
   display: inline-flex;
   align-items: center;
   position: absolute;
@@ -364,12 +364,12 @@
   transition: all 0.2s ease-in-out;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper-1 {
+app-project-settings-route .btn-save:hover:not(:disabled) .svg-wrapper-1 {
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.svg-wrapper {
+app-project-settings-route .svg-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,49 +379,49 @@
   height: 24px;
 }
 
-.btn-save:hover:not(:disabled) .svg-wrapper {
+app-project-settings-route .btn-save:hover:not(:disabled) .svg-wrapper {
   transform: scale(1.2);
 }
 
-.btn-save:hover:not(:disabled) span {
+app-project-settings-route .btn-save:hover:not(:disabled) span {
   opacity: 0;
 }
 
-.btn-save:disabled .svg-wrapper-1 {
+app-project-settings-route .btn-save:disabled .svg-wrapper-1 {
   left: 12px;
 }
 
-.btn-save.is-loading .svg-wrapper-1 {
+app-project-settings-route .btn-save.is-loading .svg-wrapper-1 {
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.btn-save.is-loading span {
+app-project-settings-route .btn-save.is-loading span {
   opacity: 0;
 }
 
-.btn-save span {
+app-project-settings-route .btn-save span {
   transition: opacity 0.2s ease-in-out;
 }
 
-.icon {
+app-project-settings-route .icon {
   display: block;
   width: 24px;
   height: 24px;
   transition: all 0.3s ease-in-out;
 }
 
-.icon-save {
+app-project-settings-route .icon-save {
   fill: currentColor;
 }
 
-.icon-loading {
+app-project-settings-route .icon-loading {
   width: 3.25em;
   transform-origin: center;
   animation: rotate4 2s linear infinite;
 }
 
-.icon-loading circle {
+app-project-settings-route .icon-loading circle {
   fill: none;
   stroke: white;
   stroke-width: 4;
@@ -431,49 +431,49 @@
   animation: dash4 1.5s ease-in-out infinite;
 }
 
-.btn-secondary {
+app-project-settings-route .btn-secondary {
   background: rgba(255, 255, 255, 0.9);
   color: rgba(11, 11, 18, 0.92);
   border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
-.btn-secondary:hover:not(:disabled) {
+app-project-settings-route .btn-secondary:hover:not(:disabled) {
   background: rgba(117, 102, 255, 0.06);
   border-color: rgba(117, 102, 255, 0.35);
 }
 
-.btn-secondary-danger {
+app-project-settings-route .btn-secondary-danger {
   background: rgba(255, 255, 255, 0.9);
   color: #b45309;
   border: 1px solid rgba(245, 158, 11, 0.28);
 }
 
-.btn-secondary-danger:hover:not(:disabled) {
+app-project-settings-route .btn-secondary-danger:hover:not(:disabled) {
   background: rgba(245, 158, 11, 0.08);
   border-color: rgba(245, 158, 11, 0.4);
 }
 
-.btn-danger {
+app-project-settings-route .btn-danger {
   background: rgba(239, 68, 68, 0.08);
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.28);
 }
 
-.btn-danger:hover:not(:disabled) {
+app-project-settings-route .btn-danger:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.18);
   border-color: rgba(239, 68, 68, 0.4);
 }
 
-.btn:disabled {
+app-project-settings-route .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.danger-section {
+app-project-settings-route .danger-section {
   gap: 18px;
 }
 
-.danger-content {
+app-project-settings-route .danger-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -485,14 +485,14 @@
   box-shadow: none;
 }
 
-.danger-main {
+app-project-settings-route .danger-main {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   min-width: 0;
 }
 
-.danger-icon {
+app-project-settings-route .danger-icon {
   width: 44px;
   height: 44px;
   display: flex;
@@ -506,39 +506,39 @@
   flex-shrink: 0;
 }
 
-.danger-icon svg {
+app-project-settings-route .danger-icon svg {
   width: 24px;
   height: 24px;
 }
 
-.danger-text {
+app-project-settings-route .danger-text {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.danger-action-title {
+app-project-settings-route .danger-action-title {
   font-size: 15px;
   font-weight: 700;
   color: #991b1b;
   margin: 0;
 }
 
-.danger-action-description {
+app-project-settings-route .danger-action-description {
   font-size: 13px;
   color: rgba(127, 29, 29, 0.82);
   margin: 0;
   line-height: 1.5;
 }
 
-.danger-points {
+app-project-settings-route .danger-points {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.danger-point {
+app-project-settings-route .danger-point {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -551,7 +551,7 @@
   font-weight: 600;
 }
 
-.danger-actions {
+app-project-settings-route .danger-actions {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -560,7 +560,7 @@
   flex-shrink: 0;
 }
 
-.project-settings-state {
+app-project-settings-route .project-settings-state {
   padding: 28px;
   border: 1px solid rgba(215, 217, 223, 0.95);
   border-radius: 20px;
@@ -570,49 +570,49 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
-.project-settings-state h2 {
+app-project-settings-route .project-settings-state h2 {
   margin: 0 0 10px;
   font-size: 18px;
   color: #0b0b12;
 }
 
-.project-settings-state p {
+app-project-settings-route .project-settings-state p {
   margin: 0 0 16px;
   font-size: 14px;
   color: rgba(11, 11, 18, 0.68);
 }
 
-.project-settings-skeleton,
-.project-settings-skeleton-box {
+app-project-settings-route .project-settings-skeleton,
+app-project-settings-route .project-settings-skeleton-box {
   border-radius: 12px;
   background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
   background-size: 220% 100%;
   animation: projectSettingsSkeletonShimmer 1.25s linear infinite;
 }
 
-.project-settings-skeleton-grid {
+app-project-settings-route .project-settings-skeleton-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-.project-settings-skeleton-field {
+app-project-settings-route .project-settings-skeleton-field {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.project-settings-skeleton--label {
+app-project-settings-route .project-settings-skeleton--label {
   width: 96px;
   height: 12px;
 }
 
-.project-settings-skeleton--input {
+app-project-settings-route .project-settings-skeleton--input {
   width: 100%;
   height: 44px;
 }
 
-.project-settings-skeleton--intro {
+app-project-settings-route .project-settings-skeleton--intro {
   width: 100%;
   max-width: 420px;
   height: 14px;
@@ -623,7 +623,7 @@
   100% { background-position: -20% 0; }
 }
 
-.modal-overlay {
+app-project-settings-route .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(23, 20, 53, 0.6);
@@ -635,7 +635,7 @@
   animation: projectSettingsFadeIn 180ms ease;
 }
 
-.modal-content {
+app-project-settings-route .modal-content {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(11, 11, 18, 0.12);
@@ -646,7 +646,7 @@
   animation: projectSettingsSlideUp 200ms ease;
 }
 
-.modal-header {
+app-project-settings-route .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -654,20 +654,20 @@
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.modal-title {
+app-project-settings-route .modal-title {
   font-size: 1.25rem;
   font-weight: 700;
   color: #0b0b12;
   margin: 0;
 }
 
-.modal-divider {
+app-project-settings-route .modal-divider {
   height: 1px;
   background: rgba(15, 23, 42, 0.08);
   margin: 0;
 }
 
-.modal-close {
+app-project-settings-route .modal-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -680,31 +680,31 @@
   transition: background 0.15s, color 0.15s;
 }
 
-.modal-close:hover {
+app-project-settings-route .modal-close:hover {
   background: rgba(15, 23, 42, 0.06);
   color: #0b0b12;
 }
 
-.modal-close svg {
+app-project-settings-route .modal-close svg {
   width: 22px;
   height: 22px;
 }
 
-.modal-body {
+app-project-settings-route .modal-body {
   padding: 22px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.modal-description {
+app-project-settings-route .modal-description {
   font-size: 14px;
   color: rgba(11, 11, 18, 0.7);
   line-height: 1.6;
   margin: 0;
 }
 
-.modal-footer {
+app-project-settings-route .modal-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -749,23 +749,23 @@
   }
 }
 
-:host-context(.theme-dark) .project-settings-title {
+.theme-dark app-project-settings-route .project-settings-title {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .project-settings-subtitle,
-:host-context(.theme-dark) .project-settings-state p,
-:host-context(.theme-dark) .section-intro,
-:host-context(.theme-dark) .danger-action-description,
-:host-context(.theme-dark) .modal-description {
+.theme-dark app-project-settings-route .project-settings-subtitle,
+.theme-dark app-project-settings-route .project-settings-state p,
+.theme-dark app-project-settings-route .section-intro,
+.theme-dark app-project-settings-route .danger-action-description,
+.theme-dark app-project-settings-route .modal-description {
   color: rgba(226, 231, 244, 0.68);
 }
 
-:host-context(.theme-dark) .project-settings-meta__pill,
-:host-context(.theme-dark) .project-settings-meta__item,
-:host-context(.theme-dark) .section-content,
-:host-context(.theme-dark) .project-settings-state,
-:host-context(.theme-dark) .modal-content {
+.theme-dark app-project-settings-route .project-settings-meta__pill,
+.theme-dark app-project-settings-route .project-settings-meta__item,
+.theme-dark app-project-settings-route .section-content,
+.theme-dark app-project-settings-route .project-settings-state,
+.theme-dark app-project-settings-route .modal-content {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
     #171e2a;
@@ -775,161 +775,161 @@
     0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
-:host-context(.theme-dark) .project-settings-meta__item {
+.theme-dark app-project-settings-route .project-settings-meta__item {
   color: rgba(226, 231, 244, 0.7);
 }
 
-:host-context(.theme-dark) .project-settings-meta__pill {
+.theme-dark app-project-settings-route .project-settings-meta__pill {
   color: #9b90ff;
 }
 
-:host-context(.theme-dark) .form-label,
-:host-context(.theme-dark) .project-settings-logo-meta__title,
-:host-context(.theme-dark) .project-settings-state h2,
-:host-context(.theme-dark) .modal-title {
+.theme-dark app-project-settings-route .form-label,
+.theme-dark app-project-settings-route .project-settings-logo-meta__title,
+.theme-dark app-project-settings-route .project-settings-state h2,
+.theme-dark app-project-settings-route .modal-title {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .form-label__icon {
+.theme-dark app-project-settings-route .form-label__icon {
   color: rgba(226, 231, 244, 0.74);
 }
 
-:host-context(.theme-dark) .form-input {
+.theme-dark app-project-settings-route .form-input {
   background: rgba(15, 23, 42, 0.3);
   border-color: rgba(255, 255, 255, 0.08);
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .form-input::placeholder {
+.theme-dark app-project-settings-route .form-input::placeholder {
   color: rgba(226, 231, 244, 0.36);
 }
 
-:host-context(.theme-dark) .project-settings-logo-preview {
+.theme-dark app-project-settings-route .project-settings-logo-preview {
   background: linear-gradient(180deg, rgba(117, 102, 255, 0.16), rgba(255, 255, 255, 0.03));
   border-color: rgba(117, 102, 255, 0.24);
 }
 
-:host-context(.theme-dark) .project-settings-logo-placeholder {
+.theme-dark app-project-settings-route .project-settings-logo-placeholder {
   color: rgba(226, 231, 244, 0.72);
 }
 
-:host-context(.theme-dark) .project-settings-logo-meta__hint {
+.theme-dark app-project-settings-route .project-settings-logo-meta__hint {
   color: rgba(226, 231, 244, 0.68);
 }
 
-:host-context(.theme-dark) .project-settings-upload-button {
+.theme-dark app-project-settings-route .project-settings-upload-button {
   background: rgba(255, 255, 255, 0.04);
   color: #f4f7ff;
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-:host-context(.theme-dark) .project-settings-upload-button:hover {
+.theme-dark app-project-settings-route .project-settings-upload-button:hover {
   background: rgba(117, 102, 255, 0.12);
   border-color: rgba(117, 102, 255, 0.28);
 }
 
-:host-context(.theme-dark) .form-input:focus {
+.theme-dark app-project-settings-route .form-input:focus {
   border-color: rgba(117, 102, 255, 0.42);
   box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.14);
 }
 
-:host-context(.theme-dark) .btn-secondary {
+.theme-dark app-project-settings-route .btn-secondary {
   background: rgba(255, 255, 255, 0.04);
   color: #f4f7ff;
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-:host-context(.theme-dark) .btn-secondary:hover:not(:disabled) {
+.theme-dark app-project-settings-route .btn-secondary:hover:not(:disabled) {
   background: rgba(117, 102, 255, 0.12);
   border-color: rgba(117, 102, 255, 0.28);
 }
 
-:host-context(.theme-dark) .btn-secondary-danger {
+.theme-dark app-project-settings-route .btn-secondary-danger {
   background: rgba(245, 158, 11, 0.08);
   color: #f7b955;
   border-color: rgba(245, 158, 11, 0.22);
 }
 
-:host-context(.theme-dark) .btn-danger {
+.theme-dark app-project-settings-route .btn-danger {
   background: rgba(239, 68, 68, 0.12);
   color: #ff9898;
   border-color: rgba(239, 68, 68, 0.22);
 }
 
-:host-context(.theme-dark) .danger-content {
+.theme-dark app-project-settings-route .danger-content {
   background: rgba(239, 68, 68, 0.08);
 }
 
-:host-context(.theme-dark) .danger-action-title {
+.theme-dark app-project-settings-route .danger-action-title {
   color: #ffb0b0;
 }
 
-:host-context(.theme-dark) .danger-point {
+.theme-dark app-project-settings-route .danger-point {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(239, 68, 68, 0.12);
   color: rgba(255, 210, 210, 0.9);
 }
 
-:host-context(.theme-dark) .modal-header,
-:host-context(.theme-dark) .modal-divider {
+.theme-dark app-project-settings-route .modal-header,
+.theme-dark app-project-settings-route .modal-divider {
   border-color: rgba(255, 255, 255, 0.08);
   background: transparent;
 }
 
-:host-context(.theme-dark) .modal-close {
+.theme-dark app-project-settings-route .modal-close {
   color: rgba(226, 231, 244, 0.7);
 }
 
-:host-context(.theme-dark) .modal-close:hover {
+.theme-dark app-project-settings-route .modal-close:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #f4f7ff;
 }
 
 @media (max-width: 640px) {
-  .project-settings-container {
+  app-project-settings-route .project-settings-container {
     padding: 12px 12px 28px;
   }
 
-  .project-settings-title {
+  app-project-settings-route .project-settings-title {
     font-size: 24px;
   }
 
-  .form-row {
+  app-project-settings-route .form-row {
     grid-template-columns: 1fr;
     gap: 18px;
   }
 
-  .project-settings-logo-section {
+  app-project-settings-route .project-settings-logo-section {
     flex-direction: column;
     align-items: center;
   }
 
-  .project-settings-logo-actions {
+  app-project-settings-route .project-settings-logo-actions {
     align-items: center;
     min-width: 0;
     text-align: center;
   }
 
-  .danger-content {
+  app-project-settings-route .danger-content {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .danger-actions {
+  app-project-settings-route .danger-actions {
     min-width: 0;
   }
 
-  .form-actions {
+  app-project-settings-route .form-actions {
     flex-direction: column-reverse;
   }
 
-  .form-actions .btn,
-  .danger-actions .btn,
-  .modal-footer .btn {
+  app-project-settings-route .form-actions .btn,
+  app-project-settings-route .danger-actions .btn,
+  app-project-settings-route .modal-footer .btn {
     width: 100%;
   }
 
-  .modal-footer {
+  app-project-settings-route .modal-footer {
     flex-direction: column-reverse;
   }
 }

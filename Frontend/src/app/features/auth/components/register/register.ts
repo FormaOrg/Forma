@@ -19,7 +19,6 @@ interface RegisterModel {
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.html',
-  styleUrls: ['./register.css'],
   imports: [NgIf, FormsModule, NgClass, RouterModule]
 })
 export class RegisterComponent implements OnInit {
