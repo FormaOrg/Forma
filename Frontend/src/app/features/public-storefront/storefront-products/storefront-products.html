@@ -1,0 +1,69 @@
+@if (isLoading()) {
+  <section class="storefront-products__state">
+    <p>Loading products...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-products__state storefront-products__state--error">
+    <h1>Catalog unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else {
+  <div class="storefront-products">
+    <header class="storefront-products__header">
+      <div>
+        <a class="storefront-products__brand" [routerLink]="['/store', projectId()]">
+          {{ storefront()?.storeName || 'Storefront' }}
+        </a>
+        <p>Published products from this store's live catalog.</p>
+      </div>
+
+      <nav class="storefront-products__nav" aria-label="Store navigation">
+        <a [routerLink]="['/store', projectId()]">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+      </nav>
+    </header>
+
+    <main class="storefront-products__content">
+      <section class="storefront-products__hero">
+        <span>Store catalog</span>
+        <h1>Browse products</h1>
+        <p>{{ products().length }} live item{{ products().length === 1 ? '' : 's' }} ready to order.</p>
+      </section>
+
+      @if (products().length) {
+        <section class="storefront-products__grid">
+          @for (product of products(); track trackProduct($index, product)) {
+            <article class="storefront-products__card">
+              <a [routerLink]="['/store', projectId(), 'products', product.id]">
+                <div class="storefront-products__media">
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" />
+                  } @else {
+                    <div class="storefront-products__placeholder">{{ product.name.slice(0, 1) }}</div>
+                  }
+                </div>
+
+                <div class="storefront-products__copy">
+                  <p class="storefront-products__category">{{ product.category || 'Catalog item' }}</p>
+                  <h2>{{ product.name }}</h2>
+                  @if (product.description) {
+                    <p class="storefront-products__description">{{ product.description }}</p>
+                  }
+                  <div class="storefront-products__meta">
+                    <strong>{{ product.price | currency:'USD':'symbol':'1.0-2' }}</strong>
+                    <span>{{ product.inventoryQuantity }} in stock</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          }
+        </section>
+      } @else {
+        <section class="storefront-products__empty">
+          <h2>No live products yet</h2>
+          <p>This storefront has been published, but the catalog does not have any active, ready products yet.</p>
+        </section>
+      }
+    </main>
+  </div>
+}

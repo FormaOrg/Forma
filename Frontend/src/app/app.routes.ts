@@ -36,6 +36,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/templates-pages/landing-showcase/landing-showcase').then((m) => m.LandingShowcase)
   },
   {
+    path: 'store/:projectId/products/:productId',
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-product-detail/storefront-product-detail').then((m) => m.StorefrontProductDetail)
+  },
+  {
+    path: 'store/:projectId/products',
+    loadComponent: () => import('./features/public-storefront/storefront-products/storefront-products').then((m) => m.StorefrontProducts)
+  },
+  {
+    path: 'store/:projectId',
+    loadComponent: () => import('./features/public-storefront/storefront-home/storefront-home').then((m) => m.StorefrontHome)
+  },
+  {
     path: 'product',
     loadComponent: () => import('./features/product/product').then((m) => m.Product)
   },
