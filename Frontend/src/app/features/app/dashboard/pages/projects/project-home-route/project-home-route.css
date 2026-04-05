@@ -30,6 +30,16 @@
   gap: 14px;
 }
 
+.project-home-page__hero {
+  align-items: center;
+}
+
+.project-home-page__hero-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .project-home-page__eyebrow {
   margin: 0 0 4px;
   font-size: 0.74rem;
@@ -63,7 +73,6 @@
   color: rgba(11, 11, 18, 0.64);
 }
 
-.project-home-page__hero-action,
 .project-home-page__section-head a,
 .project-home-page__suggested-body a {
   text-decoration: none;
@@ -113,21 +122,14 @@
     color 180ms ease;
 }
 
-.project-home-page__hero-action {
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(117, 102, 255, 0.24);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-}
-
 .project-home-page__status {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.project-home-page__status--hero {
+  margin-top: 14px;
 }
 
 .project-home-page__status-pill {
@@ -239,6 +241,11 @@
 .project-home-page__empty h3 {
   margin: 0;
   color: #111111;
+}
+
+.project-home-page__section-head h2 {
+  font-size: 1.34rem;
+  font-weight: 700;
 }
 
 .project-home-page__activity-list,

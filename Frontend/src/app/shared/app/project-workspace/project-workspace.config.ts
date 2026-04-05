@@ -30,11 +30,10 @@ export interface ProjectWorkspaceConfig {
 
 type WorkspaceKind = 'ECOMMERCE' | 'PORTFOLIO' | 'BLOG' | 'GENERIC';
 
-const SHARED_SUPPORT_SECTION: ProjectWorkspaceNavSection = {
-  id: 'support',
-  label: 'Support',
+const SHARED_SETTINGS_SECTION: ProjectWorkspaceNavSection = {
+  id: 'settings',
+  label: 'Settings',
   items: [
-    { label: 'Help', icon: 'help-circle', path: 'help' },
     { label: 'Settings', icon: 'settings', path: 'settings' },
   ],
 };
@@ -77,7 +76,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
           { label: 'Analytics', icon: 'bar-chart', path: 'analytics' },
         ],
       },
-      SHARED_SUPPORT_SECTION,
+      SHARED_SETTINGS_SECTION,
     ],
   },
   PORTFOLIO: {
@@ -117,7 +116,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
           { label: 'Analytics', icon: 'bar-chart', path: 'analytics' },
         ],
       },
-      SHARED_SUPPORT_SECTION,
+      SHARED_SETTINGS_SECTION,
     ],
   },
   BLOG: {
@@ -157,7 +156,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
           { label: 'Analytics', icon: 'bar-chart', path: 'analytics' },
         ],
       },
-      SHARED_SUPPORT_SECTION,
+      SHARED_SETTINGS_SECTION,
     ],
   },
   GENERIC: {
@@ -190,7 +189,7 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
         label: 'Insights',
         items: [{ label: 'Analytics', icon: 'bar-chart', path: 'analytics' }],
       },
-      SHARED_SUPPORT_SECTION,
+      SHARED_SETTINGS_SECTION,
     ],
   },
 };

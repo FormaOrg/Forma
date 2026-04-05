@@ -7,14 +7,12 @@
           <div class="project-home-page__skeleton project-home-page__skeleton--title"></div>
           <div class="project-home-page__skeleton project-home-page__skeleton--subtitle"></div>
           <div class="project-home-page__skeleton project-home-page__skeleton--subtitle project-home-page__skeleton--subtitle-short"></div>
+          <div class="project-home-page__status project-home-page__status--hero">
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill project-home-page__skeleton--pill-wide"></div>
+          </div>
         </div>
-        <div class="project-home-page__skeleton project-home-page__skeleton--hero-action"></div>
-      </section>
-
-      <section class="project-home-page__status project-home-page__panel">
-        <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
-        <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
-        <div class="project-home-page__skeleton project-home-page__skeleton--pill project-home-page__skeleton--pill-wide"></div>
       </section>
 
       <section class="project-home-page__metrics">
@@ -88,25 +86,20 @@
     </section>
   } @else if (page(); as page) {
     <section class="project-home-page__hero project-home-page__panel">
-      <div>
+      <div class="project-home-page__hero-copy">
         <p class="project-home-page__eyebrow">Project workspace</p>
         <h1 class="project-home-page__title">Welcome back, <span>{{ page.ownerName }}</span>.</h1>
         <p class="project-home-page__subtitle">
           {{ workspaceConfig().homeSubtitle }}
         </p>
+        <div class="project-home-page__status project-home-page__status--hero">
+          @for (item of statusPills(); track item.label) {
+            <span class="project-home-page__status-pill" [class.project-home-page__status-pill--accent]="item.accent">
+              {{ item.label }}
+            </span>
+          }
+        </div>
       </div>
-
-      <a class="project-home-page__hero-action" [routerLink]="['/app/projects', page.projectId, workspaceConfig().heroActionPath]">
-        {{ workspaceConfig().heroActionLabel }}
-      </a>
-    </section>
-
-    <section class="project-home-page__status project-home-page__panel">
-      @for (item of statusPills(); track item.label) {
-        <span class="project-home-page__status-pill" [class.project-home-page__status-pill--accent]="item.accent">
-          {{ item.label }}
-        </span>
-      }
     </section>
 
     <section class="project-home-page__metrics">
