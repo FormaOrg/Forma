@@ -10,6 +10,7 @@ import { ProjectCard, ProjectStatus } from './components/project-card/project-ca
 
 type ProjectFilter = 'all' | ProjectStatus | 'archived';
 type ProjectSort = 'last-edited' | 'name' | 'recently-created';
+type ProjectView = 'cards' | 'rows';
 
 @Component({
   selector: 'app-projects',
@@ -49,6 +50,8 @@ export class Projects implements OnInit {
   readonly searchTerm = signal('');
   readonly activeFilter = signal<ProjectFilter>('all');
   readonly activeSort = signal<ProjectSort>('last-edited');
+  readonly activeView = signal<ProjectView>('cards');
+  readonly filterDropdownOpen = signal(false);
   readonly sortDropdownOpen = signal(false);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
@@ -56,6 +59,19 @@ export class Projects implements OnInit {
   readonly totalProjects = computed(() => this.projects().length);
   readonly publishedProjects = computed(() => this.projects().filter((project) => project.status === 'published').length);
   readonly draftProjects = computed(() => this.projects().filter((project) => project.status === 'draft').length);
+  readonly archivedProjects = computed(() => this.projects().filter((project) => project.status === 'archived').length);
+  readonly activeFilterLabel = computed(() => {
+    switch (this.activeFilter()) {
+      case 'published':
+        return 'Published';
+      case 'draft':
+        return 'Draft';
+      case 'archived':
+        return 'Archived';
+      default:
+        return 'All projects';
+    }
+  });
   readonly activeSortLabel = computed(() => {
     switch (this.activeSort()) {
       case 'name':
@@ -160,6 +176,7 @@ export class Projects implements OnInit {
 
   updateFilter(filter: ProjectFilter): void {
     this.activeFilter.set(filter);
+    this.filterDropdownOpen.set(false);
     this.closeDropdowns();
   }
 
@@ -168,11 +185,22 @@ export class Projects implements OnInit {
     this.sortDropdownOpen.set(false);
   }
 
+  updateView(view: ProjectView): void {
+    this.activeView.set(view);
+  }
+
   toggleSortDropdown(): void {
     this.sortDropdownOpen.update((value) => !value);
+    this.filterDropdownOpen.set(false);
+  }
+
+  toggleFilterDropdown(): void {
+    this.filterDropdownOpen.update((value) => !value);
+    this.sortDropdownOpen.set(false);
   }
 
   closeDropdowns(): void {
+    this.filterDropdownOpen.set(false);
     this.sortDropdownOpen.set(false);
   }
 

@@ -60,31 +60,57 @@
       />
     </div>
 
-    <div class="projects-toolbar__filters" role="tablist" aria-label="Project status filter">
-      <button
-        type="button"
-        class="projects-toolbar__filter"
-        [class.projects-toolbar__filter--active]="activeFilter() === 'all'"
-        (click)="updateFilter('all')"
-      >
-        All
+    <div
+      class="projects-toolbar__dropdown projects-toolbar__dropdown--filter"
+      [class.is-open]="filterDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="projects-toolbar__dropdown-trigger" (click)="toggleFilterDropdown()">
+        <span class="projects-toolbar__dropdown-label">Status</span>
+        <span class="projects-toolbar__dropdown-value">{{ activeFilterLabel() }}</span>
+        <span class="projects-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
       </button>
-      <button
-        type="button"
-        class="projects-toolbar__filter"
-        [class.projects-toolbar__filter--active]="activeFilter() === 'published'"
-        (click)="updateFilter('published')"
-      >
-        Published
-      </button>
-      <button
-        type="button"
-        class="projects-toolbar__filter"
-        [class.projects-toolbar__filter--active]="activeFilter() === 'draft'"
-        (click)="updateFilter('draft')"
-      >
-        Draft
-      </button>
+
+      @if (filterDropdownOpen()) {
+        <div class="projects-toolbar__dropdown-menu">
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeFilter() === 'all'"
+            (click)="updateFilter('all')"
+          >
+            All projects
+          </button>
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeFilter() === 'published'"
+            (click)="updateFilter('published')"
+          >
+            Published
+          </button>
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeFilter() === 'draft'"
+            (click)="updateFilter('draft')"
+          >
+            Draft
+          </button>
+          <button
+            type="button"
+            class="projects-toolbar__dropdown-item"
+            [class.is-selected]="activeFilter() === 'archived'"
+            (click)="updateFilter('archived')"
+          >
+            Archived
+          </button>
+        </div>
+      }
     </div>
 
     <div
@@ -130,6 +156,44 @@
           </button>
         </div>
       }
+    </div>
+
+    <div
+      class="projects-toolbar__view"
+      [attr.data-view]="activeView()"
+      role="tablist"
+      aria-label="Projects layout"
+    >
+      <span class="projects-toolbar__view-pill" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="projects-toolbar__view-button"
+        [class.projects-toolbar__view-button--active]="activeView() === 'cards'"
+        (click)="updateView('cards')"
+        aria-label="Card view"
+        title="Card view"
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <rect x="3.25" y="3.25" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="11.25" y="3.25" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="3.25" y="11.25" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="11.25" y="11.25" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="projects-toolbar__view-button"
+        [class.projects-toolbar__view-button--active]="activeView() === 'rows'"
+        (click)="updateView('rows')"
+        aria-label="Row view"
+        title="Row view"
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 5.25H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M4 9.75H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M4 14.25H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
     </div>
   </section>
 
@@ -196,110 +260,132 @@
         </button>
       </div>
     } @else {
-      @if (featuredProject(); as featured) {
-        <article class="projects-featured">
-          <div class="projects-featured__content">
-            <p class="projects-featured__eyebrow">Most recently edited</p>
-            <h2 class="projects-featured__title">{{ featured.name }}</h2>
-            <p class="projects-featured__text">{{ featured.description }}</p>
+      @if (activeView() === 'cards') {
+        @if (featuredProject(); as featured) {
+          <article class="projects-featured">
+            <div class="projects-featured__content">
+              <p class="projects-featured__eyebrow">Most recently edited</p>
+              <h2 class="projects-featured__title">{{ featured.name }}</h2>
+              <p class="projects-featured__text">{{ featured.description }}</p>
 
-            <div class="projects-featured__meta">
-              <span
-                class="projects-featured__badge"
-                [class.projects-featured__badge--draft]="featured.status === 'draft'"
-                [class.projects-featured__badge--archived]="featured.status === 'archived'"
-              >
-                {{ featured.statusLabel }}
-              </span>
-              <span>Updated {{ featured.updatedDateLabel }}</span>
-              <span>{{ featured.typeLabel }} via {{ featured.creationMethodLabel }}</span>
-              @if (featured.domain) {
-                <span>{{ featured.domain }}</span>
+              <div class="projects-featured__meta">
+                <span
+                  class="projects-featured__badge"
+                  [class.projects-featured__badge--draft]="featured.status === 'draft'"
+                  [class.projects-featured__badge--archived]="featured.status === 'archived'"
+                >
+                  {{ featured.statusLabel }}
+                </span>
+                <span>Updated {{ featured.updatedDateLabel }}</span>
+                <span>{{ featured.typeLabel }} via {{ featured.creationMethodLabel }}</span>
+                @if (featured.domain) {
+                  <span>{{ featured.domain }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="projects-featured__actions">
+              <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route ?? '/app/projects'">Open project</a>
+              @if (featured.previewRoute) {
+                <a class="projects-featured__action projects-featured__action--secondary" [href]="featured.previewRoute" target="_blank" rel="noreferrer">
+                  Preview
+                </a>
+              } @else {
+                <button type="button" class="projects-featured__action projects-featured__action--secondary" disabled>
+                  Preview unavailable
+                </button>
               }
             </div>
-          </div>
-
-          <div class="projects-featured__actions">
-            <a class="projects-featured__action projects-featured__action--primary" [routerLink]="featured.route ?? '/app/projects'">Open project</a>
-            @if (featured.previewRoute) {
-              <a class="projects-featured__action projects-featured__action--secondary" [href]="featured.previewRoute" target="_blank" rel="noreferrer">
-                Preview
-              </a>
-            } @else {
-              <button type="button" class="projects-featured__action projects-featured__action--secondary" disabled>
-                Preview unavailable
-              </button>
-            }
-          </div>
-        </article>
-      }
-
-      <div class="projects-grid">
-        @if (featuredProject(); as featuredCard) {
-          <app-project-card [project]="featuredCard" [highlighted]="true"></app-project-card>
+          </article>
         }
 
-        @for (project of secondaryProjects(); track trackByProject($index, project)) {
-          <app-project-card [project]="project"></app-project-card>
-        }
-      </div>
+        <div class="projects-grid">
+          @if (featuredProject(); as featuredCard) {
+            <app-project-card [project]="featuredCard" [highlighted]="true"></app-project-card>
+          }
 
-      <section class="projects-records">
-        <div class="projects-records__header">
-          <div>
-            <p class="projects-records__eyebrow">Projects table</p>
-            <h3 class="projects-records__title">Live records from your workspace database</h3>
-          </div>
-
-          <span class="projects-records__count">{{ filteredProjects().length }} rows</span>
+          @for (project of secondaryProjects(); track trackByProject($index, project)) {
+            <app-project-card [project]="project"></app-project-card>
+          }
         </div>
+      } @else {
+        <section class="projects-records">
+          <div class="projects-records__header">
+            <div>
+              <p class="projects-records__eyebrow">Projects table</p>
+              <h3 class="projects-records__title">Live records from your workspace database</h3>
+            </div>
 
-        <div class="projects-records__table-wrap">
-          <table class="projects-records__table">
-            <thead>
-              <tr>
-                <th>Project</th>
-                <th>Type</th>
-                <th>Creation</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th>Domain</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (project of filteredProjects(); track trackByProject($index, project)) {
+            <span class="projects-records__count">{{ filteredProjects().length }} rows</span>
+          </div>
+
+          <div class="projects-records__table-wrap">
+            <table class="projects-records__table">
+              <thead>
                 <tr>
-                  <td>
-                    <div class="projects-records__project">
-                      <span class="projects-records__swatch" [style.background]="project.accent"></span>
-                      <div class="projects-records__project-copy">
-                        <strong>{{ project.name }}</strong>
-                        <span>{{ project.description }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{{ project.typeLabel }}</td>
-                  <td>{{ project.creationMethodLabel }}</td>
-                  <td>
-                    <span
-                      class="projects-records__status"
-                      [class.projects-records__status--published]="project.status === 'published'"
-                      [class.projects-records__status--draft]="project.status === 'draft'"
-                      [class.projects-records__status--archived]="project.status === 'archived'"
-                    >
-                      {{ project.statusLabel }}
-                    </span>
-                  </td>
-                  <td>{{ project.createdDateLabel }}</td>
-                  <td>{{ project.updatedDateLabel }}</td>
-                  <td>{{ project.domain || 'Not deployed' }}</td>
+                  <th>Project</th>
+                  <th>Type</th>
+                  <th>Creation</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  <th>Domain</th>
+                  <th class="projects-records__actions-heading">Actions</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                @for (project of filteredProjects(); track trackByProject($index, project)) {
+                  <tr>
+                    <td>
+                      <div class="projects-records__project">
+                        <span class="projects-records__swatch" [style.background]="project.accent"></span>
+                        <div class="projects-records__project-copy">
+                          <strong>{{ project.name }}</strong>
+                          <span>{{ project.description }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ project.typeLabel }}</td>
+                    <td>{{ project.creationMethodLabel }}</td>
+                    <td>
+                      <span
+                        class="projects-records__status"
+                        [class.projects-records__status--published]="project.status === 'published'"
+                        [class.projects-records__status--draft]="project.status === 'draft'"
+                        [class.projects-records__status--archived]="project.status === 'archived'"
+                      >
+                        {{ project.statusLabel }}
+                      </span>
+                    </td>
+                    <td>{{ project.createdDateLabel }}</td>
+                    <td>{{ project.updatedDateLabel }}</td>
+                    <td>{{ project.domain || 'Not deployed' }}</td>
+                    <td class="projects-records__actions-cell">
+                      <div class="projects-records__actions">
+                        <a class="projects-records__open" [routerLink]="project.route ?? '/app/projects'">
+                          Open project
+                        </a>
+                        <button
+                          type="button"
+                          class="projects-records__more"
+                          aria-label="More actions"
+                          title="More actions"
+                        >
+                          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <circle cx="4" cy="10" r="1.5" fill="currentColor" />
+                            <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+                            <circle cx="16" cy="10" r="1.5" fill="currentColor" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
     }
   </section>
 </section>

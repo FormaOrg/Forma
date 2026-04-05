@@ -199,7 +199,7 @@ export const routes: Routes = [
               {
                 path: 'settings',
                 data: { title: 'Settings' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-settings-route/project-settings-route').then((m) => m.ProjectSettingsRoute)
               },
               { path: 'overview', redirectTo: 'home', pathMatch: 'full' },
               { path: 'deploy', redirectTo: 'sales', pathMatch: 'full' },

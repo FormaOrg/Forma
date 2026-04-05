@@ -39,6 +39,50 @@ public class Project {
     @Column(length = 2000)
     private String description;
 
+    @Size(max = 160)
+    @Column(name = "store_title", length = 160)
+    private String storeTitle;
+
+    @Size(max = 40)
+    @Column(name = "contact_phone", length = 40)
+    private String contactPhone;
+
+    @Size(max = 255)
+    @Column(name = "store_email", length = 255)
+    private String storeEmail;
+
+    @Size(max = 255)
+    @Column(name = "default_domain", length = 255)
+    private String defaultDomain;
+
+    @Size(max = 500)
+    @Column(name = "meta_description", length = 500)
+    private String metaDescription;
+
+    @Size(max = 1000)
+    @Column(name = "logo_url", length = 1000)
+    private String logoUrl;
+
+    @Size(max = 255)
+    @Column(name = "logo_public_id", length = 255)
+    private String logoPublicId;
+
+    @Size(max = 255)
+    @Column(name = "facebook_url", length = 255)
+    private String facebookUrl;
+
+    @Size(max = 255)
+    @Column(name = "instagram_url", length = 255)
+    private String instagramUrl;
+
+    @Size(max = 255)
+    @Column(name = "tiktok_url", length = 255)
+    private String tiktokUrl;
+
+    @Size(max = 255)
+    @Column(name = "whatsapp_number", length = 255)
+    private String whatsappNumber;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)

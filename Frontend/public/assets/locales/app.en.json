@@ -110,6 +110,7 @@
   "settings.profile.picture.uploadTitle": "Upload a photo",
   "settings.profile.picture.hint": "PNG, JPG up to 5MB. Square images look best.",
   "settings.profile.picture.button": "Upload Photo",
+  "settings.profile.picture.replaceButton": "Replace Photo",
   "settings.profile.picture.remove": "Remove photo",
   "settings.profile.personal.title": "Personal Information",
   "settings.profile.fields.firstName": "First Name",

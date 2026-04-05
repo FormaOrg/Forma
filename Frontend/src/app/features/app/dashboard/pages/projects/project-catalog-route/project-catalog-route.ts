@@ -335,6 +335,7 @@ export class ProjectCatalogRoute {
     const projectId = this.projectId();
     const input = event.target as HTMLInputElement | null;
     const file = input?.files?.[0];
+    const previousImageUrl = this.productForm.controls.imageUrl.value.trim();
 
     if (!projectId || !file) {
       return;
@@ -359,6 +360,17 @@ export class ProjectCatalogRoute {
       )
       .subscribe({
         next: (response) => {
+          if (previousImageUrl && previousImageUrl !== response.url) {
+            this.uploadService
+              .deleteFile(previousImageUrl)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                error: () => {
+                  // Best-effort cleanup only. We still keep the new uploaded cover.
+                },
+              });
+          }
+
           this.productForm.controls.imageUrl.setValue(response.url);
           this.toastService.success('Cover image uploaded.');
         },

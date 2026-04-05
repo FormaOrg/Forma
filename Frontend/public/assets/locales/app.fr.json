@@ -110,6 +110,7 @@
   "settings.profile.picture.uploadTitle": "Téléverser une photo",
   "settings.profile.picture.hint": "PNG, JPG jusqu'à 5 Mo. Les images carrées sont idéales.",
   "settings.profile.picture.button": "Téléverser une photo",
+  "settings.profile.picture.replaceButton": "Remplacer la photo",
   "settings.profile.picture.remove": "Supprimer la photo",
   "settings.profile.personal.title": "Informations personnelles",
   "settings.profile.fields.firstName": "Prénom",

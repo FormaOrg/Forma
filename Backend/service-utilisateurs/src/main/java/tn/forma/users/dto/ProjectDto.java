@@ -21,6 +21,16 @@ public class ProjectDto {
     private Long templateId;
     private String name;
     private String description;
+    private String storeTitle;
+    private String contactPhone;
+    private String storeEmail;
+    private String defaultDomain;
+    private String metaDescription;
+    private String logoUrl;
+    private String facebookUrl;
+    private String instagramUrl;
+    private String tiktokUrl;
+    private String whatsappNumber;
     private ProjectType type;
     private CreationMethod creationMethod;
     private ProjectStatus status;
