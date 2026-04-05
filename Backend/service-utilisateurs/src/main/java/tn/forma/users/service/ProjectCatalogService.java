@@ -13,6 +13,7 @@ import tn.forma.users.model.ProjectProduct;
 import tn.forma.users.model.ProjectProductStatus;
 import tn.forma.users.model.ProjectProductType;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectOrderRepository;
 import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.UserRepository;
@@ -32,6 +33,7 @@ public class ProjectCatalogService {
 
     private final ProjectRepository projectRepository;
     private final ProjectProductRepository projectProductRepository;
+    private final ProjectOrderRepository projectOrderRepository;
     private final UserRepository userRepository;
 
     public ProjectCatalogPageDto getCatalogPage(
@@ -162,7 +164,9 @@ public class ProjectCatalogService {
     @Transactional
     public void deleteProduct(String email, Long projectId, Long productId) {
         getOwnedProject(email, projectId);
-        projectProductRepository.delete(getOwnedProduct(projectId, productId));
+        ProjectProduct product = getOwnedProduct(projectId, productId);
+        projectOrderRepository.deleteAll(projectOrderRepository.findAllByProjectIdAndProductId(projectId, productId));
+        projectProductRepository.delete(product);
     }
 
     private ProjectCatalogSummaryDto buildSummary(List<ProjectCatalogProductDto> products) {

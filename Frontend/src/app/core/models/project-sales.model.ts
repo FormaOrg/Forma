@@ -104,6 +104,7 @@ export interface CreateProjectOrderRequest {
 export type UpdateProjectOrderRequest = CreateProjectOrderRequest;
 
 export interface ProjectSalesOrdersPage {
+  allItems: ProjectSalesOrderRow[];
   items: ProjectSalesOrderRow[];
   page: number;
   size: number;

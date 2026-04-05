@@ -107,4 +107,18 @@ public class ProjectSalesController {
                 request
         ));
     }
+
+    @DeleteMapping("/orders")
+    public ResponseEntity<Void> deleteOrders(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId,
+            @Valid @RequestBody DeleteProjectOrdersRequest request
+    ) {
+        projectSalesService.deleteOrders(
+                userDetails.getUsername(),
+                projectId,
+                request.getOrderIds()
+        );
+        return ResponseEntity.noContent().build();
+    }
 }

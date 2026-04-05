@@ -133,6 +133,21 @@ public class ProjectSalesService {
         return mapOrderEditorDto(projectOrderRepository.save(order));
     }
 
+    @Transactional
+    public void deleteOrders(String email, Long projectId, List<Long> orderIds) {
+        getOwnedProject(email, projectId);
+        if (orderIds == null || orderIds.isEmpty()) {
+            throw new RuntimeException("At least one order must be selected.");
+        }
+
+        List<ProjectOrder> orders = projectOrderRepository.findAllByIdInAndProjectId(orderIds, projectId);
+        if (orders.size() != orderIds.size()) {
+            throw new RuntimeException("One or more selected orders were not found.");
+        }
+
+        projectOrderRepository.deleteAllInBatch(orders);
+    }
+
     private List<ProjectOrder> loadOrders(Long projectId, ResolvedRange range) {
         return projectOrderRepository.findAllByProjectIdAndPlacedAtGreaterThanEqualAndPlacedAtLessThanOrderByPlacedAtDesc(
                 projectId,
@@ -320,6 +335,17 @@ public class ProjectSalesService {
     private ProjectSalesOrdersPageDto buildOrdersPage(List<ProjectOrder> currentOrders, String search, SalesOrderSort sort, SalesOrderFilter filter, Integer page, Integer size) {
         int safeSize = Math.max(1, Math.min(size == null ? DEFAULT_PAGE_SIZE : size, MAX_PAGE_SIZE));
         int requestedPage = Math.max(page == null ? 0 : page, 0);
+        List<ProjectSalesOrderRowDto> allItems = currentOrders.stream()
+                .map(order -> ProjectSalesOrderRowDto.builder()
+                        .id(order.getId())
+                        .orderNumber(order.getOrderNumber())
+                        .customerName(customerName(order))
+                        .placedAt(Objects.toString(order.getPlacedAt(), null))
+                        .paymentStatus(order.getPaymentStatus().name())
+                        .fulfillmentStatus(order.getFulfillmentStatus().name())
+                        .total(amount(order.getTotal()))
+                        .build())
+                .toList();
         List<ProjectOrder> filteredOrders = applyOrderFilters(currentOrders, search, filter, sort);
 
         int totalPages = filteredOrders.isEmpty() ? 0 : (int) Math.ceil((double) filteredOrders.size() / safeSize);
@@ -340,6 +366,7 @@ public class ProjectSalesService {
                 .toList();
 
         return ProjectSalesOrdersPageDto.builder()
+                .allItems(allItems)
                 .items(items)
                 .page(safePage)
                 .size(safeSize)

@@ -4,6 +4,11 @@
 
 .orders-table {
   background: #ffffff;
+  overflow: hidden;
+  border-radius: 0 0 16px 16px;
+  border-left: 1px solid rgba(215, 217, 223, 0.95);
+  border-right: 1px solid rgba(215, 217, 223, 0.95);
+  border-bottom: 1px solid rgba(215, 217, 223, 0.95);
 }
 
 .orders-table__head,

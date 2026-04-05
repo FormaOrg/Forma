@@ -45,6 +45,12 @@ export class ProjectSalesService {
     return this.http.put<ProjectSalesOrderEditor>(`${this.baseUrl}/${projectId}/sales/orders/${orderId}`, payload);
   }
 
+  deleteOrders(projectId: number, orderIds: number[]): Observable<void> {
+    return this.http.request<void>('DELETE', `${this.baseUrl}/${projectId}/sales/orders`, {
+      body: { orderIds },
+    });
+  }
+
   private buildParams(query: ProjectSalesQuery, includePagination = true): HttpParams {
     let params = new HttpParams()
       .set('range', query.range)

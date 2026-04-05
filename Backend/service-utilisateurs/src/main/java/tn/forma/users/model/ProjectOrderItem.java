@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 
@@ -31,7 +33,8 @@ public class ProjectOrderItem {
     private ProjectOrder order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_project_order_items_product"))
     private ProjectProduct product;
 
     @NotBlank

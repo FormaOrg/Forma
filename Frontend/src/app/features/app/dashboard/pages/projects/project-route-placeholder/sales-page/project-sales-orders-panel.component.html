@@ -36,71 +36,98 @@
 
   <div class="orders-panel__table-shell">
     <div class="orders-panel__toolbar">
-      <div class="orders-panel__toolbar-actions">
-        <div class="orders-panel__dropdown" [class.is-open]="filterDropdownOpen">
-          <button type="button" class="orders-panel__dropdown-trigger" (click)="toggleFilterDropdown()">
-            <span class="orders-panel__dropdown-label">Filter</span>
-            <span class="orders-panel__dropdown-value">{{ filterLabel() }}</span>
-            <span class="orders-panel__dropdown-caret" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none">
-                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-          </button>
+      @if (hasSelection) {
+        <div class="orders-panel__selection-bar orders-panel__toolbar-mode">
+          <div class="orders-panel__selection-summary">
+            <span class="orders-panel__selection-count">{{ selectedCount }} of {{ totalElements }} selected</span>
+            <button type="button" class="orders-panel__selection-link" (click)="toggleSelectionState()">
+              {{ allVisibleOrdersSelected ? 'Clear visible' : 'Select all' }}
+            </button>
+            @if (!allVisibleOrdersSelected && selectedCount > 0) {
+              <button type="button" class="orders-panel__selection-link" (click)="clearSelection()">Clear selection</button>
+            }
+          </div>
 
-          @if (filterDropdownOpen) {
-            <div class="orders-panel__dropdown-menu">
-              @for (option of filterOptions; track option.value) {
-                <button
-                  type="button"
-                  class="orders-panel__dropdown-item"
-                  [class.is-selected]="query.filter === option.value"
-                  (click)="selectFilter(option.value)"
-                >
-                  {{ option.label }}
-                </button>
+          <div class="orders-panel__selection-actions">
+            <button type="button" class="orders-panel__selection-action" [disabled]="isExporting" (click)="exportSelection()">
+              <app-icon name="file-text" [size]="14"></app-icon>
+              <span>{{ isExporting ? 'Exporting...' : 'Export' }}</span>
+            </button>
+            <button type="button" class="orders-panel__selection-action orders-panel__selection-action--danger" [disabled]="isDeleting" (click)="deleteSelection()">
+              <app-icon name="trash" [size]="14"></app-icon>
+              <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="orders-panel__toolbar-mode orders-panel__toolbar-mode--default">
+          <div class="orders-panel__toolbar-actions">
+            <div class="orders-panel__dropdown" [class.is-open]="filterDropdownOpen">
+              <button type="button" class="orders-panel__dropdown-trigger" (click)="toggleFilterDropdown()">
+                <span class="orders-panel__dropdown-label">Filter</span>
+                <span class="orders-panel__dropdown-value">{{ filterLabel() }}</span>
+                <span class="orders-panel__dropdown-caret" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </button>
+
+              @if (filterDropdownOpen) {
+                <div class="orders-panel__dropdown-menu">
+                  @for (option of filterOptions; track option.value) {
+                    <button
+                      type="button"
+                      class="orders-panel__dropdown-item"
+                      [class.is-selected]="query.filter === option.value"
+                      (click)="selectFilter(option.value)"
+                    >
+                      {{ option.label }}
+                    </button>
+                  }
+                </div>
               }
             </div>
-          }
-        </div>
 
-        <div class="orders-panel__dropdown" [class.is-open]="sortDropdownOpen">
-          <button type="button" class="orders-panel__dropdown-trigger" (click)="toggleSortDropdown()">
-            <span class="orders-panel__dropdown-label">Sort</span>
-            <span class="orders-panel__dropdown-value">{{ sortLabel() }}</span>
-            <span class="orders-panel__dropdown-caret" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none">
-                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-          </button>
+            <div class="orders-panel__dropdown" [class.is-open]="sortDropdownOpen">
+              <button type="button" class="orders-panel__dropdown-trigger" (click)="toggleSortDropdown()">
+                <span class="orders-panel__dropdown-label">Sort</span>
+                <span class="orders-panel__dropdown-value">{{ sortLabel() }}</span>
+                <span class="orders-panel__dropdown-caret" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </button>
 
-          @if (sortDropdownOpen) {
-            <div class="orders-panel__dropdown-menu">
-              @for (option of sortOptions; track option.value) {
-                <button
-                  type="button"
-                  class="orders-panel__dropdown-item"
-                  [class.is-selected]="query.sort === option.value"
-                  (click)="selectSort(option.value)"
-                >
-                  {{ option.label }}
-                </button>
+              @if (sortDropdownOpen) {
+                <div class="orders-panel__dropdown-menu">
+                  @for (option of sortOptions; track option.value) {
+                    <button
+                      type="button"
+                      class="orders-panel__dropdown-item"
+                      [class.is-selected]="query.sort === option.value"
+                      (click)="selectSort(option.value)"
+                    >
+                      {{ option.label }}
+                    </button>
+                  }
+                </div>
               }
             </div>
-          }
-        </div>
-      </div>
+          </div>
 
-      <label class="orders-panel__search">
-        <app-icon class="orders-panel__search-icon" name="search" [size]="14"></app-icon>
-        <input
-          type="text"
-          [value]="searchValue"
-          placeholder="Search orders or customers"
-          (input)="onSearchChange($any($event.target).value)"
-        />
-      </label>
+          <label class="orders-panel__search">
+            <app-icon class="orders-panel__search-icon" name="search" [size]="14"></app-icon>
+            <input
+              type="text"
+              [value]="searchValue"
+              placeholder="Search orders or customers"
+              (input)="onSearchChange($any($event.target).value)"
+            />
+          </label>
+        </div>
+      }
     </div>
 
     @if (hasOrders) {

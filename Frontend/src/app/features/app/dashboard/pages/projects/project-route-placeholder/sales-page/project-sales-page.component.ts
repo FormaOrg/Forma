@@ -63,6 +63,8 @@ export class ProjectSalesPageComponent {
   @Input({ required: true }) ordersPage = 0;
   @Input({ required: true }) ordersTotalPages = 0;
   @Input({ required: true }) ordersTotalElements = 0;
+  @Input({ required: true }) ordersExporting = false;
+  @Input({ required: true }) ordersDeleting = false;
 
   @Output() rangeChange = new EventEmitter<SalesRangePreset>();
   @Output() compareToggle = new EventEmitter<void>();
@@ -77,6 +79,7 @@ export class ProjectSalesPageComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() createOrder = new EventEmitter<void>();
   @Output() editOrder = new EventEmitter<number>();
+  @Output() deleteSelectedOrders = new EventEmitter<void>();
 
   readonly skeletonCards = [1, 2, 3, 4, 5, 6] as const;
 }

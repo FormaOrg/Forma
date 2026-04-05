@@ -27,6 +27,8 @@ type CatalogStatusFilter = 'ALL' | ProjectCatalogStatus;
   styleUrl: './project-catalog-route.css',
 })
 export class ProjectCatalogRoute {
+  private static readonly editorTransitionMs = 220;
+  private readonly deleteConfirmPreferenceKey = 'forma.catalog.skipProductDeleteConfirm';
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
@@ -35,6 +37,7 @@ export class ProjectCatalogRoute {
   private readonly toastService = inject(ToastService);
 
   private searchTimeout?: number;
+  private editorCloseTimeout?: number;
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -52,7 +55,13 @@ export class ProjectCatalogRoute {
   readonly selectedCategory = signal('ALL');
   readonly categoryDropdownOpen = signal(false);
   readonly isEditorOpen = signal(false);
+  readonly isEditorClosing = signal(false);
   readonly editingProduct = signal<ProjectCatalogProduct | null>(null);
+  readonly pendingDeleteProduct = signal<ProjectCatalogProduct | null>(null);
+  readonly skipDeleteConfirmThisSession = signal(
+    typeof sessionStorage !== 'undefined' && sessionStorage.getItem(this.deleteConfirmPreferenceKey) === 'true'
+  );
+  readonly deleteConfirmOptOut = signal(false);
 
   readonly statusFilters: ReadonlyArray<{ label: string; value: CatalogStatusFilter }> = [
     { label: 'All', value: 'ALL' },
@@ -90,6 +99,7 @@ export class ProjectCatalogRoute {
   readonly summary = computed(() => this.catalogPage()?.summary ?? null);
   readonly products = computed(() => this.catalogPage()?.products ?? []);
   readonly categories = computed(() => this.catalogPage()?.categories ?? []);
+  readonly hasCatalogProducts = computed(() => (this.summary()?.totalProducts ?? 0) > 0);
   readonly readyProductsCount = computed(() => this.products().filter((product) => product.readyToPublish).length);
   readonly selectedCategoryLabel = computed(() =>
     this.selectedCategory() === 'ALL' ? 'All categories' : this.selectedCategory()
@@ -157,6 +167,7 @@ export class ProjectCatalogRoute {
   }
 
   openCreateEditor(): void {
+    this.reopenEditorIfClosing();
     this.editingProduct.set(null);
     this.productForm.reset({
       name: '',
@@ -171,10 +182,12 @@ export class ProjectCatalogRoute {
       imageUrl: '',
       tags: '',
     });
+    this.isEditorClosing.set(false);
     this.isEditorOpen.set(true);
   }
 
   openEditEditor(product: ProjectCatalogProduct): void {
+    this.reopenEditorIfClosing();
     this.editingProduct.set(product);
     this.productForm.reset({
       name: product.name,
@@ -189,15 +202,21 @@ export class ProjectCatalogRoute {
       imageUrl: product.imageUrl ?? '',
       tags: product.tags.join(', '),
     });
+    this.isEditorClosing.set(false);
     this.isEditorOpen.set(true);
   }
 
   closeEditor(): void {
-    if (this.isSaving() || this.isUploadingImage()) {
+    if (this.isSaving() || this.isUploadingImage() || !this.isEditorOpen() || this.isEditorClosing()) {
       return;
     }
 
-    this.isEditorOpen.set(false);
+    this.isEditorClosing.set(true);
+    window.clearTimeout(this.editorCloseTimeout);
+    this.editorCloseTimeout = window.setTimeout(() => {
+      this.isEditorOpen.set(false);
+      this.isEditorClosing.set(false);
+    }, ProjectCatalogRoute.editorTransitionMs);
   }
 
   saveProduct(): void {
@@ -236,7 +255,9 @@ export class ProjectCatalogRoute {
       .subscribe({
         next: () => {
           this.toastService.success(existingProduct ? 'Product updated.' : 'Product created.');
+          window.clearTimeout(this.editorCloseTimeout);
           this.isEditorOpen.set(false);
+          this.isEditorClosing.set(false);
           this.loadCatalog();
         },
         error: (error) => {
@@ -246,6 +267,43 @@ export class ProjectCatalogRoute {
   }
 
   deleteProduct(product: ProjectCatalogProduct): void {
+    if (!this.skipDeleteConfirmThisSession()) {
+      this.pendingDeleteProduct.set(product);
+      this.deleteConfirmOptOut.set(false);
+      return;
+    }
+
+    this.performDeleteProduct(product);
+  }
+
+  closeDeleteConfirm(): void {
+    if (this.isDeleting()) {
+      return;
+    }
+
+    this.pendingDeleteProduct.set(null);
+    this.deleteConfirmOptOut.set(false);
+  }
+
+  setDeleteConfirmOptOut(value: boolean): void {
+    this.deleteConfirmOptOut.set(value);
+  }
+
+  confirmDeleteProduct(): void {
+    const product = this.pendingDeleteProduct();
+    if (!product) {
+      return;
+    }
+
+    if (this.deleteConfirmOptOut()) {
+      this.skipDeleteConfirmThisSession.set(true);
+      sessionStorage.setItem(this.deleteConfirmPreferenceKey, 'true');
+    }
+
+    this.performDeleteProduct(product);
+  }
+
+  private performDeleteProduct(product: ProjectCatalogProduct): void {
     const projectId = this.projectId();
     if (!projectId || this.isDeleting() === product.id) {
       return;
@@ -258,8 +316,12 @@ export class ProjectCatalogRoute {
       .subscribe({
         next: () => {
           this.toastService.success(`Deleted ${product.name}.`);
+          this.pendingDeleteProduct.set(null);
+          this.deleteConfirmOptOut.set(false);
           if (this.editingProduct()?.id === product.id) {
+            window.clearTimeout(this.editorCloseTimeout);
             this.isEditorOpen.set(false);
+            this.isEditorClosing.set(false);
           }
           this.loadCatalog();
         },
@@ -314,6 +376,18 @@ export class ProjectCatalogRoute {
 
     if (!target?.closest('.catalog-toolbar__dropdown')) {
       this.closeDropdowns();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.pendingDeleteProduct()) {
+      this.closeDeleteConfirm();
+      return;
+    }
+
+    if (this.isEditorOpen()) {
+      this.closeEditor();
     }
   }
 
@@ -405,5 +479,14 @@ export class ProjectCatalogRoute {
     }
 
     return fallback;
+  }
+
+  private reopenEditorIfClosing(): void {
+    if (!this.isEditorClosing()) {
+      return;
+    }
+
+    window.clearTimeout(this.editorCloseTimeout);
+    this.isEditorClosing.set(false);
   }
 }

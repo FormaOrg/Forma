@@ -1,9 +1,84 @@
 <section class="project-home-page">
   @if (isLoading()) {
-    <section class="project-home-page__state">
-      <div class="project-home-page__skeleton"></div>
-      <div class="project-home-page__skeleton"></div>
-      <div class="project-home-page__skeleton"></div>
+    <section class="project-home-page__skeleton-shell" aria-hidden="true">
+      <section class="project-home-page__hero project-home-page__panel">
+        <div class="project-home-page__skeleton-copy">
+          <div class="project-home-page__skeleton project-home-page__skeleton--eyebrow"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--title"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--subtitle"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--subtitle project-home-page__skeleton--subtitle-short"></div>
+        </div>
+        <div class="project-home-page__skeleton project-home-page__skeleton--hero-action"></div>
+      </section>
+
+      <section class="project-home-page__status project-home-page__panel">
+        <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+        <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+        <div class="project-home-page__skeleton project-home-page__skeleton--pill project-home-page__skeleton--pill-wide"></div>
+      </section>
+
+      <section class="project-home-page__metrics">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <article class="project-home-page__metric project-home-page__panel">
+            <div class="project-home-page__metric-top">
+              <div class="project-home-page__skeleton project-home-page__skeleton--icon"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--metric-label"></div>
+            </div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--metric-value"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--metric-helper"></div>
+          </article>
+        }
+      </section>
+
+      <section class="project-home-page__workspace">
+        <article class="project-home-page__panel">
+          <div class="project-home-page__section-head">
+            <div class="project-home-page__skeleton-copy">
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-title"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-copy"></div>
+            </div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+          </div>
+
+          <div class="project-home-page__activity-list">
+            @for (item of [1, 2, 3]; track item) {
+              <article class="project-home-page__activity-row">
+                <div class="project-home-page__skeleton project-home-page__skeleton--dot"></div>
+                <div class="project-home-page__activity-body">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-title"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-copy"></div>
+                </div>
+                <div class="project-home-page__activity-side">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--time"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+                </div>
+              </article>
+            }
+          </div>
+        </article>
+
+        <aside class="project-home-page__panel">
+          <div class="project-home-page__section-head">
+            <div class="project-home-page__skeleton-copy">
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-title"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-copy"></div>
+            </div>
+          </div>
+
+          <div class="project-home-page__suggested-list">
+            @for (item of [1, 2, 3]; track item) {
+              <article class="project-home-page__suggested-card">
+                <div class="project-home-page__skeleton project-home-page__skeleton--suggested-icon"></div>
+                <div class="project-home-page__suggested-body">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-title"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-copy"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+                </div>
+              </article>
+            }
+          </div>
+        </aside>
+      </section>
     </section>
   } @else if (errorMessage()) {
     <section class="project-home-page__state project-home-page__state--error" role="alert">
@@ -69,10 +144,12 @@
                 }
               }
             </span>
-            <span class="project-home-page__metric-label">{{ metric.label }}</span>
           </div>
-          <strong class="project-home-page__metric-value">{{ metric.value }}</strong>
-          <span class="project-home-page__metric-helper">{{ metric.helper }}</span>
+          <div class="project-home-page__metric-body">
+            <span class="project-home-page__metric-label">{{ metric.label }}</span>
+            <strong class="project-home-page__metric-value">{{ metric.value }}</strong>
+            <span class="project-home-page__metric-helper">{{ metric.helper }}</span>
+          </div>
         </article>
       }
     </section>
@@ -84,7 +161,7 @@
             <h2>Recent activity</h2>
             <p>{{ workspaceConfig().activityDescription }}</p>
           </div>
-          <a [routerLink]="['/app/projects', page.projectId, workspaceConfig().activityLinkPath]">
+          <a class="project-home-page__view-all" [routerLink]="['/app/projects', page.projectId, workspaceConfig().activityLinkPath]">
             {{ workspaceConfig().activityLinkLabel }}
           </a>
         </div>
@@ -92,17 +169,57 @@
         @if (activities().length) {
           <div class="project-home-page__activity-list">
             @for (activity of activities(); track activity.title + activity.occurredAt) {
-              <article class="project-home-page__activity-row">
-                <span class="project-home-page__activity-dot" aria-hidden="true"></span>
+              <a class="project-home-page__activity-row" [routerLink]="activity.route">
+                <span
+                  class="project-home-page__activity-icon"
+                  [class.project-home-page__activity-icon--catalog]="activityTone(activity.title) === 'catalog'"
+                  [class.project-home-page__activity-icon--customer]="activityTone(activity.title) === 'customer'"
+                  [class.project-home-page__activity-icon--order]="activityTone(activity.title) === 'order'"
+                  [class.project-home-page__activity-icon--project]="activityTone(activity.title) === 'project'"
+                  aria-hidden="true"
+                >
+                  @switch (activityTone(activity.title)) {
+                    @case ('catalog') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('customer') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M5.5 18.5C6.3 15.9 8.65 14.2 11.45 14.2H12.55C15.35 14.2 17.7 15.9 18.5 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('order') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7 8.25V6.75C7 4.68 8.68 3 10.75 3H13.25C15.32 3 17 4.68 17 6.75V8.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M5.25 8.25H18.75L17.96 18.64C17.88 19.73 16.97 20.58 15.88 20.58H8.12C7.03 20.58 6.12 19.73 6.04 18.64L5.25 8.25Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @default {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8" />
+                      </svg>
+                    }
+                  }
+                </span>
                 <div class="project-home-page__activity-body">
-                  <h3>{{ activity.title }}</h3>
+                  <div class="project-home-page__activity-title-row">
+                    <h3>{{ activity.title }}</h3>
+                    <span class="project-home-page__activity-title-separator" aria-hidden="true">·</span>
+                    <span class="project-home-page__activity-inline-time">{{ formatOccurredAt(activity.occurredAt) }}</span>
+                  </div>
                   <p>{{ activity.description }}</p>
                 </div>
                 <div class="project-home-page__activity-side">
-                  <span>{{ formatOccurredAt(activity.occurredAt) }}</span>
-                  <a [routerLink]="activity.route">Open</a>
+                  <span class="project-home-page__activity-link" aria-hidden="true">
+                    <span class="project-home-page__link-chevron">›</span>
+                  </span>
                 </div>
-              </article>
+              </a>
             }
           </div>
         } @else {
@@ -124,11 +241,49 @@
         <div class="project-home-page__suggested-list">
           @for (action of actions(); track action.title) {
             <article class="project-home-page__suggested-card">
-              <div class="project-home-page__suggested-icon" aria-hidden="true"></div>
+              <div
+                class="project-home-page__suggested-icon"
+                [class.project-home-page__suggested-icon--setup]="suggestedActionTone(action.title) === 'setup'"
+                [class.project-home-page__suggested-icon--catalog]="suggestedActionTone(action.title) === 'catalog'"
+                [class.project-home-page__suggested-icon--customer]="suggestedActionTone(action.title) === 'customer'"
+                [class.project-home-page__suggested-icon--launch]="suggestedActionTone(action.title) === 'launch'"
+                aria-hidden="true"
+              >
+                @switch (suggestedActionTone(action.title)) {
+                  @case ('catalog') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('customer') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M5.5 18.5C6.3 15.9 8.65 14.2 11.45 14.2H12.55C15.35 14.2 17.7 15.9 18.5 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('launch') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    </svg>
+                  }
+                  @default {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M12 5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                }
+              </div>
               <div class="project-home-page__suggested-body">
                 <h3>{{ action.title }}</h3>
                 <p>{{ action.description }}</p>
-                <a [routerLink]="action.route">{{ action.actionLabel }}</a>
+                <a [routerLink]="action.route">
+                  {{ action.actionLabel }}
+                </a>
               </div>
             </article>
           }

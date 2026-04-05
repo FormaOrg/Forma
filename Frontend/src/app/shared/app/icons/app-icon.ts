@@ -28,7 +28,8 @@ export type AppIconName =
   | 'help-circle'
   | 'wand'
   | 'pen'
-  | 'dollar-sign';
+  | 'dollar-sign'
+  | 'trash';
 
 @Component({
   selector: 'app-icon',
@@ -189,6 +190,13 @@ export type AppIconName =
                   C8 8.657 9.791 10 12 10C14.209 10 16 11.343 16 13
                   C16 14.657 14.209 16 12 16C9.791 16 8 14.657 8 13"
                 stroke-linejoin="round" />
+        }
+        @case ('trash') {
+          <path d="M3 6h18" />
+          <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
         }
     }
     </svg>

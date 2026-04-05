@@ -12,7 +12,7 @@
       <button type="button" class="catalog-hero__action catalog-hero__action--secondary" (click)="loadCatalog()">
         Refresh
       </button>
-      <button type="button" class="catalog-hero__action" (click)="openCreateEditor()">
+      <button type="button" class="catalog-hero__action catalog-hero__action--primary" (click)="openCreateEditor()">
         Add product
       </button>
     </div>
@@ -20,24 +20,68 @@
 
   <section class="catalog-stats">
     <article class="catalog-stat">
-      <span class="catalog-stat__label">Products</span>
-      <strong class="catalog-stat__value">{{ summary()?.totalProducts ?? 0 }}</strong>
-      <span class="catalog-stat__hint">Across this project catalog</span>
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--products" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Products</span>
+        <strong class="catalog-stat__value">{{ summary()?.totalProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Across this project catalog</span>
+      </div>
     </article>
     <article class="catalog-stat">
-      <span class="catalog-stat__label">Active</span>
-      <strong class="catalog-stat__value">{{ summary()?.activeProducts ?? 0 }}</strong>
-      <span class="catalog-stat__hint">Visible in your storefront</span>
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--active" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.8" />
+            <path d="M9 12.1L11.1 14.2L15.3 10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Active</span>
+        <strong class="catalog-stat__value">{{ summary()?.activeProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Visible in your storefront</span>
+      </div>
     </article>
     <article class="catalog-stat">
-      <span class="catalog-stat__label">Ready to publish</span>
-      <strong class="catalog-stat__value">{{ summary()?.readyToPublishProducts ?? readyProductsCount() }}</strong>
-      <span class="catalog-stat__hint">Listings with key fields filled in</span>
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--draft" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 16.5L8.2 13.8L14.8 7.2L17.3 9.7L10.7 16.3L8 17L7.5 16.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M13.8 8.2L16.3 10.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M6.5 19H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Draft products</span>
+        <strong class="catalog-stat__value">{{ summary()?.draftProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Still being prepared before publish</span>
+      </div>
     </article>
     <article class="catalog-stat">
-      <span class="catalog-stat__label">Low stock</span>
-      <strong class="catalog-stat__value">{{ summary()?.lowStockProducts ?? 0 }}</strong>
-      <span class="catalog-stat__hint">Needs a restock soon</span>
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--stock" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 8.5H16.5V16.5H7.5V8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M9 8.5V7.5C9 6.67157 9.67157 6 10.5 6H13.5C14.3284 6 15 6.67157 15 7.5V8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M10 12.5H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M12 10.5V14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Low stock</span>
+        <strong class="catalog-stat__value">{{ summary()?.lowStockProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Needs a restock soon</span>
+      </div>
     </article>
   </section>
 
@@ -123,11 +167,17 @@
       <p>{{ errorMessage() }}</p>
       <button type="button" (click)="loadCatalog()">Try again</button>
     </section>
-  } @else if (!products().length) {
+  } @else if (!products().length && !hasCatalogProducts()) {
     <section class="catalog-state">
       <h2>No products yet</h2>
       <p>Start with your first listing so pricing, stock, and merchandising all have a home.</p>
       <button type="button" (click)="openCreateEditor()">Create the first product</button>
+    </section>
+  } @else if (!products().length) {
+    <section class="catalog-state">
+      <h2>No matching products</h2>
+      <p>Try a different product name, SKU, category, tag, or status filter.</p>
+      <button type="button" (click)="updateSearch(''); updateStatus('ALL'); updateCategory('ALL')">Clear filters</button>
     </section>
   } @else {
     <section class="catalog-grid">
@@ -143,7 +193,7 @@
 
           <div class="catalog-card__body">
             <div class="catalog-card__heading">
-              <div>
+              <div class="catalog-card__heading-copy">
                 <div class="catalog-card__badges">
                   <span
                     class="catalog-badge"
@@ -159,10 +209,6 @@
                 </div>
                 <h2>{{ product.name }}</h2>
               </div>
-
-              <button type="button" class="catalog-card__edit" (click)="openEditEditor(product)">
-                Edit
-              </button>
             </div>
 
             <p class="catalog-card__description">
@@ -212,14 +258,32 @@
 
             <div class="catalog-card__footer">
               <span class="catalog-card__sku">{{ product.sku || 'No SKU yet' }}</span>
-              <button
-                type="button"
-                class="catalog-card__delete"
-                [disabled]="isDeleting() === product.id"
-                (click)="deleteProduct(product)"
-              >
-                {{ isDeleting() === product.id ? 'Deleting...' : 'Delete' }}
-              </button>
+              <div class="catalog-card__actions">
+                <button type="button" class="catalog-card__edit" (click)="openEditEditor(product)">
+                  <span class="catalog-card__action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none">
+                      <path d="M3.5 13.9L3.9 16.1L6.1 16.5L14.8 7.8L12.2 5.2L3.5 13.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                      <path d="M11.4 6L14 8.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="catalog-card__delete"
+                  [disabled]="isDeleting() === product.id"
+                  (click)="deleteProduct(product)"
+                >
+                  <span class="catalog-card__action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none">
+                      <path d="M5.8 6.2L6.3 15.5H13.7L14.2 6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M4.8 5.2H15.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                      <path d="M8 5.2V3.9H12V5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  {{ isDeleting() === product.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
             </div>
           </div>
         </article>
@@ -228,8 +292,8 @@
   }
 
   @if (isEditorOpen()) {
-    <section class="catalog-editor-backdrop" (click)="closeEditor()"></section>
-    <aside class="catalog-editor">
+    <section class="catalog-editor-backdrop" [class.is-closing]="isEditorClosing()" (click)="closeEditor()"></section>
+    <aside class="catalog-editor" [class.is-closing]="isEditorClosing()">
       <header class="catalog-editor__header">
         <div class="catalog-editor__header-copy">
           <p class="catalog-editor__eyebrow">Catalog editor</p>
@@ -350,5 +414,52 @@
         </footer>
       </form>
     </aside>
+  }
+
+  @if (pendingDeleteProduct(); as product) {
+    <section class="catalog-confirm-backdrop" (click)="closeDeleteConfirm()"></section>
+    <section class="catalog-confirm" role="dialog" aria-modal="true" aria-labelledby="catalog-delete-title">
+      <button type="button" class="catalog-confirm__close" (click)="closeDeleteConfirm()" aria-label="Close dialog">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="catalog-confirm__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7.2 8L7.8 18H16.2L16.8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M6 6.8H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M9.2 6.8V5.4H14.8V6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="catalog-confirm__copy">
+        <p class="catalog-confirm__eyebrow">Delete product</p>
+        <h2 id="catalog-delete-title">Delete {{ product.name }}?</h2>
+        <p>
+          This removes the product from the catalog and also deletes any orders that contain it.
+        </p>
+      </div>
+
+      <label class="catalog-confirm__remember">
+        <input
+          type="checkbox"
+          [checked]="deleteConfirmOptOut()"
+          (change)="setDeleteConfirmOptOut($any($event.target).checked)"
+        />
+        <span>Don’t show this again this session</span>
+      </label>
+
+      <div class="catalog-confirm__actions">
+        <button type="button" class="catalog-confirm__secondary" (click)="closeDeleteConfirm()">Cancel</button>
+        <button
+          type="button"
+          class="catalog-confirm__danger"
+          [disabled]="isDeleting() === product.id"
+          (click)="confirmDeleteProduct()"
+        >
+          {{ isDeleting() === product.id ? 'Deleting...' : 'Delete product' }}
+        </button>
+      </div>
+    </section>
   }
 </section>

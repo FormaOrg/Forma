@@ -21,6 +21,7 @@ import { ToastService } from '../../../../../../core/services/toast.service';
   styleUrl: './project-customers-route.css',
 })
 export class ProjectCustomersRoute {
+  private static readonly editorTransitionMs = 220;
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
@@ -28,6 +29,7 @@ export class ProjectCustomersRoute {
   private readonly toastService = inject(ToastService);
 
   private searchTimeout?: number;
+  private editorCloseTimeout?: number;
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -43,6 +45,7 @@ export class ProjectCustomersRoute {
   readonly selectedZone = signal('ALL');
   readonly editingCustomer = signal<ProjectCustomer | null>(null);
   readonly isEditorOpen = signal(false);
+  readonly isEditorClosing = signal(false);
 
   readonly customerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.maxLength(120)]],
@@ -146,6 +149,7 @@ export class ProjectCustomersRoute {
   }
 
   openCreateEditor(): void {
+    this.reopenEditorIfClosing();
     this.editingCustomer.set(null);
     this.customerForm.reset({
       firstName: '',
@@ -155,10 +159,12 @@ export class ProjectCustomersRoute {
       address: '',
       zoneLabel: '',
     });
+    this.isEditorClosing.set(false);
     this.isEditorOpen.set(true);
   }
 
   openEditEditor(customer: ProjectCustomer): void {
+    this.reopenEditorIfClosing();
     this.editingCustomer.set(customer);
     this.customerForm.reset({
       firstName: customer.firstName,
@@ -168,15 +174,21 @@ export class ProjectCustomersRoute {
       address: customer.address ?? '',
       zoneLabel: customer.zoneLabel ?? '',
     });
+    this.isEditorClosing.set(false);
     this.isEditorOpen.set(true);
   }
 
   closeEditor(): void {
-    if (this.isSaving()) {
+    if (this.isSaving() || !this.isEditorOpen() || this.isEditorClosing()) {
       return;
     }
 
-    this.isEditorOpen.set(false);
+    this.isEditorClosing.set(true);
+    window.clearTimeout(this.editorCloseTimeout);
+    this.editorCloseTimeout = window.setTimeout(() => {
+      this.isEditorOpen.set(false);
+      this.isEditorClosing.set(false);
+    }, ProjectCustomersRoute.editorTransitionMs);
   }
 
   saveCustomer(): void {
@@ -202,7 +214,9 @@ export class ProjectCustomersRoute {
       .subscribe({
         next: () => {
           this.toastService.success(editingCustomer ? 'Customer updated.' : 'Customer created.');
+          window.clearTimeout(this.editorCloseTimeout);
           this.isEditorOpen.set(false);
+          this.isEditorClosing.set(false);
           this.loadCustomers();
         },
         error: () => this.toastService.error('Unable to save this customer right now.'),
@@ -284,5 +298,14 @@ export class ProjectCustomersRoute {
   private blankToNull(value: string): string | null {
     const trimmed = value.trim();
     return trimmed.length ? trimmed : null;
+  }
+
+  private reopenEditorIfClosing(): void {
+    if (!this.isEditorClosing()) {
+      return;
+    }
+
+    window.clearTimeout(this.editorCloseTimeout);
+    this.isEditorClosing.set(false);
   }
 }
