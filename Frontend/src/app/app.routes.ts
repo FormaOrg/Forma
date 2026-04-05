@@ -188,8 +188,8 @@ export const routes: Routes = [
               },
               {
                 path: 'editor',
-                data: { title: 'Editor' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-route-placeholder/project-route-placeholder').then((m) => m.ProjectRoutePlaceholder)
+                data: { title: 'Editor', immersive: true },
+                loadComponent: () => import('./features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor').then((m) => m.ProjectStorefrontEditor)
               },
               {
                 path: 'settings',
