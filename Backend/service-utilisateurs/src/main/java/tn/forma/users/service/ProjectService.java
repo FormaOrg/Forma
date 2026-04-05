@@ -25,6 +25,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final TemplateService templateService;
+    private final FileUploadService fileUploadService;
 
     public List<ProjectDto> getMyProjects(String email) {
         User user = getUserByEmail(email);
@@ -78,6 +79,42 @@ public class ProjectService {
             project.setDescription(blankToNull(request.getDescription()));
         }
 
+        if (request.getStoreTitle() != null) {
+            project.setStoreTitle(blankToNull(request.getStoreTitle()));
+        }
+
+        if (request.getContactPhone() != null) {
+            project.setContactPhone(blankToNull(request.getContactPhone()));
+        }
+
+        if (request.getStoreEmail() != null) {
+            project.setStoreEmail(blankToNull(request.getStoreEmail()));
+        }
+
+        if (request.getDefaultDomain() != null) {
+            project.setDefaultDomain(blankToNull(request.getDefaultDomain()));
+        }
+
+        if (request.getMetaDescription() != null) {
+            project.setMetaDescription(blankToNull(request.getMetaDescription()));
+        }
+
+        if (request.getFacebookUrl() != null) {
+            project.setFacebookUrl(blankToNull(request.getFacebookUrl()));
+        }
+
+        if (request.getInstagramUrl() != null) {
+            project.setInstagramUrl(blankToNull(request.getInstagramUrl()));
+        }
+
+        if (request.getTiktokUrl() != null) {
+            project.setTiktokUrl(blankToNull(request.getTiktokUrl()));
+        }
+
+        if (request.getWhatsappNumber() != null) {
+            project.setWhatsappNumber(blankToNull(request.getWhatsappNumber()));
+        }
+
         if (request.getTemplateId() != null) {
             project.setTemplateId(request.getTemplateId());
         }
@@ -102,7 +139,11 @@ public class ProjectService {
     @Transactional
     public void deleteProject(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
+        String logoPublicId = blankToNull(project.getLogoPublicId());
         projectRepository.delete(project);
+        if (logoPublicId != null) {
+            fileUploadService.deleteByPublicId(logoPublicId);
+        }
         log.info("Project {} deleted for {}", projectId, email);
     }
 
@@ -131,6 +172,29 @@ public class ProjectService {
         return mapToDto(projectRepository.save(project));
     }
 
+    @Transactional
+    public void updateProjectLogo(String email, Long projectId, String logoUrl, String logoPublicId) {
+        Project project = getOwnedProject(email, projectId);
+        project.setLogoUrl(blankToNull(logoUrl));
+        project.setLogoPublicId(blankToNull(logoPublicId));
+        projectRepository.save(project);
+    }
+
+    public String getProjectLogoPublicId(String email, Long projectId) {
+        Project project = getOwnedProject(email, projectId);
+        return blankToNull(project.getLogoPublicId());
+    }
+
+    @Transactional
+    public String clearProjectLogo(String email, Long projectId) {
+        Project project = getOwnedProject(email, projectId);
+        String logoPublicId = blankToNull(project.getLogoPublicId());
+        project.setLogoUrl(null);
+        project.setLogoPublicId(null);
+        projectRepository.save(project);
+        return logoPublicId;
+    }
+
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -149,6 +213,16 @@ public class ProjectService {
                 .templateId(project.getTemplateId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .storeTitle(project.getStoreTitle())
+                .contactPhone(project.getContactPhone())
+                .storeEmail(project.getStoreEmail())
+                .defaultDomain(project.getDefaultDomain())
+                .metaDescription(project.getMetaDescription())
+                .logoUrl(project.getLogoUrl())
+                .facebookUrl(project.getFacebookUrl())
+                .instagramUrl(project.getInstagramUrl())
+                .tiktokUrl(project.getTiktokUrl())
+                .whatsappNumber(project.getWhatsappNumber())
                 .type(project.getType())
                 .creationMethod(project.getCreationMethod())
                 .status(project.getStatus())

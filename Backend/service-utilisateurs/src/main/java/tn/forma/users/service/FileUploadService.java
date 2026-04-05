@@ -31,6 +31,10 @@ public class FileUploadService {
         return upload(file, "forma/media");
     }
 
+    public FileUploadResponse uploadProjectLogo(MultipartFile file) {
+        return upload(file, "forma/project-logos");
+    }
+
     public FileUploadResponse uploadDesignAsset(MultipartFile file) {
         return upload(file, "forma/design");
     }

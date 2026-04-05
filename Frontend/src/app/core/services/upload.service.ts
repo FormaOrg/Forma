@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 export interface UploadResponse {
   url: string;
   message: string;
+  publicId?: string;
 }
 
 export interface ValidationResult {
@@ -46,6 +47,16 @@ export class UploadService {
     return this.http.post<UploadResponse>(`${this.apiUrl}/media`, formData);
   }
 
+  uploadProjectLogo(file: File, projectId: number): Observable<UploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<UploadResponse>(`${this.apiUrl}/projects/${projectId}/logo`, formData);
+  }
+
+  deleteProjectLogo(projectId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/projects/${projectId}/logo`);
+  }
+
   // ── Design asset (Figma-style visual designer) ─────────
 
   uploadDesignAsset(file: File, projectId: number): Observable<UploadResponse> {
@@ -71,6 +82,10 @@ export class UploadService {
 
   validateMedia(file: File): ValidationResult {
     return this.validateFile(file, this.MAX_MEDIA_SIZE, 'Image');
+  }
+
+  validateProjectLogo(file: File): ValidationResult {
+    return this.validateAvatar(file);
   }
 
   private validateFile(file: File, maxSize: number, label: string): ValidationResult {

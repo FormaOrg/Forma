@@ -155,7 +155,13 @@
                 [disabled]="isUploadingAvatar"
                 hidden
               />
-              {{ isUploadingAvatar ? ('common.saving' | t) : ('settings.profile.picture.button' | t) }}
+              {{
+                isUploadingAvatar
+                  ? ('common.saving' | t)
+                  : (avatarPreview
+                      ? ('settings.profile.picture.replaceButton' | t)
+                      : ('settings.profile.picture.button' | t))
+              }}
             </label>
           </div>
         </div>

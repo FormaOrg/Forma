@@ -21,6 +21,16 @@ export interface Project {
   id: number;
   name: string;
   description?: string;
+  logoUrl?: string | null;
+  storeTitle?: string | null;
+  contactPhone?: string | null;
+  storeEmail?: string | null;
+  defaultDomain?: string | null;
+  metaDescription?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  tiktokUrl?: string | null;
+  whatsappNumber?: string | null;
   type: ProjectType;
   creationMethod: CreationMethod;
   status: ProjectStatus;
@@ -133,7 +143,16 @@ export interface UpdateProjectRequest {
   name?: string;
   description?: string;
   status?: ProjectStatus;
+  isPublished?: boolean;
+  storeTitle?: string | null;
+  contactPhone?: string | null;
+  storeEmail?: string | null;
+  defaultDomain?: string | null;
   metaDescription?: string;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  tiktokUrl?: string | null;
+  whatsappNumber?: string | null;
 }
 
 export interface DeployProjectRequest {
