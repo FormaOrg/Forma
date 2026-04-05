@@ -120,13 +120,6 @@
                     <rect x="13" y="13" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
                   </svg>
                 }
-                @case ('media') {
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/>
-                    <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                }
                 @case ('audience') {
                   <svg viewBox="0 0 24 24" fill="none">
                     <circle cx="9" cy="9" r="2.7" stroke="currentColor" stroke-width="1.8"/>
@@ -135,11 +128,11 @@
                     <path d="M14.8 18C15.2 16.45 16.5 15.35 18.05 15.35H18.35C19.9 15.35 21.2 16.45 21.6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                   </svg>
                 }
-                @case ('sections') {
+                @case ('launch') {
                   <svg viewBox="0 0 24 24" fill="none">
-                    <rect x="4" y="5" width="16" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                    <rect x="4" y="10.5" width="12" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                    <rect x="4" y="16" width="9" height="4" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                   </svg>
                 }
                 @case ('catalog') {
@@ -200,7 +193,6 @@
                 <span
                   class="project-home-page__activity-icon"
                   [class.project-home-page__activity-icon--page]="activityTone(activity) === 'page'"
-                  [class.project-home-page__activity-icon--media]="activityTone(activity) === 'media'"
                   [class.project-home-page__activity-icon--audience]="activityTone(activity) === 'audience'"
                   [class.project-home-page__activity-icon--launch]="activityTone(activity) === 'launch'"
                   [class.project-home-page__activity-icon--catalog]="activityTone(activity) === 'catalog'"
@@ -215,13 +207,6 @@
                         <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
                         <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                         <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      </svg>
-                    }
-                    @case ('media') {
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
-                        <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8" />
-                        <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
                     }
                     @case ('audience') {
@@ -302,7 +287,6 @@
               <div
                 class="project-home-page__suggested-icon"
                 [class.project-home-page__suggested-icon--page]="suggestedActionTone(action) === 'page'"
-                [class.project-home-page__suggested-icon--media]="suggestedActionTone(action) === 'media'"
                 [class.project-home-page__suggested-icon--audience]="suggestedActionTone(action) === 'audience'"
                 [class.project-home-page__suggested-icon--setup]="suggestedActionTone(action) === 'setup'"
                 [class.project-home-page__suggested-icon--catalog]="suggestedActionTone(action) === 'catalog'"
@@ -316,13 +300,6 @@
                       <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
                       <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                       <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                    </svg>
-                  }
-                  @case ('media') {
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
-                      <circle cx="9" cy="10" r="1.8" stroke="currentColor" stroke-width="1.8" />
-                      <path d="M6.5 16L11 12L14 14.5L17.5 11L20 13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   }
                   @case ('audience') {
