@@ -83,14 +83,14 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
     typeLabel: 'Portfolio',
     defaultPath: 'home',
     setupTitle: "Let's set up your portfolio",
-    homeSubtitle: 'Shape your pages, media, and personal brand presentation from one workspace.',
+    homeSubtitle: 'Shape your pages, inquiries, and personal brand presentation from one workspace.',
     heroActionLabel: 'Review pages',
     heroActionPath: 'pages',
-    activityDescription: 'Recent page changes, media updates, and publishing tasks for this portfolio.',
+    activityDescription: 'Recent page changes, inquiry flow updates, and publishing tasks for this portfolio.',
     activityLinkLabel: 'Review pages',
     activityLinkPath: 'pages',
     emptyActivityDescription:
-      'As soon as you update your portfolio pages, media, or launch settings, activity will appear here.',
+      'As soon as you update your portfolio pages, inquiry flow, or launch settings, activity will appear here.',
     placeholderDescription:
       'The route structure and portfolio workspace are ready. You can build this portfolio section next.',
     sections: [
@@ -105,7 +105,6 @@ const CONFIGS: Record<WorkspaceKind, ProjectWorkspaceConfig> = {
         items: [
           { label: 'Home', icon: 'home', path: 'home' },
           { label: 'Pages', icon: 'layout-grid', path: 'pages' },
-          { label: 'Media', icon: 'image', path: 'media' },
         ],
       },
       {

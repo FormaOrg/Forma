@@ -337,8 +337,7 @@
   color: #7566ff;
 }
 
-.project-home-page__activity-icon--customer,
-.project-home-page__activity-icon--media {
+.project-home-page__activity-icon--customer {
   background: rgba(74, 159, 255, 0.12);
   border-color: rgba(74, 159, 255, 0.18);
   color: #4a9fff;
@@ -455,8 +454,7 @@
   color: #7566ff;
 }
 
-.project-home-page__suggested-icon--catalog,
-.project-home-page__suggested-icon--media {
+.project-home-page__suggested-icon--catalog {
   background: rgba(74, 159, 255, 0.12);
   border-color: rgba(74, 159, 255, 0.16);
   color: #4a9fff;
@@ -705,8 +703,7 @@
   border-color: rgba(117, 102, 255, 0.12);
 }
 
-:host-context(.theme-dark) .project-home-page__activity-icon--customer,
-:host-context(.theme-dark) .project-home-page__activity-icon--media {
+:host-context(.theme-dark) .project-home-page__activity-icon--customer {
   background: rgba(74, 159, 255, 0.18);
   border-color: rgba(74, 159, 255, 0.12);
 }
@@ -729,8 +726,7 @@
   border-color: rgba(117, 102, 255, 0.12);
 }
 
-:host-context(.theme-dark) .project-home-page__suggested-icon--catalog,
-:host-context(.theme-dark) .project-home-page__suggested-icon--media {
+:host-context(.theme-dark) .project-home-page__suggested-icon--catalog {
   background: rgba(74, 159, 255, 0.18);
   border-color: rgba(74, 159, 255, 0.12);
 }
