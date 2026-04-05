@@ -10,7 +10,6 @@ import { GoogleAuthPopupService } from '../../../../core/services/google-auth-po
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.html',
-  styleUrls: ['./login.css'],
   imports: [FormsModule, NgIf, RouterModule]
 })
 export class LoginComponent implements OnInit {

@@ -1,14 +1,14 @@
-:host {
+app-settings-activity {
   display: block;
 }
 
-.profile-container {
+app-settings-activity .profile-container {
   max-width: 900px;
   margin: 0 auto;
   padding: 18px 16px 40px;
 }
 
-.profile-header {
+app-settings-activity .profile-header {
   margin: 0 0 40px;
   padding: 0 4px;
   position: relative;
@@ -16,34 +16,34 @@
   background: transparent;
 }
 
-.profile-title {
+app-settings-activity .profile-title {
   font-size: 28px;
   font-weight: 600;
   color: #222;
   margin: 0 0 8px 0;
 }
 
-.profile-subtitle {
+app-settings-activity .profile-subtitle {
   font-size: 14px;
   color: #666;
   margin: 0;
 }
 
-.profile-section {
+app-settings-activity .profile-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 30px;
 }
 
-.section-header {
+app-settings-activity .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.section-title {
+app-settings-activity .section-title {
   font-size: 13px;
   font-weight: 700;
   color: rgba(11, 11, 18, 0.82);
@@ -52,11 +52,11 @@
   margin: 0;
 }
 
-.section-header--simple {
+app-settings-activity .section-header--simple {
   justify-content: flex-start;
 }
 
-.section-content {
+app-settings-activity .section-content {
   background-color: #fff;
   border: 1px solid rgba(215, 217, 223, 0.95);
   border-radius: 20px;
@@ -66,7 +66,7 @@
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
-:host-context(.theme-dark) .section-content {
+.theme-dark app-settings-activity .section-content {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
     #171e2a;
@@ -76,19 +76,19 @@
     0 10px 24px rgba(6, 10, 18, 0.18);
 }
 
-.section-footer {
+app-settings-activity .section-footer {
   padding: 16px 24px;
   border-top: 1px solid #e5e7eb;
   background-color: #fafafa;
   text-align: left;
 }
 
-:host-context(.theme-dark) .section-footer {
+.theme-dark app-settings-activity .section-footer {
   background: #141c29;
   border-top-color: rgba(226, 231, 244, 0.1);
 }
 
-.section-footer .btn {
+app-settings-activity .section-footer .btn {
   background-color: transparent;
   color: #7566ff;
   border: none;
@@ -99,115 +99,115 @@
   transition: opacity 0.2s ease;
 }
 
-.section-footer .btn:hover:not(:disabled) {
+app-settings-activity .section-footer .btn:hover:not(:disabled) {
   opacity: 0.7;
   background-color: transparent;
 }
 
-.empty-state {
+app-settings-activity .empty-state {
   text-align: center;
   padding: 40px 24px;
   color: #999;
   font-size: 14px;
 }
 
-.activity-skeleton-line,
-.activity-skeleton-box {
+app-settings-activity .activity-skeleton-line,
+app-settings-activity .activity-skeleton-box {
   border-radius: 12px;
   background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
   background-size: 220% 100%;
   animation: activitySkeletonShimmer 1.25s linear infinite;
 }
 
-.activity-skeleton-list {
+app-settings-activity .activity-skeleton-list {
   display: flex;
   flex-direction: column;
 }
 
-.activity-skeleton-card,
-.activity-skeleton-history {
+app-settings-activity .activity-skeleton-card,
+app-settings-activity .activity-skeleton-history {
   padding: 20px 24px;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.activity-skeleton-card:last-child,
-.activity-skeleton-history:last-child {
+app-settings-activity .activity-skeleton-card:last-child,
+app-settings-activity .activity-skeleton-history:last-child {
   border-bottom: none;
 }
 
-.activity-skeleton-header,
-.activity-skeleton-history {
+app-settings-activity .activity-skeleton-header,
+app-settings-activity .activity-skeleton-history {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.activity-skeleton-left {
+app-settings-activity .activity-skeleton-left {
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 1;
 }
 
-.activity-skeleton-copy {
+app-settings-activity .activity-skeleton-copy {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
 }
 
-.activity-skeleton-copy--grow {
+app-settings-activity .activity-skeleton-copy--grow {
   flex: 1;
 }
 
-.activity-skeleton-box--icon {
+app-settings-activity .activity-skeleton-box--icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
   flex-shrink: 0;
 }
 
-.activity-skeleton-box--status {
+app-settings-activity .activity-skeleton-box--status {
   width: 32px;
   height: 32px;
   border-radius: 999px;
   flex-shrink: 0;
 }
 
-.activity-skeleton-box--button {
+app-settings-activity .activity-skeleton-box--button {
   width: 92px;
   height: 36px;
   flex-shrink: 0;
 }
 
-.activity-skeleton-line {
+app-settings-activity .activity-skeleton-line {
   height: 12px;
 }
 
-.activity-skeleton-line--title {
+app-settings-activity .activity-skeleton-line--title {
   width: 180px;
   height: 14px;
 }
 
-.activity-skeleton-line--text {
+app-settings-activity .activity-skeleton-line--text {
   width: 120px;
 }
 
-.activity-skeleton-line--wide {
+app-settings-activity .activity-skeleton-line--wide {
   width: 100%;
   max-width: 260px;
 }
 
-.activity-skeleton-line--label {
+app-settings-activity .activity-skeleton-line--label {
   width: 72px;
 }
 
-.activity-skeleton-line--value {
+app-settings-activity .activity-skeleton-line--value {
   width: 100px;
 }
 
-.activity-skeleton-details {
+app-settings-activity .activity-skeleton-details {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
@@ -216,7 +216,7 @@
   border-top: 1px solid #f3f4f6;
 }
 
-.activity-skeleton-field {
+app-settings-activity .activity-skeleton-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -228,13 +228,13 @@
 }
 
 /* Active Sessions Styles */
-.sessions-list {
+app-settings-activity .sessions-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.session-card {
+app-settings-activity .session-card {
   padding: 20px 24px;
   border-bottom: 1px solid #e5e7eb;
   background:
@@ -244,23 +244,23 @@
     border-color 0.2s ease;
 }
 
-.session-card:last-child {
+app-settings-activity .session-card:last-child {
   border-bottom: none;
 }
 
-.session-card.current {
+app-settings-activity .session-card.current {
   background:
     linear-gradient(180deg, rgba(117, 102, 255, 0.07), rgba(117, 102, 255, 0.03)),
     #f8f6ff;
 }
 
-.session-card:hover {
+app-settings-activity .session-card:hover {
   background:
     linear-gradient(180deg, rgba(117, 102, 255, 0.05), rgba(117, 102, 255, 0.02)),
     #fcfbff;
 }
 
-.session-header {
+app-settings-activity .session-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -268,14 +268,14 @@
   margin-bottom: 12px;
 }
 
-.session-info {
+app-settings-activity .session-info {
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 1;
 }
 
-.device-icon {
+app-settings-activity .device-icon {
   width: 40px;
   height: 40px;
   border-radius: 8px;
@@ -286,21 +286,21 @@
   background-color: #f5f3ff;
 }
 
-.device-icon.device-mobile {
+app-settings-activity .device-icon.device-mobile {
   color: #059669;
   background-color: #f0fdf4;
 }
 
-.device-icon.device-tablet {
+app-settings-activity .device-icon.device-tablet {
   color: #9333ea;
   background-color: #faf5ff;
 }
 
-.device-details {
+app-settings-activity .device-details {
   flex: 1;
 }
 
-.device-name {
+app-settings-activity .device-name {
   font-size: 14px;
   font-weight: 600;
   color: #222;
@@ -310,13 +310,13 @@
   gap: 8px;
 }
 
-.device-meta {
+app-settings-activity .device-meta {
   font-size: 13px;
   color: #666;
   margin: 0;
 }
 
-.badge {
+app-settings-activity .badge {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 12px;
@@ -325,12 +325,12 @@
   white-space: nowrap;
 }
 
-.badge-current {
+app-settings-activity .badge-current {
   background-color: #ede9fe;
   color: #5b21b6;
 }
 
-.session-details {
+app-settings-activity .session-details {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
@@ -339,13 +339,13 @@
   border-top: 1px solid #f3f4f6;
 }
 
-.detail-item {
+app-settings-activity .detail-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.detail-label {
+app-settings-activity .detail-label {
   font-size: 11px;
   font-weight: 600;
   color: #999;
@@ -353,19 +353,19 @@
   letter-spacing: 0.5px;
 }
 
-.detail-value {
+app-settings-activity .detail-value {
   font-size: 13px;
   color: #222;
 }
 
 /* Login History Styles */
-.login-history-list {
+app-settings-activity .login-history-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.login-record {
+app-settings-activity .login-record {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -375,11 +375,11 @@
   transition: background-color 0.2s ease;
 }
 
-.login-record:last-child {
+app-settings-activity .login-record:last-child {
   border-bottom: none;
 }
 
-.login-device-icon {
+app-settings-activity .login-device-icon {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
@@ -392,12 +392,12 @@
   margin-top: 2px;
 }
 
-.login-info {
+app-settings-activity .login-info {
   flex: 1;
   min-width: 0;
 }
 
-.login-header {
+app-settings-activity .login-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -405,31 +405,31 @@
   margin-bottom: 8px;
 }
 
-.login-device {
+app-settings-activity .login-device {
   font-size: 14px;
   font-weight: 600;
   color: #222;
   margin: 0 0 2px 0;
 }
 
-.login-meta {
+app-settings-activity .login-meta {
   font-size: 12px;
   color: #666;
   margin: 0;
 }
 
-.login-time {
+app-settings-activity .login-time {
   text-align: right;
   flex-shrink: 0;
 }
 
-.login-date {
+app-settings-activity .login-date {
   font-size: 13px;
   color: #222;
   font-weight: 500;
 }
 
-.login-details {
+app-settings-activity .login-details {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -437,14 +437,14 @@
   color: #666;
 }
 
-.login-detail {
+app-settings-activity .login-detail {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
 /* Buttons */
-.btn {
+app-settings-activity .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -460,63 +460,63 @@
   text-decoration: none;
 }
 
-.btn:disabled {
+app-settings-activity .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.btn-primary {
+app-settings-activity .btn-primary {
   background-color: #7566ff;
   color: #fff;
   border-color: #7566ff;
 }
 
-.btn-primary:hover:not(:disabled) {
+app-settings-activity .btn-primary:hover:not(:disabled) {
   background-color: #6452e8;
 }
 
-.btn-secondary {
+app-settings-activity .btn-secondary {
   background-color: #f3f4f6;
   color: #222;
   border-color: #e5e7eb;
 }
 
-.btn-secondary:hover:not(:disabled) {
+app-settings-activity .btn-secondary:hover:not(:disabled) {
   background-color: #e5e7eb;
 }
 
-.btn-outline {
+app-settings-activity .btn-outline {
   background-color: transparent;
   color: #7566ff;
   border-color: #7566ff;
 }
 
-.btn-outline:hover:not(:disabled) {
+app-settings-activity .btn-outline:hover:not(:disabled) {
   background-color: #f5f3ff;
 }
 
 /* Sign Out All Other Sessions Button */
-.btn-secondary:nth-child(2).btn-sm {
+app-settings-activity .btn-secondary:nth-child(2).btn-sm {
   background-color: transparent;
   color: #7566ff;
   border-color: #7566ff;
   border: 1px solid #7566ff;
 }
 
-.btn-secondary:nth-child(2).btn-sm:hover:not(:disabled) {
+app-settings-activity .btn-secondary:nth-child(2).btn-sm:hover:not(:disabled) {
   background-color: rgba(117, 102, 255, 0.08);
   color: #7566ff;
   border-color: #7566ff;
 }
 
-.btn-sm {
+app-settings-activity .btn-sm {
   padding: 6px 12px;
   font-size: .9em;
   height: 43px;
 }
 
 /* Modal Styles */
-.modal-overlay {
+app-settings-activity .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -530,7 +530,7 @@
   padding: 20px;
 }
 
-.modal-content {
+app-settings-activity .modal-content {
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -540,11 +540,11 @@
   max-width: 500px;
 }
 
-.modal-content.modal-large {
+app-settings-activity .modal-content.modal-large {
   max-width: 700px;
 }
 
-.modal-header {
+app-settings-activity .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -552,13 +552,13 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.modal-title {
+app-settings-activity .modal-title {
   font-size: 1.3em;
   font-weight: 600;
   color: #000;
 }
 
-.modal-close {
+app-settings-activity .modal-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -569,21 +569,21 @@
   justify-content: center;
 }
 
-.modal-close svg {
+app-settings-activity .modal-close svg {
   width: 30px;
   height: 30px;
 }
 
-.modal-close:hover {
+app-settings-activity .modal-close:hover {
   opacity: 0.7;
 }
   
 
-.modal-body {
+app-settings-activity .modal-body {
   padding: 0 0px 10px 0px;
 }
 
-.modal-filters {
+app-settings-activity .modal-filters {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
@@ -594,7 +594,7 @@
   align-items: flex-end;
 }
 
-.filter-group {
+app-settings-activity .filter-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -602,7 +602,7 @@
   min-width: 150px;
 }
 
-.filter-label {
+app-settings-activity .filter-label {
   font-size: 12px;
   font-weight: 600;
   color: #666;
@@ -610,7 +610,7 @@
   letter-spacing: 0.5px;
 }
 
-.filter-select {
+app-settings-activity .filter-select {
   padding: 10px 12px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
@@ -630,134 +630,134 @@
   padding-right: 32px !important;
 }
 
-.filter-select:hover {
+app-settings-activity .filter-select:hover {
   border-color: rgba(0, 0, 0, 0.3);
 }
 
-.filter-select:focus {
+app-settings-activity .filter-select:focus {
   outline: none;
   border-color: rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
-.filter-select::-ms-expand {
+app-settings-activity .filter-select::-ms-expand {
   display: none;
 }
 
 
 /* Modal Sessions List */
-.modal-sessions-list {
+app-settings-activity .modal-sessions-list {
   max-height: 400px;
   overflow-y: auto;
   padding: 16px;
 }
 
-.modal-login-history-list {
+app-settings-activity .modal-login-history-list {
   max-height: 400px;
   overflow-y: auto;
 }
 
 /* Responsive Modal */
 @media (max-width: 640px) {
-  .activity-skeleton-card,
-  .activity-skeleton-history {
+  app-settings-activity .activity-skeleton-card,
+  app-settings-activity .activity-skeleton-history {
     padding: 12px 16px;
   }
 
-  .activity-skeleton-header,
-  .activity-skeleton-history {
+  app-settings-activity .activity-skeleton-header,
+  app-settings-activity .activity-skeleton-history {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .activity-skeleton-box--button {
+  app-settings-activity .activity-skeleton-box--button {
     width: 100%;
   }
 
-  .activity-skeleton-details {
+  app-settings-activity .activity-skeleton-details {
     grid-template-columns: 1fr;
     gap: 8px;
     margin-top: 8px;
     padding-top: 8px;
   }
 
-  .profile-header {
+  app-settings-activity .profile-header {
     padding: 0 16px;
   }
 
-  .section-header,
-  .section-title {
+  app-settings-activity .section-header,
+  app-settings-activity .section-title {
     padding: 0 16px;
   }
 
-  .session-card,
-  .login-record {
+  app-settings-activity .session-card,
+  app-settings-activity .login-record {
     padding: 12px 16px;
   }
 
-  .session-header {
+  app-settings-activity .session-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .session-details {
+  app-settings-activity .session-details {
     grid-template-columns: 1fr;
     gap: 8px;
     margin-top: 8px;
   }
 
-  .login-header {
+  app-settings-activity .login-header {
     flex-direction: column;
     gap: 4px;
   }
 
-  .login-time {
+  app-settings-activity .login-time {
     text-align: left;
   }
 
-  .login-details {
+  app-settings-activity .login-details {
     flex-direction: column;
     gap: 4px;
   }
 }
 
-:host-context(.theme-dark) .session-card {
+.theme-dark app-settings-activity .session-card {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
     #141c29;
   border-bottom-color: rgba(226, 231, 244, 0.08);
 }
 
-:host-context(.theme-dark) .session-card.current {
+.theme-dark app-settings-activity .session-card.current {
   background:
     linear-gradient(180deg, rgba(117, 102, 255, 0.12), rgba(117, 102, 255, 0.04)),
     #171e2a;
 }
 
-:host-context(.theme-dark) .session-card:hover {
+.theme-dark app-settings-activity .session-card:hover {
   background:
     linear-gradient(180deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.03)),
     #182131;
 }
 
-:host-context(.theme-dark) .device-name,
-:host-context(.theme-dark) .detail-value {
+.theme-dark app-settings-activity .device-name,
+.theme-dark app-settings-activity .detail-value {
   color: #f4f7ff;
 }
 
-:host-context(.theme-dark) .device-meta {
+.theme-dark app-settings-activity .device-meta {
   color: rgba(226, 231, 244, 0.66);
 }
 
-:host-context(.theme-dark) .badge-current {
+.theme-dark app-settings-activity .badge-current {
   background: rgba(117, 102, 255, 0.18);
   color: #cfcaff;
 }
 
-:host-context(.theme-dark) .session-details {
+.theme-dark app-settings-activity .session-details {
   border-top-color: rgba(226, 231, 244, 0.08);
 }
 
-:host-context(.theme-dark) .detail-label {
+.theme-dark app-settings-activity .detail-label {
   color: rgba(226, 231, 244, 0.48);
 }

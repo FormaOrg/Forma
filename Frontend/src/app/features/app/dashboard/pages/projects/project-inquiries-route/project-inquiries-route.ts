@@ -26,7 +26,6 @@ interface PortfolioInquiry {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-inquiries-route.html',
-  styleUrl: './project-inquiries-route.css',
 })
 export class ProjectInquiriesRoute {
   private readonly route = inject(ActivatedRoute);

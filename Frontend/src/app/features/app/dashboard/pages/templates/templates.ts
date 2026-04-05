@@ -18,7 +18,6 @@ type TemplateSort = 'featured' | 'popular' | 'newest' | 'name';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, DataCard, TemplateCard],
   templateUrl: './templates.html',
-  styleUrl: './templates.css',
 })
 export class Templates implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);

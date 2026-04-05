@@ -29,7 +29,6 @@ interface BlogPostItem {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-posts-route.html',
-  styleUrl: './project-posts-route.css',
 })
 export class ProjectPostsRoute {
   private readonly route = inject(ActivatedRoute);

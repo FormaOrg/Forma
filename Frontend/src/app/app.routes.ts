@@ -157,11 +157,6 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/app/dashboard/pages/projects/project-pages-route/project-pages-route').then((m) => m.ProjectPagesRoute)
               },
               {
-                path: 'media',
-                data: { title: 'Media' },
-                loadComponent: () => import('./features/app/dashboard/pages/projects/project-media-route/project-media-route').then((m) => m.ProjectMediaRoute)
-              },
-              {
                 path: 'audience',
                 data: { title: 'Inquiries' },
                 loadComponent: () => import('./features/app/dashboard/pages/projects/project-inquiries-route/project-inquiries-route').then((m) => m.ProjectInquiriesRoute)

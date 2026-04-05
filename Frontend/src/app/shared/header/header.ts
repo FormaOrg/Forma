@@ -45,7 +45,6 @@ type NavItem = {
   selector: 'app-header',
   imports: [RouterLink],
   templateUrl: './header.html',
-  styleUrl: './header.css',
 })
 export class Header {
   constructor(

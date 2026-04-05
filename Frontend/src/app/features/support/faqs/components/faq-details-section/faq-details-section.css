@@ -1,20 +1,20 @@
-:host {
+app-faq-details-section {
   display: block;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
-* {
+app-faq-details-section * {
   box-sizing: border-box;
 }
 
-.faq-detail-layout {
+app-faq-details-section .faq-detail-layout {
   position: relative;
   background: #f3f3f3;
 }
 
-.faq-detail-layout__inner {
+app-faq-details-section .faq-detail-layout__inner {
   width: 100%;
   margin: 0 auto;
   padding: 120px 125px 160px;
@@ -26,11 +26,11 @@
 
 /* SIDEBAR */
 
-.faq-sidebar {
+app-faq-details-section .faq-sidebar {
   position: relative;
 }
 
-.faq-sidebar__sticky {
+app-faq-details-section .faq-sidebar__sticky {
   position: sticky;
   top: 120px;
   padding: 28px;
@@ -40,7 +40,7 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.04);
 }
 
-.faq-sidebar__eyebrow {
+app-faq-details-section .faq-sidebar__eyebrow {
   margin: 0 0 16px;
   color: #198b4a;
   font-size: 0.82rem;
@@ -50,7 +50,7 @@
   font-weight: 600;
 }
 
-.faq-sidebar__title {
+app-faq-details-section .faq-sidebar__title {
   margin: 0;
   color: #111111;
   font-size: clamp(1.8rem, 2vw, 2.5rem);
@@ -59,20 +59,20 @@
   font-weight: 400;
 }
 
-.faq-sidebar__intro {
+app-faq-details-section .faq-sidebar__intro {
   margin: 16px 0 0;
   color: #3f3f3f;
   font-size: 1rem;
   line-height: 1.45;
 }
 
-.faq-sidebar__nav {
+app-faq-details-section .faq-sidebar__nav {
   display: grid;
   gap: 10px;
   margin-top: 28px;
 }
 
-.faq-sidebar__link {
+app-faq-details-section .faq-sidebar__link {
   width: 100%;
   padding: 14px 16px;
   border: 0;
@@ -92,17 +92,17 @@
     color 0.24s ease;
 }
 
-.faq-sidebar__link:hover {
+app-faq-details-section .faq-sidebar__link:hover {
   background: #ededed;
   transform: translateX(2px);
 }
 
-.faq-sidebar__link--active {
+app-faq-details-section .faq-sidebar__link--active {
   background: #111111;
   color: #ffffff;
 }
 
-.faq-sidebar__dot {
+app-faq-details-section .faq-sidebar__dot {
   width: 10px;
   height: 10px;
   border-radius: 999px;
@@ -110,36 +110,36 @@
   flex-shrink: 0;
 }
 
-.faq-sidebar__dot--group-card--green {
+app-faq-details-section .faq-sidebar__dot--group-card--green {
   color: #81b29a;
 }
 
-.faq-sidebar__dot--group-card--yellow {
+app-faq-details-section .faq-sidebar__dot--group-card--yellow {
   color: #f0c808;
 }
 
-.faq-sidebar__dot--group-card--blue {
+app-faq-details-section .faq-sidebar__dot--group-card--blue {
   color: #8ecae6;
 }
 
-.faq-sidebar__dot--group-card--purple {
+app-faq-details-section .faq-sidebar__dot--group-card--purple {
   color: #9d4edd;
 }
 
 /* DECK */
 
-.faq-deck {
+app-faq-details-section .faq-deck {
   position: relative;
 }
 
-.faq-deck__stage {
+app-faq-details-section .faq-deck__stage {
   position: sticky;
   top: 120px;
   height: 650px;
   border-radius: 40px;
 }
 
-.faq-card {
+app-faq-details-section .faq-card {
   position: absolute;
   inset: 0;
   border-radius: 40px;
@@ -157,7 +157,7 @@
     filter 0.42s ease;
 }
 
-.faq-card__peek-label {
+app-faq-details-section .faq-card__peek-label {
   position: absolute;
   top: 16px;
   left: 24px;
@@ -177,7 +177,7 @@
     visibility 0s linear 0.18s;
 }
 
-.faq-card__body {
+app-faq-details-section .faq-card__body {
   position: absolute;
   inset: 0;
   padding: 34px;
@@ -187,14 +187,14 @@
 
 /* FRONT CARD */
 
-.faq-card--front {
+app-faq-details-section .faq-card--front {
   z-index: 4;
   transform: translateY(0) scale(1);
   opacity: 1;
   filter: none;
 }
 
-.faq-card--front .faq-card__peek-label {
+app-faq-details-section .faq-card--front .faq-card__peek-label {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
@@ -203,14 +203,14 @@
 
 /* BACK CARDS */
 
-.faq-card--back-1 {
+app-faq-details-section .faq-card--back-1 {
   z-index: 3;
   transform: translateY(18px) scale(0.988);
   opacity: 1;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
-.faq-card--back-1 .faq-card__peek-label {
+app-faq-details-section .faq-card--back-1 .faq-card__peek-label {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -220,14 +220,14 @@
     visibility 0s linear 0s;
 }
 
-.faq-card--back-2 {
+app-faq-details-section .faq-card--back-2 {
   z-index: 2;
   transform: translateY(36px) scale(0.976);
   opacity: 1;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
 }
 
-.faq-card--back-2 .faq-card__peek-label {
+app-faq-details-section .faq-card--back-2 .faq-card__peek-label {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -237,14 +237,14 @@
     visibility 0s linear 0s;
 }
 
-.faq-card--back-3 {
+app-faq-details-section .faq-card--back-3 {
   z-index: 1;
   transform: translateY(54px) scale(0.964);
   opacity: 1;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 
-.faq-card--back-3 .faq-card__peek-label {
+app-faq-details-section .faq-card--back-3 .faq-card__peek-label {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -254,14 +254,14 @@
     visibility 0s linear 0s;
 }
 
-.faq-card--hidden {
+app-faq-details-section .faq-card--hidden {
   z-index: 0;
   transform: translateY(72px) scale(0.952);
   opacity: 0;
   pointer-events: none;
 }
 
-.faq-card--hidden .faq-card__peek-label {
+app-faq-details-section .faq-card--hidden .faq-card__peek-label {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
@@ -270,11 +270,11 @@
 
 /* CONTENT */
 
-.faq-group__header {
+app-faq-details-section .faq-group__header {
   margin-bottom: 26px;
 }
 
-.faq-group__pill {
+app-faq-details-section .faq-group__pill {
   display: inline-block;
   margin-bottom: 16px;
   padding: 9px 14px;
@@ -287,7 +287,7 @@
   text-transform: uppercase;
 }
 
-.faq-group__header h3 {
+app-faq-details-section .faq-group__header h3 {
   margin: 0;
   color: #111111;
   font-size: clamp(2rem, 3vw, 3.4rem);
@@ -296,7 +296,7 @@
   font-weight: 400;
 }
 
-.faq-group__header p {
+app-faq-details-section .faq-group__header p {
   margin: 16px 0 0;
   max-width: 760px;
   color: #2c2c2c;
@@ -304,12 +304,12 @@
   line-height: 1.45;
 }
 
-.faq-group__items {
+app-faq-details-section .faq-group__items {
   display: grid;
   gap: 14px;
 }
 
-.faq-accordion {
+app-faq-details-section .faq-accordion {
   border-radius: 26px;
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(17, 17, 17, 0.08);
@@ -320,16 +320,16 @@
     background 0.26s ease;
 }
 
-.faq-accordion:hover {
+app-faq-details-section .faq-accordion:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.05);
 }
 
-.faq-accordion--open {
+app-faq-details-section .faq-accordion--open {
   background: #ffffff;
 }
 
-.faq-accordion__trigger {
+app-faq-details-section .faq-accordion__trigger {
   width: 100%;
   border: 0;
   background: transparent;
@@ -343,20 +343,20 @@
   color: #111111;
 }
 
-.faq-accordion__question {
+app-faq-details-section .faq-accordion__question {
   font-size: clamp(1.05rem, 1.5vw, 1.35rem);
   line-height: 1.25;
   font-weight: 400;
 }
 
-.faq-accordion__icon {
+app-faq-details-section .faq-accordion__icon {
   position: relative;
   width: 22px;
   height: 22px;
   flex-shrink: 0;
 }
 
-.faq-accordion__line {
+app-faq-details-section .faq-accordion__line {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -368,36 +368,36 @@
     transform 0.24s ease;
 }
 
-.faq-accordion__line--horizontal {
+app-faq-details-section .faq-accordion__line--horizontal {
   width: 18px;
   height: 2px;
 }
 
-.faq-accordion__line--vertical {
+app-faq-details-section .faq-accordion__line--vertical {
   width: 2px;
   height: 18px;
 }
 
-.faq-accordion__line--hidden {
+app-faq-details-section .faq-accordion__line--hidden {
   opacity: 0;
   transform: translate(-50%, -50%) scaleY(0.2);
 }
 
-.faq-accordion__content {
+app-faq-details-section .faq-accordion__content {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.34s ease;
 }
 
-.faq-accordion__content--open {
+app-faq-details-section .faq-accordion__content--open {
   grid-template-rows: 1fr;
 }
 
-.faq-accordion__content-inner {
+app-faq-details-section .faq-accordion__content-inner {
   overflow: hidden;
 }
 
-.faq-accordion__content-inner p {
+app-faq-details-section .faq-accordion__content-inner p {
   margin: 0;
   padding: 0 24px 24px;
   max-width: 760px;
@@ -409,17 +409,17 @@
 /* RESPONSIVE */
 
 @media (max-width: 1100px) {
-  .faq-detail-layout__inner {
+  app-faq-details-section .faq-detail-layout__inner {
     padding: 100px 40px 120px;
     grid-template-columns: 1fr;
   }
 
-  .faq-sidebar__sticky {
+  app-faq-details-section .faq-sidebar__sticky {
     position: relative;
     top: auto;
   }
 
-  .faq-deck__stage {
+  app-faq-details-section .faq-deck__stage {
     position: relative;
     top: auto;
     height: auto;
@@ -427,23 +427,23 @@
     gap: 18px;
   }
 
-  .faq-card,
-  .faq-card--front,
-  .faq-card--back-1,
-  .faq-card--back-2,
-  .faq-card--back-3,
-  .faq-card--hidden {
+  app-faq-details-section .faq-card,
+  app-faq-details-section .faq-card--front,
+  app-faq-details-section .faq-card--back-1,
+  app-faq-details-section .faq-card--back-2,
+  app-faq-details-section .faq-card--back-3,
+  app-faq-details-section .faq-card--hidden {
     position: relative;
     inset: auto;
     transform: none;
     opacity: 1;
   }
 
-  .faq-card__peek-label {
+  app-faq-details-section .faq-card__peek-label {
     display: none;
   }
 
-  .faq-card__body {
+  app-faq-details-section .faq-card__body {
     position: relative;
     inset: auto;
     padding: 28px;
@@ -452,30 +452,30 @@
 }
 
 @media (max-width: 700px) {
-  .faq-detail-layout__inner {
+  app-faq-details-section .faq-detail-layout__inner {
     padding: 72px 20px 90px;
     gap: 22px;
   }
 
-  .faq-sidebar__sticky,
-  .faq-card,
-  .faq-card__body {
+  app-faq-details-section .faq-sidebar__sticky,
+  app-faq-details-section .faq-card,
+  app-faq-details-section .faq-card__body {
     border-radius: 24px;
   }
 
-  .faq-card__body {
+  app-faq-details-section .faq-card__body {
     padding: 22px;
   }
 
-  .faq-accordion {
+  app-faq-details-section .faq-accordion {
     border-radius: 18px;
   }
 
-  .faq-accordion__trigger {
+  app-faq-details-section .faq-accordion__trigger {
     padding: 18px;
   }
 
-  .faq-accordion__content-inner p {
+  app-faq-details-section .faq-accordion__content-inner p {
     padding: 0 18px 18px;
     font-size: 0.98rem;
   }

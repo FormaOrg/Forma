@@ -5,7 +5,6 @@ import { ThemeService } from '../../../core/services/theme.service';
   selector: 'app-bootstrap-loader',
   standalone: true,
   templateUrl: './bootstrap-loader.html',
-  styleUrl: './bootstrap-loader.css'
 })
 export class BootstrapLoader implements OnInit, OnDestroy {
   currentWord = 'Build';
