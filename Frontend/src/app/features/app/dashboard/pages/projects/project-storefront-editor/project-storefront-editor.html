@@ -12,7 +12,7 @@
       <p class="storefront-editor__state-eyebrow">Storefront editor</p>
       <h1 class="storefront-editor__state-title">We couldn't open this editor.</h1>
       <p class="storefront-editor__state-copy">{{ errorMessage() }}</p>
-      <a class="storefront-editor__state-link" [routerLink]="['/app/projects', projectId(), 'home']">Back to project</a>
+      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">Back to project</button>
     </div>
   </section>
 } @else if (!isEcommerceProject()) {
@@ -21,7 +21,7 @@
       <p class="storefront-editor__state-eyebrow">Storefront editor</p>
       <h1 class="storefront-editor__state-title">This editor is only available for ecommerce projects.</h1>
       <p class="storefront-editor__state-copy">Other project types can keep using their current workspace until their dedicated editors are ready.</p>
-      <a class="storefront-editor__state-link" [routerLink]="['/app/projects', projectId(), 'home']">Back to project</a>
+      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">Back to project</button>
     </div>
   </section>
 } @else if (workingStorefront(); as storefront) {
@@ -36,77 +36,239 @@
       [class.storefront-editor__workspace--sidebar-collapsed]="sidebarCollapsed()"
     >
       <aside class="storefront-editor__sidebar-shell">
-        <div class="storefront-editor__sidebar-brand">
-          <div class="storefront-editor__sidebar-mark">F</div>
-          <div class="storefront-editor__sidebar-brand-copy">
-            <strong>Storefront</strong>
-            <small>{{ storeName() }}</small>
+        <div class="storefront-editor__sidebar-rail">
+          <div class="storefront-editor__sidebar-brand">
+            <div class="storefront-editor__sidebar-mark">F</div>
+          </div>
+
+          <div class="storefront-editor__sidebar-tools">
+            <button
+              type="button"
+              class="storefront-editor__tool-button"
+              [class.storefront-editor__tool-button--active]="sidebarMode() === 'structure'"
+              (click)="setSidebarMode('structure')"
+            >
+              <app-icon name="layout-grid" [size]="18"></app-icon>
+            </button>
+            <button
+              type="button"
+              class="storefront-editor__tool-button"
+              [class.storefront-editor__tool-button--active]="sidebarMode() === 'page'"
+              (click)="setSidebarMode('page')"
+            >
+              <app-icon name="home" [size]="18"></app-icon>
+            </button>
+            <button
+              type="button"
+              class="storefront-editor__tool-button"
+              [class.storefront-editor__tool-button--active]="sidebarMode() === 'theme'"
+              (click)="setSidebarMode('theme')"
+            >
+              <app-icon name="settings" [size]="18"></app-icon>
+            </button>
+            <button
+              type="button"
+              class="storefront-editor__tool-button"
+              [class.storefront-editor__tool-button--active]="sidebarMode() === 'assets'"
+              (click)="setSidebarMode('assets')"
+            >
+              <app-icon name="image" [size]="18"></app-icon>
+            </button>
           </div>
         </div>
 
         <div class="storefront-editor__sidebar-body">
-          <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--status">
-            <p class="storefront-editor__sidebar-label">Workspace</p>
-            <h2 class="storefront-editor__sidebar-title">Homepage editor</h2>
-            <p class="storefront-editor__sidebar-copy">Edit structure, preview changes, and publish from one focused workspace.</p>
+          <div class="storefront-editor__sidebar-headline">
+            <div>
+              <p class="storefront-editor__sidebar-label">Editor panel</p>
+              <h2 class="storefront-editor__sidebar-title">
+                @switch (sidebarMode()) {
+                  @case ('page') { Page setup }
+                  @case ('theme') { Theme direction }
+                  @case ('assets') { Assets }
+                  @default { Layers }
+                }
+              </h2>
+            </div>
             <span class="storefront-editor__badge">{{ storefront.storeStatus }}</span>
           </div>
 
-          <nav class="storefront-editor__nav" aria-label="Editor navigation">
-            <div class="storefront-editor__nav-section-label">Page</div>
-
-            <button
-              type="button"
-              class="storefront-editor__nav-row"
-              [class.storefront-editor__nav-row--active]="pageSettingsSelected()"
-              [class.storefront-editor__nav-row--collapsed]="sidebarCollapsed()"
-              (click)="selectPageSettings()"
-            >
-              <span class="storefront-editor__nav-icon">
-                <app-icon name="home" [size]="18"></app-icon>
-              </span>
-              <span class="storefront-editor__nav-copy">
-                <strong>Home settings</strong>
-                <small>Identity and SEO</small>
-              </span>
-              <span class="storefront-editor__nav-pad" aria-hidden="true"></span>
-            </button>
-
-            <div class="storefront-editor__nav-section-label">Sections</div>
-
-            @for (section of sections(); track trackSection($index, section)) {
+          @if (sidebarMode() === 'page') {
+            <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--status">
+              <p class="storefront-editor__sidebar-copy">Manage the page identity, store title, and search preview settings from the inspector.</p>
               <button
                 type="button"
                 class="storefront-editor__nav-row"
-                [class.storefront-editor__nav-row--active]="selectedSectionId() === section.id"
+                [class.storefront-editor__nav-row--active]="pageSettingsSelected()"
                 [class.storefront-editor__nav-row--collapsed]="sidebarCollapsed()"
-                (click)="selectSection(section.id)"
+                (click)="selectPageSettings()"
               >
-                <span class="storefront-editor__nav-icon storefront-editor__nav-icon--index">{{ $index + 1 }}</span>
-                <span class="storefront-editor__nav-copy">
-                  <strong>{{ sectionLabel(section) }}</strong>
-                  <small>{{ sectionDescription(section) || 'No content yet' }}</small>
+                <span class="storefront-editor__nav-icon">
+                  <app-icon name="home" [size]="18"></app-icon>
                 </span>
-                <span class="storefront-editor__nav-chip">{{ section.enabled ? 'On' : 'Off' }}</span>
+                <span class="storefront-editor__nav-copy">
+                  <strong>Homepage settings</strong>
+                  <small>Identity and SEO</small>
+                </span>
+                <span class="storefront-editor__nav-pad" aria-hidden="true"></span>
               </button>
-            }
-          </nav>
+            </div>
+          } @else if (sidebarMode() === 'theme') {
+            <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--status">
+              <p class="storefront-editor__sidebar-copy">Theme controls are the next layer to add. For now, use the inspector and preview to shape the homepage feel.</p>
+              <div class="storefront-editor__coming-soon">
+                <span class="storefront-editor__meta-pill">Color system soon</span>
+                <span class="storefront-editor__meta-pill">Typography soon</span>
+              </div>
+            </div>
+          } @else if (sidebarMode() === 'assets') {
+            <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--status">
+              <p class="storefront-editor__sidebar-copy">Assets will eventually let you manage hero imagery and reusable brand visuals in one place.</p>
+              <div class="storefront-editor__coming-soon">
+                <span class="storefront-editor__meta-pill">Media library soon</span>
+              </div>
+            </div>
+          } @else {
+            <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--status">
+              <p class="storefront-editor__sidebar-copy">Build the storefront like a visual editor: add sections, select layers, and reorganize the homepage from here.</p>
+            </div>
+
+            <nav class="storefront-editor__nav" aria-label="Editor navigation">
+              <div class="storefront-editor__nav-section-label">Add section</div>
+
+              <div class="storefront-editor__add-section-list">
+                @for (type of availableSectionTypes; track type) {
+                  <button
+                    type="button"
+                    class="storefront-editor__add-section-button"
+                    [class.storefront-editor__add-section-button--collapsed]="sidebarCollapsed()"
+                    (click)="addSection(type)"
+                  >
+                    <span class="storefront-editor__add-section-icon">
+                      <app-icon [name]="sectionTypeIcon(type)" [size]="16"></app-icon>
+                    </span>
+                    <span class="storefront-editor__add-section-copy">
+                      Add {{ sectionLabel({ id: '', type, enabled: true, props: {} }) }}
+                    </span>
+                  </button>
+                }
+              </div>
+
+              <div class="storefront-editor__nav-section-label">Homepage layers</div>
+
+              @for (section of sections(); track trackSection($index, section)) {
+                <div
+                  class="storefront-editor__section-card"
+                  [class.storefront-editor__section-card--active]="selectedSectionId() === section.id"
+                  [class.storefront-editor__section-card--collapsed]="sidebarCollapsed()"
+                >
+                  <button
+                    type="button"
+                    class="storefront-editor__nav-row"
+                    [class.storefront-editor__nav-row--active]="selectedSectionId() === section.id"
+                    [class.storefront-editor__nav-row--collapsed]="sidebarCollapsed()"
+                    (click)="selectSection(section.id)"
+                  >
+                    <span class="storefront-editor__nav-icon storefront-editor__nav-icon--index">{{ $index + 1 }}</span>
+                    <span class="storefront-editor__nav-copy">
+                      <strong>{{ sectionLabel(section) }}</strong>
+                      <small>{{ sectionDescription(section) || 'No content yet' }}</small>
+                    </span>
+                    <span class="storefront-editor__nav-chip">{{ section.enabled ? 'On' : 'Off' }}</span>
+                  </button>
+
+                  <div class="storefront-editor__section-actions" [class.storefront-editor__section-actions--collapsed]="sidebarCollapsed()">
+                    <button
+                      type="button"
+                      class="storefront-editor__section-action"
+                      (click)="toggleSectionEnabled(section.id)"
+                    >
+                      {{ section.enabled ? 'Hide' : 'Show' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__section-action"
+                      (click)="moveSection(section.id, 'up')"
+                      [disabled]="!canMoveSection(section.id, 'up')"
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__section-action"
+                      (click)="moveSection(section.id, 'down')"
+                      [disabled]="!canMoveSection(section.id, 'down')"
+                    >
+                      Down
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__section-action"
+                      (click)="duplicateSection(section.id)"
+                    >
+                      Duplicate
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__section-action storefront-editor__section-action--danger"
+                      (click)="removeSection(section.id)"
+                      [disabled]="!canRemoveSection()"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              }
+            </nav>
+          }
         </div>
       </aside>
 
       <div class="storefront-editor__main">
+        <div class="storefront-editor__editor-bar">
+          <div class="storefront-editor__editor-bar-group">
+            <span class="storefront-editor__editor-chip">Page</span>
+            <button type="button" class="storefront-editor__editor-select" (click)="selectPageSettings()">
+              Home
+              <app-icon name="chevron-down" [size]="14"></app-icon>
+            </button>
+          </div>
+
+          <div class="storefront-editor__editor-bar-group">
+            <span class="storefront-editor__editor-chip">Canvas</span>
+            <button type="button" class="storefront-editor__editor-ghost" (click)="setViewport('desktop')">
+              Desktop
+            </button>
+            <button type="button" class="storefront-editor__editor-ghost" (click)="setViewport('mobile')">
+              Mobile
+            </button>
+          </div>
+
+          <div class="storefront-editor__editor-bar-group storefront-editor__editor-bar-group--end">
+            <span class="storefront-editor__editor-zoom">{{ viewport() === 'desktop' ? '100%' : '75%' }}</span>
+            <span class="storefront-editor__editor-separator" aria-hidden="true"></span>
+            <span class="storefront-editor__editor-status">{{ hasUnsavedChanges() ? 'Editing draft' : 'All changes saved' }}</span>
+          </div>
+        </div>
+
         <div class="storefront-editor__toolbar">
           <div class="storefront-editor__toolbar-copy">
             <p class="storefront-editor__eyebrow">Storefront editor</p>
             <h1 class="storefront-editor__title">{{ previewTitle() }}</h1>
             <p class="storefront-editor__subtitle">A separate editor page with dashboard-style chrome, a focused navigation rail, and a live storefront canvas.</p>
+
+            <div class="storefront-editor__meta-strip">
+              <span class="storefront-editor__meta-pill">{{ sections().length }} sections</span>
+              <span class="storefront-editor__meta-pill">{{ featuredProductsPreview().length }} featured products</span>
+              <span class="storefront-editor__meta-pill">{{ storefront.storeStatus === 'PUBLISHED' ? 'Live storefront' : 'Draft only' }}</span>
+            </div>
           </div>
 
           <div class="storefront-editor__toolbar-actions">
-            <a class="storefront-editor__back-link" [routerLink]="['/app/projects', projectId(), 'home']">
+            <button type="button" class="storefront-editor__back-link" (click)="navigateBackToProject()">
               <app-icon name="arrow-left" [size]="16"></app-icon>
               Back to project
-            </a>
+            </button>
 
             <div class="storefront-editor__viewport-toggle" aria-label="Preview size">
               <button
@@ -275,8 +437,11 @@
             <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--inspector">
               @if (pageSettingsSelected()) {
                 <div class="storefront-editor__inspector-head">
-                  <p class="storefront-editor__sidebar-label">Page settings</p>
-                  <h2 class="storefront-editor__sidebar-title">Homepage identity</h2>
+                  <div>
+                    <p class="storefront-editor__sidebar-label">Page settings</p>
+                    <h2 class="storefront-editor__sidebar-title">Homepage identity</h2>
+                  </div>
+                  <span class="storefront-editor__inspector-badge">Page</span>
                 </div>
 
                 <label class="storefront-editor__field">
@@ -314,6 +479,7 @@
                     <p class="storefront-editor__sidebar-label">Section inspector</p>
                     <h2 class="storefront-editor__sidebar-title">{{ sectionLabel(section) }}</h2>
                   </div>
+                  <span class="storefront-editor__inspector-badge">{{ section.enabled ? 'Enabled' : 'Disabled' }}</span>
                 </div>
 
                 <p class="storefront-editor__inspector-copy">Update the content and order for this homepage section. Structured editing keeps the layout reliable while still letting you customize the store.</p>
