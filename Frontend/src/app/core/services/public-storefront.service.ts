@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PublicStorefrontHome, PublicStorefrontProduct } from '../models/public-storefront.model';
+import {
+  PublicCheckoutRequest,
+  PublicCheckoutResponse,
+  PublicStorefrontHome,
+  PublicStorefrontProduct,
+} from '../models/public-storefront.model';
 
 @Injectable({ providedIn: 'root' })
 export class PublicStorefrontService {
@@ -20,5 +25,9 @@ export class PublicStorefrontService {
 
   getProduct(projectId: number, productId: number): Observable<PublicStorefrontProduct> {
     return this.http.get<PublicStorefrontProduct>(`${this.baseUrl}/${projectId}/products/${productId}`);
+  }
+
+  checkout(projectId: number, payload: PublicCheckoutRequest): Observable<PublicCheckoutResponse> {
+    return this.http.post<PublicCheckoutResponse>(`${this.baseUrl}/${projectId}/checkout`, payload);
   }
 }

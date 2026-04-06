@@ -1,0 +1,94 @@
+@if (isLoading()) {
+  <section class="storefront-checkout__state">
+    <p>Loading checkout...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-checkout__state storefront-checkout__state--error">
+    <h1>Checkout unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else if (!items().length) {
+  <section class="storefront-checkout__state storefront-checkout__state--empty">
+    <h1>Your cart is empty</h1>
+    <p>Add products before starting checkout.</p>
+    <a [routerLink]="['/store', projectId(), 'products']">Browse products</a>
+  </section>
+} @else {
+  <div class="storefront-checkout">
+    <header class="storefront-checkout__header">
+      <a class="storefront-checkout__brand" [routerLink]="['/store', projectId()]">
+        {{ storefront()?.storeName || 'Storefront' }}
+      </a>
+
+      <nav class="storefront-checkout__nav" aria-label="Store navigation">
+        <a [routerLink]="['/store', projectId()]">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']">Cart</a>
+      </nav>
+    </header>
+
+    <main class="storefront-checkout__layout">
+      <section class="storefront-checkout__form-card">
+        <span>Manual checkout</span>
+        <h1>Confirm your order</h1>
+        <p>The store owner will follow up directly after you place this order.</p>
+
+        <form [formGroup]="checkoutForm" (ngSubmit)="submitCheckout()" class="storefront-checkout__form">
+          <div class="storefront-checkout__grid">
+            <label>
+              <span>First name</span>
+              <input type="text" formControlName="firstName" />
+            </label>
+            <label>
+              <span>Last name</span>
+              <input type="text" formControlName="lastName" />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="tel" formControlName="phone" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" formControlName="email" />
+            </label>
+          </div>
+
+          <label>
+            <span>Delivery address</span>
+            <textarea rows="3" formControlName="address"></textarea>
+          </label>
+
+          <label>
+            <span>Notes</span>
+            <textarea rows="4" formControlName="notes"></textarea>
+          </label>
+
+          <button type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Placing order...' : 'Place order' }}
+          </button>
+        </form>
+      </section>
+
+      <aside class="storefront-checkout__summary">
+        <h2>Order summary</h2>
+
+        <div class="storefront-checkout__items">
+          @for (item of items(); track item.productId) {
+            <div class="storefront-checkout__item">
+              <div>
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.quantity }} x {{ item.price | currency:'TND':'symbol':'1.0-2' }}</span>
+              </div>
+              <strong>{{ item.price * item.quantity | currency:'TND':'symbol':'1.0-2' }}</strong>
+            </div>
+          }
+        </div>
+
+        <div class="storefront-checkout__total">
+          <span>Total</span>
+          <strong>{{ subtotal() | currency:'TND':'symbol':'1.0-2' }}</strong>
+        </div>
+      </aside>
+    </main>
+  </div>
+}

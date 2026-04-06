@@ -10,4 +10,6 @@ import java.util.List;
 public interface ProjectCustomerRepository extends JpaRepository<ProjectCustomer, Long> {
     List<ProjectCustomer> findAllByProjectIdOrderByCreatedAtDesc(Long projectId);
     java.util.Optional<ProjectCustomer> findByIdAndProjectId(Long id, Long projectId);
+    java.util.Optional<ProjectCustomer> findFirstByProjectIdAndEmailIgnoreCase(Long projectId, String email);
+    java.util.Optional<ProjectCustomer> findFirstByProjectIdAndPhone(Long projectId, String phone);
 }

@@ -99,6 +99,17 @@
   height: 100%;
 }
 
+.storefront-products__add {
+  margin: 0 1rem 1rem;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #251b12;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .storefront-products__media {
   aspect-ratio: 4 / 5;
   background: linear-gradient(135deg, #efe3d5, #f6f0e8);

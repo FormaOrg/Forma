@@ -1,0 +1,23 @@
+<section class="storefront-success">
+  <div class="storefront-success__card">
+    <span>Order placed</span>
+    <h1>Thanks, your order is in.</h1>
+    <p>The store owner can now see this order in the Forma dashboard and will follow up manually.</p>
+
+    <dl class="storefront-success__summary">
+      <div>
+        <dt>Order number</dt>
+        <dd>{{ orderNumber() }}</dd>
+      </div>
+      <div>
+        <dt>Total</dt>
+        <dd>{{ total() | currency:currency():'symbol':'1.0-2' }}</dd>
+      </div>
+    </dl>
+
+    <div class="storefront-success__actions">
+      <a [routerLink]="['/store', projectId()]">Back to storefront</a>
+      <a [routerLink]="['/store', projectId(), 'products']">Browse more products</a>
+    </div>
+  </div>
+</section>

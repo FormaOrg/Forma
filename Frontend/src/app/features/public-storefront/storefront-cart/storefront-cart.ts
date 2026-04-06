@@ -3,19 +3,18 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
-import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
-import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
+import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 
 @Component({
-  selector: 'app-storefront-home',
+  selector: 'app-storefront-cart',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './storefront-home.html',
-  styleUrl: './storefront-home.css',
+  templateUrl: './storefront-cart.html',
+  styleUrl: './storefront-cart.css',
 })
-export class StorefrontHome {
+export class StorefrontCart {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
@@ -32,11 +31,8 @@ export class StorefrontHome {
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
-  readonly sections = computed(
-    () => this.storefront()?.homepage.sections.filter((section) => section.enabled) ?? []
-  );
-  readonly featuredProducts = computed(() => this.storefront()?.featuredProducts ?? []);
-  readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
+  readonly items = computed(() => this.storeCartService.itemsFor(this.projectId()));
+  readonly subtotal = computed(() => this.storeCartService.subtotalFor(this.projectId()));
 
   constructor() {
     this.loadStorefront();
@@ -50,9 +46,6 @@ export class StorefrontHome {
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-
     this.publicStorefrontService
       .getStorefront(projectId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -63,41 +56,21 @@ export class StorefrontHome {
         },
         error: () => {
           this.storefront.set(null);
-          this.errorMessage.set('This storefront is not available right now.');
+          this.errorMessage.set('Unable to load this cart right now.');
           this.isLoading.set(false);
         },
       });
   }
 
-  resolveLinkHref(value: string): string {
-    const href = value.trim();
-    const projectId = this.projectId();
-
-    if (!href) {
-      return `/store/${projectId}/products`;
-    }
-    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#')) {
-      return href;
-    }
-    if (href.startsWith('/store/')) {
-      return href;
-    }
-    if (href.startsWith('/')) {
-      return `/store/${projectId}${href}`;
-    }
-
-    return `/store/${projectId}/${href.replace(/^\/+/, '')}`;
+  increaseQuantity(productId: number, quantity: number): void {
+    this.storeCartService.updateQuantity(this.projectId(), productId, quantity + 1);
   }
 
-  readStringProp(section: StorefrontHomepageSection, key: string): string {
-    const value = (section.props as Record<string, unknown>)[key];
-    return typeof value === 'string' ? value : '';
+  decreaseQuantity(productId: number, quantity: number): void {
+    this.storeCartService.updateQuantity(this.projectId(), productId, quantity - 1);
   }
 
-  productRoute(productId: number): string {
-    return `/store/${this.projectId()}/products/${productId}`;
+  removeItem(productId: number): void {
+    this.storeCartService.removeItem(this.projectId(), productId);
   }
-
-  trackSection = (_: number, section: StorefrontHomepageSection): string => section.id;
-  trackProduct = (_: number, product: PublicStorefrontProduct): number => product.id;
 }

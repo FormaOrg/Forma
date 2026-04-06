@@ -17,6 +17,7 @@
       <nav class="storefront-product__nav" aria-label="Store navigation">
         <a [routerLink]="['/store', projectId()]">Home</a>
         <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
@@ -39,9 +40,9 @@
           <h1>{{ product.name }}</h1>
 
           <div class="storefront-product__pricing">
-            <strong>{{ product.price | currency:'USD':'symbol':'1.0-2' }}</strong>
+            <strong>{{ product.price | currency:'TND':'symbol':'1.0-2' }}</strong>
             @if (product.compareAtPrice) {
-              <span>{{ product.compareAtPrice | currency:'USD':'symbol':'1.0-2' }}</span>
+              <span>{{ product.compareAtPrice | currency:'TND':'symbol':'1.0-2' }}</span>
             }
           </div>
 
@@ -73,6 +74,13 @@
               }
             </div>
           }
+
+          <div class="storefront-product__actions">
+            <button type="button" (click)="addToCart()">Add to cart</button>
+            <button type="button" class="storefront-product__actions-secondary" (click)="goToCheckout()">
+              Add and view cart
+            </button>
+          </div>
         </div>
       </section>
     </main>

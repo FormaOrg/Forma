@@ -1,0 +1,82 @@
+@if (isLoading()) {
+  <section class="storefront-cart__state">
+    <p>Loading cart...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-cart__state storefront-cart__state--error">
+    <h1>Cart unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else {
+  <div class="storefront-cart">
+    <header class="storefront-cart__header">
+      <a class="storefront-cart__brand" [routerLink]="['/store', projectId()]">
+        {{ storefront()?.storeName || 'Storefront' }}
+      </a>
+
+      <nav class="storefront-cart__nav" aria-label="Store navigation">
+        <a [routerLink]="['/store', projectId()]">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']">Cart</a>
+      </nav>
+    </header>
+
+    <main class="storefront-cart__content">
+      <section class="storefront-cart__summary-card">
+        <span>Ready when you are</span>
+        <h1>Your cart</h1>
+        <p>{{ items().length }} item{{ items().length === 1 ? '' : 's' }} selected.</p>
+      </section>
+
+      @if (items().length) {
+        <div class="storefront-cart__layout">
+          <section class="storefront-cart__items">
+            @for (item of items(); track item.productId) {
+              <article class="storefront-cart__item">
+                <div class="storefront-cart__item-media">
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.name" />
+                  } @else {
+                    <div class="storefront-cart__placeholder">{{ item.name.slice(0, 1) }}</div>
+                  }
+                </div>
+
+                <div class="storefront-cart__item-copy">
+                  <p class="storefront-cart__item-category">{{ item.category || 'Product' }}</p>
+                  <h2>{{ item.name }}</h2>
+                  <p class="storefront-cart__item-price">{{ item.price | currency:'TND':'symbol':'1.0-2' }}</p>
+
+                  <div class="storefront-cart__item-actions">
+                    <button type="button" (click)="decreaseQuantity(item.productId, item.quantity)">-</button>
+                    <span>{{ item.quantity }}</span>
+                    <button type="button" (click)="increaseQuantity(item.productId, item.quantity)">+</button>
+                    <button type="button" class="storefront-cart__remove" (click)="removeItem(item.productId)">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </article>
+            }
+          </section>
+
+          <aside class="storefront-cart__summary">
+            <div>
+              <span>Subtotal</span>
+              <strong>{{ subtotal() | currency:'TND':'symbol':'1.0-2' }}</strong>
+            </div>
+            <p>Shipping and payment are handled manually after checkout confirmation.</p>
+            <a class="storefront-cart__checkout" [routerLink]="['/store', projectId(), 'checkout']">
+              Continue to checkout
+            </a>
+          </aside>
+        </div>
+      } @else {
+        <section class="storefront-cart__empty">
+          <h2>Your cart is empty</h2>
+          <p>Add a few products from the live catalog to start a checkout.</p>
+          <a [routerLink]="['/store', projectId(), 'products']">Browse products</a>
+        </section>
+      }
+    </main>
+  </div>
+}

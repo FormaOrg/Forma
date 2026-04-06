@@ -15,6 +15,7 @@
       <nav class="storefront-home__nav" aria-label="Store navigation">
         <a [routerLink]="['/store', projectId()]">Home</a>
         <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
@@ -91,7 +92,7 @@
                             {{ product.category || 'Featured product' }}
                           </p>
                           <h3>{{ product.name }}</h3>
-                          <p class="storefront-home__product-price">{{ product.price | currency:'USD':'symbol':'1.0-2' }}</p>
+                          <p class="storefront-home__product-price">{{ product.price | currency:'TND':'symbol':'1.0-2' }}</p>
                         </div>
                       </a>
                     </article>
