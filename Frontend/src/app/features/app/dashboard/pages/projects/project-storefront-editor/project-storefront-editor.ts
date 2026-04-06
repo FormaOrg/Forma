@@ -14,13 +14,14 @@ import { ProjectService } from '../../../../../../core/services/project.service'
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
+import { AppHeader } from '../../../../../../shared/app/app-header/app-header';
 
 type EditorViewport = 'desktop' | 'mobile';
 
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppIcon],
+  imports: [CommonModule, FormsModule, RouterLink, AppIcon, AppHeader],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
@@ -47,6 +48,7 @@ export class ProjectStorefrontEditor {
   readonly products = signal<ProjectCatalogProduct[]>([]);
   readonly selectedSectionId = signal<string | null>(null);
   readonly viewport = signal<EditorViewport>('desktop');
+  readonly sidebarCollapsed = signal(false);
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
   readonly isPublishing = signal(false);
@@ -159,6 +161,10 @@ export class ProjectStorefrontEditor {
 
   setViewport(viewport: EditorViewport): void {
     this.viewport.set(viewport);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed.update((value) => !value);
   }
 
   updateStoreName(value: string): void {

@@ -6,6 +6,8 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { StoreCartService } from '../../../core/services/store-cart.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-storefront-products',
@@ -18,6 +20,8 @@ export class StorefrontProducts {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storeCartService = inject(StoreCartService);
+  private readonly toastService = inject(ToastService);
 
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
@@ -31,6 +35,7 @@ export class StorefrontProducts {
   readonly products = signal<PublicStorefrontProduct[]>([]);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
+  readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
 
   constructor() {
     this.loadProducts();
@@ -68,4 +73,9 @@ export class StorefrontProducts {
   }
 
   trackProduct = (_: number, product: PublicStorefrontProduct): number => product.id;
+
+  addToCart(product: PublicStorefrontProduct): void {
+    this.storeCartService.addItem(this.projectId(), product, 1);
+    this.toastService.success(`${product.name} added to cart.`);
+  }
 }

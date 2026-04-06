@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { StoreCartService } from '../../../core/services/store-cart.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-storefront-product-detail',
@@ -16,8 +18,11 @@ import { PublicStorefrontService } from '../../../core/services/public-storefron
 })
 export class StorefrontProductDetail {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storeCartService = inject(StoreCartService);
+  private readonly toastService = inject(ToastService);
 
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
@@ -35,6 +40,7 @@ export class StorefrontProductDetail {
   readonly product = signal<PublicStorefrontProduct | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
+  readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
 
   constructor() {
     this.loadProduct();
@@ -70,5 +76,20 @@ export class StorefrontProductDetail {
           this.isLoading.set(false);
         },
       });
+  }
+
+  addToCart(): void {
+    const product = this.product();
+    if (!product) {
+      return;
+    }
+
+    this.storeCartService.addItem(this.projectId(), product, 1);
+    this.toastService.success(`${product.name} added to cart.`);
+  }
+
+  goToCheckout(): void {
+    this.addToCart();
+    void this.router.navigate(['/store', this.projectId(), 'cart']);
   }
 }

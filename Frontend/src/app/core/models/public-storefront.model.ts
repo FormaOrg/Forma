@@ -23,3 +23,34 @@ export interface PublicStorefrontHome {
   homepage: StorefrontHomepageDocument;
   featuredProducts: PublicStorefrontProduct[];
 }
+
+export interface StoreCartItem {
+  productId: number;
+  name: string;
+  category: string | null;
+  price: number;
+  imageUrl: string | null;
+  quantity: number;
+}
+
+export interface PublicCheckoutItemRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface PublicCheckoutRequest {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string | null;
+  address: string;
+  notes?: string | null;
+  items: PublicCheckoutItemRequest[];
+}
+
+export interface PublicCheckoutResponse {
+  orderId: number;
+  orderNumber: string;
+  total: number;
+  currencyCode: string;
+}

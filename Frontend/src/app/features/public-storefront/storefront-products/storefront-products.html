@@ -20,6 +20,7 @@
       <nav class="storefront-products__nav" aria-label="Store navigation">
         <a [routerLink]="['/store', projectId()]">Home</a>
         <a [routerLink]="['/store', projectId(), 'products']">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
@@ -50,11 +51,14 @@
                     <p class="storefront-products__description">{{ product.description }}</p>
                   }
                   <div class="storefront-products__meta">
-                    <strong>{{ product.price | currency:'USD':'symbol':'1.0-2' }}</strong>
+                    <strong>{{ product.price | currency:'TND':'symbol':'1.0-2' }}</strong>
                     <span>{{ product.inventoryQuantity }} in stock</span>
                   </div>
                 </div>
               </a>
+              <button type="button" class="storefront-products__add" (click)="addToCart(product)">
+                Add to cart
+              </button>
             </article>
           }
         </section>

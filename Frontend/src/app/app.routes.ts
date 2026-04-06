@@ -41,6 +41,19 @@ export const routes: Routes = [
       import('./features/public-storefront/storefront-product-detail/storefront-product-detail').then((m) => m.StorefrontProductDetail)
   },
   {
+    path: 'store/:projectId/cart',
+    loadComponent: () => import('./features/public-storefront/storefront-cart/storefront-cart').then((m) => m.StorefrontCart)
+  },
+  {
+    path: 'store/:projectId/checkout/success',
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-checkout-success/storefront-checkout-success').then((m) => m.StorefrontCheckoutSuccess)
+  },
+  {
+    path: 'store/:projectId/checkout',
+    loadComponent: () => import('./features/public-storefront/storefront-checkout/storefront-checkout').then((m) => m.StorefrontCheckout)
+  },
+  {
     path: 'store/:projectId/products',
     loadComponent: () => import('./features/public-storefront/storefront-products/storefront-products').then((m) => m.StorefrontProducts)
   },
@@ -266,3 +279,4 @@ export const routes: Routes = [
 ];
 
   
+
