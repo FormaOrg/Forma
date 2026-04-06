@@ -6,7 +6,11 @@ import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
-import { ProjectStorefront, StorefrontHomepageSection } from '../../../../../../core/models/project-storefront.model';
+import {
+  ProjectStorefront,
+  StorefrontHomepageDocument,
+  StorefrontHomepageSection,
+} from '../../../../../../core/models/project-storefront.model';
 import { Project } from '../../../../../../core/models/project.model';
 import { ProjectCatalogService } from '../../../../../../core/services/project-catalog.service';
 import { ProjectStorefrontService } from '../../../../../../core/services/project-storefront.service';
@@ -92,7 +96,9 @@ export class ProjectStorefrontEditor {
       .filter((product): product is ProjectCatalogProduct => Boolean(product))
       .slice(0, maxItems);
   });
-  readonly previewTitle = computed(() => this.workingStorefront()?.draftHomepage.seo.title || this.storeName());
+  readonly previewTitle = computed(
+    () => this.workingStorefront()?.draftHomepage?.seo?.title || this.storeName()
+  );
   readonly availableSectionTypes: StorefrontSectionType[] = [
     'announcement-bar',
     'hero',
@@ -147,7 +153,7 @@ export class ProjectStorefrontEditor {
             return;
           }
 
-          const snapshot = this.cloneStorefront(storefront);
+          const snapshot = this.normalizeStorefront(storefront);
           this.storefront.set(snapshot);
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           this.selectedSectionId.set(snapshot.draftHomepage.sections[0]?.id ?? null);
@@ -448,7 +454,7 @@ export class ProjectStorefrontEditor {
       .pipe(finalize(() => this.isSaving.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (savedStorefront) => {
-          const snapshot = this.cloneStorefront(savedStorefront);
+          const snapshot = this.normalizeStorefront(savedStorefront);
           this.storefront.set(snapshot);
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           this.toastService.success('Storefront draft saved.');
@@ -482,7 +488,7 @@ export class ProjectStorefrontEditor {
       )
       .subscribe({
         next: (response) => {
-          const snapshot = this.cloneStorefront(response.storefront);
+          const snapshot = this.normalizeStorefront(response.storefront);
           this.storefront.set(snapshot);
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           this.toastService.success('Storefront published.');
@@ -503,7 +509,7 @@ export class ProjectStorefrontEditor {
       .pipe(finalize(() => this.isUnpublishing.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {
-          const snapshot = this.cloneStorefront(storefront);
+          const snapshot = this.normalizeStorefront(storefront);
           this.storefront.set(snapshot);
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           this.toastService.success('Storefront unpublished.');
@@ -598,6 +604,46 @@ export class ProjectStorefrontEditor {
 
   private cloneStorefront(storefront: ProjectStorefront): ProjectStorefront {
     return JSON.parse(JSON.stringify(storefront)) as ProjectStorefront;
+  }
+
+  private normalizeStorefront(storefront: ProjectStorefront): ProjectStorefront {
+    const snapshot = this.cloneStorefront(storefront);
+    const fallbackDocument = this.createDefaultHomepageDocument(snapshot.storeName);
+    const draftHomepage = snapshot.draftHomepage as Partial<StorefrontHomepageDocument> | null | undefined;
+
+    snapshot.draftHomepage = {
+      version: typeof draftHomepage?.version === 'number' ? draftHomepage.version : fallbackDocument.version,
+      pageKey: draftHomepage?.pageKey === 'home' ? 'home' : fallbackDocument.pageKey,
+      seo: {
+        title:
+          typeof draftHomepage?.seo?.title === 'string' && draftHomepage.seo.title.trim()
+            ? draftHomepage.seo.title
+            : fallbackDocument.seo.title,
+        description:
+          typeof draftHomepage?.seo?.description === 'string' ? draftHomepage.seo.description : fallbackDocument.seo.description,
+      },
+      sections: Array.isArray(draftHomepage?.sections)
+        ? draftHomepage.sections
+        : fallbackDocument.sections,
+    };
+
+    return snapshot;
+  }
+
+  private createDefaultHomepageDocument(storeName: string | null): StorefrontHomepageDocument {
+    return {
+      version: 1,
+      pageKey: 'home',
+      seo: {
+        title: storeName?.trim() || this.project()?.storeTitle || this.project()?.name || 'Storefront',
+        description: '',
+      },
+      sections: [
+        this.createSection('hero'),
+        this.createSection('featured-products'),
+        this.createSection('footer'),
+      ],
+    };
   }
 
   private createSection(type: StorefrontSectionType): StorefrontHomepageSection {

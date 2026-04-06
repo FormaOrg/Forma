@@ -1,1 +1,144 @@
-:host{display:block}
+:host {
+  display: block;
+  width: calc(100% + 48px);
+  max-width: none;
+  min-height: 100%;
+  margin: -24px;
+  box-sizing: border-box;
+}
+
+.storefront-editor--immersive {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+app-app-header {
+  flex: 0 0 auto;
+}
+
+.storefront-editor__workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.storefront-editor__workspace--sidebar-collapsed {
+  grid-template-columns: 88px minmax(0, 1fr);
+}
+
+.storefront-editor__sidebar-shell,
+.storefront-editor__main,
+.storefront-editor__content,
+.storefront-editor__canvas-wrap,
+.storefront-editor__inspector-shell {
+  min-height: 0;
+}
+
+.storefront-editor__sidebar-shell {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.storefront-editor__sidebar-rail {
+  overflow-y: auto;
+}
+
+.storefront-editor__sidebar-body {
+  overflow-y: auto;
+}
+
+.storefront-editor__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.storefront-editor__toolbar,
+.storefront-editor__editor-bar {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.storefront-editor__content {
+  flex: 1 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 0;
+  overflow: visible;
+}
+
+.storefront-editor__canvas-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: fit-content;
+  overflow: visible;
+  padding: 0 0 28px;
+}
+
+.storefront-editor__canvas-stage {
+  flex: 1 0 auto;
+  min-height: min-content;
+  padding: 24px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.storefront-editor__canvas-frame {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.storefront-editor__canvas-frame--mobile {
+  width: min(100%, 430px);
+}
+
+.storefront-editor__canvas {
+  overflow: hidden;
+}
+
+.storefront-editor__inspector-shell {
+  min-height: fit-content;
+  overflow: visible;
+}
+
+.storefront-editor__state-card {
+  max-width: 560px;
+  margin: 48px auto;
+}
+
+@media (max-width: 960px) {
+  :host {
+    width: calc(100% + 28px);
+    margin: -18px -14px -24px;
+  }
+
+  .storefront-editor__workspace,
+  .storefront-editor__workspace--sidebar-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .storefront-editor__sidebar-shell,
+  .storefront-editor__inspector-shell {
+    display: none;
+  }
+
+  .storefront-editor__content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .storefront-editor__canvas-stage {
+    padding: 16px;
+  }
+}
