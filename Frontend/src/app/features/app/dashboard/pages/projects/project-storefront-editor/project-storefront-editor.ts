@@ -24,6 +24,17 @@ import { StorefrontSectionType } from '../../../../../../core/models/project-sto
 type EditorViewport = 'desktop' | 'mobile';
 type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
+type EditorBlockKind = 'text' | 'button' | 'product-list' | 'contact';
+
+interface EditorBlockDescriptor {
+  id: string;
+  sectionId: string;
+  kind: EditorBlockKind;
+  label: string;
+  propKey?: string;
+  multiline?: boolean;
+  description?: string;
+}
 
 @Component({
   selector: 'app-project-storefront-editor',
@@ -55,6 +66,8 @@ export class ProjectStorefrontEditor {
   readonly workingStorefront = signal<ProjectStorefront | null>(null);
   readonly products = signal<ProjectCatalogProduct[]>([]);
   readonly selectedSectionId = signal<string | null>(null);
+  readonly selectedBlockId = signal<string | null>(null);
+  readonly inlineEditingBlockId = signal<string | null>(null);
   readonly viewport = signal<EditorViewport>('desktop');
   readonly sidebarCollapsed = signal(false);
   readonly sidebarMode = signal<EditorSidebarMode>('structure');
@@ -69,6 +82,12 @@ export class ProjectStorefrontEditor {
   readonly pageSettingsSelected = computed(() => this.selectedSectionId() === null);
   readonly selectedSection = computed<StorefrontHomepageSection | null>(
     () => this.sections().find((section) => section.id === this.selectedSectionId()) ?? null
+  );
+  readonly editableBlocks = computed(() =>
+    this.sections().flatMap((section) => this.describeSectionBlocks(section))
+  );
+  readonly selectedBlock = computed<EditorBlockDescriptor | null>(
+    () => this.editableBlocks().find((block) => block.id === this.selectedBlockId()) ?? null
   );
   readonly storeName = computed(
     () => this.workingStorefront()?.storeName ?? this.project()?.storeTitle ?? this.project()?.name ?? 'Storefront'
@@ -171,11 +190,35 @@ export class ProjectStorefrontEditor {
   selectPageSettings(): void {
     this.sidebarMode.set('page');
     this.selectedSectionId.set(null);
+    this.selectedBlockId.set(null);
+    this.inlineEditingBlockId.set(null);
   }
 
   selectSection(sectionId: string): void {
     this.sidebarMode.set('structure');
     this.selectedSectionId.set(sectionId);
+    this.selectedBlockId.set(null);
+    this.inlineEditingBlockId.set(null);
+  }
+
+  selectBlock(sectionId: string, blockId: string): void {
+    this.sidebarMode.set('structure');
+    this.selectedSectionId.set(sectionId);
+    this.selectedBlockId.set(blockId);
+  }
+
+  startInlineEditing(blockId: string): void {
+    const block = this.editableBlocks().find((item) => item.id === blockId);
+    if (!block || !block.propKey) {
+      return;
+    }
+
+    this.selectBlock(block.sectionId, blockId);
+    this.inlineEditingBlockId.set(blockId);
+  }
+
+  stopInlineEditing(): void {
+    this.inlineEditingBlockId.set(null);
   }
 
   setViewport(viewport: EditorViewport): void {
@@ -403,6 +446,21 @@ export class ProjectStorefrontEditor {
     }));
   }
 
+  updateBlockStringProp(blockId: string, value: string): void {
+    const block = this.editableBlocks().find((item) => item.id === blockId);
+    if (!block?.propKey) {
+      return;
+    }
+
+    this.updateSectionById(block.sectionId, (section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [block.propKey!]: value,
+      },
+    }));
+  }
+
   updateSelectedNumberProp(key: string, value: string): void {
     const parsed = Number(value);
     this.updateSelectedSection((section) => ({
@@ -434,6 +492,42 @@ export class ProjectStorefrontEditor {
   isFeaturedProductSelected(productId: number): boolean {
     const section = this.selectedSection();
     return section ? this.readNumberArrayProp(section, 'productIds').includes(productId) : false;
+  }
+
+  blocksForSection(section: StorefrontHomepageSection): EditorBlockDescriptor[] {
+    return this.describeSectionBlocks(section);
+  }
+
+  isSectionSelected(sectionId: string): boolean {
+    return this.selectedSectionId() === sectionId && !this.selectedBlockId();
+  }
+
+  isBlockSelected(blockId: string): boolean {
+    return this.selectedBlockId() === blockId;
+  }
+
+  isInlineEditing(blockId: string): boolean {
+    return this.inlineEditingBlockId() === blockId;
+  }
+
+  blockValue(block: EditorBlockDescriptor | null): string {
+    if (!block?.propKey) {
+      return '';
+    }
+
+    const section = this.sections().find((item) => item.id === block.sectionId) ?? null;
+    return this.readStringProp(section, block.propKey);
+  }
+
+  blockPlaceholder(block: EditorBlockDescriptor): string {
+    switch (block.kind) {
+      case 'button':
+        return 'Button label';
+      case 'contact':
+        return 'Contact detail';
+      default:
+        return 'Enter text';
+    }
   }
 
   saveDraft(): void {
@@ -577,6 +671,19 @@ export class ProjectStorefrontEditor {
     }
   }
 
+  blockKindLabel(kind: EditorBlockKind): string {
+    switch (kind) {
+      case 'button':
+        return 'Button';
+      case 'product-list':
+        return 'Product list';
+      case 'contact':
+        return 'Contact';
+      default:
+        return 'Text';
+    }
+  }
+
   private updateSelectedSection(
     updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection
   ): void {
@@ -600,6 +707,82 @@ export class ProjectStorefrontEditor {
         },
       };
     });
+  }
+
+  private updateSectionById(
+    sectionId: string,
+    updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection
+  ): void {
+    this.workingStorefront.update((storefront) => {
+      if (!storefront) {
+        return storefront;
+      }
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections: storefront.draftHomepage.sections.map((section) =>
+            section.id === sectionId ? updater(section) : section
+          ),
+        },
+      };
+    });
+  }
+
+  private describeSectionBlocks(section: StorefrontHomepageSection): EditorBlockDescriptor[] {
+    switch (section.type) {
+      case 'announcement-bar':
+        return [
+          this.createBlockDescriptor(section.id, 'text', 'announcement-text', 'Announcement text', 'text'),
+          this.createBlockDescriptor(section.id, 'button', 'announcement-link', 'Announcement link', 'linkLabel'),
+        ];
+      case 'hero':
+        return [
+          this.createBlockDescriptor(section.id, 'text', 'hero-eyebrow', 'Eyebrow', 'eyebrow'),
+          this.createBlockDescriptor(section.id, 'text', 'hero-title', 'Headline', 'title'),
+          this.createBlockDescriptor(section.id, 'text', 'hero-description', 'Description', 'description', true),
+          this.createBlockDescriptor(section.id, 'button', 'hero-primary-cta', 'Primary button', 'primaryCtaLabel'),
+          this.createBlockDescriptor(section.id, 'button', 'hero-secondary-cta', 'Secondary button', 'secondaryCtaLabel'),
+        ];
+      case 'featured-products':
+        return [
+          this.createBlockDescriptor(section.id, 'text', 'featured-title', 'Section title', 'title'),
+          {
+            id: `${section.id}:featured-grid`,
+            sectionId: section.id,
+            kind: 'product-list',
+            label: 'Product grid',
+            description: 'Select products and ordering from the inspector.',
+          },
+        ];
+      case 'footer':
+        return [
+          this.createBlockDescriptor(section.id, 'text', 'footer-brand', 'Brand', 'brandText'),
+          this.createBlockDescriptor(section.id, 'contact', 'footer-email', 'Email', 'contactEmail'),
+          this.createBlockDescriptor(section.id, 'contact', 'footer-phone', 'Phone', 'contactPhone'),
+        ];
+      default:
+        return [];
+    }
+  }
+
+  private createBlockDescriptor(
+    sectionId: string,
+    kind: EditorBlockKind,
+    key: string,
+    label: string,
+    propKey?: string,
+    multiline = false
+  ): EditorBlockDescriptor {
+    return {
+      id: `${sectionId}:${key}`,
+      sectionId,
+      kind,
+      label,
+      propKey,
+      multiline,
+    };
   }
 
   private cloneStorefront(storefront: ProjectStorefront): ProjectStorefront {

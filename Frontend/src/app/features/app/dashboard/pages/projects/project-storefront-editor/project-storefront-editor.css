@@ -118,6 +118,162 @@ app-app-header {
   margin: 48px auto;
 }
 
+.storefront-editor__layer-list {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0 0 42px;
+}
+
+.storefront-editor__layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(25, 40, 72, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #20324f;
+  cursor: pointer;
+  text-align: left;
+}
+
+.storefront-editor__layer-item--active {
+  border-color: rgba(76, 114, 255, 0.4);
+  background: rgba(76, 114, 255, 0.08);
+}
+
+.storefront-editor__layer-item-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.storefront-editor__layer-item-kind {
+  font-size: 11px;
+  color: rgba(32, 50, 79, 0.58);
+}
+
+.storefront-editor__canvas-section {
+  position: relative;
+  margin-bottom: 18px;
+  border: 1px solid transparent;
+  border-radius: 26px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.storefront-editor__canvas-section:hover {
+  border-color: rgba(76, 114, 255, 0.22);
+}
+
+.storefront-editor__canvas-section--selected,
+.storefront-editor__canvas-section--has-selected-block {
+  border-color: rgba(76, 114, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(76, 114, 255, 0.08);
+  background: rgba(247, 250, 255, 0.9);
+}
+
+.storefront-editor__canvas-section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(32, 50, 79, 0.54);
+}
+
+.storefront-editor__canvas-block {
+  border: 1px dashed transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.storefront-editor__canvas-block:hover {
+  border-color: rgba(76, 114, 255, 0.24);
+  background: rgba(76, 114, 255, 0.04);
+}
+
+.storefront-editor__canvas-block--selected {
+  border-color: rgba(76, 114, 255, 0.48);
+  background: rgba(76, 114, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(76, 114, 255, 0.1);
+}
+
+.storefront-editor__canvas-block--text,
+.storefront-editor__canvas-block--eyebrow,
+.storefront-editor__canvas-block--title,
+.storefront-editor__canvas-block--copy,
+.storefront-editor__canvas-block--products-title,
+.storefront-editor__canvas-block--footer-brand,
+.storefront-editor__canvas-block--footer-meta,
+.storefront-editor__canvas-block--button-link {
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+.storefront-editor__canvas-block--title,
+.storefront-editor__canvas-block--copy,
+.storefront-editor__canvas-block--products-title {
+  display: block;
+  width: 100%;
+  text-align: inherit;
+}
+
+.storefront-editor__canvas-block--primary-button,
+.storefront-editor__canvas-block--secondary-button {
+  padding: 12px 18px;
+  border-radius: 999px;
+}
+
+.storefront-editor__inline-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(76, 114, 255, 0.38);
+  border-radius: 14px;
+  background: #fff;
+  color: #142033;
+  font: inherit;
+  box-shadow: 0 0 0 3px rgba(76, 114, 255, 0.08);
+}
+
+.storefront-editor__inline-input--announcement,
+.storefront-editor__inline-input--announcement-link,
+.storefront-editor__inline-input--button,
+.storefront-editor__inline-input--eyebrow,
+.storefront-editor__inline-input--footer-brand,
+.storefront-editor__inline-input--footer-meta,
+.storefront-editor__inline-input--products {
+  width: auto;
+  min-width: 180px;
+}
+
+.storefront-editor__inline-input--title {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.storefront-editor__inline-input--description {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.storefront-editor__hint-panel {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid rgba(25, 40, 72, 0.08);
+  border-radius: 16px;
+  background: rgba(246, 248, 252, 0.92);
+  color: rgba(32, 50, 79, 0.72);
+}
+
 @media (max-width: 960px) {
   :host {
     width: calc(100% + 28px);
