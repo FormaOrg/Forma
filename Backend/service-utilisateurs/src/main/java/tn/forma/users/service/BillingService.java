@@ -2,6 +2,7 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.forma.users.dto.*;
 import tn.forma.users.model.*;
 import tn.forma.users.repository.*;
@@ -25,6 +26,7 @@ public class BillingService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d, yyyy");
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("0.##");
 
+    @Transactional(readOnly = true)
     public BillingOverviewDto getOverview(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -145,16 +147,24 @@ public class BillingService {
     }
 
     private Long getProjectLimit(SubscriptionPlan plan) {
+        if (plan == null) {
+            return null;
+        }
+
         return switch (plan) {
-            case STARTER -> 5L;
-            case PRO, BUSINESS -> null;
+            case FREE, STARTER -> 5L;
+            case PREMIUM, PRO, BUSINESS -> null;
         };
     }
 
     private Long getPublishedLimit(SubscriptionPlan plan) {
+        if (plan == null) {
+            return null;
+        }
+
         return switch (plan) {
-            case STARTER -> 1L;
-            case PRO -> 25L;
+            case FREE, STARTER -> 1L;
+            case PREMIUM, PRO -> 25L;
             case BUSINESS -> null;
         };
     }
@@ -174,26 +184,38 @@ public class BillingService {
     }
 
     private String toPlanName(SubscriptionPlan plan) {
+        if (plan == null) {
+            return "Custom";
+        }
+
         return switch (plan) {
-            case STARTER -> "Starter";
-            case PRO -> "Pro";
+            case FREE, STARTER -> "Starter";
+            case PREMIUM, PRO -> "Pro";
             case BUSINESS -> "Business";
         };
     }
 
     private String toPlanDescription(SubscriptionPlan plan) {
+        if (plan == null) {
+            return "Plan details are syncing from your billing workspace.";
+        }
+
         return switch (plan) {
-            case STARTER -> "Perfect for individuals and smaller website launches.";
-            case PRO -> "Best for growing teams shipping multiple live experiences.";
+            case FREE, STARTER -> "Perfect for individuals and smaller website launches.";
+            case PREMIUM, PRO -> "Best for growing teams shipping multiple live experiences.";
             case BUSINESS -> "Built for larger operations with broader scale and support.";
         };
     }
 
     private String toStatus(SubscriptionStatus status) {
+        if (status == null) {
+            return "inactive";
+        }
+
         return switch (status) {
             case ACTIVE -> "active";
-            case TRIAL -> "trial";
-            case CANCELED -> "canceled";
+            case PENDING, TRIAL -> "trial";
+            case EXPIRED, CANCELLED, CANCELED -> "canceled";
             case PAST_DUE -> "past-due";
         };
     }

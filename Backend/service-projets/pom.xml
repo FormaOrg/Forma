@@ -151,6 +151,7 @@
 						<exclude>**/controller/PublicProjectAnalyticsController.java</exclude>
 						<exclude>**/controller/PublicStorefrontController.java</exclude>
 						<exclude>**/controller/UserController.java</exclude>
+						<exclude>**/config/WebSocketConfig.java</exclude>
 						<exclude>**/service/ActivityService.java</exclude>
 						<exclude>**/service/AuthService.java</exclude>
 						<exclude>**/service/BillingService.java</exclude>
@@ -167,6 +168,7 @@
 						<exclude>**/service/PublicCheckoutService.java</exclude>
 						<exclude>**/service/PublicStorefrontService.java</exclude>
 						<exclude>**/service/UserService.java</exclude>
+						<exclude>**/websocket/*.java</exclude>
 					</excludes>
 					<testExcludes>
 						<testExclude>**/service/ProjectCatalogServiceTest.java</testExclude>

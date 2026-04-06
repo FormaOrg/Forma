@@ -1,292 +1,465 @@
-@if (isLoading()) {
-<section class="builder-state"><div><p>Website editor</p><h1>Loading page builder...</h1></div></section>
-} @else if (errorMessage()) {
-<section class="builder-state"><div><p>Website editor</p><h1>{{ errorMessage() }}</h1><button type="button" (click)="load()">Retry</button></div></section>
-} @else if (page(); as page) {
-<section class="builder" [class.builder--preview]="previewMode()">
-  <header class="builder__topbar">
-    <div class="builder__topbar-main">
-      <div class="builder__brand-strip">
-        <button type="button" class="builder__brand" (click)="goBack()">
-          <span class="builder__brand-mark">F</span>
-          <span class="builder__brand-name">Forma</span>
-        </button>
-
-        <nav class="builder__main-nav" aria-label="Editor sections">
-          <button type="button" class="builder__main-link is-active">Site</button>
-          <button type="button" class="builder__main-link" (click)="selectPage()">Page</button>
-          <button type="button" class="builder__main-link" (click)="setLeftTab('layers')">Layers</button>
-          <button type="button" class="builder__main-link" (click)="setLeftTab('media')">Media</button>
-          <button type="button" class="builder__main-link" (click)="setLeftTab('sections')">Sections</button>
-        </nav>
-      </div>
-
-      <div class="builder__main-actions">
-        <div class="builder__status">
-          <strong>{{ storeName() }}</strong>
-          <span>@if (isSaving()) { Saving... } @else if (hasAutosavePending()) { Autosave queued } @else if (lastSavedAt()) { Saved } @else { Draft }</span>
-        </div>
-        <button type="button" class="builder__text-action" (click)="saveNow()" [disabled]="isSaving()">Save</button>
-        <button type="button" class="builder__text-action" (click)="togglePreview()">{{ previewMode() ? 'Edit' : 'Preview' }}</button>
-        <button type="button" class="builder__publish">Publish</button>
-      </div>
+<section class="catalog-page">
+  <section class="catalog-hero">
+    <div class="catalog-hero__copy">
+      <p class="catalog-hero__eyebrow">Project workspace</p>
+      <h1 class="catalog-hero__title">Catalog</h1>
+      <p class="catalog-hero__subtitle">
+        Organize products, keep inventory visible, and prepare every listing to go live.
+      </p>
     </div>
 
-    <div class="builder__topbar-sub">
-      <div class="builder__sub-left">
-        <div class="builder__page-chip">
-          <span class="builder__page-chip-label">Page:</span>
-          <strong>Home</strong>
-        </div>
+    <div class="catalog-hero__actions">
+      <button type="button" class="catalog-hero__action catalog-hero__action--secondary" (click)="loadCatalog()">
+        Refresh
+      </button>
+      <button type="button" class="catalog-hero__action catalog-hero__action--primary" (click)="openCreateEditor()">
+        Add product
+      </button>
+    </div>
+  </section>
 
-        <div class="builder__domain-chip">
-          <span class="builder__domain-dot"></span>
-          <span>{{ storeName().toLowerCase().replaceAll(' ', '') }}.site</span>
-          <button type="button" class="builder__domain-action">Connect domain</button>
-        </div>
+  <section class="catalog-stats">
+    <article class="catalog-stat">
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--products" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
       </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Products</span>
+        <strong class="catalog-stat__value">{{ summary()?.totalProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Across this project catalog</span>
+      </div>
+    </article>
+    <article class="catalog-stat">
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--active" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.8" />
+            <path d="M9 12.1L11.1 14.2L15.3 10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Active</span>
+        <strong class="catalog-stat__value">{{ summary()?.activeProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Visible in your storefront</span>
+      </div>
+    </article>
+    <article class="catalog-stat">
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--draft" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 16.5L8.2 13.8L14.8 7.2L17.3 9.7L10.7 16.3L8 17L7.5 16.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M13.8 8.2L16.3 10.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M6.5 19H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Draft products</span>
+        <strong class="catalog-stat__value">{{ summary()?.draftProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Still being prepared before publish</span>
+      </div>
+    </article>
+    <article class="catalog-stat">
+      <div class="catalog-stat__top">
+        <span class="catalog-stat__icon catalog-stat__icon--stock" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 8.5H16.5V16.5H7.5V8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M9 8.5V7.5C9 6.67157 9.67157 6 10.5 6H13.5C14.3284 6 15 6.67157 15 7.5V8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M10 12.5H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M12 10.5V14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="catalog-stat__body">
+        <span class="catalog-stat__label">Low stock</span>
+        <strong class="catalog-stat__value">{{ summary()?.lowStockProducts ?? 0 }}</strong>
+        <span class="catalog-stat__hint">Needs a restock soon</span>
+      </div>
+    </article>
+  </section>
 
-      <div class="builder__sub-right">
-        <div class="builder__history-actions">
-          <button type="button" class="builder__icon-button" (click)="undo()" [disabled]="!canUndo()">Undo</button>
-          <button type="button" class="builder__icon-button" (click)="redo()" [disabled]="!canRedo()">Redo</button>
-        </div>
+  <section class="catalog-toolbar" (click)="closeDropdowns()">
+    <label class="catalog-toolbar__search">
+      <span class="catalog-toolbar__search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </span>
+      <input
+        type="search"
+        placeholder="Search by name, SKU, category, or tag"
+        [value]="searchValue()"
+        (input)="updateSearch(searchInput.value)"
+        #searchInput
+      />
+    </label>
 
-        <div class="builder__viewport-group">
-          @for (option of ['desktop', 'tablet', 'mobile']; track option) {
+    <div class="catalog-toolbar__filters" role="tablist" aria-label="Catalog filters">
+      @for (filter of statusFilters; track filter.value) {
+        <button
+          type="button"
+          class="catalog-toolbar__filter"
+          [class.catalog-toolbar__filter--active]="selectedStatus() === filter.value"
+          (click)="updateStatus(filter.value)"
+        >
+          {{ filter.label }}
+        </button>
+      }
+    </div>
+
+    <div
+      class="catalog-toolbar__dropdown catalog-toolbar__dropdown--category"
+      [class.is-open]="categoryDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="catalog-toolbar__dropdown-trigger" (click)="toggleCategoryDropdown()">
+        <span class="catalog-toolbar__dropdown-label">Category</span>
+        <span class="catalog-toolbar__dropdown-value">{{ selectedCategoryLabel() }}</span>
+        <span class="catalog-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (categoryDropdownOpen()) {
+        <div class="catalog-toolbar__dropdown-menu">
+          <button
+            type="button"
+            class="catalog-toolbar__dropdown-item"
+            [class.is-selected]="selectedCategory() === 'ALL'"
+            (click)="updateCategory('ALL')"
+          >
+            All categories
+          </button>
+          @for (category of categories(); track category) {
             <button
               type="button"
-              class="builder__viewport"
-              [class.is-active]="viewport() === option"
-              (click)="setViewport($any(option))"
+              class="catalog-toolbar__dropdown-item"
+              [class.is-selected]="selectedCategory() === category"
+              (click)="updateCategory(category)"
             >
-              {{ option }}
+              {{ category }}
             </button>
           }
         </div>
-      </div>
-    </div>
-  </header>
-
-  @if (!previewMode()) {
-  <aside class="builder__left">
-    <div class="builder__tabs">
-      <button type="button" [class.is-active]="leftTab() === 'layers'" (click)="setLeftTab('layers')">Layers</button>
-      <button type="button" [class.is-active]="leftTab() === 'sections'" (click)="setLeftTab('sections')">Add Section</button>
-      <button type="button" [class.is-active]="leftTab() === 'elements'" (click)="setLeftTab('elements')">Add Element</button>
-      <button type="button" [class.is-active]="leftTab() === 'media'" (click)="setLeftTab('media')">Media</button>
-    </div>
-
-    <div class="builder__panel">
-      @if (leftTab() === 'layers') {
-        <button type="button" class="layer layer--page" [class.is-active]="selection().kind === 'page'" (click)="selectPage()">Page</button>
-        @for (section of sections(); track trackSection($index, section)) {
-          <div class="layer-group">
-            <button type="button" class="layer" [class.is-active]="isSectionSelected(section.id)" (click)="selectSection(section.id)">
-              <span>{{ section.name }}</span><small>{{ section.elements.length }} blocks</small>
-            </button>
-            <div class="layer-actions">
-              <button type="button" (click)="moveSection(section.id, 'up')" [disabled]="!canMoveSection(section.id, 'up')">Up</button>
-              <button type="button" (click)="moveSection(section.id, 'down')" [disabled]="!canMoveSection(section.id, 'down')">Down</button>
-              <button type="button" (click)="duplicateSection(section.id)">Dup</button>
-              <button type="button" class="danger" (click)="deleteSection(section.id)">Del</button>
-            </div>
-            @for (element of section.elements; track trackElement($index, element)) {
-              <div class="layer-row">
-                <button type="button" class="layer layer--child" [class.is-active]="isElementSelected(element.id)" (click)="selectElement(section.id, element.id)">
-                  <span>{{ element.name }}</span><small>{{ element.type }}</small>
-                </button>
-                <div class="layer-actions layer-actions--inline">
-                  <button type="button" (click)="moveElement(section.id, element.id, 'up')" [disabled]="!canMoveElement(section.id, element.id, 'up')">Up</button>
-                  <button type="button" (click)="moveElement(section.id, element.id, 'down')" [disabled]="!canMoveElement(section.id, element.id, 'down')">Down</button>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      } @else if (leftTab() === 'sections') {
-        @for (section of sectionOptions; track section.type) {
-          <button type="button" class="preset" (click)="addSection(section.type)"><strong>{{ section.label }}</strong><span>{{ section.description }}</span></button>
-        }
-      } @else if (leftTab() === 'elements') {
-        @for (element of elementOptions; track element.type) {
-          <button type="button" class="preset" (click)="addElement(element.type)"><strong>{{ element.label }}</strong><span>{{ element.description }}</span></button>
-        }
-      } @else {
-        <label class="upload">
-          <span>{{ isUploading() ? 'Uploading...' : 'Upload image' }}</span>
-          <input type="file" accept="image/*" (change)="uploadMedia($event)" />
-        </label>
-        @for (item of media(); track trackMedia($index, item)) {
-          <button type="button" class="media-item" (click)="applyMedia(item.url)">
-            <img [src]="item.url" [alt]="item.label" />
-            <span>{{ item.label }}</span>
-          </button>
-        }
       }
     </div>
-  </aside>
-  }
+  </section>
 
-  <main class="builder__canvas-shell">
-    <div class="builder__canvas-meta">
-      <div><p>Canvas</p><h2>{{ page.seo.title || storeName() }}</h2></div>
-      <span>{{ sections().length }} sections</span>
-    </div>
-    <div class="builder__canvas-stage">
-      <div class="builder__canvas-frame" [style.width]="canvasWidth()">
-        <div class="builder__canvas" (click)="selectPage()">
-          @for (section of sections(); track trackSection($index, section)) {
-            <section class="canvas-section" [class.is-selected]="isSectionSelected(section.id)" [ngStyle]="sectionStyle(section)" (click)="$event.stopPropagation(); selectSection(section.id)">
-              <div class="canvas-section__inner">
-                @for (element of section.elements; track trackElement($index, element)) {
-                  <div class="canvas-element" [class.is-selected]="isElementSelected(element.id)" [class.canvas-element--button]="element.type === 'button'" [class.canvas-element--divider]="element.type === 'divider'" [class.canvas-element--gallery]="element.type === 'gallery'" [class.canvas-element--container]="element.type === 'container'" [class.canvas-element--product]="element.type === 'product'" [ngStyle]="elementStyle(element)" (click)="$event.stopPropagation(); selectElement(section.id, element.id)">
-                    @switch (element.type) {
-                      @case ('text') {
-                        <div class="canvas-text" [attr.data-tag]="element.tag">
-                          <div contenteditable="true" spellcheck="false" (input)="onCanvasTextInput($event, section.id, element.id)">{{ element.content }}</div>
-                        </div>
-                      }
-                      @case ('image') {
-                        @if (element.src) { <img class="canvas-image" [src]="element.src" [alt]="element.alt" [style.height.px]="element.height" [style.object-fit]="element.fit" /> } @else { <div class="canvas-image canvas-image--empty" [style.height.px]="element.height">Select an image from Media</div> }
-                      }
-                      @case ('button') {
-                        <button type="button" class="canvas-button" [class.canvas-button--outline]="element.variant === 'outline'"><span contenteditable="true" spellcheck="false" (input)="onCanvasButtonInput($event, section.id, element.id)">{{ element.label }}</span></button>
-                      }
-                      @case ('icon') {
-                        <div class="canvas-icon" [style.font-size.px]="element.size">{{ element.icon }}</div>
-                      }
-                      @case ('divider') {
-                        <div class="canvas-divider" [style.height.px]="element.thickness"></div>
-                      }
-                      @case ('container') {
-                        <div class="canvas-container" [class.canvas-container--row]="element.direction === 'row'"><strong>{{ element.title }}</strong><p>{{ element.body }}</p></div>
-                      }
-                      @case ('product') {
-                        @if (productFor(element); as product) {
-                          <article class="canvas-product">
-                            <div class="canvas-product__media">@if (product.imageUrl) { <img [src]="product.imageUrl" [alt]="product.name" /> } @else { <span>No image</span> }</div>
-                            <div class="canvas-product__body"><strong>{{ product.name }}</strong>@if (element.showDescription) { <p>{{ product.description || 'No product description yet.' }}</p> } @if (element.showPrice) { <span>{{ product.price | number: '1.2-2' }}</span> }<button type="button">{{ element.ctaLabel }}</button></div>
-                          </article>
-                        } @else { <div class="canvas-empty">Choose a product in the inspector.</div> }
-                      }
-                      @case ('gallery') {
-                        <div class="canvas-gallery" [style.grid-template-columns]="'repeat(' + element.columns + ', minmax(0, 1fr))'">
-                          @for (url of element.imageUrls; track url) { <img [src]="url" alt="Gallery image" [style.height.px]="element.height" /> }
-                          @if (!element.imageUrls.length) { <div class="canvas-empty">Add gallery images from Media.</div> }
-                        </div>
-                      }
-                    }
-                  </div>
+  @if (isLoading()) {
+    <section class="catalog-state">
+      <div class="catalog-state__skeleton"></div>
+      <div class="catalog-state__skeleton"></div>
+      <div class="catalog-state__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="catalog-state catalog-state--error" role="alert">
+      <h2>We couldn't load this catalog</h2>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadCatalog()">Try again</button>
+    </section>
+  } @else if (!products().length && !hasCatalogProducts()) {
+    <section class="catalog-state">
+      <h2>No products yet</h2>
+      <p>Start with your first listing so pricing, stock, and merchandising all have a home.</p>
+      <button type="button" (click)="openCreateEditor()">Create the first product</button>
+    </section>
+  } @else if (!products().length) {
+    <section class="catalog-state">
+      <h2>No matching products</h2>
+      <p>Try a different product name, SKU, category, tag, or status filter.</p>
+      <button type="button" (click)="updateSearch(''); updateStatus('ALL'); updateCategory('ALL')">Clear filters</button>
+    </section>
+  } @else {
+    <section class="catalog-grid">
+      @for (product of products(); track trackByProduct($index, product)) {
+        <article class="catalog-card">
+          <div class="catalog-card__media" [class.catalog-card__media--empty]="!product.imageUrl">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            } @else {
+              <span>No image</span>
+            }
+          </div>
+
+          <div class="catalog-card__body">
+            <div class="catalog-card__heading">
+              <div class="catalog-card__heading-copy">
+                <div class="catalog-card__badges">
+                  <span
+                    class="catalog-badge"
+                    [class.catalog-badge--active]="product.status === 'ACTIVE'"
+                    [class.catalog-badge--archived]="product.status === 'ARCHIVED'"
+                  >
+                    {{ product.status }}
+                  </span>
+                  <span class="catalog-badge catalog-badge--muted">{{ product.productType }}</span>
+                  @if (product.category) {
+                    <span class="catalog-badge catalog-badge--muted">{{ product.category }}</span>
+                  }
+                </div>
+                <h2>{{ product.name }}</h2>
+              </div>
+            </div>
+
+            <p class="catalog-card__description">
+              {{ product.description || 'Add a short product description to explain what makes this offer useful.' }}
+            </p>
+
+            <div class="catalog-card__meta">
+              <div>
+                <span class="catalog-card__meta-label">Price</span>
+                <strong>{{ formatCurrency(product.price) }}</strong>
+                @if (product.compareAtPrice) {
+                  <span class="catalog-card__meta-subtle">{{ formatCurrency(product.compareAtPrice) }}</span>
                 }
               </div>
-            </section>
-          }
-        </div>
-      </div>
-    </div>
-  </main>
-
-  @if (!previewMode()) {
-  <aside class="builder__right">
-    <div class="builder__panel builder__panel--inspector">
-      @if (selection().kind === 'page') {
-        <h3>Page Settings</h3>
-        <label><span>Store name</span><input [ngModel]="storeName()" (ngModelChange)="updateStoreName($event)" /></label>
-        <label><span>SEO title</span><input [ngModel]="page.seo.title" (ngModelChange)="updateSeo('title', $event)" /></label>
-        <label><span>SEO description</span><textarea rows="4" [ngModel]="page.seo.description" (ngModelChange)="updateSeo('description', $event)"></textarea></label>
-      } @else if (selectedSection(); as section) {
-        @if (selection().kind === 'section') {
-          <h3>Section Inspector</h3>
-          <label><span>Name</span><input [ngModel]="section.name" (ngModelChange)="updateSectionName($event)" /></label>
-          <label><span>Background</span><input type="color" [ngModel]="section.style.background" (ngModelChange)="updateSectionStyle('background', $event)" /></label>
-          <label><span>Text color</span><input type="color" [ngModel]="section.style.color" (ngModelChange)="updateSectionStyle('color', $event)" /></label>
-          <div class="grid-2">
-            <label><span>Columns</span><input type="number" min="1" max="4" [ngModel]="section.style.columns" (ngModelChange)="updateSectionStyle('columns', +$event)" /></label>
-            <label><span>Gap</span><input type="number" min="0" [ngModel]="section.style.gap" (ngModelChange)="updateSectionStyle('gap', +$event)" /></label>
-          </div>
-          <label><span>Max width</span><input type="number" min="320" [ngModel]="section.style.maxWidth" (ngModelChange)="updateSectionStyle('maxWidth', +$event)" /></label>
-          <div class="grid-2">
-            <label><span>Padding top</span><input type="number" min="0" [ngModel]="section.style.padding.top" (ngModelChange)="updateSectionPadding('top', +$event)" /></label>
-            <label><span>Padding bottom</span><input type="number" min="0" [ngModel]="section.style.padding.bottom" (ngModelChange)="updateSectionPadding('bottom', +$event)" /></label>
-          </div>
-        } @else if (selectedElement(); as element) {
-          <h3>Element Inspector</h3>
-          <p class="inspector-type">{{ element.type }}</p>
-          <div class="grid-2">
-            <label><span>Text color</span><input type="color" [ngModel]="element.style.color" (ngModelChange)="updateElementStyle('color', $event)" /></label>
-            <label><span>Background</span><input type="color" [ngModel]="element.style.background" (ngModelChange)="updateElementStyle('background', $event)" /></label>
-          </div>
-          <div class="grid-2">
-            <label><span>Radius</span><input type="number" min="0" [ngModel]="element.style.radius" (ngModelChange)="updateElementStyle('radius', +$event)" /></label>
-            <label><span>Width %</span><input type="number" min="20" max="100" [ngModel]="element.style.width" (ngModelChange)="updateElementStyle('width', +$event)" /></label>
-          </div>
-          <div class="grid-2">
-            <label><span>Font size</span><input type="number" min="10" [ngModel]="element.style.typography.size" (ngModelChange)="updateElementTypography('size', +$event)" /></label>
-            <label><span>Weight</span><select [ngModel]="element.style.typography.weight" (ngModelChange)="updateTypographyWeight(+$event)"><option [ngValue]="400">400</option><option [ngValue]="500">500</option><option [ngValue]="600">600</option><option [ngValue]="700">700</option><option [ngValue]="800">800</option></select></label>
-          </div>
-          <label><span>Alignment</span><select [ngModel]="element.style.typography.align" (ngModelChange)="updateElementTypography('align', $event)"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
-          <div class="grid-2">
-            <label><span>Padding top</span><input type="number" min="0" [ngModel]="element.style.padding.top" (ngModelChange)="updateElementPadding('top', +$event)" /></label>
-            <label><span>Padding bottom</span><input type="number" min="0" [ngModel]="element.style.padding.bottom" (ngModelChange)="updateElementPadding('bottom', +$event)" /></label>
-          </div>
-
-          @switch (element.type) {
-            @case ('text') {
-              <label><span>Tag</span><select [ngModel]="element.tag" (ngModelChange)="updateTextTag($event)"><option value="p">Paragraph</option><option value="h1">H1</option><option value="h2">H2</option><option value="h3">H3</option></select></label>
-              <label><span>Content</span><textarea rows="5" [ngModel]="element.content" (ngModelChange)="updateTextContent($event)"></textarea></label>
-            }
-            @case ('image') {
-              <label><span>Image URL</span><input [ngModel]="element.src" (ngModelChange)="updateImage('src', $event)" /></label>
-              <label><span>Alt text</span><input [ngModel]="element.alt" (ngModelChange)="updateImage('alt', $event)" /></label>
-              <div class="grid-2">
-                <label><span>Fit</span><select [ngModel]="element.fit" (ngModelChange)="updateImage('fit', $event)"><option value="cover">Cover</option><option value="contain">Contain</option></select></label>
-                <label><span>Height</span><input type="number" min="140" [ngModel]="element.height" (ngModelChange)="updateImageHeight(+$event)" /></label>
+              <div>
+                <span class="catalog-card__meta-label">Inventory</span>
+                <strong>{{ product.inventoryQuantity }}</strong>
               </div>
-              <button type="button" class="builder__ghost builder__full" (click)="removeSelectedImage()">Remove image</button>
-            }
-            @case ('button') {
-              <label><span>Label</span><input [ngModel]="element.label" (ngModelChange)="updateButton('label', $event)" /></label>
-              <label><span>Link</span><input [ngModel]="element.href" (ngModelChange)="updateButton('href', $event)" /></label>
-              <label><span>Variant</span><select [ngModel]="element.variant" (ngModelChange)="updateButton('variant', $event)"><option value="solid">Solid</option><option value="outline">Outline</option></select></label>
-            }
-            @case ('icon') {
-              <label><span>Icon</span><input [ngModel]="element.icon" (ngModelChange)="updateIcon('icon', $event)" /></label>
-              <label><span>Size</span><input type="number" min="18" [ngModel]="element.size" (ngModelChange)="updateIconSize(+$event)" /></label>
-            }
-            @case ('divider') {
-              <label><span>Thickness</span><input type="number" min="1" [ngModel]="element.thickness" (ngModelChange)="updateDivider(+$event)" /></label>
-            }
-            @case ('container') {
-              <label><span>Title</span><input [ngModel]="element.title" (ngModelChange)="updateContainer('title', $event)" /></label>
-              <label><span>Body</span><textarea rows="4" [ngModel]="element.body" (ngModelChange)="updateContainer('body', $event)"></textarea></label>
-              <label><span>Direction</span><select [ngModel]="element.direction" (ngModelChange)="updateContainer('direction', $event)"><option value="column">Column</option><option value="row">Row</option></select></label>
-            }
-            @case ('product') {
-              <label><span>Product</span><select [ngModel]="element.productId" (ngModelChange)="updateProduct('productId', '' + $event)"><option [ngValue]="null">Choose product</option>@for (product of products(); track trackProduct($index, product)) { <option [ngValue]="product.id">{{ product.name }}</option> }</select></label>
-              <label><span>Button label</span><input [ngModel]="element.ctaLabel" (ngModelChange)="updateProduct('ctaLabel', $event)" /></label>
-              <label class="check"><input type="checkbox" [ngModel]="element.showDescription" (ngModelChange)="toggleProduct('showDescription', $event)" /><span>Show description</span></label>
-              <label class="check"><input type="checkbox" [ngModel]="element.showPrice" (ngModelChange)="toggleProduct('showPrice', $event)" /><span>Show price</span></label>
-            }
-            @case ('gallery') {
-              <div class="grid-2">
-                <label><span>Columns</span><input type="number" min="1" max="4" [ngModel]="element.columns" (ngModelChange)="updateGallery('columns', +$event)" /></label>
-                <label><span>Height</span><input type="number" min="140" [ngModel]="element.height" (ngModelChange)="updateGallery('height', +$event)" /></label>
+              <div>
+                <span class="catalog-card__meta-label">Stock status</span>
+                <strong>{{ lowStockLabel(product) }}</strong>
               </div>
-              <label><span>Images</span><textarea rows="6" [ngModel]="element.imageUrls.join('\n')" (ngModelChange)="updateGalleryUrls($event)"></textarea></label>
-              @for (url of element.imageUrls; track url) { <button type="button" class="builder__ghost builder__full" (click)="removeGalleryImage(url)">Remove {{ url }}</button> }
-            }
-          }
+              <div>
+                <span class="catalog-card__meta-label">Updated</span>
+                <strong>{{ formatDate(product.updatedAt) }}</strong>
+              </div>
+            </div>
 
-          <div class="inspector-actions">
-            <button type="button" class="builder__ghost" (click)="duplicateElement(section.id, element.id)">Duplicate</button>
-            <button type="button" class="builder__ghost danger" (click)="deleteElement(section.id, element.id)">Delete</button>
+            @if (product.tags.length) {
+              <div class="catalog-card__tags">
+                @for (tag of product.tags; track tag) {
+                  <span>{{ tag }}</span>
+                }
+              </div>
+            }
+
+            @if (!product.readyToPublish) {
+              <div class="catalog-card__readiness">
+                <span class="catalog-card__readiness-title">Needs attention</span>
+                <ul>
+                  @for (issue of product.readinessIssues; track issue) {
+                    <li>{{ issue }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <div class="catalog-card__footer">
+              <span class="catalog-card__sku">{{ product.sku || 'No SKU yet' }}</span>
+              <div class="catalog-card__actions">
+                <button type="button" class="catalog-card__edit" (click)="openEditEditor(product)">
+                  <span class="catalog-card__action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none">
+                      <path d="M3.5 13.9L3.9 16.1L6.1 16.5L14.8 7.8L12.2 5.2L3.5 13.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                      <path d="M11.4 6L14 8.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="catalog-card__delete"
+                  [disabled]="isDeleting() === product.id"
+                  (click)="deleteProduct(product)"
+                >
+                  <span class="catalog-card__action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none">
+                      <path d="M5.8 6.2L6.3 15.5H13.7L14.2 6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M4.8 5.2H15.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                      <path d="M8 5.2V3.9H12V5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  {{ isDeleting() === product.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
+            </div>
           </div>
-        }
+        </article>
       }
-    </div>
-  </aside>
+    </section>
+  }
+
+  @if (isEditorOpen()) {
+    <section class="catalog-editor-backdrop" [class.is-closing]="isEditorClosing()" (click)="closeEditor()"></section>
+    <aside class="catalog-editor" [class.is-closing]="isEditorClosing()">
+      <header class="catalog-editor__header">
+        <div class="catalog-editor__header-copy">
+          <p class="catalog-editor__eyebrow">Catalog editor</p>
+          <h2>{{ editorTitle() }}</h2>
+          <p class="catalog-editor__subtitle">Keep the product details concise, structured, and ready for publishing.</p>
+        </div>
+        <button type="button" class="catalog-editor__close" (click)="closeEditor()">Close</button>
+      </header>
+
+      <form class="catalog-editor__form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
+        <div class="catalog-editor__body">
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Core details</h3>
+            <p>Set the name, description, and classification first.</p>
+          </div>
+
+          <label>
+            <span>Name</span>
+            <input type="text" formControlName="name" placeholder="Forma starter kit" />
+          </label>
+
+          <label>
+            <span>Description</span>
+            <textarea rows="4" formControlName="description" placeholder="Describe what the customer receives."></textarea>
+          </label>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>SKU</span>
+              <input type="text" formControlName="sku" placeholder="KIT-001" />
+            </label>
+            <label>
+              <span>Category</span>
+              <input type="text" formControlName="category" placeholder="Bundles" />
+            </label>
+          </div>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>Type</span>
+              <select formControlName="productType">
+                @for (option of productTypeOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select formControlName="status">
+                @for (option of productStatusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Pricing and stock</h3>
+            <p>Make the commercial details easy to review at a glance.</p>
+          </div>
+
+          <div class="catalog-editor__split">
+            <label>
+              <span>Price</span>
+              <input type="number" step="0.01" min="0" formControlName="price" />
+            </label>
+            <label>
+              <span>Compare-at price</span>
+              <input type="number" step="0.01" min="0" formControlName="compareAtPrice" />
+            </label>
+          </div>
+
+          <label>
+            <span>Inventory quantity</span>
+            <input type="number" min="0" step="1" formControlName="inventoryQuantity" />
+          </label>
+        </section>
+
+        <section class="catalog-editor__section">
+          <div class="catalog-editor__section-head">
+            <h3>Media and discovery</h3>
+            <p>Add a cover image and tags so the listing feels complete.</p>
+          </div>
+
+          <div class="catalog-editor__upload">
+            <label>
+              <span>Cover image URL</span>
+              <input type="url" formControlName="imageUrl" placeholder="https://..." />
+            </label>
+            <label class="catalog-editor__upload-button">
+              <span>{{ isUploadingImage() ? 'Uploading image...' : 'Upload image' }}</span>
+              <input type="file" accept="image/*" (change)="uploadCoverImage($event)" />
+            </label>
+          </div>
+
+          @if (productForm.controls.imageUrl.value) {
+            <div class="catalog-editor__preview">
+              <img [src]="productForm.controls.imageUrl.value" alt="Product cover preview" />
+            </div>
+          }
+
+          <label>
+            <span>Tags</span>
+            <input type="text" formControlName="tags" placeholder="featured, launch, bestseller" />
+          </label>
+        </section>
+
+        </div>
+
+        <footer class="catalog-editor__footer">
+          <button type="button" class="catalog-editor__secondary" (click)="closeEditor()">Cancel</button>
+          <button type="submit" class="catalog-editor__primary" [disabled]="isSaving() || isUploadingImage()">
+            {{ isSaving() ? 'Saving...' : editingProduct() ? 'Save changes' : 'Create product' }}
+          </button>
+        </footer>
+      </form>
+    </aside>
+  }
+
+  @if (pendingDeleteProduct(); as product) {
+    <section class="catalog-confirm-backdrop" (click)="closeDeleteConfirm()"></section>
+    <section class="catalog-confirm" role="dialog" aria-modal="true" aria-labelledby="catalog-delete-title">
+      <button type="button" class="catalog-confirm__close" (click)="closeDeleteConfirm()" aria-label="Close dialog">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="catalog-confirm__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7.2 8L7.8 18H16.2L16.8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M6 6.8H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M9.2 6.8V5.4H14.8V6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="catalog-confirm__copy">
+        <p class="catalog-confirm__eyebrow">Delete product</p>
+        <h2 id="catalog-delete-title">Delete {{ product.name }}?</h2>
+        <p>
+          This removes the product from the catalog and also deletes any orders that contain it.
+        </p>
+      </div>
+
+      <label class="catalog-confirm__remember">
+        <input
+          type="checkbox"
+          [checked]="deleteConfirmOptOut()"
+          (change)="setDeleteConfirmOptOut($any($event.target).checked)"
+        />
+        <span>Don’t show this again this session</span>
+      </label>
+
+      <div class="catalog-confirm__actions">
+        <button type="button" class="catalog-confirm__secondary" (click)="closeDeleteConfirm()">Cancel</button>
+        <button
+          type="button"
+          class="catalog-confirm__danger"
+          [disabled]="isDeleting() === product.id"
+          (click)="confirmDeleteProduct()"
+        >
+          {{ isDeleting() === product.id ? 'Deleting...' : 'Delete product' }}
+        </button>
+      </div>
+    </section>
   }
 </section>
-}
-

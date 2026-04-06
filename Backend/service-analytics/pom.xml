@@ -153,6 +153,7 @@
 						<exclude>**/controller/TemplateController.java</exclude>
 						<exclude>**/controller/UploadController.java</exclude>
 						<exclude>**/controller/UserController.java</exclude>
+						<exclude>**/config/WebSocketConfig.java</exclude>
 						<exclude>**/service/ActivityService.java</exclude>
 						<exclude>**/service/AuthService.java</exclude>
 						<exclude>**/service/BillingService.java</exclude>
@@ -171,6 +172,7 @@
 						<exclude>**/service/PublicStorefrontService.java</exclude>
 						<exclude>**/service/TemplateService.java</exclude>
 						<exclude>**/service/UserService.java</exclude>
+						<exclude>**/websocket/*.java</exclude>
 					</excludes>
 					<testExcludes>
 						<testExclude>**/service/ProjectCatalogServiceTest.java</testExclude>
