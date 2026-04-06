@@ -1088,3 +1088,448 @@ app-project-storefront-editor .storefront-editor__state-card--error{border-color
 @media (max-width:1240px){app-project-storefront-editor .storefront-editor__content{grid-template-columns:1fr}app-project-storefront-editor .storefront-editor__inspector-shell{position:static}}
 @media (max-width:1080px){app-project-storefront-editor .storefront-editor__toolbar,app-project-storefront-editor .storefront-editor__canvas-toolbar{flex-direction:column;align-items:flex-start}}
 @media (max-width:900px){app-project-storefront-editor .storefront-editor__workspace,app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed{grid-template-columns:1fr}app-project-storefront-editor .storefront-editor__sidebar-shell{position:static;height:auto;border-right:0;border-bottom:1px solid rgba(15,23,42,.08)}app-project-storefront-editor .storefront-editor__sidebar-brand-copy,app-project-storefront-editor .storefront-editor__sidebar-card--status,app-project-storefront-editor .storefront-editor__nav-section-label,app-project-storefront-editor .storefront-editor__nav-row .storefront-editor__nav-copy,app-project-storefront-editor .storefront-editor__nav-row .storefront-editor__nav-chip{display:flex;position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto;white-space:normal}app-project-storefront-editor .storefront-editor__nav-row{grid-template-columns:20px minmax(0,1fr) auto;padding:10px 14px}app-project-storefront-editor .storefront-editor__main{padding:18px 14px 20px}}
+
+app-project-storefront-editor .storefront-editor__workspace{
+    background:
+        radial-gradient(circle at top left, rgba(117, 102, 255, 0.06), transparent 28%),
+        linear-gradient(180deg, #f7f8fb 0%, #f3f5fb 100%);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-shell{
+    box-shadow: inset -1px 0 0 rgba(15, 23, 42, 0.04);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-brand{
+    background: linear-gradient(180deg, #ffffff, #fbfbfe);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-card--status{
+    background:
+        radial-gradient(circle at top right, rgba(117, 102, 255, 0.12), transparent 42%),
+        linear-gradient(180deg, #f9faff, #f4f6fd);
+    border-color: rgba(117, 102, 255, 0.12);
+}
+
+app-project-storefront-editor .storefront-editor__nav{
+    gap: 8px;
+}
+
+app-project-storefront-editor .storefront-editor__nav-section-label{
+    margin-top: 6px;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-button{
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px dashed rgba(117, 102, 255, 0.22);
+    border-radius: 14px;
+    background: rgba(117, 102, 255, 0.04);
+    color: #5a49d6;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    text-align: left;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-button:hover{
+    background: rgba(117, 102, 255, 0.08);
+    border-color: rgba(117, 102, 255, 0.34);
+    transform: translateY(-1px);
+}
+
+app-project-storefront-editor .storefront-editor__add-section-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-copy{
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-button--collapsed{
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0;
+}
+
+app-project-storefront-editor .storefront-editor__add-section-button--collapsed .storefront-editor__add-section-copy{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+app-project-storefront-editor .storefront-editor__section-card{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 18px;
+    border: 1px solid transparent;
+    background: transparent;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+app-project-storefront-editor .storefront-editor__section-card--active{
+    border-color: rgba(117, 102, 255, 0.14);
+    background: rgba(117, 102, 255, 0.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+app-project-storefront-editor .storefront-editor__section-card--collapsed{
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+app-project-storefront-editor .storefront-editor__section-actions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 6px 6px;
+}
+
+app-project-storefront-editor .storefront-editor__section-actions--collapsed{
+    display: none;
+}
+
+app-project-storefront-editor .storefront-editor__section-action{
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #ffffff;
+    color: rgba(11, 11, 18, 0.72);
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease;
+}
+
+app-project-storefront-editor .storefront-editor__section-action:hover:not(:disabled){
+    border-color: rgba(117, 102, 255, 0.18);
+    color: #4c3dcb;
+}
+
+app-project-storefront-editor .storefront-editor__section-action--danger:hover:not(:disabled){
+    border-color: rgba(188, 67, 48, 0.18);
+    color: #b43d2b;
+}
+
+app-project-storefront-editor .storefront-editor__section-action:disabled{
+    opacity: 0.45;
+    cursor: default;
+}
+
+app-project-storefront-editor .storefront-editor__nav-row{
+    min-height: 50px;
+    padding: 12px 14px;
+    border: 1px solid transparent;
+}
+
+app-project-storefront-editor .storefront-editor__nav-row:hover:not(.storefront-editor__nav-row--active){
+    border-color: rgba(117, 102, 255, 0.1);
+    box-shadow: 0 10px 18px rgba(117, 102, 255, 0.05);
+}
+
+app-project-storefront-editor .storefront-editor__nav-row--active{
+    border-color: rgba(117, 102, 255, 0.18);
+    box-shadow: 0 14px 26px rgba(117, 102, 255, 0.1);
+}
+
+app-project-storefront-editor .storefront-editor__nav-icon{
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    background: rgba(117, 102, 255, 0.08);
+}
+
+app-project-storefront-editor .storefront-editor__nav-row--active .storefront-editor__nav-icon{
+    background: rgba(117, 102, 255, 0.14);
+}
+
+app-project-storefront-editor .storefront-editor__nav-chip{
+    background: #ffffff;
+}
+
+app-project-storefront-editor .storefront-editor__toolbar{
+    border-radius: 22px;
+    padding: 22px 24px;
+    background:
+        radial-gradient(circle at top right, rgba(117, 102, 255, 0.1), transparent 28%),
+        linear-gradient(180deg, #ffffff, #fafbff);
+}
+
+app-project-storefront-editor .storefront-editor__subtitle{
+    max-width: 62ch;
+}
+
+app-project-storefront-editor .storefront-editor__meta-strip{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+app-project-storefront-editor .storefront-editor__meta-pill,
+app-project-storefront-editor .storefront-editor__inspector-badge{
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(117, 102, 255, 0.12);
+    background: rgba(117, 102, 255, 0.08);
+    color: #5a49d6;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+app-project-storefront-editor .storefront-editor__toolbar-actions{
+    align-items: flex-start;
+}
+
+app-project-storefront-editor .storefront-editor__canvas-toolbar{
+    border-radius: 22px;
+    padding: 18px 20px;
+    background: linear-gradient(180deg, #ffffff, #fbfcff);
+}
+
+app-project-storefront-editor .storefront-editor__canvas-stage{
+    position: relative;
+    border-radius: 28px;
+    border-color: rgba(117, 102, 255, 0.08);
+    background:
+        radial-gradient(circle at top, rgba(117, 102, 255, 0.08), transparent 26%),
+        linear-gradient(180deg, #f8f9ff, #f3f5fb);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+app-project-storefront-editor .storefront-editor__canvas-stage::before{
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border-radius: 22px;
+    border: 1px dashed rgba(117, 102, 255, 0.12);
+    pointer-events: none;
+}
+
+app-project-storefront-editor .storefront-editor__canvas-frame{
+    border-radius: 24px;
+    border-color: rgba(215, 217, 223, 0.98);
+    box-shadow: 0 16px 34px rgba(76, 61, 203, 0.08);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-card--inspector{
+    border-radius: 22px;
+    padding: 22px;
+}
+
+app-project-storefront-editor .storefront-editor__inspector-head{
+    padding-bottom: 14px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+app-project-storefront-editor .storefront-editor__field input,
+app-project-storefront-editor .storefront-editor__field textarea{
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease;
+}
+
+app-project-storefront-editor .storefront-editor__field input:focus,
+app-project-storefront-editor .storefront-editor__field textarea:focus{
+    outline: none;
+    border-color: rgba(117, 102, 255, 0.3);
+    box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.08);
+    background: #ffffff;
+}
+
+app-project-storefront-editor .storefront-editor__product-option{
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+}
+
+app-project-storefront-editor .storefront-editor__product-option:hover{
+    border-color: rgba(117, 102, 255, 0.16);
+    box-shadow: 0 12px 24px rgba(117, 102, 255, 0.06);
+    transform: translateY(-1px);
+}
+
+@media (max-width:1080px){
+    app-project-storefront-editor .storefront-editor__toolbar-actions{
+        align-items: stretch;
+    }
+}
+
+@media (max-width:900px){
+    app-project-storefront-editor .storefront-editor__add-section-button--collapsed{
+        grid-template-columns: 20px minmax(0, 1fr);
+        justify-items: stretch;
+        padding: 0 12px;
+    }
+
+    app-project-storefront-editor .storefront-editor__add-section-button--collapsed .storefront-editor__add-section-copy{
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        white-space: nowrap;
+    }
+}
+
+app-project-storefront-editor .storefront-editor__workspace{grid-template-columns:332px minmax(0,1fr)}
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed{grid-template-columns:82px minmax(0,1fr)}
+app-project-storefront-editor .storefront-editor__sidebar-shell{display:grid;grid-template-columns:68px minmax(0,1fr);background:linear-gradient(180deg,#ffffff,#fbfcff)}
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-shell{grid-template-columns:1fr}
+app-project-storefront-editor .storefront-editor__sidebar-brand{justify-content:center;padding:0;border-right:1px solid rgba(15,23,42,.06)}
+app-project-storefront-editor .storefront-editor__sidebar-tools{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 10px;border-right:1px solid rgba(15,23,42,.06)}
+app-project-storefront-editor .storefront-editor__tool-button{width:44px;height:44px;border-radius:14px;border:1px solid transparent;background:transparent;color:#697181;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease}
+app-project-storefront-editor .storefront-editor__tool-button:hover{background:#f7f8fb;color:#2f3744}
+app-project-storefront-editor .storefront-editor__tool-button--active{background:#eef2ff;border-color:rgba(117,102,255,.16);color:#4c3dcb;box-shadow:0 10px 20px rgba(117,102,255,.1)}
+app-project-storefront-editor .storefront-editor__sidebar-body{padding:18px 16px 18px;background:linear-gradient(180deg,#fbfcff,#f7f8fc)}
+app-project-storefront-editor .storefront-editor__sidebar-headline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+app-project-storefront-editor .storefront-editor__editor-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 16px;border:1px solid rgba(215,217,223,.95);border-radius:18px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.03),0 6px 18px rgba(17,17,17,.03)}
+app-project-storefront-editor .storefront-editor__editor-bar-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+app-project-storefront-editor .storefront-editor__editor-bar-group--end{margin-left:auto}
+app-project-storefront-editor .storefront-editor__editor-chip{min-height:28px;padding:0 10px;border-radius:999px;background:#f7f8fb;border:1px solid rgba(15,23,42,.06);color:#697181;font-size:.76rem;font-weight:700;display:inline-flex;align-items:center}
+app-project-storefront-editor .storefront-editor__editor-select,app-project-storefront-editor .storefront-editor__editor-ghost{min-height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(215,217,223,.95);background:#fff;color:#111;font:inherit;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+app-project-storefront-editor .storefront-editor__editor-ghost:hover,app-project-storefront-editor .storefront-editor__editor-select:hover{border-color:rgba(117,102,255,.18);background:#fbfbff}
+app-project-storefront-editor .storefront-editor__editor-zoom,app-project-storefront-editor .storefront-editor__editor-status{font-size:.82rem;font-weight:600;color:#5d6470}
+app-project-storefront-editor .storefront-editor__editor-separator{width:1px;height:18px;background:rgba(15,23,42,.08)}
+app-project-storefront-editor .storefront-editor__sidebar-card{border-radius:16px}
+app-project-storefront-editor .storefront-editor__sidebar-card--status{background:linear-gradient(180deg,#ffffff,#f9faff)}
+app-project-storefront-editor .storefront-editor__coming-soon{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+app-project-storefront-editor .storefront-editor__canvas-stage::after{content:'';position:absolute;top:20px;left:50%;transform:translateX(-50%);width:180px;height:10px;border-radius:999px;background:rgba(117,102,255,.08);pointer-events:none}
+app-project-storefront-editor .storefront-editor__canvas-toolbar{position:relative;overflow:hidden}
+app-project-storefront-editor .storefront-editor__canvas-toolbar::after{content:'';position:absolute;inset:auto 0 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(117,102,255,.18),transparent)}
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-body{display:none}
+
+@media (max-width:1080px){
+  app-project-storefront-editor .storefront-editor__editor-bar{flex-direction:column;align-items:flex-start}
+}
+
+@media (max-width:900px){
+  app-project-storefront-editor .storefront-editor__workspace,
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed{grid-template-columns:1fr}
+  app-project-storefront-editor .storefront-editor__sidebar-shell{position:static;height:auto;grid-template-columns:1fr;border-right:0;border-bottom:1px solid rgba(15,23,42,.08)}
+  app-project-storefront-editor .storefront-editor__sidebar-brand,
+  app-project-storefront-editor .storefront-editor__sidebar-tools{display:none}
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-body{display:flex}
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-shell{
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr);
+  align-items:stretch;
+  overflow:hidden;
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-rail{
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+  border-right:1px solid rgba(15,23,42,.06);
+  background:linear-gradient(180deg,#ffffff,#fbfcff);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-brand{
+  border-right:0;
+  border-bottom:1px solid rgba(15,23,42,.08);
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-tools{
+  flex:1;
+  justify-content:flex-start;
+  border-right:0;
+}
+
+app-project-storefront-editor .storefront-editor__sidebar-body{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-shell{
+  grid-template-columns:68px 0fr;
+}
+
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-body{
+  padding-left:0;
+  padding-right:0;
+  overflow:hidden;
+}
+
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-headline,
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-card,
+app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__nav{
+  opacity:0;
+  pointer-events:none;
+}
+
+@media (max-width:900px){
+  app-project-storefront-editor .storefront-editor__sidebar-shell,
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-shell{
+    grid-template-columns:1fr;
+  }
+
+  app-project-storefront-editor .storefront-editor__sidebar-rail{
+    display:none;
+  }
+
+  app-project-storefront-editor .storefront-editor__sidebar-body,
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-body{
+    padding:18px 16px;
+    overflow:visible;
+  }
+
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-headline,
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__sidebar-card,
+  app-project-storefront-editor .storefront-editor__workspace--sidebar-collapsed .storefront-editor__nav{
+    opacity:1;
+    pointer-events:auto;
+  }
+}

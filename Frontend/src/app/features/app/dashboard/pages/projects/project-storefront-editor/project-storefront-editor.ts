@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
@@ -15,18 +15,22 @@ import { ProjectWorkspaceContextService } from '../../../../../../core/services/
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
 import { AppHeader } from '../../../../../../shared/app/app-header/app-header';
+import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
 
 type EditorViewport = 'desktop' | 'mobile';
+type SectionInsertMode = 'append' | 'after-selected';
+type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppIcon, AppHeader],
+  imports: [CommonModule, FormsModule, AppIcon, AppHeader],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
 export class ProjectStorefrontEditor {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectService = inject(ProjectService);
   private readonly projectCatalogService = inject(ProjectCatalogService);
@@ -49,6 +53,7 @@ export class ProjectStorefrontEditor {
   readonly selectedSectionId = signal<string | null>(null);
   readonly viewport = signal<EditorViewport>('desktop');
   readonly sidebarCollapsed = signal(false);
+  readonly sidebarMode = signal<EditorSidebarMode>('structure');
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
   readonly isPublishing = signal(false);
@@ -88,6 +93,12 @@ export class ProjectStorefrontEditor {
       .slice(0, maxItems);
   });
   readonly previewTitle = computed(() => this.workingStorefront()?.draftHomepage.seo.title || this.storeName());
+  readonly availableSectionTypes: StorefrontSectionType[] = [
+    'announcement-bar',
+    'hero',
+    'featured-products',
+    'footer',
+  ];
 
   constructor() {
     this.loadEditor();
@@ -152,10 +163,12 @@ export class ProjectStorefrontEditor {
   }
 
   selectPageSettings(): void {
+    this.sidebarMode.set('page');
     this.selectedSectionId.set(null);
   }
 
   selectSection(sectionId: string): void {
+    this.sidebarMode.set('structure');
     this.selectedSectionId.set(sectionId);
   }
 
@@ -165,6 +178,24 @@ export class ProjectStorefrontEditor {
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update((value) => !value);
+  }
+
+  setSidebarMode(mode: EditorSidebarMode): void {
+    this.sidebarMode.set(mode);
+    if (mode === 'page') {
+      this.selectedSectionId.set(null);
+    } else if (mode === 'structure' && !this.selectedSectionId() && this.sections().length) {
+      this.selectedSectionId.set(this.sections()[0].id);
+    }
+  }
+
+  navigateBackToProject(): void {
+    const projectId = this.projectId();
+    if (!projectId) {
+      return;
+    }
+
+    void this.router.navigate(['/app/projects', projectId, 'home']);
   }
 
   updateStoreName(value: string): void {
@@ -229,6 +260,131 @@ export class ProjectStorefrontEditor {
         },
       };
     });
+  }
+
+  moveSection(sectionId: string, direction: 'up' | 'down'): void {
+    this.selectedSectionId.set(sectionId);
+    this.moveSelectedSection(direction);
+  }
+
+  addSection(type: StorefrontSectionType, mode: SectionInsertMode = 'after-selected'): void {
+    this.workingStorefront.update((storefront) => {
+      if (!storefront) {
+        return storefront;
+      }
+
+      const section = this.createSection(type);
+      const sections = [...storefront.draftHomepage.sections];
+      const selectedSectionId = this.selectedSectionId();
+      const selectedIndex = selectedSectionId
+        ? sections.findIndex((item) => item.id === selectedSectionId)
+        : -1;
+      const insertAt =
+        mode === 'after-selected' && selectedIndex >= 0 ? selectedIndex + 1 : sections.length;
+
+      sections.splice(insertAt, 0, section);
+      this.selectedSectionId.set(section.id);
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections,
+        },
+      };
+    });
+  }
+
+  duplicateSection(sectionId: string): void {
+    this.workingStorefront.update((storefront) => {
+      if (!storefront) {
+        return storefront;
+      }
+
+      const sections = [...storefront.draftHomepage.sections];
+      const index = sections.findIndex((section) => section.id === sectionId);
+      if (index < 0) {
+        return storefront;
+      }
+
+      const duplicate = {
+        ...JSON.parse(JSON.stringify(sections[index])),
+        id: this.createSectionId(sections[index].type),
+      } as StorefrontHomepageSection;
+
+      sections.splice(index + 1, 0, duplicate);
+      this.selectedSectionId.set(duplicate.id);
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections,
+        },
+      };
+    });
+  }
+
+  removeSection(sectionId: string): void {
+    this.workingStorefront.update((storefront) => {
+      if (!storefront) {
+        return storefront;
+      }
+
+      const sections = storefront.draftHomepage.sections;
+      if (sections.length <= 1) {
+        return storefront;
+      }
+
+      const index = sections.findIndex((section) => section.id === sectionId);
+      if (index < 0) {
+        return storefront;
+      }
+
+      const nextSections = sections.filter((section) => section.id !== sectionId);
+      const nextSelected =
+        nextSections[index]?.id ?? nextSections[index - 1]?.id ?? null;
+      this.selectedSectionId.set(nextSelected);
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections: nextSections,
+        },
+      };
+    });
+  }
+
+  toggleSectionEnabled(sectionId: string): void {
+    this.workingStorefront.update((storefront) => {
+      if (!storefront) {
+        return storefront;
+      }
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections: storefront.draftHomepage.sections.map((section) =>
+            section.id === sectionId ? { ...section, enabled: !section.enabled } : section
+          ),
+        },
+      };
+    });
+  }
+
+  canMoveSection(sectionId: string, direction: 'up' | 'down'): boolean {
+    const index = this.sections().findIndex((section) => section.id === sectionId);
+    if (index < 0) {
+      return false;
+    }
+
+    return direction === 'up' ? index > 0 : index < this.sections().length - 1;
+  }
+
+  canRemoveSection(): boolean {
+    return this.sections().length > 1;
   }
 
   updateSelectedStringProp(key: string, value: string): void {
@@ -404,6 +560,17 @@ export class ProjectStorefrontEditor {
   trackSection = (_: number, section: StorefrontHomepageSection): string => section.id;
   trackProduct = (_: number, product: ProjectCatalogProduct): number => product.id;
 
+  sectionTypeIcon(type: StorefrontSectionType): 'layout-grid' | 'package' | 'settings' {
+    switch (type) {
+      case 'featured-products':
+        return 'package';
+      case 'footer':
+        return 'settings';
+      default:
+        return 'layout-grid';
+    }
+  }
+
   private updateSelectedSection(
     updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection
   ): void {
@@ -431,5 +598,62 @@ export class ProjectStorefrontEditor {
 
   private cloneStorefront(storefront: ProjectStorefront): ProjectStorefront {
     return JSON.parse(JSON.stringify(storefront)) as ProjectStorefront;
+  }
+
+  private createSection(type: StorefrontSectionType): StorefrontHomepageSection {
+    switch (type) {
+      case 'announcement-bar':
+        return {
+          id: this.createSectionId(type),
+          type,
+          enabled: true,
+          props: {
+            text: 'Free shipping on orders over 150 TND',
+            linkLabel: 'Shop now',
+            linkHref: '/products',
+          },
+        };
+      case 'featured-products':
+        return {
+          id: this.createSectionId(type),
+          type,
+          enabled: true,
+          props: {
+            title: 'Featured products',
+            productIds: [],
+            maxItems: 4,
+          },
+        };
+      case 'footer':
+        return {
+          id: this.createSectionId(type),
+          type,
+          enabled: true,
+          props: {
+            brandText: this.storeName(),
+            contactEmail: 'store@example.com',
+            contactPhone: '+216 00 000 000',
+          },
+        };
+      default:
+        return {
+          id: this.createSectionId(type),
+          type,
+          enabled: true,
+          props: {
+            eyebrow: 'New collection',
+            title: 'Design your next bestseller',
+            description: 'Use this hero section to introduce your products with a strong headline and clear calls to action.',
+            primaryCtaLabel: 'Shop now',
+            primaryCtaHref: '/products',
+            secondaryCtaLabel: 'Learn more',
+            secondaryCtaHref: '/about',
+          },
+        };
+    }
+  }
+
+  private createSectionId(type: StorefrontSectionType): string {
+    return `${type}-${Math.random().toString(36).slice(2, 10)}`;
   }
 }
