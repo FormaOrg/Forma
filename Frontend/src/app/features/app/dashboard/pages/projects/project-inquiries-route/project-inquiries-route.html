@@ -17,11 +17,11 @@
         <p class="project-inquiries__eyebrow">Portfolio inquiries</p>
         <h1 class="project-inquiries__title">Track inbound leads without leaving the workspace.</h1>
         <p class="project-inquiries__subtitle">
-          Review the people reaching out through {{ project.name }}, keep new opportunities visible, and separate fresh leads from active conversations.
+          Review the people reaching out through {{ project.projectName }}, keep new opportunities visible, and separate fresh leads from active conversations.
         </p>
       </div>
 
-      <a class="project-inquiries__hero-action" [routerLink]="['/app/projects', project.id, 'editor']">Open contact page</a>
+      <a class="project-inquiries__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">Open contact page</a>
     </section>
 
     <section class="project-inquiries__summary-grid">
@@ -55,7 +55,13 @@
             />
           </label>
 
-          <div class="project-inquiries__filters">
+          <div
+            class="project-inquiries__filters"
+            role="tablist"
+            aria-label="Inquiry status"
+            [attr.data-status]="selectedStatus()"
+          >
+            <span class="project-inquiries__filters-pill" aria-hidden="true"></span>
             <button
               type="button"
               class="project-inquiries__filter"
@@ -114,15 +120,17 @@
               </div>
 
               <div class="project-inquiries__row-meta">
-                <span>{{ item.serviceLabel }}</span>
-                <span>{{ item.budgetLabel }}</span>
-                <span>{{ item.receivedLabel }}</span>
+                <span>{{ item.serviceLabel || 'General inquiry' }}</span>
+                <span>{{ item.budgetLabel || 'Budget not shared' }}</span>
+                <span>{{ formatReceivedLabel(item.createdAt) }}</span>
               </div>
             </button>
           } @empty {
             <div class="project-inquiries__empty">
-              <h2>No matching inquiries</h2>
-              <p>Try a different search or switch the status filter.</p>
+              <h2>{{ inquiries().length ? 'No matching inquiries' : 'No inquiries yet' }}</h2>
+              <p>
+                {{ inquiries().length ? 'Try a different search or switch the status filter.' : 'New portfolio inquiries will appear here once they are saved to the workspace.' }}
+              </p>
             </div>
           }
         </div>
@@ -158,6 +166,7 @@
                       type="button"
                       class="project-inquiries__dropdown-item"
                       [class.is-selected]="selectedInquiry.status === option.value"
+                      [disabled]="isUpdatingStatus()"
                       (click)="updateInquiryStatus(selectedInquiry.id, option.value)"
                     >
                       {{ option.label }}
@@ -176,28 +185,28 @@
               </div>
               <div>
                 <span>Service</span>
-                <strong>{{ selectedInquiry.serviceLabel }}</strong>
+                <strong>{{ selectedInquiry.serviceLabel || 'General inquiry' }}</strong>
               </div>
               <div>
                 <span>Budget</span>
-                <strong>{{ selectedInquiry.budgetLabel }}</strong>
+                <strong>{{ selectedInquiry.budgetLabel || 'Budget not shared' }}</strong>
               </div>
               <div>
                 <span>Source</span>
-                <strong>{{ selectedInquiry.sourceLabel }}</strong>
+                <strong>{{ selectedInquiry.sourceLabel || 'Unknown source' }}</strong>
               </div>
             </div>
 
             <div class="project-inquiries__message">
               <span>Message</span>
-              <p>{{ selectedInquiry.message }}</p>
+              <p>{{ selectedInquiry.message || 'No message was included with this inquiry.' }}</p>
             </div>
 
             <div class="project-inquiries__detail-actions">
               <a [href]="'mailto:' + selectedInquiry.email" class="project-inquiries__detail-action">
                 Reply by email
               </a>
-              <a [routerLink]="['/app/projects', project.id, 'editor']" class="project-inquiries__detail-action project-inquiries__detail-action--ghost">
+              <a [routerLink]="['/app/projects', project.projectId, 'editor']" class="project-inquiries__detail-action project-inquiries__detail-action--ghost">
                 Review contact page
               </a>
             </div>

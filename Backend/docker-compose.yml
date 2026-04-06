@@ -1,0 +1,62 @@
+services:
+  service-utilisateurs:
+    build: ./service-utilisateurs
+    container_name: forma_users
+    env_file:
+      - ./service-utilisateurs/.env
+    ports:
+      - "8081:8081"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-Zm9ybWEtc3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtMjAyNQ==}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+    volumes:
+      - uploads_data:/app/uploads
+
+  service-projets:
+    build: ./service-projets
+    container_name: forma_projects
+    env_file:
+      - ./service-utilisateurs/.env
+    ports:
+      - "8082:8082"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-Zm9ybWEtc3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtMjAyNQ==}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+    volumes:
+      - uploads_data:/app/uploads
+
+  service-commerce:
+    build: ./service-commerce
+    container_name: forma_commerce
+    env_file:
+      - ./service-utilisateurs/.env
+    ports:
+      - "8083:8083"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-Zm9ybWEtc3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtMjAyNQ==}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+
+  service-analytics:
+    build: ./service-analytics
+    container_name: forma_analytics
+    env_file:
+      - ./service-utilisateurs/.env
+    ports:
+      - "8084:8084"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-Zm9ybWEtc3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtMjAyNQ==}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+
+  service-billing:
+    build: ./service-billing
+    container_name: forma_billing
+    env_file:
+      - ./service-utilisateurs/.env
+    ports:
+      - "8085:8085"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-Zm9ybWEtc3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtMjAyNQ==}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+
+volumes:
+  uploads_data:

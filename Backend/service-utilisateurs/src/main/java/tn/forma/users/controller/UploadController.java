@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.forma.users.dto.FileUploadResponse;
 import tn.forma.users.dto.MessageResponse;
 import tn.forma.users.service.FileUploadService;
-import tn.forma.users.service.ProjectService;
 import tn.forma.users.service.UserService;
 
 @RestController
@@ -24,7 +23,6 @@ public class UploadController {
 
     private final FileUploadService fileUploadService;
     private final UserService userService;
-    private final ProjectService projectService;
 
     @PostMapping("/avatar")
     public ResponseEntity<FileUploadResponse> uploadAvatar(
@@ -52,54 +50,6 @@ public class UploadController {
             fileUploadService.deleteByPublicId(avatarPublicId);
         }
         return ResponseEntity.ok(new MessageResponse("Avatar removed successfully"));
-    }
-
-    @PostMapping("/projects/{projectId}/logo")
-    public ResponseEntity<FileUploadResponse> uploadProjectLogo(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long projectId,
-            @RequestParam("file") MultipartFile file
-    ) {
-        String previousLogoPublicId = projectService.getProjectLogoPublicId(userDetails.getUsername(), projectId);
-        FileUploadResponse upload = fileUploadService.uploadProjectLogo(file);
-
-        if (previousLogoPublicId != null && !previousLogoPublicId.equals(upload.getPublicId())) {
-            fileUploadService.deleteByPublicId(previousLogoPublicId);
-        }
-
-        projectService.updateProjectLogo(userDetails.getUsername(), projectId, upload.getUrl(), upload.getPublicId());
-        upload.setMessage("Project logo uploaded successfully");
-        return ResponseEntity.ok(upload);
-    }
-
-    @DeleteMapping("/projects/{projectId}/logo")
-    public ResponseEntity<MessageResponse> deleteProjectLogo(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long projectId
-    ) {
-        String logoPublicId = projectService.clearProjectLogo(userDetails.getUsername(), projectId);
-        if (logoPublicId != null) {
-            fileUploadService.deleteByPublicId(logoPublicId);
-        }
-        return ResponseEntity.ok(new MessageResponse("Project logo removed successfully"));
-    }
-
-    @PostMapping("/media")
-    public ResponseEntity<FileUploadResponse> uploadProjectMedia(
-            @RequestParam("file") MultipartFile file
-    ) {
-        FileUploadResponse upload = fileUploadService.uploadProjectMedia(file);
-        upload.setMessage("Media uploaded successfully");
-        return ResponseEntity.ok(upload);
-    }
-
-    @PostMapping("/design-asset")
-    public ResponseEntity<FileUploadResponse> uploadDesignAsset(
-            @RequestParam("file") MultipartFile file
-    ) {
-        FileUploadResponse upload = fileUploadService.uploadDesignAsset(file);
-        upload.setMessage("Design asset uploaded successfully");
-        return ResponseEntity.ok(upload);
     }
 
     @DeleteMapping
