@@ -61,6 +61,10 @@ public class ProjectStorefront {
     @Column(name = "published_homepage_json", columnDefinition = "jsonb")
     private JsonNode publishedHomepageJson;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "editor_session_json", columnDefinition = "jsonb")
+    private JsonNode editorSessionJson;
+
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 

@@ -1,5 +1,6 @@
 export type StorefrontStatus = 'DRAFT' | 'PUBLISHED';
 export type StorefrontPageKey = 'home';
+export type StorefrontEditorViewport = 'desktop' | 'mobile';
 export type StorefrontSectionType =
   | 'announcement-bar'
   | 'hero'
@@ -62,6 +63,22 @@ export interface StorefrontHomepageDocument {
   sections: StorefrontHomepageSection[];
 }
 
+export interface StorefrontEditorSnapshot {
+  storeName: string | null;
+  themeKey: string | null;
+  activePageKey: StorefrontPageKey;
+  draftHomepage: StorefrontHomepageDocument;
+  selectedSectionId: string | null;
+}
+
+export interface StorefrontEditorSession {
+  selectedSectionId: string | null;
+  viewport: StorefrontEditorViewport;
+  zoomPercent: number;
+  undoStack: StorefrontEditorSnapshot[];
+  redoStack: StorefrontEditorSnapshot[];
+}
+
 export interface ProjectStorefront {
   id: number;
   projectId: number;
@@ -71,6 +88,7 @@ export interface ProjectStorefront {
   activePageKey: StorefrontPageKey;
   draftHomepage: StorefrontHomepageDocument;
   publishedHomepage: StorefrontHomepageDocument | null;
+  editorSession: StorefrontEditorSession | null;
   publishedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -81,6 +99,7 @@ export interface UpdateProjectStorefrontRequest {
   themeKey?: string | null;
   activePageKey?: StorefrontPageKey;
   draftHomepage?: StorefrontHomepageDocument;
+  editorSession?: StorefrontEditorSession;
 }
 
 export interface PublishProjectStorefrontResponse {

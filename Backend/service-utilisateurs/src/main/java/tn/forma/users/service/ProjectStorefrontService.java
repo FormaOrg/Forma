@@ -11,6 +11,7 @@ import tn.forma.users.dto.ProjectStorefrontDto;
 import tn.forma.users.dto.PublishProjectStorefrontResponse;
 import tn.forma.users.dto.UpdateProjectStorefrontRequest;
 import tn.forma.users.model.Project;
+import tn.forma.users.model.ProjectStatus;
 import tn.forma.users.model.ProjectStorefront;
 import tn.forma.users.model.ProjectType;
 import tn.forma.users.model.StorefrontStatus;
@@ -57,7 +58,11 @@ public class ProjectStorefrontService {
         }
 
         if (request.getDraftHomepage() != null) {
-            storefront.setDraftHomepageJson(request.getDraftHomepage().deepCopy());
+            storefront.setDraftHomepageJson(objectMapper.valueToTree(request.getDraftHomepage()));
+        }
+
+        if (request.getEditorSession() != null) {
+            storefront.setEditorSessionJson(objectMapper.valueToTree(request.getEditorSession()));
         }
 
         return mapToDto(projectStorefrontRepository.save(storefront));
@@ -66,9 +71,14 @@ public class ProjectStorefrontService {
     @Transactional
     public PublishProjectStorefrontResponse publishStorefront(String email, Long projectId) {
         ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
-        storefront.setPublishedHomepageJson(storefront.getDraftHomepageJson());
+        storefront.setPublishedHomepageJson(storefront.getDraftHomepageJson() != null
+                ? storefront.getDraftHomepageJson().deepCopy()
+                : null);
         storefront.setStoreStatus(StorefrontStatus.PUBLISHED);
         storefront.setPublishedAt(LocalDateTime.now());
+        storefront.setEditorSessionJson(resetEditorSession(storefront.getEditorSessionJson()));
+        storefront.getProject().setPublished(true);
+        storefront.getProject().setStatus(ProjectStatus.PUBLISHED);
 
         ProjectStorefront savedStorefront = projectStorefrontRepository.save(storefront);
         return PublishProjectStorefrontResponse.builder()
@@ -83,6 +93,8 @@ public class ProjectStorefrontService {
         storefront.setStoreStatus(StorefrontStatus.DRAFT);
         storefront.setPublishedHomepageJson(null);
         storefront.setPublishedAt(null);
+        storefront.getProject().setPublished(false);
+        storefront.getProject().setStatus(ProjectStatus.DRAFT);
         return mapToDto(projectStorefrontRepository.save(storefront));
     }
 
@@ -117,6 +129,7 @@ public class ProjectStorefrontService {
                 .activePageKey(DEFAULT_PAGE_KEY)
                 .draftHomepageJson(buildDefaultHomepage(project))
                 .publishedHomepageJson(null)
+                .editorSessionJson(buildDefaultEditorSession())
                 .publishedAt(null)
                 .build();
     }
@@ -210,6 +223,25 @@ public class ProjectStorefrontService {
         return section;
     }
 
+    private ObjectNode buildDefaultEditorSession() {
+        ObjectNode session = objectMapper.createObjectNode();
+        session.putNull("selectedSectionId");
+        session.put("viewport", "desktop");
+        session.put("zoomPercent", 120);
+        session.set("undoStack", objectMapper.createArrayNode());
+        session.set("redoStack", objectMapper.createArrayNode());
+        return session;
+    }
+
+    private JsonNode resetEditorSession(JsonNode editorSession) {
+        ObjectNode session = editorSession != null && editorSession.isObject()
+                ? editorSession.deepCopy()
+                : buildDefaultEditorSession();
+        session.set("undoStack", objectMapper.createArrayNode());
+        session.set("redoStack", objectMapper.createArrayNode());
+        return session;
+    }
+
     private ProjectStorefrontDto mapToDto(ProjectStorefront storefront) {
         return ProjectStorefrontDto.builder()
                 .id(storefront.getId())
@@ -218,12 +250,17 @@ public class ProjectStorefrontService {
                 .storeStatus(storefront.getStoreStatus().name())
                 .themeKey(storefront.getThemeKey())
                 .activePageKey(storefront.getActivePageKey())
-                .draftHomepage(storefront.getDraftHomepageJson() != null ? storefront.getDraftHomepageJson().deepCopy() : null)
-                .publishedHomepage(storefront.getPublishedHomepageJson() != null ? storefront.getPublishedHomepageJson().deepCopy() : null)
+                .draftHomepage(toPlainJson(storefront.getDraftHomepageJson()))
+                .publishedHomepage(toPlainJson(storefront.getPublishedHomepageJson()))
+                .editorSession(toPlainJson(storefront.getEditorSessionJson()))
                 .publishedAt(Objects.toString(storefront.getPublishedAt(), null))
                 .createdAt(Objects.toString(storefront.getCreatedAt(), null))
                 .updatedAt(Objects.toString(storefront.getUpdatedAt(), null))
                 .build();
+    }
+
+    private Object toPlainJson(JsonNode node) {
+        return node != null ? objectMapper.convertValue(node, Object.class) : null;
     }
 
     private String blankToNull(String value) {
