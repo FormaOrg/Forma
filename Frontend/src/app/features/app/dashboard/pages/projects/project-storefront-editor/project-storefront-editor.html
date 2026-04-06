@@ -177,6 +177,20 @@
                     <span class="storefront-editor__nav-chip">{{ section.enabled ? 'On' : 'Off' }}</span>
                   </button>
 
+                  <div class="storefront-editor__layer-list">
+                    @for (block of blocksForSection(section); track block.id) {
+                      <button
+                        type="button"
+                        class="storefront-editor__layer-item"
+                        [class.storefront-editor__layer-item--active]="isBlockSelected(block.id)"
+                        (click)="selectBlock(section.id, block.id)"
+                      >
+                        <span class="storefront-editor__layer-item-label">{{ block.label }}</span>
+                        <span class="storefront-editor__layer-item-kind">{{ blockKindLabel(block.kind) }}</span>
+                      </button>
+                    }
+                  </div>
+
                   <div class="storefront-editor__section-actions" [class.storefront-editor__section-actions--collapsed]="sidebarCollapsed()">
                     <button
                       type="button"
@@ -225,7 +239,7 @@
       </aside>
 
       <div class="storefront-editor__main">
-        <div class="storefront-editor__editor-bar">
+        <div class="storefront-editor__editor-bar storefront-editor__editor-bar--compact">
           <div class="storefront-editor__editor-bar-group">
             <span class="storefront-editor__editor-chip">Page</span>
             <button type="button" class="storefront-editor__editor-select" (click)="selectPageSettings()">
@@ -235,42 +249,20 @@
           </div>
 
           <div class="storefront-editor__editor-bar-group">
-            <span class="storefront-editor__editor-chip">Canvas</span>
-            <button type="button" class="storefront-editor__editor-ghost" (click)="setViewport('desktop')">
-              Desktop
-            </button>
-            <button type="button" class="storefront-editor__editor-ghost" (click)="setViewport('mobile')">
-              Mobile
+            <button type="button" class="storefront-editor__back-link storefront-editor__back-link--compact" (click)="navigateBackToProject()">
+              <app-icon name="arrow-left" [size]="15"></app-icon>
+              Project
             </button>
           </div>
 
-          <div class="storefront-editor__editor-bar-group storefront-editor__editor-bar-group--end">
-            <span class="storefront-editor__editor-zoom">{{ viewport() === 'desktop' ? '100%' : '75%' }}</span>
-            <span class="storefront-editor__editor-separator" aria-hidden="true"></span>
-            <span class="storefront-editor__editor-status">{{ hasUnsavedChanges() ? 'Editing draft' : 'All changes saved' }}</span>
-          </div>
-        </div>
-
-        <div class="storefront-editor__toolbar">
-          <div class="storefront-editor__toolbar-copy">
-            <p class="storefront-editor__eyebrow">Storefront editor</p>
-            <h1 class="storefront-editor__title">{{ previewTitle() }}</h1>
-            <p class="storefront-editor__subtitle">A separate editor page with dashboard-style chrome, a focused navigation rail, and a live storefront canvas.</p>
-
-            <div class="storefront-editor__meta-strip">
-              <span class="storefront-editor__meta-pill">{{ sections().length }} sections</span>
-              <span class="storefront-editor__meta-pill">{{ featuredProductsPreview().length }} featured products</span>
-              <span class="storefront-editor__meta-pill">{{ storefront.storeStatus === 'PUBLISHED' ? 'Live storefront' : 'Draft only' }}</span>
-            </div>
+          <div class="storefront-editor__editor-bar-search">
+            <span class="storefront-editor__editor-search-badge">Forma</span>
+            <span class="storefront-editor__editor-search-copy">{{ previewTitle() }}</span>
+            <span class="storefront-editor__editor-search-meta">{{ storefront.storeStatus === 'PUBLISHED' ? 'Live storefront' : 'Draft mode' }}</span>
           </div>
 
-          <div class="storefront-editor__toolbar-actions">
-            <button type="button" class="storefront-editor__back-link" (click)="navigateBackToProject()">
-              <app-icon name="arrow-left" [size]="16"></app-icon>
-              Back to project
-            </button>
-
-            <div class="storefront-editor__viewport-toggle" aria-label="Preview size">
+          <div class="storefront-editor__editor-bar-group">
+            <div class="storefront-editor__viewport-toggle storefront-editor__viewport-toggle--compact" aria-label="Preview size">
               <button
                 type="button"
                 class="storefront-editor__viewport-button"
@@ -288,6 +280,10 @@
                 Mobile
               </button>
             </div>
+          </div>
+
+          <div class="storefront-editor__editor-bar-group storefront-editor__editor-bar-group--end">
+            <span class="storefront-editor__editor-status">{{ hasUnsavedChanges() ? 'Editing draft' : 'All changes saved' }}</span>
 
             <button
               type="button"
@@ -315,7 +311,7 @@
               (click)="publishStorefront()"
               [disabled]="isPublishing() || isUnpublishing()"
             >
-              {{ isPublishing() ? 'Publishing...' : storefront.storeStatus === 'PUBLISHED' ? 'Republish' : 'Publish storefront' }}
+              {{ isPublishing() ? 'Publishing...' : storefront.storeStatus === 'PUBLISHED' ? 'Republish' : 'Publish' }}
             </button>
           </div>
         </div>
@@ -324,20 +320,22 @@
           <main class="storefront-editor__canvas-wrap">
             <div class="storefront-editor__canvas-toolbar">
               <div>
-                <p class="storefront-editor__canvas-label">Preview canvas</p>
+                <p class="storefront-editor__canvas-label">Canvas</p>
                 <h2 class="storefront-editor__canvas-title">{{ storeName() }}</h2>
                 <p class="storefront-editor__canvas-copy">
                   @if (hasUnsavedChanges()) {
-                    You have unsaved changes in this draft.
+                    Draft changes are local until you save.
                   } @else if (storefront.storeStatus === 'PUBLISHED') {
-                    This draft matches the published storefront.
+                    Synced with the published storefront.
                   } @else {
-                    Save your draft, then publish when the homepage feels ready.
+                    Save first, then publish when ready.
                   }
                 </p>
               </div>
 
               <div class="storefront-editor__canvas-status">
+                <span class="storefront-editor__canvas-chip">{{ sections().length }} sections</span>
+                <span class="storefront-editor__canvas-chip">{{ featuredProductsPreview().length }} featured</span>
                 <span class="storefront-editor__canvas-chip">{{ viewport() === 'desktop' ? 'Desktop preview' : 'Mobile preview' }}</span>
               </div>
             </div>
@@ -360,40 +358,210 @@
 
                   @for (section of sections(); track trackSection($index, section)) {
                     @if (section.enabled) {
-                      @switch (section.type) {
+                      <div
+                        class="storefront-editor__canvas-section"
+                        [class.storefront-editor__canvas-section--selected]="isSectionSelected(section.id)"
+                        [class.storefront-editor__canvas-section--has-selected-block]="selectedSectionId() === section.id && selectedBlockId() !== null"
+                        (click)="selectSection(section.id)"
+                      >
+                        <div class="storefront-editor__canvas-section-bar">
+                          <span>{{ sectionLabel(section) }}</span>
+                          <span>{{ blocksForSection(section).length }} blocks</span>
+                        </div>
+
+                        @switch (section.type) {
                         @case ('announcement-bar') {
                           <section class="preview-announcement">
                             <div class="preview-announcement__inner">
-                              <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
+                              @if (isInlineEditing(section.id + ':announcement-text')) {
+                                <input
+                                  class="storefront-editor__inline-input storefront-editor__inline-input--announcement"
+                                  [ngModel]="readStringProp(section, 'text')"
+                                  (ngModelChange)="updateBlockStringProp(section.id + ':announcement-text', $event)"
+                                  (click)="$event.stopPropagation()"
+                                  (blur)="stopInlineEditing()"
+                                  (keydown.enter)="stopInlineEditing()"
+                                />
+                              } @else {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__canvas-block storefront-editor__canvas-block--text"
+                                  [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':announcement-text')"
+                                  (click)="selectBlock(section.id, section.id + ':announcement-text'); $event.stopPropagation()"
+                                  (dblclick)="startInlineEditing(section.id + ':announcement-text'); $event.stopPropagation()"
+                                >
+                                  {{ readStringProp(section, 'text') || 'Announcement text' }}
+                                </button>
+                              }
                               @if (readStringProp(section, 'linkLabel')) {
-                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'linkLabel') }}</a>
+                                @if (isInlineEditing(section.id + ':announcement-link')) {
+                                  <input
+                                    class="storefront-editor__inline-input storefront-editor__inline-input--announcement-link"
+                                    [ngModel]="readStringProp(section, 'linkLabel')"
+                                    (ngModelChange)="updateBlockStringProp(section.id + ':announcement-link', $event)"
+                                    (click)="$event.stopPropagation()"
+                                    (blur)="stopInlineEditing()"
+                                    (keydown.enter)="stopInlineEditing()"
+                                  />
+                                } @else {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__canvas-block storefront-editor__canvas-block--button-link"
+                                    [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':announcement-link')"
+                                    (click)="selectBlock(section.id, section.id + ':announcement-link'); $event.stopPropagation()"
+                                    (dblclick)="startInlineEditing(section.id + ':announcement-link'); $event.stopPropagation()"
+                                  >
+                                    {{ readStringProp(section, 'linkLabel') }}
+                                  </button>
+                                }
                               }
                             </div>
                           </section>
                         }
                         @case ('hero') {
                           <section class="preview-hero">
-                            <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</p>
-                            <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || 'Your headline goes here' }}</h3>
-                            <p class="preview-hero__copy">{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</p>
+                            @if (isInlineEditing(section.id + ':hero-eyebrow')) {
+                              <input
+                                class="storefront-editor__inline-input storefront-editor__inline-input--eyebrow"
+                                [ngModel]="readStringProp(section, 'eyebrow')"
+                                (ngModelChange)="updateBlockStringProp(section.id + ':hero-eyebrow', $event)"
+                                (click)="$event.stopPropagation()"
+                                (blur)="stopInlineEditing()"
+                                (keydown.enter)="stopInlineEditing()"
+                              />
+                            } @else {
+                              <button
+                                type="button"
+                                class="storefront-editor__canvas-block storefront-editor__canvas-block--eyebrow"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':hero-eyebrow')"
+                                (click)="selectBlock(section.id, section.id + ':hero-eyebrow'); $event.stopPropagation()"
+                                (dblclick)="startInlineEditing(section.id + ':hero-eyebrow'); $event.stopPropagation()"
+                              >
+                                {{ readStringProp(section, 'eyebrow') || 'Storefront' }}
+                              </button>
+                            }
+                            @if (isInlineEditing(section.id + ':hero-title')) {
+                              <textarea
+                                rows="2"
+                                class="storefront-editor__inline-input storefront-editor__inline-input--title"
+                                [ngModel]="readStringProp(section, 'title')"
+                                (ngModelChange)="updateBlockStringProp(section.id + ':hero-title', $event)"
+                                (click)="$event.stopPropagation()"
+                                (blur)="stopInlineEditing()"
+                              ></textarea>
+                            } @else {
+                              <button
+                                type="button"
+                                class="storefront-editor__canvas-block storefront-editor__canvas-block--title"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':hero-title')"
+                                (click)="selectBlock(section.id, section.id + ':hero-title'); $event.stopPropagation()"
+                                (dblclick)="startInlineEditing(section.id + ':hero-title'); $event.stopPropagation()"
+                              >
+                                {{ readStringProp(section, 'title') || 'Your headline goes here' }}
+                              </button>
+                            }
+                            @if (isInlineEditing(section.id + ':hero-description')) {
+                              <textarea
+                                rows="4"
+                                class="storefront-editor__inline-input storefront-editor__inline-input--description"
+                                [ngModel]="readStringProp(section, 'description')"
+                                (ngModelChange)="updateBlockStringProp(section.id + ':hero-description', $event)"
+                                (click)="$event.stopPropagation()"
+                                (blur)="stopInlineEditing()"
+                              ></textarea>
+                            } @else {
+                              <button
+                                type="button"
+                                class="storefront-editor__canvas-block storefront-editor__canvas-block--copy"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':hero-description')"
+                                (click)="selectBlock(section.id, section.id + ':hero-description'); $event.stopPropagation()"
+                                (dblclick)="startInlineEditing(section.id + ':hero-description'); $event.stopPropagation()"
+                              >
+                                {{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}
+                              </button>
+                            }
                             <div class="preview-hero__actions">
-                              <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}</a>
-                              <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}</button>
+                              @if (isInlineEditing(section.id + ':hero-primary-cta')) {
+                                <input
+                                  class="storefront-editor__inline-input storefront-editor__inline-input--button"
+                                  [ngModel]="readStringProp(section, 'primaryCtaLabel')"
+                                  (ngModelChange)="updateBlockStringProp(section.id + ':hero-primary-cta', $event)"
+                                  (click)="$event.stopPropagation()"
+                                  (blur)="stopInlineEditing()"
+                                  (keydown.enter)="stopInlineEditing()"
+                                />
+                              } @else {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__canvas-block storefront-editor__canvas-block--primary-button"
+                                  [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':hero-primary-cta')"
+                                  (click)="selectBlock(section.id, section.id + ':hero-primary-cta'); $event.stopPropagation()"
+                                  (dblclick)="startInlineEditing(section.id + ':hero-primary-cta'); $event.stopPropagation()"
+                                >
+                                  {{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}
+                                </button>
+                              }
+                              @if (isInlineEditing(section.id + ':hero-secondary-cta')) {
+                                <input
+                                  class="storefront-editor__inline-input storefront-editor__inline-input--button"
+                                  [ngModel]="readStringProp(section, 'secondaryCtaLabel')"
+                                  (ngModelChange)="updateBlockStringProp(section.id + ':hero-secondary-cta', $event)"
+                                  (click)="$event.stopPropagation()"
+                                  (blur)="stopInlineEditing()"
+                                  (keydown.enter)="stopInlineEditing()"
+                                />
+                              } @else {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__canvas-block storefront-editor__canvas-block--secondary-button"
+                                  [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':hero-secondary-cta')"
+                                  (click)="selectBlock(section.id, section.id + ':hero-secondary-cta'); $event.stopPropagation()"
+                                  (dblclick)="startInlineEditing(section.id + ':hero-secondary-cta'); $event.stopPropagation()"
+                                >
+                                  {{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}
+                                </button>
+                              }
                             </div>
                           </section>
                         }
                         @case ('featured-products') {
-                          <section class="preview-products" id="featured">
+                          <section
+                            class="preview-products"
+                            id="featured"
+                          >
                             <div class="preview-products__head">
                               <div>
                                 <p class="preview-products__eyebrow">Catalog</p>
-                                <h3 class="preview-products__title">{{ readStringProp(section, 'title') || 'Featured products' }}</h3>
+                                @if (isInlineEditing(section.id + ':featured-title')) {
+                                  <input
+                                    class="storefront-editor__inline-input storefront-editor__inline-input--products"
+                                    [ngModel]="readStringProp(section, 'title')"
+                                    (ngModelChange)="updateBlockStringProp(section.id + ':featured-title', $event)"
+                                    (click)="$event.stopPropagation()"
+                                    (blur)="stopInlineEditing()"
+                                    (keydown.enter)="stopInlineEditing()"
+                                  />
+                                } @else {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__canvas-block storefront-editor__canvas-block--products-title"
+                                    [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':featured-title')"
+                                    (click)="selectBlock(section.id, section.id + ':featured-title'); $event.stopPropagation()"
+                                    (dblclick)="startInlineEditing(section.id + ':featured-title'); $event.stopPropagation()"
+                                  >
+                                    {{ readStringProp(section, 'title') || 'Featured products' }}
+                                  </button>
+                                }
                               </div>
                               <span class="preview-products__helper">{{ featuredProductsPreview().length }} selected</span>
                             </div>
 
                             @if (featuredProductsPreview().length) {
-                              <div class="preview-products__grid">
+                              <div
+                                class="preview-products__grid"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':featured-grid')"
+                                (click)="selectBlock(section.id, section.id + ':featured-grid'); $event.stopPropagation()"
+                              >
                                 @for (product of featuredProductsPreview(); track trackProduct($index, product)) {
                                   <article class="preview-products__card">
                                     <div class="preview-products__thumb">
@@ -412,20 +580,66 @@
                                 }
                               </div>
                             } @else {
-                              <div class="preview-products__empty">Choose products in the inspector to feature them here.</div>
+                              <div
+                                class="preview-products__empty"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':featured-grid')"
+                                (click)="selectBlock(section.id, section.id + ':featured-grid'); $event.stopPropagation()"
+                              >
+                                Choose products in the inspector to feature them here.
+                              </div>
                             }
                           </section>
                         }
                         @case ('footer') {
                           <footer class="preview-footer">
-                            <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
+                            @if (isInlineEditing(section.id + ':footer-brand')) {
+                              <input
+                                class="storefront-editor__inline-input storefront-editor__inline-input--footer-brand"
+                                [ngModel]="readStringProp(section, 'brandText')"
+                                (ngModelChange)="updateBlockStringProp(section.id + ':footer-brand', $event)"
+                                (click)="$event.stopPropagation()"
+                                (blur)="stopInlineEditing()"
+                                (keydown.enter)="stopInlineEditing()"
+                              />
+                            } @else {
+                              <button
+                                type="button"
+                                class="storefront-editor__canvas-block storefront-editor__canvas-block--footer-brand"
+                                [class.storefront-editor__canvas-block--selected]="isBlockSelected(section.id + ':footer-brand')"
+                                (click)="selectBlock(section.id, section.id + ':footer-brand'); $event.stopPropagation()"
+                                (dblclick)="startInlineEditing(section.id + ':footer-brand'); $event.stopPropagation()"
+                              >
+                                {{ readStringProp(section, 'brandText') || storeName() }}
+                              </button>
+                            }
                             <div class="preview-footer__meta">
-                              <span>{{ readStringProp(section, 'contactEmail') || 'store@example.com' }}</span>
-                              <span>{{ readStringProp(section, 'contactPhone') || '+216 00 000 000' }}</span>
+                              @for (blockId of [section.id + ':footer-email', section.id + ':footer-phone']; track blockId) {
+                                @if (isInlineEditing(blockId)) {
+                                  <input
+                                    class="storefront-editor__inline-input storefront-editor__inline-input--footer-meta"
+                                    [ngModel]="blockId.endsWith('footer-email') ? readStringProp(section, 'contactEmail') : readStringProp(section, 'contactPhone')"
+                                    (ngModelChange)="updateBlockStringProp(blockId, $event)"
+                                    (click)="$event.stopPropagation()"
+                                    (blur)="stopInlineEditing()"
+                                    (keydown.enter)="stopInlineEditing()"
+                                  />
+                                } @else {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__canvas-block storefront-editor__canvas-block--footer-meta"
+                                    [class.storefront-editor__canvas-block--selected]="isBlockSelected(blockId)"
+                                    (click)="selectBlock(section.id, blockId); $event.stopPropagation()"
+                                    (dblclick)="startInlineEditing(blockId); $event.stopPropagation()"
+                                  >
+                                    {{ blockId.endsWith('footer-email') ? (readStringProp(section, 'contactEmail') || 'store@example.com') : (readStringProp(section, 'contactPhone') || '+216 00 000 000') }}
+                                  </button>
+                                }
+                              }
                             </div>
                           </footer>
                         }
                       }
+                      </div>
                     }
                   }
                 </div>
@@ -435,7 +649,85 @@
 
           <aside class="storefront-editor__inspector-shell">
             <div class="storefront-editor__sidebar-card storefront-editor__sidebar-card--inspector">
-              @if (pageSettingsSelected()) {
+              @if (selectedBlock(); as block) {
+                <div class="storefront-editor__inspector-head">
+                  <div>
+                    <p class="storefront-editor__sidebar-label">Block inspector</p>
+                    <h2 class="storefront-editor__sidebar-title">{{ block.label }}</h2>
+                  </div>
+                  <span class="storefront-editor__inspector-badge">{{ blockKindLabel(block.kind) }}</span>
+                </div>
+
+                <p class="storefront-editor__inspector-copy">
+                  Edit this block directly from the canvas or refine it here. Double-click the selected block on the preview for inline editing.
+                </p>
+
+                @if (block.propKey) {
+                  <label class="storefront-editor__field">
+                    <span>Content</span>
+                    @if (block.multiline) {
+                      <textarea
+                        rows="5"
+                        [ngModel]="blockValue(block)"
+                        (ngModelChange)="updateBlockStringProp(block.id, $event)"
+                        [placeholder]="blockPlaceholder(block)"
+                      ></textarea>
+                    } @else {
+                      <input
+                        type="text"
+                        [ngModel]="blockValue(block)"
+                        (ngModelChange)="updateBlockStringProp(block.id, $event)"
+                        [placeholder]="blockPlaceholder(block)"
+                      />
+                    }
+                  </label>
+                } @else {
+                  <div class="storefront-editor__hint-panel">
+                    <strong>Product grid settings</strong>
+                    <span>{{ block.description }}</span>
+                  </div>
+                }
+
+                <div class="storefront-editor__stack-actions">
+                  <button type="button" class="storefront-editor__mini-action" (click)="startInlineEditing(block.id)">Edit on canvas</button>
+                  <button type="button" class="storefront-editor__mini-action" (click)="selectSection(block.sectionId)">Select section</button>
+                </div>
+
+                @if (block.kind === 'product-list' && selectedSection(); as section) {
+                  <label class="storefront-editor__field">
+                    <span>Section title</span>
+                    <input type="text" [ngModel]="readStringProp(section, 'title')" (ngModelChange)="updateSelectedStringProp('title', $event)" />
+                  </label>
+
+                  <label class="storefront-editor__field">
+                    <span>Max items</span>
+                    <input type="number" min="1" max="8" [ngModel]="readNumberProp(section, 'maxItems', 4)" (ngModelChange)="updateSelectedNumberProp('maxItems', $event)" />
+                  </label>
+
+                  <div class="storefront-editor__product-picker">
+                    <p class="storefront-editor__field-label">Featured products</p>
+                    @if (products().length) {
+                      <div class="storefront-editor__product-list">
+                        @for (product of products(); track trackProduct($index, product)) {
+                          <label class="storefront-editor__product-option">
+                            <input
+                              type="checkbox"
+                              [checked]="isFeaturedProductSelected(product.id)"
+                              (change)="toggleFeaturedProduct(product.id, $any($event.target).checked)"
+                            />
+                            <span class="storefront-editor__product-option-copy">
+                              <strong>{{ product.name }}</strong>
+                              <small>{{ product.price | number: '1.2-2' }} TND</small>
+                            </span>
+                          </label>
+                        }
+                      </div>
+                    } @else {
+                      <p class="storefront-editor__hint">Add products in the catalog first, then feature them here.</p>
+                    }
+                  </div>
+                }
+              } @else if (pageSettingsSelected()) {
                 <div class="storefront-editor__inspector-head">
                   <div>
                     <p class="storefront-editor__sidebar-label">Page settings</p>
