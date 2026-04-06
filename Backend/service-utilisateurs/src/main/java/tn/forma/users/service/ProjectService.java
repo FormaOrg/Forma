@@ -29,6 +29,7 @@ public class ProjectService {
     private final PortfolioPageService portfolioPageService;
     private final PortfolioInquiryService portfolioInquiryService;
 
+    @Transactional(readOnly = true)
     public List<ProjectDto> getMyProjects(String email) {
         User user = getUserByEmail(email);
         return projectRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId())
@@ -37,6 +38,7 @@ public class ProjectService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public ProjectDto getProjectById(String email, Long projectId) {
         return mapToDto(getOwnedProject(email, projectId));
     }
