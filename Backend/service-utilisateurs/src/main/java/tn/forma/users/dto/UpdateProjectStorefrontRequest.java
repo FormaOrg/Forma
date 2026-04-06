@@ -1,6 +1,5 @@
 package tn.forma.users.dto;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +21,6 @@ public class UpdateProjectStorefrontRequest {
     @Size(max = 80)
     private String activePageKey;
 
-    private JsonNode draftHomepage;
+    private Object draftHomepage;
+    private Object editorSession;
 }

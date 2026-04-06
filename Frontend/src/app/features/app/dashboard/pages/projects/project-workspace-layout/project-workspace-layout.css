@@ -5,7 +5,6 @@
 
 .project-workspace {
   width: 100%;
-  padding: 24px 24px 32px;
 }
 
 .project-workspace__content {
@@ -14,10 +13,4 @@
 
 :host-context(.theme-dark) {
   background: #10141c;
-}
-
-@media (max-width: 960px) {
-  .project-workspace {
-    padding: 18px 14px 24px;
-  }
 }

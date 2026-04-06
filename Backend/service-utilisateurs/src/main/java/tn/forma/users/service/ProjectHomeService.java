@@ -7,11 +7,16 @@ import tn.forma.users.dto.ProjectHomeActionDto;
 import tn.forma.users.dto.ProjectHomeActivityDto;
 import tn.forma.users.dto.ProjectHomeMetricDto;
 import tn.forma.users.dto.ProjectHomePageDto;
+import tn.forma.users.model.PortfolioPage;
+import tn.forma.users.model.ProjectAnalyticsEvent;
+import tn.forma.users.model.ProjectAnalyticsEventType;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectCustomer;
 import tn.forma.users.model.ProjectOrder;
 import tn.forma.users.model.ProjectProduct;
+import tn.forma.users.model.ProjectType;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectAnalyticsEventRepository;
 import tn.forma.users.repository.ProjectCustomerRepository;
 import tn.forma.users.repository.ProjectOrderRepository;
 import tn.forma.users.repository.ProjectProductRepository;
@@ -35,6 +40,8 @@ public class ProjectHomeService {
     private final ProjectOrderRepository projectOrderRepository;
     private final ProjectProductRepository projectProductRepository;
     private final ProjectCustomerRepository projectCustomerRepository;
+    private final PortfolioPageService portfolioPageService;
+    private final ProjectAnalyticsEventRepository projectAnalyticsEventRepository;
     private final UserRepository userRepository;
 
     public ProjectHomePageDto getHomePage(String email, Long projectId) {
@@ -42,18 +49,28 @@ public class ProjectHomeService {
         List<ProjectProduct> products = projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId());
         List<ProjectCustomer> customers = projectCustomerRepository.findAllByProjectIdOrderByCreatedAtDesc(project.getId());
         List<ProjectOrder> orders = projectOrderRepository.findAllByProjectIdOrderByPlacedAtDesc(project.getId());
+        List<PortfolioPage> portfolioPages = project.getType() == ProjectType.PORTFOLIO
+                ? portfolioPageService.ensureDefaultPages(project)
+                : List.of();
+        List<ProjectAnalyticsEvent> portfolioInquiryEvents = project.getType() == ProjectType.PORTFOLIO
+                ? projectAnalyticsEventRepository.findAllByProjectIdAndOccurredAtGreaterThanEqualAndOccurredAtLessThanOrderByOccurredAtAsc(
+                        project.getId(),
+                        LocalDateTime.now().minusYears(5),
+                        LocalDateTime.now().plusDays(1)
+                ).stream().filter(event -> event.getEventType() == ProjectAnalyticsEventType.INQUIRY_SUBMITTED).toList()
+                : List.of();
 
         return ProjectHomePageDto.builder()
                 .projectId(project.getId())
                 .projectName(project.getName())
                 .ownerName(displayName(project.getUser()))
-                .projectStatus(project.getStatus().name())
+                .projectStatus(project.getStatus() != null ? project.getStatus().name() : "DRAFT")
                 .published(project.isPublished())
-                .projectType(project.getType().name())
-                .creationMethod(project.getCreationMethod().name())
-                .metrics(buildMetrics(project, products, customers, orders))
-                .recentActivities(buildActivities(project, products, customers, orders))
-                .suggestedActions(buildActions(project, products, customers, orders))
+                .projectType(project.getType() != null ? project.getType().name() : ProjectType.BUSINESS.name())
+                .creationMethod(project.getCreationMethod() != null ? project.getCreationMethod().name() : "")
+                .metrics(buildMetrics(project, products, customers, orders, portfolioPages, portfolioInquiryEvents))
+                .recentActivities(buildActivities(project, products, customers, orders, portfolioPages, portfolioInquiryEvents))
+                .suggestedActions(buildActions(project, products, customers, orders, portfolioPages, portfolioInquiryEvents))
                 .build();
     }
 
@@ -61,8 +78,36 @@ public class ProjectHomeService {
             Project project,
             List<ProjectProduct> products,
             List<ProjectCustomer> customers,
-            List<ProjectOrder> orders
+            List<ProjectOrder> orders,
+            List<PortfolioPage> portfolioPages,
+            List<ProjectAnalyticsEvent> portfolioInquiryEvents
     ) {
+        if (project.getType() == ProjectType.PORTFOLIO) {
+            long publishedPages = portfolioPages.stream().filter(page -> page.getStatus() == tn.forma.users.model.PortfolioPageStatus.PUBLISHED).count();
+            return List.of(
+                    ProjectHomeMetricDto.builder()
+                            .label("Pages")
+                            .value(String.valueOf(portfolioPages.size()))
+                            .helper(publishedPages + " published in the portfolio")
+                            .build(),
+                    ProjectHomeMetricDto.builder()
+                            .label("Inquiries")
+                            .value(String.valueOf(portfolioInquiryEvents.size()))
+                            .helper(portfolioInquiryEvents.isEmpty() ? "No inquiry events yet" : "Tracked from live portfolio activity")
+                            .build(),
+                    ProjectHomeMetricDto.builder()
+                            .label("Published")
+                            .value(String.valueOf(publishedPages))
+                            .helper("Pages currently ready for visitors")
+                            .build(),
+                    ProjectHomeMetricDto.builder()
+                            .label("Launch state")
+                            .value(project.getStatus() == null ? "Draft" : formatStatus(project.getStatus().name()))
+                            .helper(project.isPublished() ? "Live portfolio is visible to visitors" : "Still private while you refine the portfolio")
+                            .build()
+            );
+        }
+
         BigDecimal revenue = orders.stream()
                 .map(ProjectOrder::getTotal)
                 .filter(Objects::nonNull)
@@ -98,8 +143,14 @@ public class ProjectHomeService {
             Project project,
             List<ProjectProduct> products,
             List<ProjectCustomer> customers,
-            List<ProjectOrder> orders
+            List<ProjectOrder> orders,
+            List<PortfolioPage> portfolioPages,
+            List<ProjectAnalyticsEvent> portfolioInquiryEvents
     ) {
+        if (project.getType() == ProjectType.PORTFOLIO) {
+            return buildPortfolioActivities(project, portfolioPages, portfolioInquiryEvents);
+        }
+
         List<ActivityEvent> events = new ArrayList<>();
         events.add(new ActivityEvent(
                 project.getUpdatedAt() != null ? project.getUpdatedAt() : project.getCreatedAt(),
@@ -148,8 +199,14 @@ public class ProjectHomeService {
             Project project,
             List<ProjectProduct> products,
             List<ProjectCustomer> customers,
-            List<ProjectOrder> orders
+            List<ProjectOrder> orders,
+            List<PortfolioPage> portfolioPages,
+            List<ProjectAnalyticsEvent> portfolioInquiryEvents
     ) {
+        if (project.getType() == ProjectType.PORTFOLIO) {
+            return buildPortfolioActions(project, portfolioPages, portfolioInquiryEvents);
+        }
+
         List<ProjectHomeActionDto> actions = new ArrayList<>();
 
         if (!project.isPublished()) {
@@ -194,6 +251,111 @@ public class ProjectHomeService {
         }
 
         return actions.stream().limit(3).toList();
+    }
+
+    private List<ProjectHomeActivityDto> buildPortfolioActivities(
+            Project project,
+            List<PortfolioPage> pages,
+            List<ProjectAnalyticsEvent> inquiryEvents
+    ) {
+        List<ActivityEvent> events = new ArrayList<>();
+        events.add(new ActivityEvent(
+                project.getUpdatedAt() != null ? project.getUpdatedAt() : project.getCreatedAt(),
+                "Project updated",
+                project.isPublished()
+                        ? "Your live portfolio settings were updated."
+                        : "Your portfolio draft was updated and saved.",
+                "/app/projects/" + project.getId() + "/home"
+        ));
+
+        pages.forEach(page -> events.add(new ActivityEvent(
+                page.getUpdatedAt() != null ? page.getUpdatedAt() : page.getCreatedAt(),
+                page.isFeatured() ? "Homepage updated" : page.getTitle() + " page reviewed",
+                page.getDescription(),
+                "/app/projects/" + project.getId() + "/pages"
+        )));
+
+        inquiryEvents.stream()
+                .sorted(Comparator.comparing(ProjectAnalyticsEvent::getOccurredAt, Comparator.reverseOrder()))
+                .limit(3)
+                .forEach(event -> events.add(new ActivityEvent(
+                        event.getOccurredAt(),
+                        "Inquiry captured",
+                        buildInquiryDescription(event),
+                        "/app/projects/" + project.getId() + "/audience"
+                )));
+
+        return events.stream()
+                .filter(event -> event.occurredAt() != null)
+                .sorted(Comparator.comparing(ActivityEvent::occurredAt, Comparator.reverseOrder()))
+                .limit(6)
+                .map(event -> ProjectHomeActivityDto.builder()
+                        .title(event.title())
+                        .description(event.description())
+                        .occurredAt(Objects.toString(event.occurredAt(), null))
+                        .route(event.route())
+                        .build())
+                .toList();
+    }
+
+    private List<ProjectHomeActionDto> buildPortfolioActions(
+            Project project,
+            List<PortfolioPage> pages,
+            List<ProjectAnalyticsEvent> inquiryEvents
+    ) {
+        List<ProjectHomeActionDto> actions = new ArrayList<>();
+        long publishedPages = pages.stream().filter(page -> page.getStatus() == tn.forma.users.model.PortfolioPageStatus.PUBLISHED).count();
+        boolean hasDraftPages = pages.stream().anyMatch(page -> page.getStatus() == tn.forma.users.model.PortfolioPageStatus.DRAFT);
+
+        if (!project.isPublished()) {
+            actions.add(ProjectHomeActionDto.builder()
+                    .title("Publish your portfolio")
+                    .description("Move the project out of draft once your core pages and inquiry flow are ready.")
+                    .route("/app/projects/" + project.getId())
+                    .actionLabel("Open setup")
+                    .build());
+        }
+        if (hasDraftPages || publishedPages < pages.size()) {
+            actions.add(ProjectHomeActionDto.builder()
+                    .title("Refine homepage and case studies")
+                    .description("Tighten the page structure, featured work, and supporting copy before you share the portfolio.")
+                    .route("/app/projects/" + project.getId() + "/pages")
+                    .actionLabel("Review pages")
+                    .build());
+        }
+        if (inquiryEvents.isEmpty()) {
+            actions.add(ProjectHomeActionDto.builder()
+                    .title("Tighten the contact flow")
+                    .description("Make sure your contact page and inquiry path are clear before traffic starts landing.")
+                    .route("/app/projects/" + project.getId() + "/audience")
+                    .actionLabel("View inquiries")
+                    .build());
+        }
+        if (actions.isEmpty()) {
+            actions.add(ProjectHomeActionDto.builder()
+                    .title("Check portfolio analytics")
+                    .description("Review how visitors move across your pages and where inquiries are starting to land.")
+                    .route("/app/projects/" + project.getId() + "/analytics")
+                    .actionLabel("Open analytics")
+                    .build());
+        }
+
+        return actions.stream().limit(3).toList();
+    }
+
+    private String buildInquiryDescription(ProjectAnalyticsEvent event) {
+        String pageTitle = event.getPageTitle() != null && !event.getPageTitle().isBlank() ? event.getPageTitle() : "your portfolio";
+        String source = event.getSourceType() != null ? formatStatus(event.getSourceType().name()) : "Direct";
+        return "A new inquiry was captured from " + pageTitle + " via " + source.toLowerCase() + " traffic.";
+    }
+
+    private String formatStatus(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        String normalized = value.replace('_', ' ').toLowerCase();
+        return Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
     }
 
     private Project getOwnedProject(String email, Long projectId) {

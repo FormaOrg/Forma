@@ -26,6 +26,8 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final TemplateService templateService;
     private final FileUploadService fileUploadService;
+    private final PortfolioPageService portfolioPageService;
+    private final PortfolioInquiryService portfolioInquiryService;
 
     public List<ProjectDto> getMyProjects(String email) {
         User user = getUserByEmail(email);
@@ -140,6 +142,8 @@ public class ProjectService {
     public void deleteProject(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
         String logoPublicId = blankToNull(project.getLogoPublicId());
+        portfolioPageService.deletePagesForProject(projectId);
+        portfolioInquiryService.deleteInquiriesForProject(projectId);
         projectRepository.delete(project);
         if (logoPublicId != null) {
             fileUploadService.deleteByPublicId(logoPublicId);
