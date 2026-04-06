@@ -25,6 +25,7 @@ import { StorefrontSectionType } from '../../../../../../core/models/project-sto
 
 type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
+type PagesPanelLayoutMode = 'grid' | 'rows';
 
 @Component({
   selector: 'app-project-storefront-editor',
@@ -72,11 +73,17 @@ export class ProjectStorefrontEditor {
   readonly isAccountMenuOpen = signal(false);
   readonly isZoomMenuOpen = signal(false);
   readonly isPagesPanelOpen = signal(false);
+  readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
+  readonly pageCardMenuId = signal<string | null>(null);
+  readonly pageCardMenuTop = signal(0);
+  readonly pageCardMenuLeft = signal(0);
   readonly sectionLibraryTargetId = signal<string | null>(null);
   readonly sectionOptionsMenuId = signal<string | null>(null);
   readonly draggedSectionId = signal<string | null>(null);
   readonly hoveredSectionId = signal<string | null>(null);
   readonly hoveredSectionRailTop = signal(0);
+  readonly hasPreviewStageScrollbar = signal(false);
+  readonly previewStageScrollbarWidth = signal(0);
   readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
   readonly zoomPercent = signal(120);
   readonly isLoading = signal(true);
@@ -176,7 +183,7 @@ export class ProjectStorefrontEditor {
     const baseWidth = this.viewport() === 'mobile' ? 390 : 1200;
     return Math.round(baseWidth * (this.zoomPercent() / 100));
   });
-  readonly previewStageWidth = computed(() => this.previewFrameWidth() + 4);
+  readonly previewStageWidth = computed(() => this.previewFrameWidth() + 4 + this.previewStageScrollbarWidth());
   readonly isCompactPreviewChrome = computed(() => this.previewFrameWidth() <= 780);
   readonly isNarrowPreviewChrome = computed(() => this.previewFrameWidth() <= 620);
   readonly isUltraNarrowPreviewChrome = computed(() => this.previewFrameWidth() <= 460);
@@ -224,23 +231,31 @@ export class ProjectStorefrontEditor {
     }
   }
 
+  @HostListener('window:resize')
+  handleWindowResize(): void {
+    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
+  }
+
   @HostListener('document:mousedown', ['$event'])
   handleDocumentMouseDown(event: MouseEvent): void {
-    if (!this.sectionOptionsMenuId()) {
-      return;
-    }
-
     const target = event.target;
     if (!(target instanceof Element)) {
       this.sectionOptionsMenuId.set(null);
+      this.pageCardMenuId.set(null);
       return;
     }
 
-    if (target.closest('.storefront-editor__preview-section-menu, .storefront-editor__preview-section-rail-more')) {
-      return;
+    if (this.sectionOptionsMenuId()) {
+      if (!target.closest('.storefront-editor__preview-section-menu, .storefront-editor__preview-section-rail-more')) {
+        this.sectionOptionsMenuId.set(null);
+      }
     }
 
-    this.sectionOptionsMenuId.set(null);
+    if (this.pageCardMenuId()) {
+      if (!target.closest('.storefront-editor__page-card-menu, .storefront-editor__page-card-more')) {
+        this.pageCardMenuId.set(null);
+      }
+    }
   }
 
   loadEditor(): void {
@@ -299,6 +314,7 @@ export class ProjectStorefrontEditor {
           this.selectedSectionId.set(editorSession.selectedSectionId);
           this.viewport.set(editorSession.viewport);
           this.zoomPercent.set(editorSession.zoomPercent);
+          setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
         },
         error: () => {
           this.project.set(null);
@@ -336,6 +352,7 @@ export class ProjectStorefrontEditor {
   setViewport(viewport: StorefrontEditorViewport): void {
     this.viewport.set(viewport);
     this.syncEditorSessionState({ viewport });
+    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
   }
 
   toggleFormaMenu(): void {
@@ -377,8 +394,25 @@ export class ProjectStorefrontEditor {
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
     this.isPagesPanelOpen.set(false);
+    this.pageCardMenuId.set(null);
     this.sectionLibraryTargetId.set(null);
     this.sectionOptionsMenuId.set(null);
+  }
+
+  togglePageCardMenu(pageId: string, event?: MouseEvent): void {
+    if (this.pageCardMenuId() === pageId) {
+      this.pageCardMenuId.set(null);
+      return;
+    }
+
+    const target = event?.currentTarget;
+    if (target instanceof HTMLElement) {
+      const rect = target.getBoundingClientRect();
+      this.pageCardMenuTop.set(rect.top);
+      this.pageCardMenuLeft.set(rect.right + 8);
+    }
+
+    this.pageCardMenuId.set(pageId);
   }
 
   toggleSectionOptions(sectionId: string): void {
@@ -386,6 +420,8 @@ export class ProjectStorefrontEditor {
   }
 
   syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
+    this.updatePreviewStageScrollbarState();
+
     const selectedSectionId = this.selectedSectionId();
     if (!selectedSectionId && !sectionElement) {
       return;
@@ -415,6 +451,7 @@ export class ProjectStorefrontEditor {
     this.zoomPercent.set(clamped);
     this.isZoomMenuOpen.set(false);
     this.syncEditorSessionState({ zoomPercent: clamped });
+    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
   }
 
   nudgeZoom(direction: 'in' | 'out'): void {
@@ -474,6 +511,7 @@ export class ProjectStorefrontEditor {
   }
 
   selectHomePage(): void {
+    this.pageCardMenuId.set(null);
     this.isPagesPanelOpen.set(false);
   }
 
@@ -1197,6 +1235,19 @@ export class ProjectStorefrontEditor {
     }
 
     return Math.min(200, Math.max(50, Math.round(parsed)));
+  }
+
+  private updatePreviewStageScrollbarState(): void {
+    const stage = document.querySelector('.storefront-editor__preview-stage') as HTMLElement | null;
+    if (!stage) {
+      this.hasPreviewStageScrollbar.set(false);
+      this.previewStageScrollbarWidth.set(0);
+      return;
+    }
+
+    const hasScrollbar = stage.scrollHeight > stage.clientHeight + 1;
+    this.hasPreviewStageScrollbar.set(hasScrollbar);
+    this.previewStageScrollbarWidth.set(hasScrollbar ? Math.max(0, stage.offsetWidth - stage.clientWidth) : 0);
   }
 
   private normalizeStorefront(storefront: ProjectStorefront): ProjectStorefront {
