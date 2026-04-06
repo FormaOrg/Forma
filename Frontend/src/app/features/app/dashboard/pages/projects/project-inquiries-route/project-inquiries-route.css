@@ -296,31 +296,69 @@ app-project-inquiries-route .project-inquiries__status--scheduled {
 }
 
 app-project-inquiries-route .project-inquiries__filters {
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
   align-items: center;
-  gap: 6px;
-  padding: 6px;
+  gap: 4px;
+  padding: 4px;
   border-radius: 999px;
   background: #f5f7fb;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  white-space: nowrap;
+}
+
+app-project-inquiries-route .project-inquiries__filters-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(25% - 4px);
+  border-radius: 999px;
+  background: #7566ff;
+  transition: transform 220ms cubic-bezier(0.33, 1, 0.68, 1);
+  pointer-events: none;
+}
+
+app-project-inquiries-route .project-inquiries__filters[data-status='new'] .project-inquiries__filters-pill {
+  transform: translateX(100%);
+}
+
+app-project-inquiries-route .project-inquiries__filters[data-status='replied'] .project-inquiries__filters-pill {
+  transform: translateX(200%);
+}
+
+app-project-inquiries-route .project-inquiries__filters[data-status='scheduled'] .project-inquiries__filters-pill {
+  transform: translateX(300%);
 }
 
 app-project-inquiries-route .project-inquiries__filter {
-  min-height: 34px;
+  position: relative;
+  z-index: 1;
+  min-height: 38px;
   padding: 0 14px;
   border: none;
   border-radius: 999px;
   background: transparent;
   color: rgba(11, 11, 18, 0.64);
   font: inherit;
-  font-size: 0.77rem;
+  font-size: 0.88rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+app-project-inquiries-route .project-inquiries__filter:hover {
+  color: #111111;
 }
 
 app-project-inquiries-route .project-inquiries__filter--active {
-  background: rgba(117, 102, 255, 0.1);
-  color: #7566ff;
+  color: #ffffff;
+}
+
+app-project-inquiries-route .project-inquiries__filter--active:hover {
+  color: #ffffff;
 }
 
 app-project-inquiries-route .project-inquiries__list {
@@ -503,12 +541,25 @@ app-project-inquiries-route .project-inquiries__skeleton + .project-inquiries__s
 }
 
 .theme-dark app-project-inquiries-route .project-inquiries__filters {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(226, 231, 244, 0.08);
+  background: #121925;
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-inquiries-route .project-inquiries__filters-pill {
+  background: #7566ff;
 }
 
 .theme-dark app-project-inquiries-route .project-inquiries__filter {
   color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-inquiries-route .project-inquiries__filter:hover {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-inquiries-route .project-inquiries__filter--active,
+.theme-dark app-project-inquiries-route .project-inquiries__filter--active:hover {
+  color: #ffffff;
 }
 
 @media (max-width: 980px) {
@@ -539,5 +590,26 @@ app-project-inquiries-route .project-inquiries__skeleton + .project-inquiries__s
   app-project-inquiries-route .project-inquiries__filters,
   app-project-inquiries-route .project-inquiries__detail-actions {
     width: 100%;
+  }
+
+  app-project-inquiries-route .project-inquiries__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 18px;
+  }
+
+  app-project-inquiries-route .project-inquiries__filters-pill {
+    width: calc(50% - 4px);
+  }
+
+  app-project-inquiries-route .project-inquiries__filters[data-status='new'] .project-inquiries__filters-pill {
+    transform: translateX(100%);
+  }
+
+  app-project-inquiries-route .project-inquiries__filters[data-status='replied'] .project-inquiries__filters-pill {
+    transform: translate(0, 100%);
+  }
+
+  app-project-inquiries-route .project-inquiries__filters[data-status='scheduled'] .project-inquiries__filters-pill {
+    transform: translate(100%, 100%);
   }
 }

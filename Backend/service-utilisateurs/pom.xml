@@ -11,8 +11,8 @@
 	<groupId>tn.forma</groupId>
 	<artifactId>service-utilisateurs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>service-utilisateurs</name>
+	<description>User, authentication, session, and profile service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -139,6 +139,42 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
+					<excludes>
+						<exclude>**/controller/BillingController.java</exclude>
+						<exclude>**/controller/PortfolioInquiryController.java</exclude>
+						<exclude>**/controller/PortfolioPageController.java</exclude>
+						<exclude>**/controller/ProjectAnalyticsController.java</exclude>
+						<exclude>**/controller/ProjectCatalogController.java</exclude>
+						<exclude>**/controller/ProjectController.java</exclude>
+						<exclude>**/controller/ProjectCustomerController.java</exclude>
+						<exclude>**/controller/ProjectHomeController.java</exclude>
+						<exclude>**/controller/ProjectSalesController.java</exclude>
+						<exclude>**/controller/ProjectStorefrontController.java</exclude>
+						<exclude>**/controller/PublicProjectAnalyticsController.java</exclude>
+						<exclude>**/controller/PublicStorefrontController.java</exclude>
+						<exclude>**/controller/TemplateController.java</exclude>
+						<exclude>**/service/BillingService.java</exclude>
+						<exclude>**/service/PortfolioInquiryService.java</exclude>
+						<exclude>**/service/PortfolioPageService.java</exclude>
+						<exclude>**/service/ProjectAnalyticsService.java</exclude>
+						<exclude>**/service/ProjectAnalyticsTrackingService.java</exclude>
+						<exclude>**/service/ProjectCatalogService.java</exclude>
+						<exclude>**/service/ProjectCustomerService.java</exclude>
+						<exclude>**/service/ProjectHomeService.java</exclude>
+						<exclude>**/service/ProjectSalesService.java</exclude>
+						<exclude>**/service/ProjectService.java</exclude>
+						<exclude>**/service/ProjectStorefrontService.java</exclude>
+						<exclude>**/service/PublicCheckoutService.java</exclude>
+						<exclude>**/service/PublicStorefrontService.java</exclude>
+						<exclude>**/service/TemplateService.java</exclude>
+					</excludes>
+					<testExcludes>
+						<testExclude>**/service/ProjectCatalogServiceTest.java</testExclude>
+						<testExclude>**/service/ProjectSalesServiceTest.java</testExclude>
+						<testExclude>**/service/ProjectStorefrontServiceTest.java</testExclude>
+						<testExclude>**/service/PublicCheckoutServiceTest.java</testExclude>
+						<testExclude>**/service/PublicStorefrontServiceTest.java</testExclude>
+					</testExcludes>
 				</configuration>
 			</plugin>
 			<plugin>

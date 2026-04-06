@@ -17,11 +17,11 @@
         <p class="project-pages__eyebrow">Portfolio structure</p>
         <h1 class="project-pages__title">Keep your core pages intentional.</h1>
         <p class="project-pages__subtitle">
-          {{ project.name }} now has a focused page map for your portfolio, with a cleaner view of what is published, what needs polish, and what still needs writing.
+          {{ project.projectName }} now has a focused page map for your portfolio, with a cleaner view of what is published, what needs polish, and what still needs writing.
         </p>
       </div>
 
-      <a class="project-pages__hero-action" [routerLink]="['/app/projects', project.id, 'editor']">Open editor</a>
+      <a class="project-pages__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">Open editor</a>
     </section>
 
     <section class="project-pages__summary-grid">
@@ -117,7 +117,7 @@
               </div>
               <div>
                 <span>Updated</span>
-                <strong>{{ selectedPage.updatedLabel }}</strong>
+                <strong>{{ formatDate(selectedPage.updatedAt) }}</strong>
               </div>
             </div>
 
@@ -130,7 +130,7 @@
               </ul>
             </div>
 
-            <a class="project-pages__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
+            <a class="project-pages__detail-action" [routerLink]="['/app/projects', project.projectId, 'editor']">
               Edit this page
             </a>
           </div>

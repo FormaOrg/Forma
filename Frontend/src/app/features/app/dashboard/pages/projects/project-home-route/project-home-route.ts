@@ -113,17 +113,9 @@ export class ProjectHomeRoute {
       ? 'Recommended focus areas based on your current pages, inquiry flow, and launch state.'
       : 'Actions derived from the current persisted state of this project.'
   );
-  readonly displayMetricCards = computed(() =>
-    this.isPortfolioWorkspace()
-      ? this.buildPortfolioMetricCards()
-      : this.buildDefaultMetricCards(this.metrics())
-  );
-  readonly displayActivities = computed(() =>
-    this.isPortfolioWorkspace() ? this.buildPortfolioActivities() : this.activities()
-  );
-  readonly displayActions = computed(() =>
-    this.isPortfolioWorkspace() ? this.buildPortfolioActions() : this.actions()
-  );
+  readonly displayMetricCards = computed(() => this.buildDefaultMetricCards(this.metrics()));
+  readonly displayActivities = computed(() => this.activities());
+  readonly displayActions = computed(() => this.actions());
   readonly statusPills = computed(() => {
     const page = this.page();
     if (!page) {
@@ -267,7 +259,9 @@ export class ProjectHomeRoute {
 
   private buildDefaultMetricCards(metrics: ProjectHomePage['metrics']): ProjectHomeMetricCard[] {
     const tones: ProjectHomeMetricTone[] = ['violet', 'blue', 'mint', 'amber'];
-    const icons: ProjectHomeMetricIcon[] = ['catalog', 'customer', 'order', 'revenue'];
+    const icons: ProjectHomeMetricIcon[] = this.isPortfolioWorkspace()
+      ? ['pages', 'audience', 'launch', 'launch']
+      : ['catalog', 'customer', 'order', 'revenue'];
 
     return metrics.map((metric, index) => ({
       ...metric,
@@ -276,110 +270,7 @@ export class ProjectHomeRoute {
     }));
   }
 
-  private buildPortfolioMetricCards(): ProjectHomeMetricCard[] {
-    return [
-      {
-        label: 'Pages',
-        value: '4',
-        helper: '2 published, 1 in progress, 1 draft',
-        tone: 'violet',
-        icon: 'pages',
-      },
-      {
-        label: 'Inquiries',
-        value: '3',
-        helper: '1 new lead, 2 active conversations',
-        tone: 'blue',
-        icon: 'audience',
-      },
-      {
-        label: 'Published',
-        value: '2',
-        helper: 'Home and About are ready for visitors',
-        tone: 'mint',
-        icon: 'launch',
-      },
-      {
-        label: 'Launch state',
-        value: 'Draft',
-        helper: 'Keep refining Projects and Contact before going live',
-        tone: 'amber',
-        icon: 'launch',
-      },
-    ];
-  }
-
-  private buildPortfolioActivities(): ProjectHomePage['recentActivities'] {
-    const page = this.page();
-    if (!page) {
-      return [];
-    }
-
-    return [
-      {
-        title: 'Page map reviewed',
-        description: `${page.projectName} now covers home, about, projects, and contact in the current structure.`,
-        occurredAt: this.minutesAgo(45),
-        route: this.projectRoute('pages'),
-      },
-      {
-        title: 'Inquiry flow checked',
-        description: 'Your contact experience is ready to capture new leads and keep active conversations visible.',
-        occurredAt: this.minutesAgo(120),
-        route: this.projectRoute('audience'),
-      },
-      {
-        title: 'Homepage polish in progress',
-        description: 'Your core pages are aligned around a clearer first impression and a stronger creative narrative.',
-        occurredAt: this.minutesAgo(210),
-        route: this.projectRoute('pages'),
-      },
-      {
-        title: page.published ? 'Portfolio published' : 'Draft polish in progress',
-        description: page.published
-          ? 'The live portfolio is ready to share while you keep refining pages and lead capture.'
-          : 'The portfolio stays private while you finish the final page and inquiry-flow polish.',
-        occurredAt: this.minutesAgo(360),
-        route: page.published ? this.projectRoute('analytics') : this.projectRoute('pages'),
-      },
-    ];
-  }
-
-  private buildPortfolioActions(): ProjectHomePage['suggestedActions'] {
-    const page = this.page();
-    if (!page) {
-      return [];
-    }
-
-    return [
-      {
-        title: 'Refine homepage and case studies',
-        description: 'Strengthen the first impression, featured work, and supporting page structure before you publish.',
-        route: this.projectRoute('pages'),
-        actionLabel: 'Review pages',
-      },
-      {
-        title: 'Tighten the contact flow',
-        description: 'Make the contact page and inquiry path feel clear before the portfolio goes live.',
-        route: this.projectRoute('audience'),
-        actionLabel: 'View inquiries',
-      },
-      {
-        title: page.published ? 'Check portfolio analytics' : 'Tighten the contact flow',
-        description: page.published
-          ? 'Watch how visitors engage with the portfolio once traffic starts landing.'
-          : 'Review launch readiness and make sure your page structure feels complete before publishing.',
-        route: page.published ? this.projectRoute('analytics') : this.projectRoute('pages'),
-        actionLabel: page.published ? 'Open analytics' : 'Review pages',
-      },
-    ];
-  }
-
   private projectRoute(path: string): string {
     return `/app/projects/${this.projectId()}/${path}`;
-  }
-
-  private minutesAgo(minutes: number): string {
-    return new Date(Date.now() - minutes * 60_000).toISOString();
   }
 }

@@ -3,35 +3,25 @@ import { Component, HostListener, computed, inject, signal } from '@angular/core
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
-import { Project } from '../../../../../../core/models/project.model';
-import { ProjectService } from '../../../../../../core/services/project.service';
-
-type InquiryStatus = 'new' | 'replied' | 'scheduled';
-
-interface PortfolioInquiry {
-  id: number;
-  name: string;
-  email: string;
-  serviceLabel: string;
-  budgetLabel: string;
-  status: InquiryStatus;
-  statusLabel: string;
-  sourceLabel: string;
-  receivedLabel: string;
-  message: string;
-}
+import {
+  PortfolioInquiriesPage,
+  PortfolioInquiryItem,
+  PortfolioInquiryStatus,
+} from '../../../../../../core/models/portfolio-inquiries.model';
+import { PortfolioInquiriesService } from '../../../../../../core/services/portfolio-inquiries.service';
 
 @Component({
   selector: 'app-project-inquiries-route',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './project-inquiries-route.html',
+  styleUrl: './project-inquiries-route.css',
 })
 export class ProjectInquiriesRoute {
   private readonly route = inject(ActivatedRoute);
-  private readonly projectService = inject(ProjectService);
+  private readonly portfolioInquiriesService = inject(PortfolioInquiriesService);
 
-  readonly statusOptions: ReadonlyArray<{ value: InquiryStatus; label: string }> = [
+  readonly statusOptions: ReadonlyArray<{ value: PortfolioInquiryStatus; label: string }> = [
     { value: 'new', label: 'New' },
     { value: 'replied', label: 'Replied' },
     { value: 'scheduled', label: 'Call scheduled' },
@@ -42,14 +32,16 @@ export class ProjectInquiriesRoute {
     { initialValue: Number(this.route.parent?.snapshot.paramMap.get('projectId') ?? '0') }
   );
 
-  readonly project = signal<Project | null>(null);
-  readonly inquiries = signal<PortfolioInquiry[]>([]);
+  readonly page = signal<PortfolioInquiriesPage | null>(null);
+  readonly inquiries = signal<PortfolioInquiryItem[]>([]);
   readonly isLoading = signal(true);
+  readonly isUpdatingStatus = signal(false);
   readonly errorMessage = signal('');
   readonly searchValue = signal('');
-  readonly selectedStatus = signal<'ALL' | InquiryStatus>('ALL');
-  readonly selectedInquiryId = signal(1);
+  readonly selectedStatus = signal<'ALL' | PortfolioInquiryStatus>('ALL');
+  readonly selectedInquiryId = signal<number | null>(null);
   readonly statusDropdownOpen = signal(false);
+  readonly project = computed(() => this.page());
 
   readonly filteredInquiries = computed(() => {
     const query = this.searchValue().trim().toLowerCase();
@@ -60,7 +52,7 @@ export class ProjectInquiriesRoute {
         !query ||
         item.name.toLowerCase().includes(query) ||
         item.email.toLowerCase().includes(query) ||
-        item.serviceLabel.toLowerCase().includes(query);
+        (item.serviceLabel ?? '').toLowerCase().includes(query);
       const matchesStatus = status === 'ALL' || item.status === status;
       return matchesQuery && matchesStatus;
     });
@@ -87,17 +79,17 @@ export class ProjectInquiriesRoute {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.projectService
-      .getProjectById(projectId)
+    this.portfolioInquiriesService
+      .getInquiriesPage(projectId)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (project) => {
-          this.project.set(project);
-          this.inquiries.set(this.createPortfolioInquiries(project));
-          this.selectedInquiryId.set(1);
+        next: (page: PortfolioInquiriesPage) => {
+          this.page.set(page);
+          this.inquiries.set(page.inquiries);
+          this.selectedInquiryId.set(page.inquiries[0]?.id ?? null);
         },
         error: () => {
-          this.project.set(null);
+          this.page.set(null);
           this.inquiries.set([]);
           this.errorMessage.set('Unable to load portfolio inquiries right now.');
         },
@@ -108,8 +100,10 @@ export class ProjectInquiriesRoute {
     this.searchValue.set(value);
   }
 
-  setStatus(status: 'ALL' | InquiryStatus): void {
+  setStatus(status: 'ALL' | PortfolioInquiryStatus): void {
     this.selectedStatus.set(status);
+    const nextSelected = this.filteredInquiries()[0]?.id ?? null;
+    this.selectedInquiryId.set(nextSelected);
     this.closeDropdowns();
   }
 
@@ -117,22 +111,27 @@ export class ProjectInquiriesRoute {
     this.selectedInquiryId.set(id);
   }
 
-  updateInquiryStatus(inquiryId: number, status: InquiryStatus): void {
-    const statusLabel = this.statusOptions.find((option) => option.value === status)?.label ?? 'New';
+  updateInquiryStatus(inquiryId: number, status: PortfolioInquiryStatus): void {
+    const projectId = this.projectId();
+    if (!projectId || this.isUpdatingStatus()) {
+      return;
+    }
 
-    this.inquiries.update((items) =>
-      items.map((item) =>
-        item.id === inquiryId
-          ? {
-              ...item,
-              status,
-              statusLabel,
-            }
-          : item
-      )
-    );
-
-    this.statusDropdownOpen.set(false);
+    this.isUpdatingStatus.set(true);
+    this.portfolioInquiriesService
+      .updateInquiryStatus(projectId, inquiryId, status)
+      .pipe(finalize(() => this.isUpdatingStatus.set(false)))
+      .subscribe({
+        next: (updatedInquiry) => {
+          this.inquiries.update((items) =>
+            items.map((item) => (item.id === inquiryId ? updatedInquiry : item))
+          );
+          this.statusDropdownOpen.set(false);
+        },
+        error: () => {
+          this.statusDropdownOpen.set(false);
+        },
+      });
   }
 
   toggleStatusDropdown(): void {
@@ -143,7 +142,7 @@ export class ProjectInquiriesRoute {
     this.statusDropdownOpen.set(false);
   }
 
-  trackInquiry = (_: number, item: PortfolioInquiry): number => item.id;
+  trackInquiry = (_: number, item: PortfolioInquiryItem): number => item.id;
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -154,44 +153,31 @@ export class ProjectInquiriesRoute {
     }
   }
 
-  private createPortfolioInquiries(project: Project): PortfolioInquiry[] {
-    return [
-      {
-        id: 1,
-        name: 'Amina Trabelsi',
-        email: 'amina@ateliernorth.com',
-        serviceLabel: 'Brand website redesign',
-        budgetLabel: '3k-5k TND',
-        status: 'new',
-        statusLabel: 'New',
-        sourceLabel: 'Contact page',
-        receivedLabel: 'Today',
-        message: `We love the tone of ${project.name} and would like a portfolio site that feels editorial, calm, and premium. We need help structuring the homepage, work archive, and inquiry flow.`,
-      },
-      {
-        id: 2,
-        name: 'Nour Studio',
-        email: 'hello@nourstudio.co',
-        serviceLabel: 'Case study refresh',
-        budgetLabel: '1k-3k TND',
-        status: 'replied',
-        statusLabel: 'Replied',
-        sourceLabel: 'Direct form',
-        receivedLabel: 'Yesterday',
-        message: 'We are refreshing our case studies and need a stronger way to present visuals, outcomes, and process notes across a few key projects.',
-      },
-      {
-        id: 3,
-        name: 'Rami Ben Ali',
-        email: 'rami@orbital.film',
-        serviceLabel: 'Portfolio build',
-        budgetLabel: '5k+ TND',
-        status: 'scheduled',
-        statusLabel: 'Call scheduled',
-        sourceLabel: 'Referral',
-        receivedLabel: '2 days ago',
-        message: 'I need a portfolio that helps me pitch my direction work, show selected campaigns, and collect more serious inbound leads.',
-      },
-    ];
+  formatReceivedLabel(value: string | null | undefined): string {
+    if (!value) {
+      return 'Recently';
+    }
+
+    const parsed = Date.parse(value);
+    if (!Number.isFinite(parsed)) {
+      return 'Recently';
+    }
+
+    const now = Date.now();
+    const diffMs = Math.max(0, now - parsed);
+    const diffMinutes = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 60) {
+      return diffMinutes <= 1 ? 'Just now' : `${diffMinutes} minutes ago`;
+    }
+    if (diffHours < 24) {
+      return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+    }
+    if (diffDays === 1) {
+      return 'Yesterday';
+    }
+    return `${diffDays} days ago`;
   }
 }
