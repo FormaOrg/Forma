@@ -138,6 +138,12 @@ export class ProjectStorefrontEditor {
   });
   readonly previewTitle = computed(() => this.workingStorefront()?.draftHomepage.seo.title || this.storeName());
   readonly selectedPageLabel = computed(() => 'Home');
+  readonly pagesPanelItems = computed(() => [
+    { id: 'home', title: 'Home', active: true, icon: 'home' as const, theme: 'hero' as const },
+    { id: 'privacy', title: 'Privacy Policy', active: false, icon: null, theme: 'document' as const },
+    { id: 'about', title: 'About', active: false, icon: null, theme: 'about' as const },
+    { id: 'terms', title: 'Terms & Conditions', active: false, icon: null, theme: 'document' as const },
+  ]);
   readonly hasFloatingUi = computed(
     () =>
       this.isFormaMenuOpen() ||
@@ -212,6 +218,12 @@ export class ProjectStorefrontEditor {
     if (event.key === 'Escape' && this.isMediaManagerOpen()) {
       event.preventDefault();
       this.closeMediaManager();
+      return;
+    }
+
+    if (event.key === 'Escape' && this.isPagesPanelOpen()) {
+      event.preventDefault();
+      this.isPagesPanelOpen.set(false);
       return;
     }
 
