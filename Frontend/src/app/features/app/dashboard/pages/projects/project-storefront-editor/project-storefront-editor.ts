@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, forkJoin, of, switchMap } from 'rxjs';
+import { catchError, finalize, forkJoin, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
@@ -19,9 +19,14 @@ import { ProjectStorefrontService } from '../../../../../../core/services/projec
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
+import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
+import {
+  ProjectStorefrontMediaManager,
+  StorefrontMediaManagerAsset,
+} from './project-storefront-media-manager';
 
 type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
@@ -29,7 +34,7 @@ type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIcon],
+  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
@@ -46,6 +51,7 @@ export class ProjectStorefrontEditor {
   private readonly projectStorefrontService = inject(ProjectStorefrontService);
   private readonly projectWorkspaceContextService = inject(ProjectWorkspaceContextService);
   private readonly toastService = inject(ToastService);
+  private readonly uploadService = inject(UploadService);
 
   readonly projectParamMap = toSignal(this.route.parent!.paramMap, {
     initialValue: this.route.parent!.snapshot.paramMap,
@@ -72,6 +78,7 @@ export class ProjectStorefrontEditor {
   readonly isAccountMenuOpen = signal(false);
   readonly isZoomMenuOpen = signal(false);
   readonly isPagesPanelOpen = signal(false);
+  readonly isMediaManagerOpen = signal(false);
   readonly sectionLibraryTargetId = signal<string | null>(null);
   readonly sectionOptionsMenuId = signal<string | null>(null);
   readonly draggedSectionId = signal<string | null>(null);
@@ -84,7 +91,9 @@ export class ProjectStorefrontEditor {
   readonly isAutosaving = signal(false);
   readonly isPublishing = signal(false);
   readonly isUnpublishing = signal(false);
+  readonly isMediaUploading = signal(false);
   readonly errorMessage = signal('');
+  readonly mediaAssets = signal<StorefrontMediaManagerAsset[]>([]);
 
   readonly isEcommerceProject = computed(() => this.project()?.type === 'ECOMMERCE');
   readonly sections = computed(() => this.workingStorefront()?.draftHomepage.sections ?? []);
@@ -135,6 +144,7 @@ export class ProjectStorefrontEditor {
       this.isAccountMenuOpen() ||
       this.isZoomMenuOpen() ||
       this.isPagesPanelOpen() ||
+      this.isMediaManagerOpen() ||
       this.isSectionLibraryOpen() ||
       this.sectionOptionsMenuId() !== null
   );
@@ -144,6 +154,7 @@ export class ProjectStorefrontEditor {
       this.isAccountMenuOpen() ||
       this.isZoomMenuOpen() ||
       this.isPagesPanelOpen() ||
+      this.isMediaManagerOpen() ||
       this.isSectionLibraryOpen()
   );
   readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !== null);
@@ -198,6 +209,12 @@ export class ProjectStorefrontEditor {
 
   @HostListener('window:keydown', ['$event'])
   handleZoomShortcuts(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.isMediaManagerOpen()) {
+      event.preventDefault();
+      this.closeMediaManager();
+      return;
+    }
+
     if (!event.ctrlKey || event.altKey) {
       return;
     }
@@ -262,7 +279,11 @@ export class ProjectStorefrontEditor {
           this.projectWorkspaceContextService.setProjectType(projectId, project.type);
 
           if (project.type !== 'ECOMMERCE') {
-            return of({ storefront: null, catalogProducts: [] as ProjectCatalogProduct[] });
+            return of({
+              storefront: null,
+              catalogProducts: [] as ProjectCatalogProduct[],
+              projectMedia: [],
+            });
           }
 
           return forkJoin({
@@ -270,14 +291,16 @@ export class ProjectStorefrontEditor {
             catalogProducts: this.projectCatalogService.getCatalogPage(projectId, {}).pipe(
               switchMap((catalogPage) => of(catalogPage.products))
             ),
+            projectMedia: this.projectService.getProjectMedia(projectId).pipe(catchError(() => of([]))),
           });
         }),
         finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: ({ storefront, catalogProducts }) => {
+        next: ({ storefront, catalogProducts, projectMedia }) => {
           this.products.set(catalogProducts);
+          this.mediaAssets.set(this.buildMediaManagerAssets(projectMedia, catalogProducts));
 
           if (!storefront) {
             this.storefront.set(null);
@@ -377,6 +400,7 @@ export class ProjectStorefrontEditor {
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
     this.isPagesPanelOpen.set(false);
+    this.isMediaManagerOpen.set(false);
     this.sectionLibraryTargetId.set(null);
     this.sectionOptionsMenuId.set(null);
   }
@@ -461,6 +485,55 @@ export class ProjectStorefrontEditor {
   triggerPublishFromMenu(): void {
     this.closeFloatingUi();
     this.publishStorefront();
+  }
+
+  openMediaManager(): void {
+    this.closeFloatingUi();
+    this.isMediaManagerOpen.set(true);
+  }
+
+  closeMediaManager(): void {
+    this.isMediaManagerOpen.set(false);
+  }
+
+  uploadMediaFromManager(files: FileList): void {
+    const projectId = this.projectId();
+    if (!projectId || !files.length || this.isMediaUploading()) {
+      return;
+    }
+
+    const uploads = Array.from(files)
+      .map((file) => ({ file, validation: this.uploadService.validateMedia(file) }))
+      .filter(({ validation }) => validation.valid);
+
+    const invalidUploads = Array.from(files).length - uploads.length;
+    if (invalidUploads) {
+      this.toastService.error('Some files were skipped because they are not supported image uploads.');
+    }
+
+    if (!uploads.length) {
+      return;
+    }
+
+    this.isMediaUploading.set(true);
+    forkJoin(uploads.map(({ file }) => this.uploadService.uploadProjectMedia(file, projectId)))
+      .pipe(
+        switchMap(() => this.projectService.getProjectMedia(projectId).pipe(catchError(() => of([])))),
+        finalize(() => this.isMediaUploading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (projectMedia) => {
+          this.mediaAssets.set(this.buildMediaManagerAssets(projectMedia, this.products()));
+          this.toastService.success(`${uploads.length} media file${uploads.length === 1 ? '' : 's'} uploaded.`);
+        },
+        error: () => this.toastService.error('Unable to upload media right now.'),
+      });
+  }
+
+  confirmMediaSelection(asset: StorefrontMediaManagerAsset): void {
+    this.toastService.success(`${asset.name} selected.`);
+    this.closeMediaManager();
   }
 
   openAccountSettings(): void {
@@ -1370,6 +1443,54 @@ export class ProjectStorefrontEditor {
           },
         };
     }
+  }
+
+  private buildMediaManagerAssets(
+    projectMedia: Array<{ id: number; fileName: string; fileUrl: string; type: 'IMAGE' | 'VIDEO' | 'DOCUMENT'; fileSize: number; uploadedAt: string }>,
+    catalogProducts: ProjectCatalogProduct[]
+  ): StorefrontMediaManagerAsset[] {
+    const assets = new Map<string, StorefrontMediaManagerAsset>();
+
+    for (const media of projectMedia) {
+      assets.set(media.fileUrl, {
+        id: media.id,
+        name: media.fileName,
+        url: media.fileUrl,
+        type: media.type,
+        fileSize: media.fileSize,
+        uploadedAt: media.uploadedAt,
+        sourceLabel: 'Site files',
+        description: this.describeMediaAsset(media.type, media.fileSize),
+      });
+    }
+
+    for (const product of catalogProducts) {
+      if (!product.imageUrl || assets.has(product.imageUrl)) {
+        continue;
+      }
+
+      assets.set(product.imageUrl, {
+        id: product.id * 1000,
+        name: product.name,
+        url: product.imageUrl,
+        type: 'IMAGE',
+        fileSize: 0,
+        uploadedAt: product.updatedAt || product.createdAt,
+        sourceLabel: 'Catalog',
+        description: product.category || 'Product image',
+      });
+    }
+
+    return Array.from(assets.values());
+  }
+
+  private describeMediaAsset(type: 'IMAGE' | 'VIDEO' | 'DOCUMENT', fileSize: number): string {
+    const label = type === 'IMAGE' ? 'Image' : type === 'VIDEO' ? 'Video' : 'Document';
+    if (!fileSize) {
+      return label;
+    }
+
+    return `${label} • ${this.uploadService.formatFileSize(fileSize)}`;
   }
 
   private createSection(type: StorefrontSectionType): StorefrontHomepageSection {

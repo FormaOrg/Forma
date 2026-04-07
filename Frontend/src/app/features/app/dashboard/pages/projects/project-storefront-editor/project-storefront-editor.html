@@ -129,7 +129,7 @@
               <button type="button" class="storefront-editor__menu-row">
                 <span>Marketing Tools</span>
               </button>
-              <button type="button" class="storefront-editor__menu-row">
+              <button type="button" class="storefront-editor__menu-row" (click)="openMediaManager()">
                 <span>Media Manager</span>
                 <small>Ctrl + Alt + M</small>
               </button>
@@ -730,4 +730,14 @@
       </section>
     </div>
   </section>
+
+  @if (isMediaManagerOpen()) {
+    <app-project-storefront-media-manager
+      [assets]="mediaAssets()"
+      [isUploading]="isMediaUploading()"
+      (close)="closeMediaManager()"
+      (filesSelected)="uploadMediaFromManager($event)"
+      (confirmSelection)="confirmMediaSelection($event)"
+    />
+  }
 }
