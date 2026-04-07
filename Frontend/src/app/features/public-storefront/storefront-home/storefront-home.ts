@@ -24,10 +24,15 @@ export class StorefrontHome {
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
   });
+  readonly queryParamMap = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
   readonly projectId = computed(() => {
     const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
   });
+  readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
+  readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
@@ -54,7 +59,7 @@ export class StorefrontHome {
     this.errorMessage.set('');
 
     this.publicStorefrontService
-      .getStorefront(projectId)
+      .getStorefront(projectId, { preview: this.isEditorPreview() })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {
@@ -83,19 +88,27 @@ export class StorefrontHome {
       return href;
     }
     if (href.startsWith('/')) {
-      return `/store/${projectId}${href}`;
+      return this.appendPreviewQuery(`/store/${projectId}${href}`);
     }
 
-    return `/store/${projectId}/${href.replace(/^\/+/, '')}`;
+    return this.appendPreviewQuery(`/store/${projectId}/${href.replace(/^\/+/, '')}`);
+  }
+
+  productRoute(productId: number): string {
+    return this.appendPreviewQuery(`/store/${this.projectId()}/products/${productId}`);
+  }
+
+  private appendPreviewQuery(url: string): string {
+    if (!this.isEditorPreview()) {
+      return url;
+    }
+
+    return `${url}${url.includes('?') ? '&' : '?'}preview=editor`;
   }
 
   readStringProp(section: StorefrontHomepageSection, key: string): string {
     const value = (section.props as Record<string, unknown>)[key];
     return typeof value === 'string' ? value : '';
-  }
-
-  productRoute(productId: number): string {
-    return `/store/${this.projectId()}/products/${productId}`;
   }
 
   trackSection = (_: number, section: StorefrontHomepageSection): string => section.id;

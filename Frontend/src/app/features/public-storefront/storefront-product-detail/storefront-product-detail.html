@@ -10,19 +10,19 @@
 } @else if (product(); as product) {
   <div class="storefront-product">
     <header class="storefront-product__header">
-      <a class="storefront-product__brand" [routerLink]="['/store', projectId()]">
+      <a class="storefront-product__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">
         {{ storefront()?.storeName || 'Storefront' }}
       </a>
 
       <nav class="storefront-product__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
+        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
     <main class="storefront-product__content">
-      <a class="storefront-product__back" [routerLink]="['/store', projectId(), 'products']">
+      <a class="storefront-product__back" [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">
         Back to products
       </a>
 

@@ -10,12 +10,12 @@
 } @else if (storefront(); as home) {
   <div class="storefront-home">
     <header class="storefront-home__header">
-      <a class="storefront-home__brand" [routerLink]="['/store', projectId()]">{{ home.storeName }}</a>
+      <a class="storefront-home__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">{{ home.storeName }}</a>
 
       <nav class="storefront-home__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
+        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
@@ -71,14 +71,14 @@
                   <span>Catalog spotlight</span>
                   <h2>{{ readStringProp(section, 'title') || 'Featured products' }}</h2>
                 </div>
-                <a [routerLink]="['/store', projectId(), 'products']">View all products</a>
+                <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">View all products</a>
               </div>
 
               @if (featuredProducts().length) {
                 <div class="storefront-home__product-grid">
                   @for (product of featuredProducts(); track trackProduct($index, product)) {
                     <article class="storefront-home__product-card">
-                      <a [routerLink]="['/store', projectId(), 'products', product.id]">
+                      <a [attr.href]="productRoute(product.id)">
                         <div class="storefront-home__product-media">
                           @if (product.imageUrl) {
                             <img [src]="product.imageUrl" [alt]="product.name" />
