@@ -27,6 +27,9 @@ export class StorefrontProductDetail {
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
   });
+  readonly queryParamMap = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
   readonly projectId = computed(() => {
     const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
@@ -35,6 +38,8 @@ export class StorefrontProductDetail {
     const productId = Number(this.projectParamMap()?.get('productId') ?? '0');
     return Number.isFinite(productId) && productId > 0 ? productId : 0;
   });
+  readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
+  readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly product = signal<PublicStorefrontProduct | null>(null);
@@ -59,8 +64,8 @@ export class StorefrontProductDetail {
     this.errorMessage.set('');
 
     forkJoin({
-      storefront: this.publicStorefrontService.getStorefront(projectId),
-      product: this.publicStorefrontService.getProduct(projectId, productId),
+      storefront: this.publicStorefrontService.getStorefront(projectId, { preview: this.isEditorPreview() }),
+      product: this.publicStorefrontService.getProduct(projectId, productId, { preview: this.isEditorPreview() }),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -90,6 +95,8 @@ export class StorefrontProductDetail {
 
   goToCheckout(): void {
     this.addToCart();
-    void this.router.navigate(['/store', this.projectId(), 'cart']);
+    void this.router.navigate(['/store', this.projectId(), 'cart'], {
+      queryParams: this.previewQueryParams() ?? undefined,
+    });
   }
 }

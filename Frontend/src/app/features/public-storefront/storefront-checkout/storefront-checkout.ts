@@ -28,10 +28,14 @@ export class StorefrontCheckout {
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
   });
+  readonly queryParamMap = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
   readonly projectId = computed(() => {
     const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
   });
+  readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
@@ -62,7 +66,7 @@ export class StorefrontCheckout {
     }
 
     this.publicStorefrontService
-      .getStorefront(projectId)
+      .getStorefront(projectId, { preview: this.isEditorPreview() })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {
@@ -105,6 +109,7 @@ export class StorefrontCheckout {
           this.storeCartService.clear(this.projectId());
           void this.router.navigate(['/store', this.projectId(), 'checkout', 'success'], {
             queryParams: {
+              ...(this.isEditorPreview() ? { preview: 'editor' } : {}),
               orderNumber: response.orderNumber,
               total: response.total,
               currency: response.currencyCode,

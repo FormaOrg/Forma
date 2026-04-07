@@ -23,10 +23,15 @@ export class StorefrontCart {
   readonly projectParamMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
   });
+  readonly queryParamMap = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
   readonly projectId = computed(() => {
     const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
   });
+  readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
+  readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
@@ -47,7 +52,7 @@ export class StorefrontCart {
     }
 
     this.publicStorefrontService
-      .getStorefront(projectId)
+      .getStorefront(projectId, { preview: this.isEditorPreview() })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {

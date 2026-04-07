@@ -10,14 +10,14 @@
 } @else {
   <div class="storefront-cart">
     <header class="storefront-cart__header">
-      <a class="storefront-cart__brand" [routerLink]="['/store', projectId()]">
+      <a class="storefront-cart__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">
         {{ storefront()?.storeName || 'Storefront' }}
       </a>
 
       <nav class="storefront-cart__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']">Cart</a>
+        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart</a>
       </nav>
     </header>
 
@@ -65,7 +65,7 @@
               <strong>{{ subtotal() | currency:'TND':'symbol':'1.0-2' }}</strong>
             </div>
             <p>Shipping and payment are handled manually after checkout confirmation.</p>
-            <a class="storefront-cart__checkout" [routerLink]="['/store', projectId(), 'checkout']">
+            <a class="storefront-cart__checkout" [routerLink]="['/store', projectId(), 'checkout']" [queryParams]="previewQueryParams()">
               Continue to checkout
             </a>
           </aside>
@@ -74,7 +74,7 @@
         <section class="storefront-cart__empty">
           <h2>Your cart is empty</h2>
           <p>Add a few products from the live catalog to start a checkout.</p>
-          <a [routerLink]="['/store', projectId(), 'products']">Browse products</a>
+          <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Browse products</a>
         </section>
       }
     </main>

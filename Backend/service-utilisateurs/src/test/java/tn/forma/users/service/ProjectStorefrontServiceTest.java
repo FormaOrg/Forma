@@ -59,7 +59,7 @@ class ProjectStorefrontServiceTest {
         );
 
         var storefront = service.getStorefront(user.getEmail(), project.getId());
-        JsonNode draftHomepage = (JsonNode) storefront.getDraftHomepage();
+        JsonNode draftHomepage = objectMapper.valueToTree(storefront.getDraftHomepage());
 
         assertThat(storefront.getId()).isEqualTo(77L);
         assertThat(storefront.getStoreStatus()).isEqualTo(StorefrontStatus.DRAFT.name());
@@ -108,12 +108,12 @@ class ProjectStorefrontServiceTest {
         updateRequest.setDraftHomepage(draftHomepage);
 
         var updated = service.updateStorefront(user.getEmail(), project.getId(), updateRequest);
-        JsonNode updatedDraftHomepage = (JsonNode) updated.getDraftHomepage();
+        JsonNode updatedDraftHomepage = objectMapper.valueToTree(updated.getDraftHomepage());
         assertThat(updated.getStoreName()).isEqualTo("Updated shop");
         assertThat(updatedDraftHomepage.get("seo").get("title").asText()).isEqualTo("Updated shop");
 
         var published = service.publishStorefront(user.getEmail(), project.getId());
-        JsonNode publishedHomepage = (JsonNode) published.getStorefront().getPublishedHomepage();
+        JsonNode publishedHomepage = objectMapper.valueToTree(published.getStorefront().getPublishedHomepage());
         assertThat(published.getStorefront().getStoreStatus()).isEqualTo(StorefrontStatus.PUBLISHED.name());
         assertThat(publishedHomepage.get("seo").get("title").asText()).isEqualTo("Updated shop");
         assertThat(published.getPublishedAt()).isNotBlank();
