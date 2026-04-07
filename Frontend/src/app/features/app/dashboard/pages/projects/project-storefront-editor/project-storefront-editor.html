@@ -338,7 +338,102 @@
       </div>
     </header>
 
-    <div class="storefront-editor__body">
+    <div
+      class="storefront-editor__body"
+      [class.storefront-editor__body--with-pages]="isPagesPanelOpen()"
+    >
+      <aside
+        class="storefront-editor__pages-sidebar"
+        [class.storefront-editor__pages-sidebar--open]="isPagesPanelOpen()"
+        [attr.aria-hidden]="!isPagesPanelOpen()"
+      >
+        <div class="storefront-editor__pages-sidebar-head">
+          <div class="storefront-editor__pages-sidebar-title-wrap">
+            <div class="storefront-editor__pages-sidebar-title">
+              <h2>Pages</h2>
+              <strong>(1)</strong>
+            </div>
+
+            <button
+              type="button"
+              class="storefront-editor__pages-head-icon"
+              aria-label="Page layout options"
+            >
+              <app-icon name="layout-grid" [size]="15"></app-icon>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="storefront-editor__pages-close"
+            aria-label="Close pages panel"
+            (click)="togglePagesPanel()"
+          >
+            <app-icon name="x" [size]="16"></app-icon>
+          </button>
+        </div>
+
+        <div class="storefront-editor__pages-sidebar-scroll">
+          <div class="storefront-editor__pages-section-head">
+            <span>Main pages</span>
+            <span class="storefront-editor__pages-section-count">({{ pagesPanelItems().length }})</span>
+            <app-icon name="chevron-down" [size]="14"></app-icon>
+          </div>
+
+          <div class="storefront-editor__pages-card-stack">
+            @for (page of pagesPanelItems(); track page.id) {
+              <button
+                type="button"
+                class="storefront-editor__page-card"
+                [class.storefront-editor__page-card--active]="page.active"
+                (click)="selectHomePage()"
+              >
+                <span
+                  class="storefront-editor__page-card-thumb"
+                  [class.storefront-editor__page-card-thumb--hero]="page.theme === 'hero'"
+                  [class.storefront-editor__page-card-thumb--document]="page.theme === 'document'"
+                  [class.storefront-editor__page-card-thumb--about]="page.theme === 'about'"
+                >
+                  <span class="storefront-editor__page-card-browser">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                  <span class="storefront-editor__page-card-canvas">
+                    <span class="storefront-editor__page-card-bar"></span>
+                    <span class="storefront-editor__page-card-nav"></span>
+                    <span class="storefront-editor__page-card-hero"></span>
+                    <span class="storefront-editor__page-card-grid">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  </span>
+                </span>
+                <span class="storefront-editor__page-card-meta">
+                  <span class="storefront-editor__page-card-row">
+                    <strong class="storefront-editor__page-card-title">{{ page.title }}</strong>
+                    @if (page.icon) {
+                      <span class="storefront-editor__page-card-icon">
+                        <app-icon [name]="page.icon" [size]="15"></app-icon>
+                      </span>
+                    }
+                  </span>
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="storefront-editor__pages-sidebar-actions">
+          <button type="button" class="storefront-editor__pages-primary">
+            <span class="storefront-editor__pages-primary-plus" aria-hidden="true">+</span>
+            <span>Add Page</span>
+          </button>
+          <button type="button" class="storefront-editor__pages-secondary">Manage Pages</button>
+        </div>
+      </aside>
+
       <button type="button" class="storefront-editor__add-button">
         <span class="storefront-editor__add-button-plus" aria-hidden="true">+</span>
         <span>Add</span>
@@ -363,7 +458,9 @@
                   <button
                     type="button"
                     class="storefront-editor__page-trigger"
+                    [class.storefront-editor__page-trigger--active]="isPagesPanelOpen()"
                     (click)="togglePagesPanel()"
+                    [attr.aria-expanded]="isPagesPanelOpen()"
                   >
                     @if (!isCompactPreviewChrome()) {
                       <span class="storefront-editor__page-trigger-label">Page:</span>
@@ -418,51 +515,8 @@
 
           <div
             class="storefront-editor__preview-body"
-            [class.storefront-editor__preview-body--with-pages]="isPagesPanelOpen()"
             [class.storefront-editor__preview-body--with-library]="isSectionLibraryOpen()"
           >
-            @if (isPagesPanelOpen()) {
-              <aside class="storefront-editor__pages-panel">
-              <div class="storefront-editor__pages-panel-head">
-                <div>
-                  <h2>Site Pages (1)</h2>
-                </div>
-
-                <button
-                  type="button"
-                  class="storefront-editor__pages-close"
-                  aria-label="Close pages panel"
-                  (click)="togglePagesPanel()"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div class="storefront-editor__pages-section">
-                <div class="storefront-editor__pages-section-head">
-                  <span>Main pages (1)</span>
-                  <app-icon name="chevron-down" [size]="14"></app-icon>
-                </div>
-
-                <button
-                  type="button"
-                  class="storefront-editor__page-card storefront-editor__page-card--active"
-                  (click)="selectHomePage()"
-                >
-                  <span class="storefront-editor__page-card-thumb">
-                    <span class="storefront-editor__page-card-bar"></span>
-                    <span class="storefront-editor__page-card-hero"></span>
-                    <span class="storefront-editor__page-card-lines"></span>
-                  </span>
-                  <span class="storefront-editor__page-card-title">Home</span>
-                </button>
-              </div>
-
-              <button type="button" class="storefront-editor__pages-primary">+ Add Page</button>
-              <button type="button" class="storefront-editor__pages-secondary">Manage Pages</button>
-            </aside>
-          }
-
           @if (isSectionLibraryOpen()) {
             <aside class="storefront-editor__section-library">
               <div class="storefront-editor__section-library-head">
