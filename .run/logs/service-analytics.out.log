@@ -186,3 +186,4 @@ Consider the following:
 2026-04-07T12:13:51.411+02:00  INFO 25472 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
 2026-04-07T12:13:51.416+02:00  INFO 25472 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Started Application in 7.686 seconds (process running for 38.554)
 2026-04-07T12:13:51.535+02:00  INFO 25472 --- [service-analytics] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-07T14:49:19.144+02:00  WARN 25472 --- [service-analytics] [l-2:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1h1s284ms226µs800ns).
