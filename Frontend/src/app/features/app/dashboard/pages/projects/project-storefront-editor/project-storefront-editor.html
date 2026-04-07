@@ -25,7 +25,10 @@
     <div class="storefront-editor__body">
       <section class="storefront-editor__preview-shell">
         <div class="storefront-editor__preview-toolbar">
-          <div class="storefront-editor__preview-toolbar-frame storefront-editor__preview-toolbar-frame--skeleton">
+          <div
+            class="storefront-editor__preview-toolbar-frame storefront-editor__preview-toolbar-frame--skeleton"
+            [style.width.px]="previewStageWidth()"
+          >
             <div class="storefront-editor__preview-toolbar-left">
               <span class="storefront-editor__skeleton storefront-editor__skeleton--page-trigger"></span>
             </div>
@@ -39,8 +42,11 @@
         </div>
 
         <div class="storefront-editor__preview-body">
-          <div class="storefront-editor__preview-stage">
-            <div class="storefront-editor__preview-canvas storefront-editor__preview-canvas--skeleton">
+          <div class="storefront-editor__preview-stage" [style.width.px]="previewStageWidth()">
+            <div
+              class="storefront-editor__preview-canvas storefront-editor__preview-canvas--skeleton"
+              [style.width.px]="previewFrameWidth()"
+            >
               <div class="storefront-editor__skeleton storefront-editor__skeleton--preview-header"></div>
               <div class="storefront-editor__skeleton storefront-editor__skeleton--announcement"></div>
               <div class="storefront-editor__skeleton storefront-editor__skeleton--hero"></div>
@@ -338,102 +344,134 @@
       </div>
     </header>
 
-    <div
-      class="storefront-editor__body"
-      [class.storefront-editor__body--with-pages]="isPagesPanelOpen()"
-    >
+    <div class="storefront-editor__pages-panel-shell">
       <aside
-        class="storefront-editor__pages-sidebar"
-        [class.storefront-editor__pages-sidebar--open]="isPagesPanelOpen()"
-        [attr.aria-hidden]="!isPagesPanelOpen()"
+        class="storefront-editor__pages-panel"
+        [class.storefront-editor__pages-panel--open]="isPagesPanelOpen()"
       >
-        <div class="storefront-editor__pages-sidebar-head">
-          <div class="storefront-editor__pages-sidebar-title-wrap">
-            <div class="storefront-editor__pages-sidebar-title">
-              <h2>Pages</h2>
-              <strong>(1)</strong>
-            </div>
+        <div class="storefront-editor__pages-panel-head">
+          <div>
+            <h2>Site Pages (1)</h2>
+          </div>
+
+          <div class="storefront-editor__pages-panel-actions">
+            <button
+              type="button"
+              class="storefront-editor__pages-layout-button"
+              [attr.aria-label]="pagesPanelLayout() === 'grid' ? 'Switch to rows layout' : 'Switch to grid layout'"
+              (click)="pagesPanelLayout.set(pagesPanelLayout() === 'grid' ? 'rows' : 'grid')"
+            >
+              <app-icon [name]="pagesPanelLayout() === 'grid' ? 'menu' : 'layout-grid'" [size]="16"></app-icon>
+            </button>
 
             <button
               type="button"
-              class="storefront-editor__pages-head-icon"
-              aria-label="Page layout options"
+              class="storefront-editor__pages-close"
+              aria-label="Close pages panel"
+              (click)="togglePagesPanel()"
             >
-              <app-icon name="layout-grid" [size]="15"></app-icon>
+              ×
             </button>
           </div>
+        </div>
 
+        <div class="storefront-editor__pages-section">
           <button
             type="button"
-            class="storefront-editor__pages-close"
-            aria-label="Close pages panel"
-            (click)="togglePagesPanel()"
+            class="storefront-editor__page-card storefront-editor__page-card--active"
+            [class.storefront-editor__page-card--rows]="pagesPanelLayout() === 'rows'"
+            (click)="selectHomePage()"
           >
-            <app-icon name="x" [size]="16"></app-icon>
-          </button>
-        </div>
-
-        <div class="storefront-editor__pages-sidebar-scroll">
-          <div class="storefront-editor__pages-section-head">
-            <span>Main pages</span>
-            <span class="storefront-editor__pages-section-count">({{ pagesPanelItems().length }})</span>
-            <app-icon name="chevron-down" [size]="14"></app-icon>
-          </div>
-
-          <div class="storefront-editor__pages-card-stack">
-            @for (page of pagesPanelItems(); track page.id) {
-              <button
-                type="button"
-                class="storefront-editor__page-card"
-                [class.storefront-editor__page-card--active]="page.active"
-                (click)="selectHomePage()"
-              >
-                <span
-                  class="storefront-editor__page-card-thumb"
-                  [class.storefront-editor__page-card-thumb--hero]="page.theme === 'hero'"
-                  [class.storefront-editor__page-card-thumb--document]="page.theme === 'document'"
-                  [class.storefront-editor__page-card-thumb--about]="page.theme === 'about'"
-                >
-                  <span class="storefront-editor__page-card-browser">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </span>
-                  <span class="storefront-editor__page-card-canvas">
-                    <span class="storefront-editor__page-card-bar"></span>
-                    <span class="storefront-editor__page-card-nav"></span>
-                    <span class="storefront-editor__page-card-hero"></span>
-                    <span class="storefront-editor__page-card-grid">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+            @if (pagesPanelLayout() === 'grid') {
+              <span class="storefront-editor__page-card-thumb">
+                <span class="storefront-editor__page-card-canvas">
+                  <span class="storefront-editor__page-card-canvas-header">
+                    <strong>{{ storeName() }}</strong>
+                    <span class="storefront-editor__page-card-canvas-nav">
+                      <span>Home</span>
+                      <span>Products</span>
                     </span>
                   </span>
-                </span>
-                <span class="storefront-editor__page-card-meta">
-                  <span class="storefront-editor__page-card-row">
-                    <strong class="storefront-editor__page-card-title">{{ page.title }}</strong>
-                    @if (page.icon) {
-                      <span class="storefront-editor__page-card-icon">
-                        <app-icon [name]="page.icon" [size]="15"></app-icon>
-                      </span>
+                  @for (section of sections(); track trackSection($index, section)) {
+                    @if (section.enabled) {
+                      @switch (section.type) {
+                        @case ('announcement-bar') {
+                          <span class="storefront-editor__page-card-mini-announcement">
+                            <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
+                            @if (readStringProp(section, 'linkLabel')) {
+                              <small>{{ readStringProp(section, 'linkLabel') }}</small>
+                            }
+                          </span>
+                        }
+                        @case ('hero') {
+                          <span class="storefront-editor__page-card-mini-hero">
+                            <small>{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</small>
+                            <strong>{{ readStringProp(section, 'title') || 'Your headline goes here' }}</strong>
+                            <span>{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</span>
+                          </span>
+                        }
+                        @case ('featured-products') {
+                          <span class="storefront-editor__page-card-mini-section">
+                            <strong>{{ readStringProp(section, 'title') || 'Featured products' }}</strong>
+                            <small>{{ featuredProductsPreview().length }} selected</small>
+                          </span>
+                        }
+                        @case ('footer') {
+                          <span class="storefront-editor__page-card-mini-footer">
+                            <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
+                          </span>
+                        }
+                      }
                     }
-                  </span>
+                  }
                 </span>
-              </button>
+              </span>
             }
-          </div>
+            <span class="storefront-editor__page-card-footer">
+              <span class="storefront-editor__page-card-title">Home</span>
+              <span class="storefront-editor__page-card-meta">
+                <span class="storefront-editor__page-card-home">
+                  <app-icon name="home" [size]="16"></app-icon>
+                </span>
+                <span class="storefront-editor__page-card-more">
+                <button
+                  type="button"
+                  class="storefront-editor__page-card-more-button"
+                  aria-label="Page options"
+                  (click)="$event.stopPropagation(); togglePageCardMenu('home', $event)"
+                >
+                  <app-icon name="more-horizontal" [size]="18"></app-icon>
+                </button>
+              </span>
+              </span>
+            </span>
+          </button>
         </div>
 
-        <div class="storefront-editor__pages-sidebar-actions">
-          <button type="button" class="storefront-editor__pages-primary">
-            <span class="storefront-editor__pages-primary-plus" aria-hidden="true">+</span>
-            <span>Add Page</span>
-          </button>
-          <button type="button" class="storefront-editor__pages-secondary">Manage Pages</button>
-        </div>
+        <button type="button" class="storefront-editor__pages-primary">+ Add Page</button>
+        <button type="button" class="storefront-editor__pages-secondary">Manage Pages</button>
       </aside>
 
+      @if (pageCardMenuId() === 'home') {
+        <div
+          class="storefront-editor__page-card-menu storefront-editor__page-card-menu--floating"
+          [style.top.px]="pageCardMenuTop()"
+          [style.left.px]="pageCardMenuLeft()"
+        >
+          <button type="button" class="storefront-editor__page-card-menu-button">Rename</button>
+          <button type="button" class="storefront-editor__page-card-menu-button">Duplicate</button>
+          <button type="button" class="storefront-editor__page-card-menu-button">Delete</button>
+          <div class="storefront-editor__page-card-menu-divider"></div>
+          <button type="button" class="storefront-editor__page-card-menu-button">
+            <span>SEO and accessibility</span>
+            <span>›</span>
+          </button>
+          <button type="button" class="storefront-editor__page-card-menu-button">Settings</button>
+        </div>
+      }
+    </div>
+
+    <div class="storefront-editor__body">
       <button type="button" class="storefront-editor__add-button">
         <span class="storefront-editor__add-button-plus" aria-hidden="true">+</span>
         <span>Add</span>
@@ -486,7 +524,7 @@
             }
           </div>
   
-          <div class="storefront-editor__preview-toolbar-right">
+            <div class="storefront-editor__preview-toolbar-right">
             <div class="storefront-editor__mode-switch" aria-label="Preview size">
               <button
                 type="button"
@@ -513,10 +551,10 @@
           </div>
         </div>
 
-          <div
-            class="storefront-editor__preview-body"
-            [class.storefront-editor__preview-body--with-library]="isSectionLibraryOpen()"
-          >
+        <div
+          class="storefront-editor__preview-body"
+          [class.storefront-editor__preview-body--with-library]="isSectionLibraryOpen()"
+        >
           @if (isSectionLibraryOpen()) {
             <aside class="storefront-editor__section-library">
               <div class="storefront-editor__section-library-head">
@@ -592,11 +630,11 @@
                         (click)="$event.stopPropagation(); selectSection(section.id)"
                       >
                         <span class="storefront-editor__preview-section-tag">{{ sectionLabel(section) }}</span>
-                        <button
-                          type="button"
-                          class="storefront-editor__preview-section-edit"
-                          (click)="$event.stopPropagation()"
-                        >
+                      <button
+                        type="button"
+                        class="storefront-editor__preview-section-edit"
+                        (click)="$event.stopPropagation()"
+                      >
                         <app-icon name="pen" [size]="14"></app-icon>
                         <span>Edit</span>
                       </button>

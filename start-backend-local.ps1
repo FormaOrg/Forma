@@ -20,9 +20,14 @@ New-Item -ItemType Directory -Force -Path $logRoot | Out-Null
 foreach ($service in $services) {
     $serviceDir = Join-Path $backendRoot $service.Name
     $pomFile = Join-Path $serviceDir "pom.xml"
+    $mavenWrapper = Join-Path $serviceDir "mvnw.cmd"
 
     if (-not (Test-Path $pomFile)) {
         throw "Missing pom.xml for $($service.Name) at $serviceDir"
+    }
+
+    if (-not (Test-Path $mavenWrapper)) {
+        throw "Missing mvnw.cmd for $($service.Name) at $serviceDir"
     }
 
     $pidFile = Join-Path $pidRoot "$($service.Name).pid"
@@ -44,7 +49,7 @@ foreach ($service in $services) {
     Write-Host "Starting $($service.Name) on port $($service.Port)..." -ForegroundColor Cyan
 
     $process = Start-Process `
-        -FilePath "mvn" `
+        -FilePath $mavenWrapper `
         -ArgumentList "spring-boot:run" `
         -WorkingDirectory $serviceDir `
         -RedirectStandardOutput $stdoutLog `
