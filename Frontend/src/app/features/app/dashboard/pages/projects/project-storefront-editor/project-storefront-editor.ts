@@ -22,10 +22,38 @@ import { ToastService } from '../../../../../../core/services/toast.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
+import {
+  STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES,
+  STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS,
+  STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS,
+  StorefrontEditorAddElementsCategory,
+  StorefrontEditorAddElementsLibraryItem,
+  filterStorefrontEditorAddElementsLibraryItems,
+} from './storefront-editor-component-library';
+import {
+  StorefrontEditorComponentNode,
+  StorefrontEditorComponentType,
+  createStorefrontEditorComponentNode,
+} from './storefront-editor-component.model';
 
 type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 type PagesPanelLayoutMode = 'grid' | 'rows';
+type SectionLibraryCategory =
+  | 'Welcome'
+  | 'About'
+  | 'Portfolio'
+  | 'Services'
+  | 'Products'
+  | 'Promote & Engage';
+type SectionLibraryTemplate = {
+  id: string;
+  title: string;
+  category: SectionLibraryCategory;
+  type: StorefrontSectionType;
+  layout: 'wide' | 'standard' | 'tall';
+  accent: 'cobalt' | 'linen' | 'ink' | 'sand' | 'sky' | 'charcoal';
+};
 
 @Component({
   selector: 'app-project-storefront-editor',
@@ -37,6 +65,9 @@ type PagesPanelLayoutMode = 'grid' | 'rows';
 export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
+  private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
+  private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
+  private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -57,12 +88,23 @@ export class ProjectStorefrontEditor {
   });
 
   private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private sectionLibraryCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private activeComponentDrag:
+    | {
+        sectionId: string;
+        componentId: string;
+        pointerOffsetX: number;
+        pointerOffsetY: number;
+      }
+    | null = null;
 
   readonly project = signal<Project | null>(null);
   readonly storefront = signal<ProjectStorefront | null>(null);
   readonly workingStorefront = signal<ProjectStorefront | null>(null);
   readonly products = signal<ProjectCatalogProduct[]>([]);
   readonly selectedSectionId = signal<string | null>(null);
+  readonly selectedComponentId = signal<string | null>(null);
   readonly editorSession = signal<StorefrontEditorSession>(this.createDefaultEditorSession());
   readonly undoStack = signal<StorefrontEditorSnapshot[]>([]);
   readonly redoStack = signal<StorefrontEditorSnapshot[]>([]);
@@ -72,14 +114,26 @@ export class ProjectStorefrontEditor {
   readonly isFormaMenuOpen = signal(false);
   readonly isAccountMenuOpen = signal(false);
   readonly isZoomMenuOpen = signal(false);
+  readonly isAddElementsPanelOpen = signal(false);
+  readonly isAddElementsPanelClosing = signal(false);
+  readonly activeAddElementsCategory = signal<StorefrontEditorAddElementsCategory>('All');
+  readonly addElementsSearch = signal('');
   readonly isPagesPanelOpen = signal(false);
   readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
   readonly pageCardMenuId = signal<string | null>(null);
   readonly pageCardMenuTop = signal(0);
   readonly pageCardMenuLeft = signal(0);
   readonly sectionLibraryTargetId = signal<string | null>(null);
+  readonly isSectionLibraryClosing = signal(false);
+  readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Welcome');
+  readonly canScrollAddElementsTabsLeft = signal(false);
+  readonly canScrollAddElementsTabsRight = signal(false);
+  readonly canScrollSectionLibraryTabsLeft = signal(false);
+  readonly canScrollSectionLibraryTabsRight = signal(false);
   readonly sectionOptionsMenuId = signal<string | null>(null);
   readonly draggedSectionId = signal<string | null>(null);
+  readonly draggedComponentId = signal<string | null>(null);
+  readonly componentReorderTargetId = signal<string | null>(null);
   readonly hoveredSectionId = signal<string | null>(null);
   readonly hoveredSectionRailTop = signal(0);
   readonly hasPreviewStageScrollbar = signal(false);
@@ -99,6 +153,19 @@ export class ProjectStorefrontEditor {
   readonly selectedSection = computed<StorefrontHomepageSection | null>(
     () => this.sections().find((section) => section.id === this.selectedSectionId()) ?? null
   );
+  readonly selectedComponent = computed<StorefrontEditorComponentNode | null>(() => {
+    const section = this.selectedSection();
+    const componentId = this.selectedComponentId();
+    if (!section || !componentId) {
+      return null;
+    }
+
+    return this.readSectionComponents(section).find((component) => component.id === componentId) ?? null;
+  });
+  readonly selectedSectionComponents = computed(() => {
+    const section = this.selectedSection();
+    return section ? this.readSectionComponents(section) : [];
+  });
   readonly storeName = computed(
     () => this.workingStorefront()?.storeName ?? this.project()?.storeTitle ?? this.project()?.name ?? 'Storefront'
   );
@@ -141,19 +208,24 @@ export class ProjectStorefrontEditor {
       this.isFormaMenuOpen() ||
       this.isAccountMenuOpen() ||
       this.isZoomMenuOpen() ||
+      this.isAddElementsPanelVisible() ||
       this.isPagesPanelOpen() ||
-      this.isSectionLibraryOpen() ||
+      this.isSectionLibraryVisible() ||
       this.sectionOptionsMenuId() !== null
   );
   readonly hasBlockingOverlay = computed(
     () =>
-      this.isFormaMenuOpen() ||
-      this.isAccountMenuOpen() ||
-      this.isZoomMenuOpen() ||
+      this.isAddElementsPanelVisible() ||
       this.isPagesPanelOpen() ||
-      this.isSectionLibraryOpen()
+      this.isSectionLibraryVisible()
+  );
+  readonly isAddElementsPanelVisible = computed(
+    () => this.isAddElementsPanelOpen() || this.isAddElementsPanelClosing()
   );
   readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !== null);
+  readonly isSectionLibraryVisible = computed(
+    () => this.isSectionLibraryOpen() || this.isSectionLibraryClosing()
+  );
   readonly currentUser = computed(() => this.authService.currentUser);
   readonly currentUserName = computed(() => {
     const user = this.currentUser();
@@ -193,14 +265,58 @@ export class ProjectStorefrontEditor {
     'featured-products',
     'footer',
   ];
+  readonly sectionLibraryCategories: SectionLibraryCategory[] = [
+    'Welcome',
+    'About',
+    'Portfolio',
+    'Services',
+    'Products',
+    'Promote & Engage',
+  ];
+  readonly sectionLibraryTemplates: SectionLibraryTemplate[] = [
+    { id: 'hero-cobalt', title: 'Shop Our Latest Collection', category: 'Welcome', type: 'hero', layout: 'wide', accent: 'cobalt' },
+    { id: 'hero-editorial', title: 'Explore My Latest Work', category: 'Portfolio', type: 'hero', layout: 'standard', accent: 'linen' },
+    { id: 'hero-services', title: 'Efficient Services & Solutions', category: 'Services', type: 'hero', layout: 'tall', accent: 'ink' },
+    { id: 'hero-business', title: 'Reach Your Business Potential', category: 'Promote & Engage', type: 'hero', layout: 'tall', accent: 'sky' },
+    { id: 'products-fashion', title: 'Shop Our Unique Products', category: 'Products', type: 'featured-products', layout: 'standard', accent: 'sand' },
+    { id: 'footer-minimal', title: 'Elegant Footer Details', category: 'About', type: 'footer', layout: 'standard', accent: 'charcoal' },
+    { id: 'announcement-editorial', title: 'Highlight a Quick Announcement', category: 'Welcome', type: 'announcement-bar', layout: 'wide', accent: 'linen' },
+    { id: 'products-beauty', title: 'Discover Modern Products', category: 'Products', type: 'featured-products', layout: 'wide', accent: 'charcoal' },
+  ];
+  readonly visibleSectionLibraryTemplates = computed(() =>
+    this.sectionLibraryTemplates.filter((template) => template.category === this.activeSectionLibraryCategory())
+  );
+  readonly addElementsCategories = STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES;
+  readonly addElementsFeaturedShortcuts = STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS;
+  readonly addElementsLibraryItems = STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS;
+  readonly visibleAddElementsLibraryItems = computed(() => {
+    return filterStorefrontEditorAddElementsLibraryItems(
+      this.addElementsLibraryItems,
+      this.activeAddElementsCategory(),
+      this.addElementsSearch()
+    );
+  });
 
   constructor() {
     this.destroyRef.onDestroy(() => {
       if (this.autosaveTimer) {
         clearTimeout(this.autosaveTimer);
       }
+      if (this.addElementsPanelCloseTimer) {
+        clearTimeout(this.addElementsPanelCloseTimer);
+      }
+      if (this.sectionLibraryCloseTimer) {
+        clearTimeout(this.sectionLibraryCloseTimer);
+      }
     });
     this.loadEditor();
+  }
+
+  @HostListener('window:resize')
+  handleWindowResize(): void {
+    this.updateAddElementsTabScrollState();
+    this.updateSectionLibraryTabScrollState();
+    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -231,11 +347,6 @@ export class ProjectStorefrontEditor {
     }
   }
 
-  @HostListener('window:resize')
-  handleWindowResize(): void {
-    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
-  }
-
   @HostListener('document:mousedown', ['$event'])
   handleDocumentMouseDown(event: MouseEvent): void {
     const target = event.target;
@@ -256,6 +367,41 @@ export class ProjectStorefrontEditor {
         this.pageCardMenuId.set(null);
       }
     }
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  handleComponentPointerMove(event: MouseEvent): void {
+    if (!this.activeComponentDrag) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const container = document.querySelector(
+      `.storefront-editor__preview-section-content[data-section-content-id="${this.activeComponentDrag.sectionId}"]`
+    );
+
+    if (!(container instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = container.getBoundingClientRect();
+    const nextX = event.clientX - rect.left - this.activeComponentDrag.pointerOffsetX;
+    const nextY = event.clientY - rect.top - this.activeComponentDrag.pointerOffsetY;
+
+    this.updateSectionComponentFrame(
+      this.activeComponentDrag.sectionId,
+      this.activeComponentDrag.componentId,
+      nextX,
+      nextY,
+      rect.width,
+      rect.height
+    );
+  }
+
+  @HostListener('document:mouseup')
+  handleComponentPointerUp(): void {
+    this.activeComponentDrag = null;
   }
 
   loadEditor(): void {
@@ -320,11 +466,12 @@ export class ProjectStorefrontEditor {
           this.project.set(null);
           this.storefront.set(null);
           this.workingStorefront.set(null);
-          this.editorSession.set(this.createDefaultEditorSession());
-          this.undoStack.set([]);
-          this.redoStack.set([]);
-          this.products.set([]);
-          this.errorMessage.set('Unable to load the storefront editor right now.');
+            this.editorSession.set(this.createDefaultEditorSession());
+            this.undoStack.set([]);
+            this.redoStack.set([]);
+            this.selectedComponentId.set(null);
+            this.products.set([]);
+            this.errorMessage.set('Unable to load the storefront editor right now.');
         },
       });
   }
@@ -332,12 +479,14 @@ export class ProjectStorefrontEditor {
   selectPageSettings(): void {
     this.sidebarMode.set('page');
     this.selectedSectionId.set(null);
+    this.selectedComponentId.set(null);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
   selectSection(sectionId: string): void {
     this.sidebarMode.set('structure');
     this.selectedSectionId.set(sectionId);
+    this.selectedComponentId.set(null);
     this.sectionOptionsMenuId.set(null);
     this.syncEditorSessionState({ selectedSectionId: sectionId });
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
@@ -373,6 +522,241 @@ export class ProjectStorefrontEditor {
     this.isZoomMenuOpen.set(next);
   }
 
+  toggleAddElementsPanel(): void {
+    if (this.isAddElementsPanelOpen() || this.isAddElementsPanelClosing()) {
+      this.closeAddElementsPanel();
+      return;
+    }
+
+    if (this.addElementsPanelCloseTimer) {
+      clearTimeout(this.addElementsPanelCloseTimer);
+      this.addElementsPanelCloseTimer = null;
+    }
+
+    this.closeFloatingUi();
+    this.isAddElementsPanelClosing.set(false);
+    this.isAddElementsPanelOpen.set(true);
+    setTimeout(() => this.updateAddElementsTabScrollState(), 0);
+  }
+
+  closeAddElementsPanel(): void {
+    if (!this.isAddElementsPanelOpen() && !this.isAddElementsPanelClosing()) {
+      return;
+    }
+
+    if (this.addElementsPanelCloseTimer) {
+      clearTimeout(this.addElementsPanelCloseTimer);
+    }
+
+    this.isAddElementsPanelOpen.set(false);
+    this.isAddElementsPanelClosing.set(true);
+    this.addElementsPanelCloseTimer = setTimeout(() => {
+      this.isAddElementsPanelClosing.set(false);
+      this.canScrollAddElementsTabsLeft.set(false);
+      this.canScrollAddElementsTabsRight.set(false);
+      this.addElementsPanelCloseTimer = null;
+    }, ProjectStorefrontEditor.ADD_ELEMENTS_PANEL_CLOSE_MS);
+  }
+
+  scrollAddElementsTabs(direction: 'left' | 'right'): void {
+    const tabs = this.getAddElementsTabsElement();
+    if (!tabs) {
+      return;
+    }
+
+    const delta = Math.max(180, Math.round(tabs.clientWidth * 0.55));
+    tabs.scrollBy({
+      left: direction === 'right' ? delta : -delta,
+      behavior: 'smooth',
+    });
+
+    setTimeout(() => this.updateAddElementsTabScrollState(), 220);
+  }
+
+  updateAddElementsTabScrollState(): void {
+    const tabs = this.getAddElementsTabsElement();
+    if (!tabs) {
+      this.canScrollAddElementsTabsLeft.set(false);
+      this.canScrollAddElementsTabsRight.set(false);
+      return;
+    }
+
+    const maxScrollLeft = Math.max(0, tabs.scrollWidth - tabs.clientWidth);
+    this.canScrollAddElementsTabsLeft.set(tabs.scrollLeft > 4);
+    this.canScrollAddElementsTabsRight.set(tabs.scrollLeft < maxScrollLeft - 4);
+  }
+
+  insertComponentFromLibrary(item: StorefrontEditorAddElementsLibraryItem): void {
+    const selectedSection = this.selectedSection();
+    if (!selectedSection) {
+      this.toastService.info('Select a section first to add a component inside it.');
+      return;
+    }
+
+    const nextComponent = createStorefrontEditorComponentNode(item.componentType);
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== selectedSection.id) {
+            return section;
+          }
+
+          const components = this.readSectionComponents(section);
+          return this.writeSectionComponents(section, [...components, nextComponent]);
+        }),
+      },
+    }), { syncRail: true });
+
+    this.selectedComponentId.set(nextComponent.id);
+    this.closeAddElementsPanel();
+  }
+
+  selectComponent(sectionId: string, componentId: string, event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.selectedSectionId.set(sectionId);
+    this.selectedComponentId.set(componentId);
+    this.syncEditorSessionState({ selectedSectionId: sectionId }, false);
+  }
+
+  beginComponentMove(sectionId: string, componentId: string, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const section = this.sections().find((item) => item.id === sectionId);
+    const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
+    if (!component) {
+      return;
+    }
+
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    this.activeComponentDrag = {
+      sectionId,
+      componentId,
+      pointerOffsetX: event.clientX - rect.left,
+      pointerOffsetY: event.clientY - rect.top,
+    };
+
+    this.selectComponent(sectionId, componentId);
+  }
+
+  startComponentReorder(componentId: string, event: DragEvent): void {
+    this.draggedComponentId.set(componentId);
+    event.dataTransfer?.setData('text/plain', componentId);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  allowComponentDrop(event: DragEvent, targetComponentId: string): void {
+    event.preventDefault();
+    this.componentReorderTargetId.set(targetComponentId);
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  clearComponentDropTarget(): void {
+    this.componentReorderTargetId.set(null);
+  }
+
+  dropComponentReorder(event: DragEvent, targetComponentId: string): void {
+    event.preventDefault();
+    const draggedComponentId =
+      this.draggedComponentId() || event.dataTransfer?.getData('text/plain') || null;
+    const section = this.selectedSection();
+
+    this.draggedComponentId.set(null);
+    this.componentReorderTargetId.set(null);
+
+    if (!section || !draggedComponentId || draggedComponentId === targetComponentId) {
+      return;
+    }
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((item) => {
+          if (item.id !== section.id) {
+            return item;
+          }
+
+          const components = [...this.readSectionComponents(item)];
+          const draggedIndex = components.findIndex((component) => component.id === draggedComponentId);
+          const targetIndex = components.findIndex((component) => component.id === targetComponentId);
+          if (draggedIndex < 0 || targetIndex < 0) {
+            return item;
+          }
+
+          const [draggedComponent] = components.splice(draggedIndex, 1);
+          const nextTargetIndex = components.findIndex((component) => component.id === targetComponentId);
+          components.splice(nextTargetIndex, 0, draggedComponent);
+          return this.writeSectionComponents(item, components);
+        }),
+      },
+    }), { syncRail: false });
+  }
+
+  endComponentReorder(): void {
+    this.draggedComponentId.set(null);
+    this.componentReorderTargetId.set(null);
+  }
+
+  removeSelectedComponent(): void {
+    const section = this.selectedSection();
+    const componentId = this.selectedComponentId();
+    if (!section || !componentId) {
+      return;
+    }
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((item) => {
+          if (item.id !== section.id) {
+            return item;
+          }
+
+          return this.writeSectionComponents(
+            item,
+            this.readSectionComponents(item).filter((component) => component.id !== componentId)
+          );
+        }),
+      },
+    }), { syncRail: false });
+
+    this.selectedComponentId.set(null);
+  }
+
+  componentKindLabel(type: StorefrontEditorComponentType): string {
+    switch (type) {
+      case 'heading':
+        return 'Heading';
+      case 'paragraph':
+        return 'Paragraph';
+      case 'image':
+        return 'Image';
+      case 'button':
+        return 'Button';
+      case 'container':
+        return 'Container';
+      case 'graphic':
+        return 'Graphic';
+      case 'product-feed':
+        return 'Product feed';
+      case 'blog-feed':
+        return 'Blog feed';
+    }
+  }
+
   togglePagesPanel(): void {
     const next = !this.isPagesPanelOpen();
     this.closeFloatingUi();
@@ -380,22 +764,78 @@ export class ProjectStorefrontEditor {
   }
 
   openSectionLibrary(sectionId: string): void {
+    if (this.sectionLibraryCloseTimer) {
+      clearTimeout(this.sectionLibraryCloseTimer);
+      this.sectionLibraryCloseTimer = null;
+    }
     this.isPagesPanelOpen.set(false);
     this.sectionOptionsMenuId.set(null);
+    this.activeSectionLibraryCategory.set('Welcome');
+    this.isSectionLibraryClosing.set(false);
     this.sectionLibraryTargetId.set(sectionId);
+    setTimeout(() => this.updateSectionLibraryTabScrollState(), 0);
   }
 
   closeSectionLibrary(): void {
-    this.sectionLibraryTargetId.set(null);
+    if (!this.isSectionLibraryOpen() && !this.isSectionLibraryClosing()) {
+      return;
+    }
+
+    if (this.sectionLibraryCloseTimer) {
+      clearTimeout(this.sectionLibraryCloseTimer);
+    }
+
+    this.isSectionLibraryClosing.set(true);
+    this.sectionLibraryCloseTimer = setTimeout(() => {
+      this.sectionLibraryTargetId.set(null);
+      this.isSectionLibraryClosing.set(false);
+      this.canScrollSectionLibraryTabsLeft.set(false);
+      this.canScrollSectionLibraryTabsRight.set(false);
+      this.sectionLibraryCloseTimer = null;
+    }, ProjectStorefrontEditor.SECTION_LIBRARY_CLOSE_MS);
+  }
+
+  setSectionLibraryCategory(category: SectionLibraryCategory): void {
+    this.activeSectionLibraryCategory.set(category);
+    setTimeout(() => this.updateSectionLibraryTabScrollState(), 0);
+  }
+
+  scrollSectionLibraryTabs(direction: 'left' | 'right'): void {
+    const tabs = this.getSectionLibraryTabsElement();
+    if (!tabs) {
+      return;
+    }
+
+    const delta = Math.max(180, Math.round(tabs.clientWidth * 0.45));
+    tabs.scrollBy({
+      left: direction === 'right' ? delta : -delta,
+      behavior: 'smooth',
+    });
+
+    setTimeout(() => this.updateSectionLibraryTabScrollState(), 220);
+  }
+
+  updateSectionLibraryTabScrollState(): void {
+    const tabs = this.getSectionLibraryTabsElement();
+    if (!tabs) {
+      this.canScrollSectionLibraryTabsLeft.set(false);
+      this.canScrollSectionLibraryTabsRight.set(false);
+      return;
+    }
+
+    const maxScrollLeft = Math.max(0, tabs.scrollWidth - tabs.clientWidth);
+    this.canScrollSectionLibraryTabsLeft.set(tabs.scrollLeft > 4);
+    this.canScrollSectionLibraryTabsRight.set(tabs.scrollLeft < maxScrollLeft - 4);
   }
 
   closeFloatingUi(): void {
     this.isFormaMenuOpen.set(false);
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
+    this.closeAddElementsPanel();
     this.isPagesPanelOpen.set(false);
     this.pageCardMenuId.set(null);
-    this.sectionLibraryTargetId.set(null);
+    this.closeSectionLibrary();
     this.sectionOptionsMenuId.set(null);
   }
 
@@ -955,6 +1395,16 @@ export class ProjectStorefrontEditor {
     }
   }
 
+  readSectionComponents(section: StorefrontHomepageSection | null): StorefrontEditorComponentNode[] {
+    const value = (section?.props as Record<string, unknown> | undefined)?.[
+      ProjectStorefrontEditor.SECTION_COMPONENTS_PROP_KEY
+    ];
+
+    return Array.isArray(value)
+      ? (JSON.parse(JSON.stringify(value)) as StorefrontEditorComponentNode[])
+      : [];
+  }
+
   readStringProp(section: StorefrontHomepageSection | null, key: string): string {
     const value = (section?.props as Record<string, unknown> | undefined)?.[key];
     return typeof value === 'string' ? value : '';
@@ -970,6 +1420,15 @@ export class ProjectStorefrontEditor {
     return Array.isArray(value)
       ? value.filter((item: unknown): item is number => typeof item === 'number')
       : [];
+  }
+
+  componentPreviewStyle(component: StorefrontEditorComponentNode): Record<string, string> {
+    return {
+      left: `${component.frame.x}px`,
+      top: `${component.frame.y}px`,
+      width: `${component.frame.width}px`,
+      height: `${component.frame.height}px`,
+    };
   }
 
   trackSection = (_: number, section: StorefrontHomepageSection): string => section.id;
@@ -996,6 +1455,19 @@ export class ProjectStorefrontEditor {
         return 'Feature selected catalog products in a curated section.';
       case 'footer':
         return 'Add brand details and contact information at the bottom.';
+    }
+  }
+
+  sectionLibraryTypeLabel(type: StorefrontSectionType): string {
+    switch (type) {
+      case 'announcement-bar':
+        return 'Announcement';
+      case 'featured-products':
+        return 'Products';
+      case 'footer':
+        return 'Footer';
+      default:
+        return 'Welcome';
     }
   }
 
@@ -1026,6 +1498,59 @@ export class ProjectStorefrontEditor {
 
   private cloneSection(section: StorefrontHomepageSection): StorefrontHomepageSection {
     return JSON.parse(JSON.stringify(section)) as StorefrontHomepageSection;
+  }
+
+  private writeSectionComponents(
+    section: StorefrontHomepageSection,
+    components: StorefrontEditorComponentNode[]
+  ): StorefrontHomepageSection {
+    return {
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_COMPONENTS_PROP_KEY]: components,
+      },
+    };
+  }
+
+  private updateSectionComponentFrame(
+    sectionId: string,
+    componentId: string,
+    nextX: number,
+    nextY: number,
+    containerWidth: number,
+    containerHeight: number
+  ): void {
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          const components = this.readSectionComponents(section).map((component) => {
+            if (component.id !== componentId) {
+              return component;
+            }
+
+            const maxX = Math.max(0, containerWidth - component.frame.width);
+            const maxY = Math.max(0, containerHeight - component.frame.height);
+            return {
+              ...component,
+              frame: {
+                ...component.frame,
+                x: Math.max(0, Math.min(nextX, maxX)),
+                y: Math.max(0, Math.min(nextY, maxY)),
+              },
+            };
+          });
+
+          return this.writeSectionComponents(section, components);
+        }),
+      },
+    }), { syncRail: false });
   }
 
   private createDefaultEditorSession(): StorefrontEditorSession {
@@ -1085,6 +1610,7 @@ export class ProjectStorefrontEditor {
       draftHomepage: JSON.parse(JSON.stringify(snapshot.draftHomepage)) as ProjectStorefront['draftHomepage'],
     });
     this.selectedSectionId.set(snapshot.selectedSectionId);
+    this.selectedComponentId.set(null);
     this.syncEditorSessionState({ selectedSectionId: snapshot.selectedSectionId }, false);
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
   }
@@ -1202,6 +1728,7 @@ export class ProjectStorefrontEditor {
     const editorSession = this.normalizeEditorSession(snapshot.editorSession);
     this.editorSession.set(editorSession);
     this.selectedSectionId.set(editorSession.selectedSectionId);
+    this.selectedComponentId.set(null);
     this.viewport.set(editorSession.viewport);
     this.zoomPercent.set(editorSession.zoomPercent);
     if (options.resetHistory) {
@@ -1466,5 +1993,13 @@ export class ProjectStorefrontEditor {
 
     const days = Math.max(1, Math.round(diffMs / day));
     return `${days} day${days === 1 ? '' : 's'} ago`;
+  }
+
+  private getSectionLibraryTabsElement(): HTMLElement | null {
+    return document.querySelector('.storefront-editor__section-library-tabs');
+  }
+
+  private getAddElementsTabsElement(): HTMLElement | null {
+    return document.querySelector('.storefront-editor__add-elements-tabs-scroll');
   }
 }

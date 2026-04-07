@@ -1,0 +1,693 @@
+<div class="builder-container">
+  <!-- Elements Sidebar -->
+  <aside class="elements-sidebar">
+    <div class="sidebar-header">
+      <h2>Elements</h2>
+      <p>Drag elements to the canvas</p>
+    </div>
+
+    <div class="elements-list">
+      <div class="element-category">
+        <h3 class="category-title">Layout</h3>
+        <div 
+          *ngFor="let element of availableElements.slice(4, 7)"
+          class="element-item"
+          draggable="true"
+          (dragstart)="onDragStart($event, element)"
+          (dragend)="onDragEnd()">
+          <div class="element-icon">{{ element.icon }}</div>
+          <div class="element-info">
+            <div class="element-name">{{ element.name }}</div>
+            <div class="element-desc">{{ element.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="element-category">
+        <h3 class="category-title">Content</h3>
+        <div 
+          *ngFor="let element of availableElements.slice(0, 4)"
+          class="element-item"
+          draggable="true"
+          (dragstart)="onDragStart($event, element)"
+          (dragend)="onDragEnd()">
+          <div class="element-icon">{{ element.icon }}</div>
+          <div class="element-info">
+            <div class="element-name">{{ element.name }}</div>
+            <div class="element-desc">{{ element.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="element-category">
+        <h3 class="category-title">Components</h3>
+        <div 
+          *ngFor="let element of availableElements.slice(7)"
+          class="element-item"
+          draggable="true"
+          (dragstart)="onDragStart($event, element)"
+          (dragend)="onDragEnd()">
+          <div class="element-icon">{{ element.icon }}</div>
+          <div class="element-info">
+            <div class="element-name">{{ element.name }}</div>
+            <div class="element-desc">{{ element.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Canvas Area -->
+  <main class="canvas-area">
+    <!-- Toolbar -->
+    <div class="canvas-toolbar">
+      <div class="toolbar-left">
+        <button class="toolbar-btn" (click)="undo()" [disabled]="!canUndo()" title="Undo (Ctrl+Z)">
+          <span class="btn-icon">↶</span>
+          Undo
+        </button>
+        <button class="toolbar-btn" (click)="redo()" [disabled]="!canRedo()" title="Redo (Ctrl+Shift+Z)">
+          <span class="btn-icon">↷</span>
+          Redo
+        </button>
+        <button class="toolbar-btn" (click)="clearCanvas()">
+          <span class="btn-icon">🗑️</span>
+          Clear Canvas
+        </button>
+        <button class="toolbar-btn" (click)="exportProject()">
+          <span class="btn-icon">💾</span>
+          Save Project
+        </button>
+        <label class="toolbar-btn upload-btn">
+          <span class="btn-icon">📂</span>
+          Load Project
+          <input 
+            type="file" 
+            accept=".json" 
+            (change)="onFileUpload($event)"
+            style="display: none;">
+        </label>
+      </div>
+      <div class="toolbar-center">
+        <span class="canvas-info">
+          {{ canvasElements.length }} element(s) on canvas
+        </span>
+      </div>
+      <div class="toolbar-right">
+        <button class="toolbar-btn" (click)="toggleZoom()">
+          <span class="btn-icon">🔍</span>
+          {{ getZoomPercentage() }}
+        </button>
+        <button class="toolbar-btn preview-btn" (click)="openPreview()">
+          <span class="btn-icon">👁️</span>
+          Preview
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas Drop Zone -->
+    <div 
+      class="canvas-overlay"
+      [class.drag-over]="isDragging"
+      (drop)="onCanvasDrop($event)"
+      (dragover)="onDragOver($event)"
+      (contextmenu)="onCanvasContextMenu($event)"
+      (click)="onCanvasClick($event)"
+      (mousedown)="onCanvasMouseDown($event)">
+      
+      <!-- Canvas Wrapper for Centering -->
+      <div class="canvas-wrapper"
+           [style.width.px]="getCanvasWrapperWidth()"
+           [style.height.px]="getCanvasWrapperHeight()">
+        
+        <!-- Zoomable Canvas Container -->
+        <div 
+          class="canvas-container"
+          [style.width.px]="canvasWidth"
+          [style.height.px]="canvasHeight"
+          [style.transform]="'scale(' + zoom + ')'"
+          [style.transform-origin]="'0 0'">
+      
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="canvasElements.length === 0 && !isDragging">
+            <div class="empty-icon">🎨</div>
+            <h3>Start Building Your Website</h3>
+            <p>Drag elements from the sidebar to begin</p>
+          </div>
+
+          <!-- Dropped Elements -->
+          <div 
+            *ngFor="let element of canvasElements"
+            class="canvas-element"
+            [class.selected]="selectedElement === element"
+            [class.multi-selected]="isMultiSelected(element)"
+            [class.dragging]="draggedElement === element"
+            [class.editing]="isEditingText && editingElement === element"
+            [style.left.px]="element.position.x"
+            [style.top.px]="element.position.y"
+            [style.width.px]="element.size?.width"
+            [style.height.px]="element.size?.height"
+            [style.z-index]="element.zIndex || 0"
+            [style.background-color]="element.backgroundColor || 'transparent'"
+            [style.border-radius]="getBorderRadiusStyle(element)"
+            [style.transform]="'rotate(' + (element.rotation || 0) + 'deg)'"
+            [style.transform-origin]="'center center'"
+            (mousedown)="onElementMouseDown($event, element)"
+            (dblclick)="onElementDoubleClick($event, element)"
+            (contextmenu)="onContextMenu($event, element)"
+            (click)="selectElement(element, $event)">
+        
+            <!-- Resize Handles -->
+            <div class="resize-handles" *ngIf="selectedElement === element && !isResizing && !isRotating && !isEditingText">
+              <div class="resize-handle nw" (mousedown)="onResizeStart($event, element, 'nw')"></div>
+              <div class="resize-handle n" (mousedown)="onResizeStart($event, element, 'n')"></div>
+              <div class="resize-handle ne" (mousedown)="onResizeStart($event, element, 'ne')"></div>
+              <div class="resize-handle e" (mousedown)="onResizeStart($event, element, 'e')"></div>
+              <div class="resize-handle se" (mousedown)="onResizeStart($event, element, 'se')"></div>
+              <div class="resize-handle s" (mousedown)="onResizeStart($event, element, 's')"></div>
+              <div class="resize-handle sw" (mousedown)="onResizeStart($event, element, 'sw')"></div>
+              <div class="resize-handle w" (mousedown)="onResizeStart($event, element, 'w')"></div>
+            </div>
+
+            <!-- Rotation Handles (10px outside corners) -->
+            <div class="rotation-handles" *ngIf="selectedElement === element && !isResizing && !isRotating && !isEditingText">
+              <div class="rotation-handle rotation-nw" (mousedown)="onRotateStart($event, element)"></div>
+              <div class="rotation-handle rotation-ne" (mousedown)="onRotateStart($event, element)"></div>
+              <div class="rotation-handle rotation-se" (mousedown)="onRotateStart($event, element)"></div>
+              <div class="rotation-handle rotation-sw" (mousedown)="onRotateStart($event, element)"></div>
+            </div>
+
+            <!-- Size Indicator -->
+            <div class="size-indicator" *ngIf="selectedElement === element && !isEditingText"
+                 [class.flipped-position]="isRotationFlipped(element.rotation || 0)"
+                 [style.transform]="'translateX(-50%) scale(' + (1 / zoom) + ')' + (isRotationFlipped(element.rotation || 0) ? ' rotate(180deg)' : '')">
+              {{ element.size?.width || 0 }} × {{ element.size?.height || 0 }}
+            </div>
+
+            <!-- Element Name Label (top-left, visible when selected) -->
+            <div class="element-name-label"
+                 *ngIf="selectedElement === element && !isEditingText && !(isEditingName && editingNameElement === element)"
+                 [class.flipped-position]="isRotationFlipped(element.rotation || 0)"
+                 [style.transform]="'scale(' + (1 / zoom) + ')'"
+                 (dblclick)="startEditingName($event, element)"
+                 (mousedown)="$event.stopPropagation()">
+              <span class="element-name-type">{{ element.name }}</span>
+              <span class="element-name-custom">{{ element.customName || 'Untitled' }}</span>
+            </div>
+
+            <!-- Element Name Input (replaces label while editing) -->
+            <input
+              *ngIf="isEditingName && editingNameElement === element"
+              class="element-name-input"
+              [style.transform]="'scale(' + (1 / zoom) + ') rotate(' + (-(element.rotation || 0)) + 'deg)'"
+              [(ngModel)]="editingNameValue"
+              (keydown)="onNameInputKeydown($event)"
+              (blur)="finishEditingName()"
+              (mousedown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation()"
+            />
+
+            <div class="element-content">
+              <!-- Heading display -->
+              <h1 
+                *ngIf="element.type === 'heading'" 
+                class="rendered-heading"
+                [style.font-size.px]="element.fontSize || 32"
+                [style.font-family]="element.fontFamily || 'Arial'"
+                [style.color]="element.textColor || '#0f172a'"
+                [style.text-align]="element.textAlign || 'left'"
+                [style.justify-content]="element.verticalAlign === 'top' ? 'flex-start' : element.verticalAlign === 'bottom' ? 'flex-end' : 'center'">
+                {{ element.content }}
+              </h1>
+              
+              <!-- Text display -->
+              <p 
+                *ngIf="element.type === 'text'" 
+                class="rendered-text"
+                [style.font-size.px]="element.fontSize || 16"
+                [style.font-family]="element.fontFamily || 'Arial'"
+                [style.color]="element.textColor || '#475569'"
+                [style.text-align]="element.textAlign || 'left'"
+                [style.justify-content]="element.verticalAlign === 'top' ? 'flex-start' : element.verticalAlign === 'bottom' ? 'flex-end' : 'center'">
+                {{ element.content }}
+              </p>
+              
+              <button *ngIf="element.type === 'button'" class="rendered-button">{{ element.content }}</button>
+
+              <div *ngIf="element.type === 'image'" class="rendered-image">
+                <img [src]="element.content" alt="Image">
+              </div>
+
+              <nav *ngIf="element.type === 'navbar'" class="rendered-navbar">
+                <span>{{ element.content }}</span>
+              </nav>
+
+              <div *ngIf="element.type === 'hero'" class="rendered-hero">
+                <h2>{{ element.content }}</h2>
+              </div>
+
+              <div *ngIf="element.type === 'card'" class="rendered-card">
+                <p>{{ element.content }}</p>
+              </div>
+
+              <div *ngIf="element.type === 'container'" class="rendered-container">
+                <!-- Empty container - no content displayed -->
+              </div>
+
+              <div *ngIf="element.type === 'grid'" class="rendered-grid">
+                <div class="grid-col"></div>
+                <div class="grid-col"></div>
+                <div class="grid-col"></div>
+              </div>
+
+              <form *ngIf="element.type === 'form'" class="rendered-form">
+                <input type="text" placeholder="Enter text...">
+              </form>
+            </div>
+            <!-- End of Element Content -->
+          </div>
+          <!-- End of Canvas Element (ngFor loop) -->
+          
+          <!-- Selection Box for Multi-Select (inside canvas-container, scales with zoom) -->
+          <div 
+            *ngIf="isSelecting"
+            class="selection-box"
+            [style.left.px]="selectionBox.x"
+            [style.top.px]="selectionBox.y"
+            [style.width.px]="selectionBox.width"
+            [style.height.px]="selectionBox.height">
+          </div>
+          
+        </div>
+        <!-- End of Canvas Container -->
+      </div>
+      <!-- End of Canvas Wrapper -->
+
+    </div>
+    <!-- End of Canvas Overlay -->
+
+  </main>
+  <!-- End of Main -->
+
+  <!-- Figma-Style Right Properties Panel (fixed position outside main) -->
+  <div 
+    *ngIf="showPropertiesPanel && editingElement"
+    class="right-properties-panel"
+    (click)="$event.stopPropagation()"
+    (mousedown)="$event.stopPropagation()">
+    
+    <div class="properties-header">
+      <h4>{{ editingElement.type === 'heading' ? 'Heading' : editingElement.type === 'text' ? 'Text' : 'Container' }}</h4>
+      <button class="close-properties" (click)="closePropertiesPanel()">✕</button>
+    </div>
+
+    <div class="properties-content">
+      <!-- Text Content (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Content</label>
+        <textarea 
+          class="content-textarea"
+          [(ngModel)]="editingText"
+          (input)="onEditingTextChange()"
+          rows="3"
+          placeholder="Type your text..."></textarea>
+      </div>
+
+      <!-- Font Family (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Font</label>
+        <select [(ngModel)]="editingElement.fontFamily" (change)="updateTextProperty('fontFamily', editingElement.fontFamily)">
+          <option *ngFor="let font of availableFonts" [value]="font">{{ font }}</option>
+        </select>
+      </div>
+
+      <!-- Font Size (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Size</label>
+        <input 
+          type="number" 
+          list="fontSizePresets"
+          [(ngModel)]="editingElement.fontSize" 
+          (change)="updateTextProperty('fontSize', editingElement.fontSize)"
+          (input)="editingElement.fontSize = this.Math.floor(+$any($event.target).value)"
+          min="10" 
+          max="100"
+          step="1"
+          placeholder="Size">
+        <datalist id="fontSizePresets">
+          <option *ngFor="let size of fontSizePresets" [value]="size">
+        </datalist>
+      </div>
+
+      <!-- Text Color (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Color</label>
+        <div class="color-controls">
+          <input 
+            type="color" 
+            [(ngModel)]="editingElement.textColor" 
+            (change)="updateTextProperty('textColor', editingElement.textColor)">
+          <input 
+            type="text" 
+            [(ngModel)]="editingElement.textColor" 
+            (change)="updateTextProperty('textColor', editingElement.textColor)"
+            placeholder="#000000">
+        </div>
+      </div>
+
+      <!-- Horizontal Alignment (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Align</label>
+        <div class="alignment-buttons">
+          <button 
+            [class.active]="editingElement.textAlign === 'left'"
+            (click)="updateTextProperty('textAlign', 'left')"
+            title="Left">
+            ⬅️
+          </button>
+          <button 
+            [class.active]="editingElement.textAlign === 'center'"
+            (click)="updateTextProperty('textAlign', 'center')"
+            title="Center">
+            ↔️
+          </button>
+          <button 
+            [class.active]="editingElement.textAlign === 'right'"
+            (click)="updateTextProperty('textAlign', 'right')"
+            title="Right">
+            ➡️
+          </button>
+        </div>
+      </div>
+
+      <!-- Vertical Alignment (only for text and heading) -->
+      <div class="property-group" *ngIf="editingElement.type === 'text' || editingElement.type === 'heading'">
+        <label>Vertical</label>
+        <div class="alignment-buttons">
+          <button 
+            [class.active]="editingElement.verticalAlign === 'top'"
+            (click)="updateTextProperty('verticalAlign', 'top')"
+            title="Top">
+            ⬆️
+          </button>
+          <button 
+            [class.active]="editingElement.verticalAlign === 'middle'"
+            (click)="updateTextProperty('verticalAlign', 'middle')"
+            title="Middle">
+            ↕️
+          </button>
+          <button 
+            [class.active]="editingElement.verticalAlign === 'bottom'"
+            (click)="updateTextProperty('verticalAlign', 'bottom')"
+            title="Bottom">
+            ⬇️
+          </button>
+        </div>
+      </div>
+
+      <!-- Background Color (Fill) -->
+      <div class="property-group">
+        <label>Fill</label>
+        <div class="color-controls">
+          <input 
+            type="color" 
+            [(ngModel)]="editingElement.backgroundColor" 
+            (change)="updateTextProperty('backgroundColor', editingElement.backgroundColor)">
+          <input 
+            type="text" 
+            [(ngModel)]="editingElement.backgroundColor" 
+            (change)="updateTextProperty('backgroundColor', editingElement.backgroundColor)"
+            placeholder="transparent">
+        </div>
+      </div>
+
+      <!-- Border Radius -->
+      <div class="property-group">
+        <label>Radius</label>
+        <div class="radius-controls">
+          <!-- Uniform radius input (shown when customBorderRadius is false) -->
+          <div *ngIf="!editingElement.customBorderRadius" class="radius-uniform">
+            <input 
+              type="number" 
+              [(ngModel)]="editingElement.borderRadius" 
+              (change)="updateTextProperty('borderRadius', editingElement.borderRadius)"
+              min="0" 
+              max="100"
+              step="1"
+              placeholder="0">
+          </div>
+          
+          <!-- Custom radius inputs (shown when customBorderRadius is true) -->
+          <div *ngIf="editingElement.customBorderRadius" class="radius-custom">
+            <div class="radius-grid">
+              <input 
+                type="number" 
+                [(ngModel)]="editingElement.borderRadiusTopLeft" 
+                (change)="updateTextProperty('borderRadiusTopLeft', editingElement.borderRadiusTopLeft)"
+                min="0" 
+                max="100"
+                title="Top Left"
+                placeholder="TL">
+              <input 
+                type="number" 
+                [(ngModel)]="editingElement.borderRadiusTopRight" 
+                (change)="updateTextProperty('borderRadiusTopRight', editingElement.borderRadiusTopRight)"
+                min="0" 
+                max="100"
+                title="Top Right"
+                placeholder="TR">
+              <input 
+                type="number" 
+                [(ngModel)]="editingElement.borderRadiusBottomLeft" 
+                (change)="updateTextProperty('borderRadiusBottomLeft', editingElement.borderRadiusBottomLeft)"
+                min="0" 
+                max="100"
+                title="Bottom Left"
+                placeholder="BL">
+              <input 
+                type="number" 
+                [(ngModel)]="editingElement.borderRadiusBottomRight" 
+                (change)="updateTextProperty('borderRadiusBottomRight', editingElement.borderRadiusBottomRight)"
+                min="0" 
+                max="100"
+                title="Bottom Right"
+                placeholder="BR">
+            </div>
+          </div>
+          
+          <!-- Toggle button for custom radius -->
+          <button 
+            class="toggle-custom-radius" 
+            (click)="toggleCustomBorderRadius()"
+            [class.active]="editingElement.customBorderRadius"
+            title="Toggle individual corner radius">
+            {{ editingElement.customBorderRadius ? '🔓' : '🔒' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Width and Height -->
+      <div class="property-group">
+        <label>Size (W×H)</label>
+        <div class="size-controls">
+          <input 
+            type="number" 
+            [(ngModel)]="editingElement.size!.width" 
+            (change)="updateTextProperty('size', editingElement.size)"
+            min="10" 
+            max="1200"
+            step="1"
+            placeholder="Width">
+          <span class="size-separator">×</span>
+          <input 
+            type="number" 
+            [(ngModel)]="editingElement.size!.height" 
+            (change)="updateTextProperty('size', editingElement.size)"
+            min="10" 
+            max="2000"
+            step="1"
+            placeholder="Height">
+        </div>
+      </div>
+
+      <!-- Rotation -->
+      <div class="property-group">
+        <label>Rotate</label>
+        <div class="rotation-controls">
+          <input 
+            type="number" 
+            [(ngModel)]="editingElement.rotation" 
+            (input)="editingElement.rotation = normalizeRotation(+$any($event.target).value)"
+            (change)="updateTextProperty('rotation', editingElement.rotation)"
+            step="1"
+            placeholder="0">
+            step="1"
+            placeholder="0">
+          <span class="rotation-unit">°</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu on ELEMENT (outside main, fixed position) -->
+  <div 
+    *ngIf="contextMenuVisible && contextMenuElement" 
+    class="context-menu"
+    [style.left.px]="contextMenuPosition.x"
+    [style.top.px]="contextMenuPosition.y"
+    (click)="$event.stopPropagation()">
+        
+    <div class="context-menu-item" (click)="copyElement()">
+      <span class="menu-icon">📋</span>
+      <span>Copy</span>
+      <span class="menu-shortcut">Ctrl+C</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="pasteElement()" [class.disabled]="!clipboard">
+      <span class="menu-icon">📄</span>
+      <span>Paste</span>
+      <span class="menu-shortcut">Ctrl+V</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="duplicateElement()">
+      <span class="menu-icon">📑</span>
+      <span>Duplicate</span>
+      <span class="menu-shortcut">Ctrl+D</span>
+    </div>
+    
+    <div class="context-menu-divider"></div>
+    
+    <div class="context-menu-item" (click)="bringToFront()">
+      <span class="menu-icon">⬆️</span>
+      <span>Bring to Front</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="bringForward()">
+      <span class="menu-icon">🔼</span>
+      <span>Bring Forward</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="sendBackward()">
+      <span class="menu-icon">🔽</span>
+      <span>Send Backward</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="sendToBack()">
+      <span class="menu-icon">⬇️</span>
+      <span>Send to Back</span>
+    </div>
+    
+    <div class="context-menu-divider"></div>
+    
+    <div class="context-menu-item" (click)="createGroup()" [class.disabled]="selectedElements.length < 2">
+      <span class="menu-icon">📦</span>
+      <span>Group</span>
+      <span class="menu-shortcut">Ctrl+G</span>
+    </div>
+    
+    <div class="context-menu-item" (click)="ungroupElement(contextMenuElement!)" [class.disabled]="!contextMenuElement.groupId">
+      <span class="menu-icon">📂</span>
+      <span>Ungroup</span>
+      <span class="menu-shortcut">Ctrl+Shift+G</span>
+    </div>
+    
+    <div class="context-menu-divider"></div>
+    
+    <div class="context-menu-item danger" (click)="deleteElementFromContext()">
+      <span class="menu-icon">🗑️</span>
+      <span>Delete</span>
+      <span class="menu-shortcut">Del</span>
+    </div>
+  </div>
+
+  <!-- Context Menu on EMPTY CANVAS (paste only) -->
+  <div 
+    *ngIf="contextMenuVisible && !contextMenuElement" 
+    class="context-menu"
+    [style.left.px]="contextMenuPosition.x"
+    [style.top.px]="contextMenuPosition.y"
+    (click)="$event.stopPropagation()">
+
+    <div class="context-menu-item" (click)="pasteElement()" [class.disabled]="!clipboard">
+      <span class="menu-icon">📄</span>
+      <span>Paste</span>
+      <span class="menu-shortcut">Ctrl+V</span>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" *ngIf="isPreviewMode" (click)="closePreview()">
+    <div class="preview-header">
+      <h3>Preview Mode</h3>
+      <button class="preview-close-btn" (click)="closePreview()">✕</button>
+    </div>
+    <div class="preview-content" (click)="$event.stopPropagation()">
+      <div class="preview-canvas" [style.height.px]="canvasHeight">
+        <div 
+          *ngFor="let element of canvasElements"
+          class="preview-element"
+          [style.position]="'absolute'"
+          [style.left.px]="element.position.x"
+          [style.top.px]="element.position.y"
+          [style.width.px]="element.size?.width"
+          [style.height.px]="element.size?.height"
+          [style.z-index]="element.zIndex || 0">
+          
+          <div class="element-content">
+            <h1 *ngIf="element.type === 'heading'" 
+                class="rendered-heading"
+                [style.font-size.px]="element.fontSize || 32"
+                [style.font-family]="element.fontFamily || 'Arial'"
+                [style.color]="element.textColor || '#0f172a'"
+                [style.text-align]="element.textAlign || 'left'"
+                [style.justify-content]="element.verticalAlign === 'top' ? 'flex-start' : element.verticalAlign === 'bottom' ? 'flex-end' : 'center'">
+              {{ element.content }}
+            </h1>
+            <p *ngIf="element.type === 'text'" 
+               class="rendered-text"
+               [style.font-size.px]="element.fontSize || 16"
+               [style.font-family]="element.fontFamily || 'Arial'"
+               [style.color]="element.textColor || '#475569'"
+               [style.text-align]="element.textAlign || 'left'"
+               [style.justify-content]="element.verticalAlign === 'top' ? 'flex-start' : element.verticalAlign === 'bottom' ? 'flex-end' : 'center'">
+              {{ element.content }}
+            </p>
+            <button *ngIf="element.type === 'button'" class="rendered-button">{{ element.content }}</button>
+
+            <div *ngIf="element.type === 'image'" class="rendered-image">
+              <img [src]="element.content" alt="Image">
+            </div>
+
+            <nav *ngIf="element.type === 'navbar'" class="rendered-navbar">
+              <span>{{ element.content }}</span>
+            </nav>
+
+            <div *ngIf="element.type === 'hero'" class="rendered-hero">
+              <h2>{{ element.content }}</h2>
+            </div>
+
+            <div *ngIf="element.type === 'card'" class="rendered-card">
+              <p>{{ element.content }}</p>
+            </div>
+
+            <div *ngIf="element.type === 'container'" class="rendered-container">
+              <!-- Empty container - no content displayed -->
+            </div>
+
+            <div *ngIf="element.type === 'grid'" class="rendered-grid">
+              <div class="grid-col"></div>
+              <div class="grid-col"></div>
+              <div class="grid-col"></div>
+            </div>
+
+            <form *ngIf="element.type === 'form'" class="rendered-form">
+              <input type="text" placeholder="Enter text...">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- End of Builder Container -->
