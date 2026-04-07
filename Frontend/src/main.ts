@@ -10,5 +10,10 @@ declare global {
 
 if (!window.__FORMA_SKIP_BOOTSTRAP__) {
   bootstrapApplication(App, appConfig)
+    .then(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.classList.add('forma-app-ready');
+      });
+    })
     .catch((err) => console.error(err));
 }
