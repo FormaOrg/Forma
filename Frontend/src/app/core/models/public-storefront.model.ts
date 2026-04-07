@@ -24,6 +24,12 @@ export interface PublicStorefrontHome {
   featuredProducts: PublicStorefrontProduct[];
 }
 
+export interface EditorStorefrontPreviewSnapshot {
+  storefront: PublicStorefrontHome;
+  products: PublicStorefrontProduct[];
+  savedAt: string;
+}
+
 export interface StoreCartItem {
   productId: number;
   name: string;

@@ -11,16 +11,16 @@
   <div class="storefront-products">
     <header class="storefront-products__header">
       <div>
-        <a class="storefront-products__brand" [routerLink]="['/store', projectId()]">
+        <a class="storefront-products__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">
           {{ storefront()?.storeName || 'Storefront' }}
         </a>
-        <p>Published products from this store's live catalog.</p>
+        <p>{{ isEditorPreview() ? 'Previewing the draft catalog from the editor.' : \"Published products from this store's live catalog.\" }}</p>
       </div>
 
       <nav class="storefront-products__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']">Cart ({{ cartCount() }})</a>
+        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
+        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
+        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
       </nav>
     </header>
 
@@ -28,14 +28,14 @@
       <section class="storefront-products__hero">
         <span>Store catalog</span>
         <h1>Browse products</h1>
-        <p>{{ products().length }} live item{{ products().length === 1 ? '' : 's' }} ready to order.</p>
+        <p>{{ products().length }} {{ isEditorPreview() ? 'preview item' : 'live item' }}{{ products().length === 1 ? '' : 's' }} ready to order.</p>
       </section>
 
       @if (products().length) {
         <section class="storefront-products__grid">
           @for (product of products(); track trackProduct($index, product)) {
             <article class="storefront-products__card">
-              <a [routerLink]="['/store', projectId(), 'products', product.id]">
+              <a [attr.href]="productRoute(product.id)">
                 <div class="storefront-products__media">
                   @if (product.imageUrl) {
                     <img [src]="product.imageUrl" [alt]="product.name" />

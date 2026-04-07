@@ -18,6 +18,7 @@ import { ProjectCatalogService } from '../../../../../../core/services/project-c
 import { ProjectStorefrontService } from '../../../../../../core/services/project-storefront.service';
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
+import { PublicStorefrontService } from '../../../../../../core/services/public-storefront.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
@@ -85,6 +86,7 @@ export class ProjectStorefrontEditor {
   private readonly projectCatalogService = inject(ProjectCatalogService);
   private readonly projectStorefrontService = inject(ProjectStorefrontService);
   private readonly projectWorkspaceContextService = inject(ProjectWorkspaceContextService);
+  private readonly publicStorefrontService = inject(PublicStorefrontService);
   private readonly toastService = inject(ToastService);
   private readonly uploadService = inject(UploadService);
 
@@ -1796,13 +1798,71 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   openPublicPreview(): void {
-    const projectId = this.projectId();
-    if (!projectId) {
-      return;
-    }
-
-    window.open(`/store/${projectId}`, '_blank', 'noopener');
+  const projectId = this.projectId();
+  const workingStorefront = this.workingStorefront();
+  const project = this.project();
+  if (!projectId) {
+    return;
   }
+
+  if (workingStorefront && workingStorefront.draftHomepage) {
+    const previewProducts = this.products()
+      .filter(
+        (product) =>
+          product.status !== 'ARCHIVED' &&
+          !!product.name?.trim() &&
+          product.price != null &&
+          Number(product.price) > 0
+      )
+      .map((product) => ({
+        id: product.id,
+        name: product.name,
+        description: product.description ?? null,
+        sku: product.sku ?? null,
+        category: product.category ?? null,
+        productType: product.productType ?? null,
+        price: product.price,
+        compareAtPrice: product.compareAtPrice ?? null,
+        inventoryQuantity: product.inventoryQuantity ?? 0,
+        imageUrl: product.imageUrl ?? null,
+        tags: Array.isArray(product.tags) ? product.tags : [],
+        createdAt: product.createdAt ?? null,
+        updatedAt: product.updatedAt ?? null,
+      }));
+
+    this.publicStorefrontService.saveEditorPreviewSnapshot(projectId, {
+      savedAt: new Date().toISOString(),
+      storefront: {
+        projectId,
+        storeName:
+          workingStorefront.storeName?.trim() ||
+          project?.storeTitle?.trim() ||
+          project?.name?.trim() ||
+          'Storefront',
+        themeKey: workingStorefront.themeKey ?? null,
+        homepage: structuredClone(workingStorefront.draftHomepage),
+        featuredProducts: this.featuredProductsPreview().map((product) => ({
+          id: product.id,
+          name: product.name,
+          description: product.description ?? null,
+          sku: product.sku ?? null,
+          category: product.category ?? null,
+          productType: product.productType ?? null,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice ?? null,
+          inventoryQuantity: product.inventoryQuantity ?? 0,
+          imageUrl: product.imageUrl ?? null,
+          tags: Array.isArray(product.tags) ? product.tags : [],
+          createdAt: product.createdAt ?? null,
+          updatedAt: product.updatedAt ?? null,
+        })),
+      },
+      products: previewProducts,
+    });
+  }
+
+  window.open(`/store/${projectId}?preview=editor`, '_blank', 'noopener');
+}
 
   triggerPublishFromMenu(): void {
     this.closeFloatingUi();

@@ -20,6 +20,7 @@ import tn.forma.users.model.User;
 import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.ProjectStorefrontRepository;
+import tn.forma.users.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +41,9 @@ class PublicStorefrontServiceTest {
 
     @Mock
     private ProjectProductRepository projectProductRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -62,7 +66,8 @@ class PublicStorefrontServiceTest {
         PublicStorefrontService service = new PublicStorefrontService(
                 projectRepository,
                 projectStorefrontRepository,
-                projectProductRepository
+                projectProductRepository,
+                userRepository
         );
 
         var home = service.getPublishedStorefrontHome(project.getId());
@@ -93,12 +98,75 @@ class PublicStorefrontServiceTest {
         PublicStorefrontService service = new PublicStorefrontService(
                 projectRepository,
                 projectStorefrontRepository,
-                projectProductRepository
+                projectProductRepository,
+                userRepository
         );
 
         assertThatThrownBy(() -> service.getPublishedProducts(project.getId()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Storefront is not published");
+    }
+
+    @Test
+    void getPreviewStorefrontHomeReturnsDraftHomepageAndPreviewProducts() {
+        Project project = buildProject();
+        User user = project.getUser();
+
+        ObjectNode draftHomepage = objectMapper.createObjectNode();
+        draftHomepage.put("version", 1);
+        draftHomepage.put("pageKey", "home");
+        draftHomepage.set("seo", objectMapper.createObjectNode().put("title", "Draft shop"));
+        ArrayNode sections = objectMapper.createArrayNode();
+        ObjectNode featuredSection = objectMapper.createObjectNode();
+        featuredSection.put("id", "featured-products-1");
+        featuredSection.put("type", "featured-products");
+        featuredSection.put("enabled", true);
+        ObjectNode props = objectMapper.createObjectNode();
+        ArrayNode ids = objectMapper.createArrayNode();
+        ids.add(12L);
+        props.set("productIds", ids);
+        props.put("maxItems", 4);
+        featuredSection.set("props", props);
+        sections.add(featuredSection);
+        draftHomepage.set("sections", sections);
+
+        ProjectStorefront storefront = ProjectStorefront.builder()
+                .id(22L)
+                .project(project)
+                .storeName("Forma Shop")
+                .storeStatus(StorefrontStatus.DRAFT)
+                .draftHomepageJson(draftHomepage)
+                .publishedHomepageJson(objectMapper.createObjectNode().put("version", 99))
+                .build();
+
+        ProjectProduct draftProduct = buildProduct(
+                project,
+                12L,
+                "Preview Chair",
+                ProjectProductStatus.DRAFT,
+                new BigDecimal("210.00"),
+                0,
+                null
+        );
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectStorefrontRepository.findByProjectId(project.getId())).thenReturn(Optional.of(storefront));
+        when(projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId())).thenReturn(List.of(draftProduct));
+
+        PublicStorefrontService service = new PublicStorefrontService(
+                projectRepository,
+                projectStorefrontRepository,
+                projectProductRepository,
+                userRepository
+        );
+
+        var home = service.getPreviewStorefrontHome(user.getEmail(), project.getId());
+        var products = service.getPreviewProducts(user.getEmail(), project.getId());
+
+        assertThat(home.getHomepage().path("seo").path("title").asText()).isEqualTo("Draft shop");
+        assertThat(home.getFeaturedProducts()).extracting("id").containsExactly(12L);
+        assertThat(products).extracting("id").containsExactly(12L);
     }
 
     private Project buildProject() {
