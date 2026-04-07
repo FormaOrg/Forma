@@ -1,0 +1,401 @@
+<div class="media-manager" (click)="handleBackdropClick($event)">
+  <section class="media-manager__dialog" aria-modal="true" role="dialog" aria-labelledby="media-manager-title">
+    <header class="media-manager__header">
+      <div class="media-manager__header-copy">
+        <h2 id="media-manager-title">Choose media files</h2>
+        <p>Manage uploads, browse your library, and pick the right asset without leaving the editor.</p>
+      </div>
+
+      <div class="media-manager__header-actions">
+        <button type="button" class="media-manager__icon-button" aria-label="Help">
+          <app-icon name="help-circle" [size]="18"></app-icon>
+        </button>
+        <button type="button" class="media-manager__icon-button" aria-label="Close media manager" (click)="close.emit()">
+          <app-icon name="x" [size]="18"></app-icon>
+        </button>
+      </div>
+    </header>
+
+    <div class="media-manager__body">
+      <aside class="media-manager__sidebar">
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          multiple
+          class="media-manager__file-input"
+          (change)="onFileInputChange($event)"
+        />
+
+        <button type="button" class="media-manager__upload" (click)="fileInput.click()">
+          <app-icon name="upload" [size]="18"></app-icon>
+          <span>{{ isUploading ? 'Uploading...' : 'Upload media' }}</span>
+        </button>
+
+        <nav class="media-manager__nav">
+          <button
+            type="button"
+            class="media-manager__nav-link"
+            [class.media-manager__nav-link--active]="activeSection === 'home'"
+            (click)="selectSection('home')"
+          >
+            Home
+          </button>
+        </nav>
+
+        <div class="media-manager__nav-group">
+          <p>Manage</p>
+          @for (link of manageLinks; track trackLink($index, link)) {
+            <button
+              type="button"
+              class="media-manager__nav-link"
+              [class.media-manager__nav-link--active]="activeSection === link.id"
+              (click)="selectSection(link.id)"
+            >
+              {{ link.label }}
+            </button>
+          }
+        </div>
+
+        <div class="media-manager__nav-group">
+          <p>Discover</p>
+          @for (link of discoverLinks; track trackLink($index, link)) {
+            <button
+              type="button"
+              class="media-manager__nav-link"
+              [class.media-manager__nav-link--active]="activeSection === link.id"
+              (click)="selectSection(link.id)"
+            >
+              {{ link.label }}
+            </button>
+          }
+        </div>
+      </aside>
+
+      <div class="media-manager__content">
+        @if (activeSection === 'home') {
+          <div class="media-manager__home">
+            <section class="media-manager__insights">
+              <article class="media-manager__insight-card">
+                <span>Assets</span>
+                <strong>{{ totalAssetCount }}</strong>
+                <small>Your library is ready for quick reuse.</small>
+              </article>
+              <article class="media-manager__insight-card">
+                <span>Images</span>
+                <strong>{{ imageAssetCount }}</strong>
+                <small>Visuals currently available in the workspace.</small>
+              </article>
+              <article class="media-manager__insight-card">
+                <span>Storage</span>
+                <strong>{{ totalStorageLabel }}</strong>
+                <small>Total size of uploaded project media.</small>
+              </article>
+            </section>
+
+            <section class="media-manager__recent">
+              <div class="media-manager__section-head">
+                <div>
+                  <strong>Recent uploads</strong>
+                  <span>The latest files added to this project.</span>
+                </div>
+                <button type="button" class="media-manager__ghost-link" (click)="selectSection('site-files')">Open library</button>
+              </div>
+
+              <div class="media-manager__recent-grid">
+                @for (asset of recentUploads; track trackAsset($index, asset)) {
+                  <button
+                    type="button"
+                    class="media-manager__recent-card"
+                    [class.media-manager__recent-card--selected]="selectedAssetId === asset.id"
+                    (click)="selectAsset(asset.id)"
+                  >
+                    <span class="media-manager__recent-card-thumb">
+                      <img [src]="asset.url" [alt]="asset.name" loading="lazy" />
+                    </span>
+                    <span class="media-manager__recent-card-copy">
+                      <strong>{{ asset.name }}</strong>
+                      <small>{{ formatDate(asset.uploadedAt) }}</small>
+                    </span>
+                  </button>
+                }
+              </div>
+            </section>
+          </div>
+        } @else {
+          <div class="media-manager__search">
+            <app-icon name="search" [size]="18"></app-icon>
+            <input
+              type="search"
+              [value]="searchTerm"
+              [placeholder]="activeSection === 'pexels' ? 'Search Pexels photos...' : 'Search something...'"
+              (input)="onSearchInput($any($event.target).value)"
+            />
+          </div>
+
+          @if (activeSection === 'boards') {
+            <div class="media-manager__boards">
+              @if (boards.length) {
+                @for (board of boards; track trackBoard($index, board)) {
+                  <button
+                    type="button"
+                    class="media-manager__board-card"
+                    [class.media-manager__board-card--active]="selectedBoard?.id === board.id"
+                    (click)="selectBoard(board.id)"
+                  >
+                    <strong>{{ board.title }}</strong>
+                    <small>{{ board.description }}</small>
+                    <span>{{ board.assetIds.length }} assets</span>
+                  </button>
+                }
+              } @else {
+                <div class="media-manager__board-empty">
+                  <strong>No boards yet</strong>
+                  <span>Boards appear automatically when your library has reusable groups of assets.</span>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="media-manager__toolbar">
+            <div class="media-manager__toolbar-copy">
+              <strong>
+                @if (activeSection === 'pexels') {
+                  Pexels photos
+                } @else if (activeSection === 'boards') {
+                  {{ selectedBoard?.title || 'Boards' }}
+                } @else if (activeSection === 'trash') {
+                  Trash
+                } @else {
+                  Site files
+                }
+              </strong>
+              <span>{{ visibleAssets.length }} items</span>
+            </div>
+
+            <div class="media-manager__toolbar-actions">
+              <button type="button" class="media-manager__toolbar-button" (click)="fileInput.click()">
+                <app-icon name="upload" [size]="16"></app-icon>
+                <span>Add media</span>
+              </button>
+
+              <div class="media-manager__toolbar-dropdown">
+                <button type="button" class="media-manager__toolbar-trigger" (click)="toggleFilterMenu()">
+                  <span>{{ filterLabel }}</span>
+                  <app-icon name="chevron-down" [size]="14"></app-icon>
+                </button>
+
+                @if (isFilterMenuOpen) {
+                  <div class="media-manager__dropdown-menu">
+                    <button type="button" class="media-manager__dropdown-item" (click)="setFilter('ALL')">All</button>
+                    <button type="button" class="media-manager__dropdown-item" (click)="setFilter('IMAGE')">Images</button>
+                    <button type="button" class="media-manager__dropdown-item" (click)="setFilter('VIDEO')">Videos</button>
+                    <button type="button" class="media-manager__dropdown-item" (click)="setFilter('DOCUMENT')">Documents</button>
+                  </div>
+                }
+              </div>
+
+              <div class="media-manager__toolbar-dropdown">
+                <button type="button" class="media-manager__toolbar-trigger" (click)="toggleSortMenu()">
+                  <span>{{ sortLabel }}</span>
+                  <app-icon name="chevron-down" [size]="14"></app-icon>
+                </button>
+
+                @if (isSortMenuOpen) {
+                  <div class="media-manager__dropdown-menu">
+                    <button type="button" class="media-manager__dropdown-item" (click)="setSort('NEWEST')">Newest</button>
+                    <button type="button" class="media-manager__dropdown-item" (click)="setSort('OLDEST')">Oldest</button>
+                    <button type="button" class="media-manager__dropdown-item" (click)="setSort('NAME')">Name</button>
+                  </div>
+                }
+              </div>
+
+              <div class="media-manager__view-toggle" aria-label="View mode">
+                <button
+                  type="button"
+                  class="media-manager__view-button"
+                  [class.media-manager__view-button--active]="viewMode === 'grid'"
+                  (click)="setViewMode('grid')"
+                >
+                  <app-icon name="layout-grid" [size]="16"></app-icon>
+                </button>
+                <button
+                  type="button"
+                  class="media-manager__view-button"
+                  [class.media-manager__view-button--active]="viewMode === 'list'"
+                  (click)="setViewMode('list')"
+                >
+                  <app-icon name="list" [size]="16"></app-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="media-manager__grid-shell">
+            @if (isStockLoading) {
+              <div class="media-manager__empty">
+                <app-icon name="image" [size]="28"></app-icon>
+                <strong>Loading photos...</strong>
+                <span>Fetching free stock images from Pexels.</span>
+              </div>
+            } @else if (visibleAssets.length) {
+              <div class="media-manager__grid" [class.media-manager__grid--list]="viewMode === 'list'">
+                @for (asset of visibleAssets; track trackAsset($index, asset)) {
+                  <button
+                    type="button"
+                    class="media-manager__card"
+                    [class.media-manager__card--selected]="selectedAssetId === asset.id"
+                    (click)="selectAsset(asset.id)"
+                  >
+                    <span class="media-manager__card-thumb">
+                      <img [src]="asset.url" [alt]="asset.name" loading="lazy" />
+                    </span>
+                    <span class="media-manager__card-copy">
+                      <strong>{{ asset.name }}</strong>
+                      <small>{{ asset.description }}</small>
+                    </span>
+                  </button>
+                }
+              </div>
+              @if (activeSection === 'pexels') {
+                <p class="media-manager__stock-note">
+                  Photos provided by <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>
+                </p>
+              }
+            } @else if (stockError) {
+              <div class="media-manager__empty">
+                <app-icon name="image" [size]="28"></app-icon>
+                <strong>{{ activeSection === 'pexels' ? 'Pexels is not ready.' : 'No media matched this search.' }}</strong>
+                <span>{{ stockError }}</span>
+              </div>
+            } @else {
+              <div class="media-manager__empty">
+                <app-icon name="image" [size]="28"></app-icon>
+                <strong>
+                  @if (activeSection === 'trash') {
+                    Trash is empty.
+                  } @else if (activeSection === 'boards') {
+                    This board has no assets.
+                  } @else {
+                    No media matched this search.
+                  }
+                </strong>
+                <span>
+                  @if (activeSection === 'trash') {
+                    Move assets here from the preview panel when you want to clean up your library.
+                  } @else if (activeSection === 'boards') {
+                    Select another board or keep adding media to your library.
+                  } @else {
+                    Try another query, change filters, or upload a new asset.
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <aside class="media-manager__preview">
+        @if (selectedAsset; as asset) {
+          <div class="media-manager__preview-visual">
+            <img [src]="asset.url" [alt]="asset.name" />
+          </div>
+
+          <div class="media-manager__preview-section">
+            <strong>{{ asset.name }}</strong>
+            <span>{{ asset.sourceLabel }}</span>
+          </div>
+
+          <div class="media-manager__preview-section">
+            <h3>Actions</h3>
+            <button type="button" class="media-manager__action" (click)="copySelectedAssetUrl()">
+              <app-icon name="copy" [size]="16"></app-icon>
+              <span>Copy link</span>
+            </button>
+            <button type="button" class="media-manager__action" (click)="openSelectedAsset()">
+              <app-icon name="external-link" [size]="16"></app-icon>
+              <span>Open file</span>
+            </button>
+            @if (canTrashSelectedAsset) {
+              <button type="button" class="media-manager__action" (click)="moveSelectedAssetToTrash()">
+                <app-icon name="trash" [size]="16"></app-icon>
+                <span>Move to trash</span>
+              </button>
+            }
+            @if (canRestoreSelectedAsset) {
+              <button type="button" class="media-manager__action" (click)="restoreSelectedAsset()">
+                <app-icon name="arrow-left" [size]="16"></app-icon>
+                <span>Restore asset</span>
+              </button>
+            }
+          </div>
+
+          <div class="media-manager__preview-section">
+            <h3>Information</h3>
+            <dl class="media-manager__metadata">
+              <div>
+                <dt>Type</dt>
+                <dd>{{ asset.type }}</dd>
+              </div>
+              <div>
+                <dt>Size</dt>
+                <dd>{{ formatFileSize(asset.fileSize) }}</dd>
+              </div>
+              <div>
+                <dt>Added</dt>
+                <dd>{{ formatDate(asset.uploadedAt) }}</dd>
+              </div>
+              <div>
+                <dt>Source</dt>
+                <dd>{{ asset.sourceLabel }}</dd>
+              </div>
+              @if (activeSection === 'trash') {
+                <div>
+                  <dt>Status</dt>
+                  <dd>In trash</dd>
+                </div>
+              }
+            </dl>
+          </div>
+        } @else {
+          <div class="media-manager__empty media-manager__empty--preview">
+            <div class="media-manager__empty-illustration" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          <strong>Select an asset</strong>
+          <span>
+            @if (activeSection === 'trash') {
+              Select a trashed item to restore it or inspect it here.
+            } @else {
+              Choose a media card to inspect it here.
+            }
+          </span>
+        </div>
+      }
+      </aside>
+    </div>
+
+    <footer class="media-manager__footer">
+      <div class="media-manager__footer-storage">
+        <div class="media-manager__footer-storage-copy">
+          <strong>{{ storageUsageLabel }}</strong>
+          <button type="button" class="media-manager__footer-link">Upgrade storage</button>
+        </div>
+        <div class="media-manager__footer-meter" aria-hidden="true">
+          <span class="media-manager__footer-meter-fill" [style.width.%]="storageUsedPercent"></span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="media-manager__primary"
+          [disabled]="!selectedAsset"
+          (click)="confirm()"
+        >
+        Select asset
+      </button>
+    </footer>
+  </section>
+</div>
