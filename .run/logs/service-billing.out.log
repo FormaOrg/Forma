@@ -308,3 +308,4 @@ Caused by: org.springframework.util.PlaceholderResolutionException: Could not re
 2026-04-07T12:14:02.989+02:00  INFO 14076 --- [service-billing] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8085 (http) with context path '/'
 2026-04-07T12:14:02.994+02:00  INFO 14076 --- [service-billing] [  restartedMain] tn.forma.users.Application               : Started Application in 10.53 seconds (process running for 53.458)
 2026-04-07T12:14:03.204+02:00  INFO 14076 --- [service-billing] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-07T14:49:06.914+02:00  WARN 14076 --- [service-billing] [l-2:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1h9s645ms452µs100ns).
