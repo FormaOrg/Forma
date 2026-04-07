@@ -580,8 +580,58 @@ export class ProjectStorefrontEditor {
   }
 
   confirmMediaSelection(asset: StorefrontMediaManagerAsset): void {
+    const projectId = this.projectId();
+    if (!projectId) {
+      return;
+    }
+
+    if (asset.origin === 'PEXELS') {
+      this.isMediaUploading.set(true);
+      this.uploadService
+        .importProjectMedia(projectId, {
+          sourceUrl: asset.url,
+          fileName: asset.name,
+        })
+        .pipe(
+          switchMap(() => this.projectService.getProjectMedia(projectId).pipe(catchError(() => of([])))),
+          finalize(() => this.isMediaUploading.set(false)),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe({
+          next: (projectMedia) => {
+            this.mediaAssets.set(this.buildMediaManagerAssets(projectMedia, this.products()));
+            this.toastService.success(`${asset.name} imported to Site files.`);
+          },
+          error: () => this.toastService.error('Unable to import this Pexels photo right now.'),
+        });
+      return;
+    }
+
     this.toastService.success(`${asset.name} selected.`);
     this.closeMediaManager();
+  }
+
+  deleteMediaFromManager(asset: StorefrontMediaManagerAsset): void {
+    const projectId = this.projectId();
+    if (!projectId || asset.origin !== 'PROJECT') {
+      return;
+    }
+
+    this.isMediaUploading.set(true);
+    this.projectService
+      .deleteMedia(projectId, asset.id)
+      .pipe(
+        switchMap(() => this.projectService.getProjectMedia(projectId).pipe(catchError(() => of([])))),
+        finalize(() => this.isMediaUploading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (projectMedia) => {
+          this.mediaAssets.set(this.buildMediaManagerAssets(projectMedia, this.products()));
+          this.toastService.success(`${asset.name} removed from Site files.`);
+        },
+        error: () => this.toastService.error('Unable to remove this media asset right now.'),
+      });
   }
 
   logout(): void {
@@ -1352,6 +1402,7 @@ export class ProjectStorefrontEditor {
         uploadedAt: media.uploadedAt,
         sourceLabel: 'Site files',
         description: this.describeMediaAsset(media.type, media.fileSize),
+        origin: 'PROJECT',
       });
     }
 
@@ -1369,6 +1420,7 @@ export class ProjectStorefrontEditor {
         uploadedAt: product.updatedAt || product.createdAt,
         sourceLabel: 'Catalog',
         description: product.category || 'Product image',
+        origin: 'CATALOG',
       });
     }
 
