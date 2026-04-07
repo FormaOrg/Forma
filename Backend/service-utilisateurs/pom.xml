@@ -139,13 +139,6 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
-					<testExcludes>
-						<testExclude>**/service/ProjectCatalogServiceTest.java</testExclude>
-						<testExclude>**/service/ProjectSalesServiceTest.java</testExclude>
-						<testExclude>**/service/ProjectStorefrontServiceTest.java</testExclude>
-						<testExclude>**/service/PublicCheckoutServiceTest.java</testExclude>
-						<testExclude>**/service/PublicStorefrontServiceTest.java</testExclude>
-					</testExcludes>
 				</configuration>
 			</plugin>
 			<plugin>

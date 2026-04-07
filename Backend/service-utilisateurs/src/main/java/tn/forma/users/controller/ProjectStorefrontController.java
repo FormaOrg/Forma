@@ -7,9 +7,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import tn.forma.users.dto.ProjectStorefrontDto;
+import tn.forma.users.dto.PublicStorefrontHomeDto;
+import tn.forma.users.dto.PublicStorefrontProductDto;
 import tn.forma.users.dto.PublishProjectStorefrontResponse;
 import tn.forma.users.dto.UpdateProjectStorefrontRequest;
 import tn.forma.users.service.ProjectStorefrontService;
+import tn.forma.users.service.PublicStorefrontService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects/{projectId}/storefront")
@@ -17,6 +22,7 @@ import tn.forma.users.service.ProjectStorefrontService;
 public class ProjectStorefrontController {
 
     private final ProjectStorefrontService projectStorefrontService;
+    private final PublicStorefrontService publicStorefrontService;
 
     @GetMapping
     public ResponseEntity<ProjectStorefrontDto> getStorefront(
@@ -61,6 +67,41 @@ public class ProjectStorefrontController {
         return ResponseEntity.ok(projectStorefrontService.unpublishStorefront(
                 userDetails.getUsername(),
                 projectId
+        ));
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<PublicStorefrontHomeDto> getPreviewStorefront(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId
+    ) {
+        return ResponseEntity.ok(publicStorefrontService.getPreviewStorefrontHome(
+                userDetails.getUsername(),
+                projectId
+        ));
+    }
+
+    @GetMapping("/preview/products")
+    public ResponseEntity<List<PublicStorefrontProductDto>> getPreviewProducts(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId
+    ) {
+        return ResponseEntity.ok(publicStorefrontService.getPreviewProducts(
+                userDetails.getUsername(),
+                projectId
+        ));
+    }
+
+    @GetMapping("/preview/products/{productId}")
+    public ResponseEntity<PublicStorefrontProductDto> getPreviewProduct(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId,
+            @PathVariable Long productId
+    ) {
+        return ResponseEntity.ok(publicStorefrontService.getPreviewProduct(
+                userDetails.getUsername(),
+                projectId,
+                productId
         ));
     }
 }

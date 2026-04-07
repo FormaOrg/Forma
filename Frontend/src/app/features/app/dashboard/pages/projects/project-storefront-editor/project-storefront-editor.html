@@ -1452,10 +1452,11 @@
   @if (isMediaManagerOpen()) {
     <app-project-storefront-media-manager
       [assets]="mediaAssets()"
-      [isUploading]="isMediaUploading()"
-      (close)="closeMediaManager()"
-      (filesSelected)="uploadMediaFromManager($event)"
-      (confirmSelection)="confirmMediaSelection($event)"
-    />
+        [isUploading]="isMediaUploading()"
+        (close)="closeMediaManager()"
+        (filesSelected)="uploadMediaFromManager($event)"
+        (confirmSelection)="confirmMediaSelection($event)"
+        (deleteAsset)="deleteMediaFromManager($event)"
+      />
   }
 }

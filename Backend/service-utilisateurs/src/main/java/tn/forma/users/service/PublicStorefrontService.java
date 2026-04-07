@@ -11,9 +11,11 @@ import tn.forma.users.model.ProjectProductStatus;
 import tn.forma.users.model.ProjectStorefront;
 import tn.forma.users.model.ProjectType;
 import tn.forma.users.model.StorefrontStatus;
+import tn.forma.users.model.User;
 import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.ProjectStorefrontRepository;
+import tn.forma.users.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,24 +31,28 @@ public class PublicStorefrontService {
     private final ProjectRepository projectRepository;
     private final ProjectStorefrontRepository projectStorefrontRepository;
     private final ProjectProductRepository projectProductRepository;
+    private final UserRepository userRepository;
 
     public PublicStorefrontHomeDto getPublishedStorefrontHome(Long projectId) {
         Project project = getPublishedEcommerceProject(projectId);
         ProjectStorefront storefront = getPublishedStorefront(project.getId());
-        List<PublicStorefrontProductDto> featuredProducts = resolveFeaturedProducts(
+        return buildStorefrontHome(
+                project,
+                storefront,
                 storefront.getPublishedHomepageJson(),
                 getPublishedProducts(project.getId())
         );
+    }
 
-        return PublicStorefrontHomeDto.builder()
-                .projectId(project.getId())
-                .storeName(resolveStoreName(storefront, project))
-                .themeKey(storefront.getThemeKey())
-                .homepage(storefront.getPublishedHomepageJson() != null
-                        ? storefront.getPublishedHomepageJson().deepCopy()
-                        : null)
-                .featuredProducts(featuredProducts)
-                .build();
+    public PublicStorefrontHomeDto getPreviewStorefrontHome(String email, Long projectId) {
+        Project project = getOwnedEcommerceProject(email, projectId);
+        ProjectStorefront storefront = getPreviewStorefront(project.getId());
+        return buildStorefrontHome(
+                project,
+                storefront,
+                resolvePreviewHomepage(storefront),
+                getPreviewProducts(email, projectId)
+        );
     }
 
     public List<PublicStorefrontProductDto> getPublishedProducts(Long projectId) {
@@ -73,8 +79,46 @@ public class PublicStorefrontService {
         return mapToProductDto(product);
     }
 
+    public List<PublicStorefrontProductDto> getPreviewProducts(String email, Long projectId) {
+        Project project = getOwnedEcommerceProject(email, projectId);
+        getPreviewStorefront(project.getId());
+
+        return projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId()).stream()
+                .filter(this::isPreviewVisible)
+                .map(this::mapToProductDto)
+                .toList();
+    }
+
+    public PublicStorefrontProductDto getPreviewProduct(String email, Long projectId, Long productId) {
+        Project project = getOwnedEcommerceProject(email, projectId);
+        getPreviewStorefront(project.getId());
+
+        ProjectProduct product = projectProductRepository.findByIdAndProjectId(productId, project.getId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (!isPreviewVisible(product)) {
+            throw new RuntimeException("Product not found");
+        }
+
+        return mapToProductDto(product);
+    }
+
     private Project getPublishedEcommerceProject(Long projectId) {
         Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        if (project.getType() != ProjectType.ECOMMERCE) {
+            throw new RuntimeException("Storefront is only available for ecommerce projects");
+        }
+
+        return project;
+    }
+
+    private Project getOwnedEcommerceProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findByIdAndUserId(projectId, user.getId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         if (project.getType() != ProjectType.ECOMMERCE) {
@@ -93,6 +137,35 @@ public class PublicStorefrontService {
         }
 
         return storefront;
+    }
+
+    private ProjectStorefront getPreviewStorefront(Long projectId) {
+        return projectStorefrontRepository.findByProjectId(projectId)
+                .orElseThrow(() -> new RuntimeException("Storefront not found"));
+    }
+
+    private JsonNode resolvePreviewHomepage(ProjectStorefront storefront) {
+        if (storefront.getDraftHomepageJson() != null) {
+            return storefront.getDraftHomepageJson();
+        }
+        return storefront.getPublishedHomepageJson();
+    }
+
+    private PublicStorefrontHomeDto buildStorefrontHome(
+            Project project,
+            ProjectStorefront storefront,
+            JsonNode homepage,
+            List<PublicStorefrontProductDto> products
+    ) {
+        List<PublicStorefrontProductDto> featuredProducts = resolveFeaturedProducts(homepage, products);
+
+        return PublicStorefrontHomeDto.builder()
+                .projectId(project.getId())
+                .storeName(resolveStoreName(storefront, project))
+                .themeKey(storefront.getThemeKey())
+                .homepage(homepage != null ? homepage.deepCopy() : null)
+                .featuredProducts(featuredProducts)
+                .build();
     }
 
     private List<PublicStorefrontProductDto> resolveFeaturedProducts(
@@ -143,6 +216,14 @@ public class PublicStorefrontService {
     private boolean isPubliclyVisible(ProjectProduct product) {
         return product.getStatus() == ProjectProductStatus.ACTIVE
                 && buildReadinessIssues(product).isEmpty();
+    }
+
+    private boolean isPreviewVisible(ProjectProduct product) {
+        return product.getStatus() != ProjectProductStatus.ARCHIVED
+                && product.getName() != null
+                && !product.getName().isBlank()
+                && product.getPrice() != null
+                && product.getPrice().compareTo(BigDecimal.ZERO) > 0;
     }
 
     private List<String> buildReadinessIssues(ProjectProduct product) {

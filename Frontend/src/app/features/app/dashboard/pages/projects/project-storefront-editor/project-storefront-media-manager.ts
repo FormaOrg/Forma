@@ -14,6 +14,7 @@ export interface StorefrontMediaManagerAsset {
   uploadedAt: string | null;
   sourceLabel: string;
   description: string;
+  origin: 'PROJECT' | 'CATALOG' | 'PEXELS';
 }
 
 interface MediaBoard {
@@ -52,6 +53,7 @@ export class ProjectStorefrontMediaManager implements OnChanges {
   @Output() readonly close = new EventEmitter<void>();
   @Output() readonly filesSelected = new EventEmitter<FileList>();
   @Output() readonly confirmSelection = new EventEmitter<StorefrontMediaManagerAsset>();
+  @Output() readonly deleteAsset = new EventEmitter<StorefrontMediaManagerAsset>();
 
   readonly manageLinks: Array<{ id: MediaSidebarSection; label: string }> = [
     { id: 'site-files', label: 'Site files' },
@@ -232,11 +234,15 @@ export class ProjectStorefrontMediaManager implements OnChanges {
   }
 
   get canTrashSelectedAsset(): boolean {
-    return !!this.selectedAsset && this.activeSection !== 'trash' && this.activeSection !== 'pexels';
+    return !!this.selectedAsset && this.selectedAsset.origin === 'PROJECT' && this.activeSection !== 'trash';
   }
 
   get canRestoreSelectedAsset(): boolean {
     return !!this.selectedAsset && this.activeSection === 'trash';
+  }
+
+  get confirmLabel(): string {
+    return this.activeSection === 'pexels' ? 'Import to site files' : 'Select asset';
   }
 
   private get assetsForActiveSection(): StorefrontMediaManagerAsset[] {
@@ -387,14 +393,10 @@ export class ProjectStorefrontMediaManager implements OnChanges {
 
   moveSelectedAssetToTrash(): void {
     const selectedAsset = this.selectedAsset;
-    if (!selectedAsset || this.activeSection === 'pexels') {
+    if (!selectedAsset || selectedAsset.origin !== 'PROJECT') {
       return;
     }
-
-    this.trashedAssetIds.add(selectedAsset.id);
-    if (this.activeSection !== 'trash') {
-      this.selectedAssetId = this.visibleAssets.find((asset) => asset.id !== selectedAsset.id)?.id ?? null;
-    }
+    this.deleteAsset.emit(selectedAsset);
   }
 
   restoreSelectedAsset(): void {
@@ -475,6 +477,7 @@ export class ProjectStorefrontMediaManager implements OnChanges {
       uploadedAt: null,
       sourceLabel: `Photo by ${photo.photographer} on Pexels`,
       description: 'Free stock photo',
+      origin: 'PEXELS',
     };
   }
 }
