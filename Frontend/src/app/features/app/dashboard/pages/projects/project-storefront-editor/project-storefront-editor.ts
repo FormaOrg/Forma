@@ -99,6 +99,8 @@ export class ProjectStorefrontEditor {
   private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private sectionLibraryCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private suppressNextComponentClickSelectionId: string | null = null;
+  private justFinishedComponentSelectionBox = false;
   private activeComponentDrag:
     | {
         sectionId: string;
@@ -144,10 +146,19 @@ export class ProjectStorefrontEditor {
       }
     | null = null;
   private activeSectionResize:
+      | {
+          sectionId: string;
+          startY: number;
+          startHeight: number;
+        }
+      | null = null;
+  private activeAddElementsComponentDrag:
     | {
-        sectionId: string;
-        startY: number;
-        startHeight: number;
+        itemId: string;
+        pointerOffsetX: number;
+        pointerOffsetY: number;
+        width: number;
+        height: number;
       }
     | null = null;
 
@@ -158,6 +169,7 @@ export class ProjectStorefrontEditor {
   readonly selectedSectionId = signal<string | null>(null);
   readonly selectedComponentId = signal<string | null>(null);
   readonly selectedComponentIds = signal<string[]>([]);
+  readonly isolatedGroupComponentId = signal<string | null>(null);
   readonly editorSession = signal<StorefrontEditorSession>(this.createDefaultEditorSession());
   readonly undoStack = signal<StorefrontEditorSnapshot[]>([]);
   readonly redoStack = signal<StorefrontEditorSnapshot[]>([]);
@@ -172,6 +184,9 @@ export class ProjectStorefrontEditor {
   readonly activeAddElementsCategory = signal<StorefrontEditorAddElementsCategory>('All');
   readonly addElementsSearch = signal('');
   readonly draggedAddElementsItemId = signal<string | null>(null);
+  readonly draggedAddElementsPreviewPosition = signal<{ left: number; top: number; width: number; height: number } | null>(
+    null
+  );
   readonly componentAttachSectionId = signal<string | null>(null);
   readonly isPagesPanelOpen = signal(false);
   readonly isMediaManagerOpen = signal(false);
@@ -254,8 +269,30 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     return this.readSectionComponents(section).filter((component) => selectedIds.has(component.id));
   });
   readonly selectedComponentGroupId = computed(() => {
-    const selected = this.selectedComponent();
-    return selected?.groupId ?? null;
+      const selected = this.selectedComponent();
+      return selected?.groupId ?? null;
+    });
+  readonly selectedComponentGroupComponents = computed(() => {
+    const section = this.selectedSection();
+    const groupId = this.selectedComponentGroupId();
+    if (!section || !groupId) {
+      return [] as StorefrontEditorComponentNode[];
+    }
+
+    return this.readSectionComponents(section).filter((component) => component.groupId === groupId);
+  });
+  readonly selectedComponentGroupBounds = computed(() => {
+    const components = this.selectedComponentGroupComponents();
+    if (!components.length) {
+      return null as { x: number; y: number; width: number; height: number } | null;
+    }
+
+    const left = Math.min(...components.map((component) => component.frame.x));
+    const top = Math.min(...components.map((component) => component.frame.y));
+    const right = Math.max(...components.map((component) => component.frame.x + component.frame.width));
+    const bottom = Math.max(...components.map((component) => component.frame.y + component.frame.height));
+
+    return { x: left, y: top, width: right - left, height: bottom - top };
   });
   readonly storeName = computed(
     () => this.workingStorefront()?.storeName ?? this.project()?.storeTitle ?? this.project()?.name ?? 'Storefront'
@@ -308,7 +345,6 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   );
   readonly hasBlockingOverlay = computed(
     () =>
-      this.isAddElementsPanelVisible() ||
       this.isPagesPanelOpen() ||
       this.isSectionLibraryVisible() ||
       this.isMediaManagerOpen() ||
@@ -588,6 +624,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
   @HostListener('document:mousemove', ['$event'])
   handleComponentPointerMove(event: MouseEvent): void {
+    if (this.activeAddElementsComponentDrag) {
+      event.preventDefault();
+      this.updateAddElementsComponentDrag(event);
+      return;
+    }
+
     if (this.activeSectionResize) {
       event.preventDefault();
       this.updateResizingSection(event);
@@ -671,8 +713,13 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     );
   }
 
-  @HostListener('document:mouseup')
-  handleComponentPointerUp(): void {
+  @HostListener('document:mouseup', ['$event'])
+  handleComponentPointerUp(event: MouseEvent): void {
+    if (this.activeAddElementsComponentDrag) {
+      this.finishAddElementsComponentDrag(event);
+      return;
+    }
+
     this.activeComponentDrag = null;
     this.activeResize = null;
     this.activeRotation = null;
@@ -754,10 +801,11 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
           this.workingStorefront.set(null);
             this.editorSession.set(this.createDefaultEditorSession());
             this.undoStack.set([]);
-            this.redoStack.set([]);
-            this.selectedComponentId.set(null);
-            this.selectedComponentIds.set([]);
-            this.products.set([]);
+              this.redoStack.set([]);
+              this.selectedComponentId.set(null);
+              this.selectedComponentIds.set([]);
+              this.isolatedGroupComponentId.set(null);
+              this.products.set([]);
             this.errorMessage.set('Unable to load the storefront editor right now.');
         },
       });
@@ -768,6 +816,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.selectedSectionId.set(null);
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
@@ -776,6 +825,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.selectedSectionId.set(sectionId);
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
     this.sectionOptionsMenuId.set(null);
     this.syncEditorSessionState({ selectedSectionId: sectionId });
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
@@ -785,6 +835,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.selectedSectionId.set(null);
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
     this.sectionOptionsMenuId.set(null);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
@@ -889,16 +940,38 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.closeAddElementsPanel();
   }
 
-  startAddElementsComponentDrag(item: StorefrontEditorAddElementsLibraryItem, event: DragEvent): void {
-    this.draggedAddElementsItemId.set(item.id);
-    event.dataTransfer?.setData('text/storefront-editor-component-library-item', item.id);
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'copy';
+  startAddElementsComponentDrag(item: StorefrontEditorAddElementsLibraryItem, event: MouseEvent): void {
+    if (event.button !== 0) {
+      return;
     }
+
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    this.activeAddElementsComponentDrag = {
+      itemId: item.id,
+      pointerOffsetX: event.clientX - rect.left,
+      pointerOffsetY: event.clientY - rect.top,
+      width: rect.width,
+      height: rect.height,
+    };
+    this.draggedAddElementsItemId.set(item.id);
+    this.draggedAddElementsPreviewPosition.set({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    });
+    event.preventDefault();
   }
 
   endAddElementsComponentDrag(): void {
+    this.activeAddElementsComponentDrag = null;
     this.draggedAddElementsItemId.set(null);
+    this.draggedAddElementsPreviewPosition.set(null);
     this.componentAttachSectionId.set(null);
   }
 
@@ -954,6 +1027,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   }
 
   selectComponent(sectionId: string, componentId: string, event?: MouseEvent): void {
+    if (event?.type === 'click' && this.suppressNextComponentClickSelectionId === componentId) {
+      this.suppressNextComponentClickSelectionId = null;
+      event.stopPropagation();
+      return;
+    }
+
     event?.stopPropagation();
     this.selectedSectionId.set(sectionId);
     const isToggleSelection = Boolean(event?.ctrlKey || event?.metaKey);
@@ -973,6 +1052,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     } else {
       this.selectedComponentId.set(componentId);
       this.selectedComponentIds.set([componentId]);
+    }
+
+    if (!isToggleSelection) {
+      this.isolatedGroupComponentId.set(null);
     }
 
     this.closeComponentContextMenu();
@@ -999,11 +1082,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       return;
     }
 
-    const rect = target.getBoundingClientRect();
     const sectionComponents = section ? this.readSectionComponents(section) : [];
     const selectedIds = new Set(this.selectedComponentIds());
     const dragComponents = sectionComponents.filter((item) => {
-      if (component.groupId) {
+      if (component.groupId && this.isolatedGroupComponentId() !== component.id) {
         return item.groupId === component.groupId;
       }
 
@@ -1013,10 +1095,20 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     });
     const effectiveComponents = dragComponents.length ? dragComponents : [component];
     const orderedComponents = [...effectiveComponents].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+    const dragBounds = this.getDraggedComponentsBounds(
+      orderedComponents.map((item) => ({
+        startX: item.frame.x,
+        startY: item.frame.y,
+        width: item.frame.width,
+        height: item.frame.height,
+      }))
+    );
+    const container = target.closest('.storefront-editor__preview-section-content');
+    const containerRect = container instanceof HTMLElement ? container.getBoundingClientRect() : target.getBoundingClientRect();
     this.activeComponentDrag = {
       sectionId,
-      pointerOffsetX: event.clientX - rect.left,
-      pointerOffsetY: event.clientY - rect.top,
+      pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x),
+      pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y),
       components: orderedComponents.map((item) => ({
         componentId: item.id,
         startX: item.frame.x,
@@ -1024,9 +1116,17 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
         width: item.frame.width,
         height: item.frame.height,
       })),
-    };
+      };
 
-    this.selectComponent(sectionId, componentId);
+    this.suppressNextComponentClickSelectionId = componentId;
+    this.selectComponent(sectionId, componentId, event);
+  }
+
+  isolateGroupedComponent(sectionId: string, componentId: string, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectComponent(sectionId, componentId, event);
+    this.isolatedGroupComponentId.set(componentId);
   }
 
   startComponentReorder(componentId: string, event: DragEvent): void {
@@ -1103,12 +1203,15 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       return;
     }
 
-    const selectedIds = new Set(componentIds);
+    const selectedGroupId = this.selectedComponentGroupId();
+    const selectedIds = selectedGroupId
+      ? new Set(this.selectedComponentGroupComponents().map((component) => component.id))
+      : new Set(componentIds);
     this.applyStorefrontMutation((storefront) => ({
-      ...storefront,
-      draftHomepage: {
-        ...storefront.draftHomepage,
-        sections: storefront.draftHomepage.sections.map((item) => {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections: storefront.draftHomepage.sections.map((item) => {
           if (item.id !== section.id) {
             return item;
           }
@@ -1121,9 +1224,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       },
     }), { syncRail: false });
 
-    this.selectedComponentId.set(null);
+      this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
-    this.closeComponentContextMenu();
+    this.isolatedGroupComponentId.set(null);
+      this.closeComponentContextMenu();
   }
 
   copySelectedComponents(): void {
@@ -1172,9 +1276,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       selectedSectionId: sectionId,
       syncRail: true,
     });
-    this.selectedComponentId.set(nextComponent.id);
-    this.selectedComponentIds.set([nextComponent.id]);
-    this.closeComponentContextMenu();
+      this.selectedComponentId.set(nextComponent.id);
+      this.selectedComponentIds.set([nextComponent.id]);
+      this.isolatedGroupComponentId.set(null);
+      this.closeComponentContextMenu();
   }
 
   componentKindLabel(type: StorefrontEditorComponentType): string {
@@ -1198,32 +1303,56 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     }
   }
 
+  findAddElementsLibraryItem(itemId: string): StorefrontEditorAddElementsLibraryItem | null {
+    return this.addElementsLibraryItems.find((item) => item.id === itemId) ?? null;
+  }
+
   isComponentSelected(componentId: string): boolean {
     return this.selectedComponentIds().includes(componentId);
   }
 
+  isComponentMultiSelected(componentId: string): boolean {
+    const selectedIds = this.selectedComponentIds();
+    return selectedIds.length > 1 && selectedIds.includes(componentId);
+  }
+
   clearComponentSelection(sectionId?: string, event?: MouseEvent): void {
     event?.stopPropagation();
+    if (this.justFinishedComponentSelectionBox) {
+      this.justFinishedComponentSelectionBox = false;
+      return;
+    }
+
     if (sectionId) {
       this.selectedSectionId.set(sectionId);
       this.syncEditorSessionState({ selectedSectionId: sectionId }, false);
     }
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
     this.closeComponentContextMenu();
   }
 
   startComponentSelectionBox(sectionId: string, event: MouseEvent): void {
-    const target = event.target;
-    const currentTarget = event.currentTarget;
-    if (!(currentTarget instanceof HTMLElement) || target !== currentTarget) {
-      return;
-    }
+      const target = event.target;
+      const currentTarget = event.currentTarget;
+      if (!(currentTarget instanceof HTMLElement) || !(target instanceof HTMLElement)) {
+        return;
+      }
+
+      if (
+        target.closest('.storefront-editor__preview-component') ||
+        target.closest('.storefront-editor__preview-section-chrome') ||
+        target.closest('.storefront-editor__preview-section-attach-indicator')
+      ) {
+        return;
+      }
 
     event.preventDefault();
     this.selectedSectionId.set(sectionId);
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
     this.closeComponentContextMenu();
 
     const rect = currentTarget.getBoundingClientRect();
@@ -1243,7 +1372,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   openComponentContextMenu(sectionId: string, componentId: string, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.selectComponent(sectionId, componentId);
+    this.selectComponent(sectionId, componentId, event);
     this.componentContextMenuSectionId.set(sectionId);
     this.componentContextMenuComponentId.set(componentId);
     this.componentContextMenuPosition.set(
@@ -1266,11 +1395,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
     event.preventDefault();
     event.stopPropagation();
-    this.selectedSectionId.set(sectionId);
-    this.selectedComponentId.set(null);
-    this.selectedComponentIds.set([]);
-    this.closeComponentContextMenu();
-    this.openSectionOptionsAt(sectionId, event.clientX, event.clientY);
+      this.selectedSectionId.set(sectionId);
+      this.selectedComponentId.set(null);
+      this.selectedComponentIds.set([]);
+      this.isolatedGroupComponentId.set(null);
+      this.closeComponentContextMenu();
+      this.openSectionOptionsAt(sectionId, event.clientX, event.clientY);
   }
 
   closeComponentContextMenu(): void {
@@ -1422,7 +1552,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       return;
     }
 
-    this.selectComponent(sectionId, componentId);
+    this.selectComponent(sectionId, componentId, event);
     this.activeResize = {
       sectionId,
       componentId,
@@ -1779,11 +1909,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   setSidebarMode(mode: EditorSidebarMode): void {
     this.sidebarMode.set(mode);
-    if (mode === 'page') {
-      this.selectedSectionId.set(null);
-      this.selectedComponentId.set(null);
-      this.selectedComponentIds.set([]);
-    }
+      if (mode === 'page') {
+        this.selectedSectionId.set(null);
+        this.selectedComponentId.set(null);
+        this.selectedComponentIds.set([]);
+        this.isolatedGroupComponentId.set(null);
+      }
   }
 
   navigateBackToProject(): void {
@@ -2572,15 +2703,19 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   private finishComponentSelectionBox(): void {
-    if (!this.activeSelectionDrag) {
-      return;
-    }
+      if (!this.activeSelectionDrag) {
+        return;
+      }
 
-    this.activeSelectionDrag = null;
-    this.isSelectingComponents.set(false);
-    this.selectionBoxSectionId.set(null);
-    this.selectionBox.set({ x: 0, y: 0, width: 0, height: 0 });
-  }
+      const finishedBox = this.selectionBox();
+      const wasDragging = finishedBox.width > 5 || finishedBox.height > 5;
+      const hasSelection = this.selectedComponentIds().length > 0;
+      this.activeSelectionDrag = null;
+      this.isSelectingComponents.set(false);
+      this.selectionBoxSectionId.set(null);
+      this.selectionBox.set({ x: 0, y: 0, width: 0, height: 0 });
+      this.justFinishedComponentSelectionBox = wasDragging && hasSelection;
+    }
 
   private isComponentInsideSelectionBox(
     component: StorefrontEditorComponentNode,
@@ -2957,6 +3092,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSectionComponents(sectionId, (components) => [...components, component], options);
     this.selectedComponentId.set(component.id);
     this.selectedComponentIds.set([component.id]);
+    this.isolatedGroupComponentId.set(null);
   }
 
   private buildLibraryComponentForSection(
@@ -2981,6 +3117,15 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     componentType: StorefrontEditorAddElementsLibraryItem['componentType'],
     event: DragEvent
   ): StorefrontEditorComponentNode['frame'] | undefined {
+    return this.getDropFrameFromClientPoint(sectionId, componentType, event.clientX, event.clientY);
+  }
+
+  private getDropFrameFromClientPoint(
+    sectionId: string,
+    componentType: StorefrontEditorAddElementsLibraryItem['componentType'],
+    clientX: number,
+    clientY: number
+  ): StorefrontEditorComponentNode['frame'] | undefined {
     const container = document.querySelector(
       `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
     );
@@ -2988,16 +3133,16 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return undefined;
     }
 
-    const next = createStorefrontEditorComponentNode(componentType);
-    const rect = container.getBoundingClientRect();
-    const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
-    const x = event.clientX - rect.left - next.frame.width / 2;
-    const y = event.clientY - rect.top - next.frame.height / 2;
-    return {
-      ...next.frame,
-      x: Math.max(-next.frame.width + 20, Math.min(x, rect.width - 20)),
-      y: Math.max(-next.frame.height + 20, Math.min(y, previewVisibleHeight - 20)),
-    };
+      const next = createStorefrontEditorComponentNode(componentType);
+      const rect = container.getBoundingClientRect();
+      const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
+      const x = clientX - rect.left - next.frame.width / 2;
+      const y = clientY - rect.top - next.frame.height / 2;
+      return {
+        ...next.frame,
+        x: Math.max(-next.frame.width + 20, Math.min(x, rect.width - 20)),
+        y: Math.max(-next.frame.height + 20, Math.min(y, previewVisibleHeight - 20)),
+      };
   }
 
   private getPreviewVisibleHeightForSection(container: HTMLElement): number {
@@ -3010,6 +3155,48 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     const containerRect = container.getBoundingClientRect();
     const containerTopWithinPreview = containerRect.top - previewRect.top;
     return Math.max(containerRect.height, previewCanvas.scrollHeight - containerTopWithinPreview);
+  }
+
+  private updateAddElementsComponentDrag(event: MouseEvent): void {
+    if (!this.activeAddElementsComponentDrag) {
+      return;
+    }
+
+    const nextLeft = event.clientX - this.activeAddElementsComponentDrag.pointerOffsetX;
+    const nextTop = event.clientY - this.activeAddElementsComponentDrag.pointerOffsetY;
+    this.draggedAddElementsPreviewPosition.set({
+      left: nextLeft,
+      top: nextTop,
+      width: this.activeAddElementsComponentDrag.width,
+      height: this.activeAddElementsComponentDrag.height,
+    });
+
+    const hoveredSection = this.getSectionContentElementAtPoint(event.clientX, event.clientY);
+    this.componentAttachSectionId.set(hoveredSection?.dataset['sectionContentId'] ?? null);
+  }
+
+  private finishAddElementsComponentDrag(event: MouseEvent): void {
+    const activeDrag = this.activeAddElementsComponentDrag;
+    if (!activeDrag) {
+      return;
+    }
+
+    const targetSection =
+      this.componentAttachSectionId() ??
+      this.getSectionContentElementAtPoint(event.clientX, event.clientY)?.dataset['sectionContentId'] ??
+      null;
+    const item = this.addElementsLibraryItems.find((candidate) => candidate.id === activeDrag.itemId) ?? null;
+
+    if (targetSection && item) {
+      const nextComponent = this.buildLibraryComponentForSection(
+        item,
+        targetSection,
+        this.getDropFrameFromClientPoint(targetSection, item.componentType, event.clientX, event.clientY)
+      );
+      this.insertComponentIntoSection(targetSection, nextComponent, { selectedSectionId: targetSection, syncRail: true });
+    }
+
+    this.endAddElementsComponentDrag();
   }
 
   private getSectionContentElementAtPoint(clientX: number, clientY: number): HTMLElement | null {
@@ -3205,10 +3392,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       activePageKey: snapshot.activePageKey,
       draftHomepage: JSON.parse(JSON.stringify(snapshot.draftHomepage)) as ProjectStorefront['draftHomepage'],
     });
-    this.selectedSectionId.set(snapshot.selectedSectionId);
-    this.selectedComponentId.set(null);
-    this.selectedComponentIds.set([]);
-    this.syncEditorSessionState({ selectedSectionId: snapshot.selectedSectionId }, false);
+      this.selectedSectionId.set(snapshot.selectedSectionId);
+      this.selectedComponentId.set(null);
+      this.selectedComponentIds.set([]);
+      this.isolatedGroupComponentId.set(null);
+      this.syncEditorSessionState({ selectedSectionId: snapshot.selectedSectionId }, false);
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
   }
 
@@ -3324,10 +3512,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.workingStorefront.set(this.cloneStorefront(snapshot));
     const editorSession = this.normalizeEditorSession(snapshot.editorSession);
     this.editorSession.set(editorSession);
-    this.selectedSectionId.set(editorSession.selectedSectionId);
-    this.selectedComponentId.set(null);
-    this.selectedComponentIds.set([]);
-    this.viewport.set(editorSession.viewport);
+      this.selectedSectionId.set(editorSession.selectedSectionId);
+      this.selectedComponentId.set(null);
+      this.selectedComponentIds.set([]);
+      this.isolatedGroupComponentId.set(null);
+      this.viewport.set(editorSession.viewport);
     this.zoomPercent.set(editorSession.zoomPercent);
     if (options.resetHistory) {
       this.undoStack.set([]);
