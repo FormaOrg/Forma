@@ -71,6 +71,9 @@ export interface StorefrontEditorComponentBase<TType extends StorefrontEditorCom
   name: string;
   isLocked: boolean;
   isVisible: boolean;
+  zIndex: number;
+  groupId?: string;
+  rotation: number;
   frame: StorefrontEditorComponentFrame;
   props: TProps;
   children: StorefrontEditorComponentNode[];
@@ -144,6 +147,8 @@ function createStorefrontEditorComponentBase<TType extends StorefrontEditorCompo
     type,
     isLocked: false,
     isVisible: true,
+    zIndex: 1,
+    rotation: 0,
     frame: getDefaultStorefrontEditorComponentFrame(type),
     children: [] as StorefrontEditorComponentNode[],
   };
