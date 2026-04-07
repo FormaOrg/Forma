@@ -488,11 +488,12 @@
     <div class="storefront-editor__add-elements-shell">
       @if (isAddElementsPanelVisible()) {
         <aside
-          class="storefront-editor__add-elements-panel"
-          [class.storefront-editor__add-elements-panel--open]="isAddElementsPanelOpen() && !isAddElementsPanelClosing()"
-          [class.storefront-editor__add-elements-panel--closing]="isAddElementsPanelClosing()"
-          (click)="$event.stopPropagation()"
-        >
+        class="storefront-editor__add-elements-panel"
+        [class.storefront-editor__add-elements-panel--open]="isAddElementsPanelOpen() && !isAddElementsPanelClosing()"
+        [class.storefront-editor__add-elements-panel--closing]="isAddElementsPanelClosing()"
+        [class.storefront-editor__add-elements-panel--dragging-library-item]="isLibraryComponentDragging()"
+        (click)="$event.stopPropagation()"
+      >
           <div class="storefront-editor__add-elements-head">
             <h2>Add Elements</h2>
             <button
@@ -700,14 +701,12 @@
 
           <div class="storefront-editor__add-elements-grid">
             @for (item of visibleAddElementsLibraryItems(); track item.id) {
-              <button
-                type="button"
-                class="storefront-editor__add-elements-card"
-                draggable="true"
-                (click)="insertComponentFromLibrary(item)"
-                (dragstart)="startAddElementsComponentDrag(item, $event)"
-                (dragend)="endAddElementsComponentDrag()"
-              >
+                <button
+                  type="button"
+                  class="storefront-editor__add-elements-card"
+                  (click)="insertComponentFromLibrary(item)"
+                  (mousedown)="startAddElementsComponentDrag(item, $event)"
+                >
                 <span class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ item.preview }}">
                   @switch (item.preview) {
                     @case ('headline') {
@@ -769,9 +768,74 @@
           </div>
         </aside>
       }
-    </div>
+      </div>
 
-    <div class="storefront-editor__body">
+      @if (isLibraryComponentDragging() && draggedAddElementsPreviewPosition(); as draggedPreview) {
+        <div
+          class="storefront-editor__add-elements-drag-preview"
+          [style.left.px]="draggedPreview.left"
+          [style.top.px]="draggedPreview.top"
+          [style.width.px]="draggedPreview.width"
+        >
+          @if (draggedAddElementsItemId(); as draggedItemId) {
+            @if (findAddElementsLibraryItem(draggedItemId); as draggedItem) {
+              <span
+                class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ draggedItem.preview }}"
+              >
+                @switch (draggedItem.preview) {
+                  @case ('headline') {
+                    <span class="storefront-editor__add-elements-demo-heading">Heading</span>
+                  }
+                  @case ('paragraph') {
+                    <span class="storefront-editor__add-elements-demo-paragraph">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  }
+                  @case ('photo') {
+                    <span class="storefront-editor__add-elements-demo-photo"></span>
+                  }
+                  @case ('button') {
+                    <span class="storefront-editor__add-elements-demo-button">Button</span>
+                  }
+                  @case ('container') {
+                    <span class="storefront-editor__add-elements-demo-container">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  }
+                  @case ('graphic') {
+                    <span class="storefront-editor__add-elements-demo-graphic"></span>
+                  }
+                  @case ('product-feed') {
+                    <span class="storefront-editor__add-elements-demo-product-feed">
+                      <span class="storefront-editor__add-elements-demo-product-card"></span>
+                      <span class="storefront-editor__add-elements-demo-product-card"></span>
+                      <span class="storefront-editor__add-elements-demo-product-card"></span>
+                    </span>
+                  }
+                  @case ('blog-feed') {
+                    <span class="storefront-editor__add-elements-demo-blog-feed">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  }
+                }
+              </span>
+              <span class="storefront-editor__add-elements-card-copy">
+                <strong>{{ draggedItem.title }}</strong>
+                <small>{{ draggedItem.description }}</small>
+              </span>
+            }
+          }
+        </div>
+      }
+  
+      <div class="storefront-editor__body">
       <button type="button" class="storefront-editor__add-button" (click)="toggleAddElementsPanel()">
         <span class="storefront-editor__add-button-plus" aria-hidden="true">+</span>
         <span>Add</span>
@@ -881,12 +945,14 @@
                       <div
                         class="storefront-editor__preview-section-shell"
                         [attr.data-section-id]="section.id"
+                        draggable="false"
                         [class.storefront-editor__preview-section-shell--selected]="isSectionActivelySelected(section.id)"
                         (click)="$event.stopPropagation(); selectSection(section.id)"
                       >
                         <div
                           class="storefront-editor__preview-section-content"
                           [attr.data-section-content-id]="section.id"
+                          draggable="false"
                           [style.height.px]="sectionPreviewHeight(section)"
                           [class.storefront-editor__preview-section-content--attach-target]="isLibraryComponentDragging() && componentAttachSectionId() === section.id"
                           [class.storefront-editor__preview-section-content--component-dragging]="draggedComponentId() !== null"
@@ -968,11 +1034,22 @@
                         }
                         }
 
+                        @if (selectedSectionId() === section.id && selectedComponentGroupId() && selectedComponentGroupBounds(); as groupBounds) {
+                          <div
+                            class="storefront-editor__preview-component-group-frame"
+                            [style.left.px]="groupBounds.x"
+                            [style.top.px]="groupBounds.y"
+                            [style.width.px]="groupBounds.width"
+                            [style.height.px]="groupBounds.height"
+                          ></div>
+                        }
+
                         @for (component of readSectionComponents(section); track component.id) {
                           <button
                             type="button"
                             class="storefront-editor__preview-component"
                             [class.storefront-editor__preview-component--selected]="isComponentSelected(component.id)"
+                            [class.storefront-editor__preview-component--multi-selected]="isComponentMultiSelected(component.id)"
                             [class.storefront-editor__preview-component--grouped]="!!component.groupId"
                             [class.storefront-editor__preview-component--dragging]="draggedComponentId() === component.id"
                             [style.left.px]="component.frame.x"
@@ -982,7 +1059,7 @@
                             [style.zIndex]="component.zIndex || 1"
                             [style.transform]="'rotate(' + (component.rotation || 0) + 'deg)'"
                             (click)="selectComponent(section.id, component.id, $event)"
-                            (dblclick)="startEditingComponentText(section.id, component.id, $event)"
+                            (dblclick)="component.groupId ? isolateGroupedComponent(section.id, component.id, $event) : startEditingComponentText(section.id, component.id, $event)"
                             (mousedown)="beginComponentMove(section.id, component.id, $event)"
                             (contextmenu)="openComponentContextMenu(section.id, component.id, $event)"
                             [style.--storefront-editor-text-align]="component.type === 'heading' || component.type === 'paragraph' ? component.props.align : null"
