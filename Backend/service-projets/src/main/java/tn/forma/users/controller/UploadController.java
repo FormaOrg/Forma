@@ -54,15 +54,6 @@ public class UploadController {
         return ResponseEntity.ok(new MessageResponse("Project logo removed successfully"));
     }
 
-    @PostMapping("/media")
-    public ResponseEntity<FileUploadResponse> uploadProjectMedia(
-            @RequestParam("file") MultipartFile file
-    ) {
-        FileUploadResponse upload = fileUploadService.uploadProjectMedia(file);
-        upload.setMessage("Media uploaded successfully");
-        return ResponseEntity.ok(upload);
-    }
-
     @PostMapping("/design-asset")
     public ResponseEntity<FileUploadResponse> uploadDesignAsset(
             @RequestParam("file") MultipartFile file

@@ -8,7 +8,10 @@ import tn.forma.users.dto.FileUploadResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Map;
 
 @Service
@@ -17,6 +20,9 @@ import java.util.Map;
 public class FileUploadService {
 
     private final Cloudinary cloudinary;
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     private static final long MAX_SIZE       = 10L * 1024 * 1024; // 10 MB
     private static final String[] ALLOWED    = {"image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"};
@@ -37,6 +43,54 @@ public class FileUploadService {
 
     public FileUploadResponse uploadDesignAsset(MultipartFile file) {
         return upload(file, "forma/design");
+    }
+
+    public FileUploadResponse importRemoteMedia(String sourceUrl, String folder) {
+        if (sourceUrl == null || sourceUrl.isBlank()) {
+            throw new IllegalArgumentException("Source URL is required");
+        }
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(sourceUrl))
+                    .header("User-Agent", "FormaMediaImporter/1.0")
+                    .GET()
+                    .build();
+
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new RuntimeException("Remote source returned HTTP " + response.statusCode());
+            }
+
+            byte[] body = response.body();
+            if (body == null || body.length == 0) {
+                throw new RuntimeException("Remote source returned an empty file");
+            }
+
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    body,
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "image",
+                            "use_filename", true,
+                            "unique_filename", true,
+                            "overwrite", true
+                    )
+            );
+
+            String url = result.get("secure_url") != null
+                    ? result.get("secure_url").toString()
+                    : result.get("url").toString();
+            String publicId = result.get("public_id").toString();
+
+            log.info("Remote file imported to Cloudinary: {}", publicId);
+            return FileUploadResponse.builder()
+                    .url(url)
+                    .publicId(publicId)
+                    .build();
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to import remote file", ex);
+        }
     }
 
     // ── Delete ─────────────────────────────────────────────
