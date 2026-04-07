@@ -136,7 +136,7 @@
               <button type="button" class="storefront-editor__menu-row">
                 <span>Marketing Tools</span>
               </button>
-              <button type="button" class="storefront-editor__menu-row">
+              <button type="button" class="storefront-editor__menu-row" (click)="openMediaManager()">
                 <span>Media Manager</span>
                 <small>Ctrl + Alt + M</small>
               </button>
@@ -672,7 +672,7 @@
                     <button
                       type="button"
                       class="storefront-editor__components-structure-item"
-                      [class.storefront-editor__components-structure-item--selected]="selectedComponentId() === component.id"
+                      [class.storefront-editor__components-structure-item--selected]="isComponentSelected(component.id)"
                       [class.storefront-editor__components-structure-item--drop-target]="componentReorderTargetId() === component.id"
                       draggable="true"
                       (click)="selectComponent(selectedSection.id, component.id, $event)"
@@ -700,7 +700,14 @@
 
           <div class="storefront-editor__add-elements-grid">
             @for (item of visibleAddElementsLibraryItems(); track item.id) {
-              <button type="button" class="storefront-editor__add-elements-card" (click)="insertComponentFromLibrary(item)">
+              <button
+                type="button"
+                class="storefront-editor__add-elements-card"
+                draggable="true"
+                (click)="insertComponentFromLibrary(item)"
+                (dragstart)="startAddElementsComponentDrag(item, $event)"
+                (dragend)="endAddElementsComponentDrag()"
+              >
                 <span class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ item.preview }}">
                   @switch (item.preview) {
                     @case ('headline') {
@@ -789,7 +796,9 @@
                   <button
                     type="button"
                     class="storefront-editor__page-trigger"
+                    [class.storefront-editor__page-trigger--active]="isPagesPanelOpen()"
                     (click)="togglePagesPanel()"
+                    [attr.aria-expanded]="isPagesPanelOpen()"
                   >
                     @if (!isCompactPreviewChrome()) {
                       <span class="storefront-editor__page-trigger-label">Page:</span>
@@ -872,19 +881,26 @@
                       <div
                         class="storefront-editor__preview-section-shell"
                         [attr.data-section-id]="section.id"
-                        [class.storefront-editor__preview-section-shell--selected]="selectedSectionId() === section.id"
+                        [class.storefront-editor__preview-section-shell--selected]="isSectionActivelySelected(section.id)"
                         (click)="$event.stopPropagation(); selectSection(section.id)"
                       >
-                        <span class="storefront-editor__preview-section-tag">{{ sectionLabel(section) }}</span>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-edit"
-                        (click)="$event.stopPropagation()"
-                      >
-                        <app-icon name="pen" [size]="14"></app-icon>
-                        <span>Edit</span>
-                      </button>
-                      <div class="storefront-editor__preview-section-content" [attr.data-section-content-id]="section.id">
+                        <div
+                          class="storefront-editor__preview-section-content"
+                          [attr.data-section-content-id]="section.id"
+                          [style.height.px]="sectionPreviewHeight(section)"
+                          [class.storefront-editor__preview-section-content--attach-target]="isLibraryComponentDragging() && componentAttachSectionId() === section.id"
+                          [class.storefront-editor__preview-section-content--component-dragging]="draggedComponentId() !== null"
+                          (mousedown)="startComponentSelectionBox(section.id, $event)"
+                          (click)="clearComponentSelection(section.id, $event)"
+                          (contextmenu)="openSectionCanvasContextMenu(section.id, $event)"
+                          (dragenter)="enterLibraryComponentAttach($event, section.id)"
+                          (dragover)="allowLibraryComponentAttach($event, section.id)"
+                          (dragleave)="leaveLibraryComponentAttach(section.id)"
+                          (drop)="dropLibraryComponentIntoSection($event, section.id)"
+                        >
+                        @if (isLibraryComponentDragging() && componentAttachSectionId() === section.id) {
+                          <div class="storefront-editor__preview-section-attach-indicator">Attach to section</div>
+                        }
                         @switch (section.type) {
                         @case ('announcement-bar') {
                           <section class="preview-announcement">
@@ -956,176 +972,170 @@
                           <button
                             type="button"
                             class="storefront-editor__preview-component"
-                            [class.storefront-editor__preview-component--selected]="selectedComponentId() === component.id"
+                            [class.storefront-editor__preview-component--selected]="isComponentSelected(component.id)"
+                            [class.storefront-editor__preview-component--grouped]="!!component.groupId"
+                            [class.storefront-editor__preview-component--dragging]="draggedComponentId() === component.id"
                             [style.left.px]="component.frame.x"
                             [style.top.px]="component.frame.y"
                             [style.width.px]="component.frame.width"
                             [style.height.px]="component.frame.height"
+                            [style.zIndex]="component.zIndex || 1"
+                            [style.transform]="'rotate(' + (component.rotation || 0) + 'deg)'"
                             (click)="selectComponent(section.id, component.id, $event)"
+                            (dblclick)="startEditingComponentText(section.id, component.id, $event)"
                             (mousedown)="beginComponentMove(section.id, component.id, $event)"
+                            (contextmenu)="openComponentContextMenu(section.id, component.id, $event)"
+                            [style.--storefront-editor-text-align]="component.type === 'heading' || component.type === 'paragraph' ? component.props.align : null"
+                            [style.--storefront-editor-image-fit]="component.type === 'image' ? component.props.objectFit : null"
+                            [style.--storefront-editor-container-bg]="component.type === 'container' ? component.props.backgroundColor : null"
                           >
-                            <span class="storefront-editor__preview-component-toolbar">{{ component.name }}</span>
-                            @switch (component.type) {
-                              @case ('heading') {
-                                <span class="storefront-editor__preview-component-heading">{{ component.props.text }}</span>
-                              }
-                              @case ('paragraph') {
-                                <span class="storefront-editor__preview-component-paragraph">{{ component.props.text }}</span>
-                              }
-                              @case ('image') {
-                                <span class="storefront-editor__preview-component-image">
-                                  <span>Image</span>
+                            <app-storefront-editor-component-host [node]="component" />
+                            @if (selectedComponentId() === component.id && selectedComponentIds().length === 1 && !isResizingComponent() && !isRotatingComponent()) {
+                              <span
+                                class="storefront-editor__preview-component-name-label"
+                                [class.storefront-editor__preview-component-name-label--flipped]="isComponentRotationFlipped(component.rotation || 0)"
+                                (dblclick)="startEditingComponentName(section.id, component.id, $event)"
+                              >
+                                <span class="storefront-editor__preview-component-name-label-text">
+                                  {{ componentTypeLabel(component) }} · {{ componentDisplayName(component) }}
                                 </span>
+                              </span>
+                              @if (isEditingComponentName() && editingComponentNameId() === component.id) {
+                                <input
+                                  class="storefront-editor__preview-component-name-input"
+                                  [value]="editingComponentNameValue()"
+                                  (input)="editingComponentNameValue.set($any($event.target).value)"
+                                  (keydown)="onComponentNameInputKeydown($event)"
+                                  (blur)="finishEditingComponentName()"
+                                  (mousedown)="$event.stopPropagation()"
+                                  (click)="$event.stopPropagation()"
+                                />
                               }
-                              @case ('button') {
-                                <span class="storefront-editor__preview-component-button">{{ component.props.label }}</span>
-                              }
-                              @case ('container') {
-                                <span class="storefront-editor__preview-component-container">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
+                              <div class="storefront-editor__preview-component-resize-handles">
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--nw" (mousedown)="beginComponentResize(section.id, component.id, 'nw', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--n" (mousedown)="beginComponentResize(section.id, component.id, 'n', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--ne" (mousedown)="beginComponentResize(section.id, component.id, 'ne', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--e" (mousedown)="beginComponentResize(section.id, component.id, 'e', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--se" (mousedown)="beginComponentResize(section.id, component.id, 'se', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--s" (mousedown)="beginComponentResize(section.id, component.id, 's', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--sw" (mousedown)="beginComponentResize(section.id, component.id, 'sw', $event)"></span>
+                                <span class="storefront-editor__preview-component-resize-handle storefront-editor__preview-component-resize-handle--w" (mousedown)="beginComponentResize(section.id, component.id, 'w', $event)"></span>
+                              </div>
+                              <div class="storefront-editor__preview-component-rotation-handles">
+                                <span class="storefront-editor__preview-component-rotation-handle storefront-editor__preview-component-rotation-handle--nw" (mousedown)="beginComponentRotate(section.id, component.id, $event)"></span>
+                                <span class="storefront-editor__preview-component-rotation-handle storefront-editor__preview-component-rotation-handle--ne" (mousedown)="beginComponentRotate(section.id, component.id, $event)"></span>
+                                <span class="storefront-editor__preview-component-rotation-handle storefront-editor__preview-component-rotation-handle--se" (mousedown)="beginComponentRotate(section.id, component.id, $event)"></span>
+                                <span class="storefront-editor__preview-component-rotation-handle storefront-editor__preview-component-rotation-handle--sw" (mousedown)="beginComponentRotate(section.id, component.id, $event)"></span>
+                              </div>
+                              <span
+                                class="storefront-editor__preview-component-size-indicator"
+                                [class.storefront-editor__preview-component-size-indicator--flipped]="isComponentRotationFlipped(component.rotation || 0)"
+                              >
+                                <span class="storefront-editor__preview-component-size-indicator-text">
+                                  {{ roundedComponentWidth(component) }} × {{ roundedComponentHeight(component) }}
                                 </span>
-                              }
-                              @case ('graphic') {
-                                <span class="storefront-editor__preview-component-graphic"></span>
-                              }
-                              @case ('product-feed') {
-                                <span class="storefront-editor__preview-component-product-feed">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
-                                </span>
-                              }
-                              @case ('blog-feed') {
-                                <span class="storefront-editor__preview-component-blog-feed">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
-                                </span>
-                              }
+                              </span>
+                            }
+                            @if (isEditingComponentText() && editingComponentTextId() === component.id) {
+                              <textarea
+                                class="storefront-editor__preview-component-text-editor"
+                                [value]="editingComponentTextValue()"
+                                (input)="editingComponentTextValue.set($any($event.target).value)"
+                                (keydown)="onComponentTextInputKeydown($event)"
+                                (blur)="finishEditingComponentText()"
+                                (mousedown)="$event.stopPropagation()"
+                                (click)="$event.stopPropagation()"
+                              ></textarea>
                             }
                           </button>
                         }
-                      </div>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-add"
-                        (click)="$event.stopPropagation(); openSectionLibrary(section.id)"
-                      >
-                        <app-icon name="invite-plus" [size]="14"></app-icon>
-                        <span>Add Section</span>
-                      </button>
+                        @if (isSelectingComponents() && selectionBoxSectionId() === section.id) {
+                          <div
+                            class="storefront-editor__preview-selection-box"
+                            [style.left.px]="selectionBox().x"
+                            [style.top.px]="selectionBox().y"
+                            [style.width.px]="selectionBox().width"
+                            [style.height.px]="selectionBox().height"
+                          ></div>
+                        }
+                        </div>
+                        <div class="storefront-editor__preview-section-chrome">
+                          <div class="storefront-editor__preview-section-border"></div>
+                          <span class="storefront-editor__preview-section-tag">{{ sectionLabel(section) }}</span>
+                          <button
+                            type="button"
+                            class="storefront-editor__preview-section-edit"
+                            (click)="$event.stopPropagation()"
+                          >
+                            <app-icon name="pen" [size]="14"></app-icon>
+                            <span>Edit</span>
+                          </button>
+                          @if (isSectionActivelySelected(section.id)) {
+                            <button
+                              type="button"
+                              class="storefront-editor__preview-section-resize-handle"
+                              (mousedown)="beginSectionResize(section.id, $event)"
+                              aria-label="Resize section height"
+                            ></button>
+                          }
+                          <button
+                            type="button"
+                            class="storefront-editor__preview-section-add"
+                            (click)="$event.stopPropagation(); openSectionLibrary(section.id)"
+                          >
+                            <app-icon name="invite-plus" [size]="14"></app-icon>
+                            <span>Add Section</span>
+                          </button>
+                        </div>
                     </div>
                   }
                 }
               </div>
             </div>
             @if (selectedSectionId(); as selectedSectionId) {
-              <div
-                class="storefront-editor__preview-floating-rail"
-                [style.top.px]="hoveredSectionRailTop()"
-                (click)="$event.stopPropagation()"
-              >
-                <div class="storefront-editor__preview-section-rail-control">
-                  <button
-                    type="button"
-                    class="storefront-editor__preview-section-rail-button"
-                    aria-label="Move section up"
-                    [disabled]="!canMoveSection(selectedSectionId, 'up')"
-                    (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'up')"
-                  >
-                    <app-icon name="move-up" [size]="18"></app-icon>
-                  </button>
-                  <div class="storefront-editor__preview-section-rail-tooltip">Move section up</div>
+              @if (isSelectedSectionRailVisible() && !hasComponentSelection()) {
+                <div
+                  class="storefront-editor__preview-floating-rail"
+                  [style.top.px]="hoveredSectionRailTop()"
+                  (click)="$event.stopPropagation()"
+                >
+                  <div class="storefront-editor__preview-section-rail-control">
+                    <button
+                      type="button"
+                      class="storefront-editor__preview-section-rail-button"
+                      aria-label="Move section up"
+                      [disabled]="!canMoveSection(selectedSectionId, 'up')"
+                      (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'up')"
+                    >
+                      <app-icon name="move-up" [size]="18"></app-icon>
+                    </button>
+                    <div class="storefront-editor__preview-section-rail-tooltip">Move section up</div>
+                  </div>
+                  <div class="storefront-editor__preview-section-rail-control">
+                    <button
+                      type="button"
+                      class="storefront-editor__preview-section-rail-button"
+                      aria-label="Move section down"
+                      [disabled]="!canMoveSection(selectedSectionId, 'down')"
+                      (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'down')"
+                    >
+                      <app-icon name="move-down" [size]="18"></app-icon>
+                    </button>
+                    <div class="storefront-editor__preview-section-rail-tooltip">Move section down</div>
+                  </div>
+                  <div class="storefront-editor__preview-section-rail-control storefront-editor__preview-section-rail-more">
+                    <button
+                      type="button"
+                      class="storefront-editor__preview-section-rail-button"
+                      aria-label="More options"
+                      (click)="$event.stopPropagation(); toggleSectionOptions(selectedSectionId, $event)"
+                    >
+                      <app-icon name="more-horizontal" [size]="20"></app-icon>
+                    </button>
+                    <div class="storefront-editor__preview-section-rail-tooltip">More options</div>
+                  </div>
                 </div>
-                <div class="storefront-editor__preview-section-rail-control">
-                  <button
-                    type="button"
-                    class="storefront-editor__preview-section-rail-button"
-                    aria-label="Move section down"
-                    [disabled]="!canMoveSection(selectedSectionId, 'down')"
-                    (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'down')"
-                  >
-                    <app-icon name="move-down" [size]="18"></app-icon>
-                  </button>
-                  <div class="storefront-editor__preview-section-rail-tooltip">Move section down</div>
-                </div>
-                <div class="storefront-editor__preview-section-rail-control storefront-editor__preview-section-rail-more">
-                  <button
-                    type="button"
-                    class="storefront-editor__preview-section-rail-button"
-                    aria-label="More options"
-                    (click)="$event.stopPropagation(); toggleSectionOptions(selectedSectionId)"
-                  >
-                    <app-icon name="more-horizontal" [size]="20"></app-icon>
-                  </button>
-                  <div class="storefront-editor__preview-section-rail-tooltip">More options</div>
-                  @if (sectionOptionsMenuId() === selectedSectionId) {
-                    <div class="storefront-editor__preview-section-menu">
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        [disabled]="!canRemoveSection()"
-                        (click)="$event.stopPropagation(); cutSection(selectedSectionId); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Cut</span>
-                        <small>Ctrl + X</small>
-                      </button>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        (click)="$event.stopPropagation(); copySection(selectedSectionId); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Copy</span>
-                        <small>Ctrl + C</small>
-                      </button>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        [disabled]="!canPasteSection()"
-                        (click)="$event.stopPropagation(); pasteSection(selectedSectionId); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Paste</span>
-                        <small>Ctrl + V</small>
-                      </button>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        (click)="$event.stopPropagation(); duplicateSection(selectedSectionId); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Duplicate</span>
-                        <small>Ctrl + D</small>
-                      </button>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        [disabled]="!canRemoveSection()"
-                        (click)="$event.stopPropagation(); removeSection(selectedSectionId); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Delete</span>
-                      </button>
-                      <div class="storefront-editor__preview-section-menu-divider"></div>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        [disabled]="!canMoveSection(selectedSectionId, 'up')"
-                        (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'up'); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Move section up</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="storefront-editor__preview-section-menu-item"
-                        [disabled]="!canMoveSection(selectedSectionId, 'down')"
-                        (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'down'); sectionOptionsMenuId.set(null)"
-                      >
-                        <span>Move section down</span>
-                      </button>
-                    </div>
-                  }
-                </div>
-              </div>
+              }
             }
           </div>
       </section>
@@ -1233,5 +1243,142 @@
         </div>
       </div>
     }
+
+    @if (isComponentContextMenuOpen()) {
+      <div
+        class="storefront-editor__component-context-menu"
+        [style.left.px]="componentContextMenuPosition().x"
+        [style.top.px]="componentContextMenuPosition().y"
+        (click)="$event.stopPropagation()"
+      >
+        <button type="button" class="storefront-editor__component-context-item" [disabled]="!selectedComponentIds().length" (click)="copySelectedComponents()">
+          <span>Copy</span>
+        </button>
+        <button type="button" class="storefront-editor__component-context-item" [disabled]="!componentClipboard()" (click)="pasteComponentFromClipboard()">
+          <span>Paste</span>
+        </button>
+        <div class="storefront-editor__component-context-divider"></div>
+        <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
+          <span>Duplicate</span>
+        </button>
+        <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsToFront()">
+          <span>Bring to front</span>
+        </button>
+        <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsForward()">
+          <span>Bring forward</span>
+        </button>
+        <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsBackward()">
+          <span>Send backward</span>
+        </button>
+        <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsToBack()">
+          <span>Send to back</span>
+        </button>
+        <div class="storefront-editor__component-context-divider"></div>
+        <button
+          type="button"
+          class="storefront-editor__component-context-item"
+          [disabled]="selectedComponentIds().length < 2"
+          (click)="groupSelectedComponents()"
+        >
+          <span>Group</span>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__component-context-item"
+          [disabled]="!selectedComponentGroupId()"
+          (click)="ungroupSelectedComponents()"
+        >
+          <span>Ungroup</span>
+        </button>
+        <div class="storefront-editor__component-context-divider"></div>
+        <button
+          type="button"
+          class="storefront-editor__component-context-item storefront-editor__component-context-item--danger"
+          [disabled]="!selectedComponentIds().length"
+          (click)="deleteSelectedComponents()"
+        >
+          <span>Delete</span>
+        </button>
+      </div>
+    }
+
+    @if (sectionOptionsMenuId(); as sectionMenuId) {
+      <div
+        class="storefront-editor__preview-section-menu storefront-editor__preview-section-menu--floating"
+        [style.left.px]="sectionContextMenuPosition().x"
+        [style.top.px]="sectionContextMenuPosition().y"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canRemoveSection()"
+          (click)="cutSection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Cut</span>
+          <small>Ctrl + X</small>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          (click)="copySection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Copy</span>
+          <small>Ctrl + C</small>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canPasteSection()"
+          (click)="pasteSection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Paste</span>
+          <small>Ctrl + V</small>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          (click)="duplicateSection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Duplicate</span>
+          <small>Ctrl + D</small>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canRemoveSection()"
+          (click)="removeSection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Delete</span>
+        </button>
+        <div class="storefront-editor__preview-section-menu-divider"></div>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canMoveSection(sectionMenuId, 'up')"
+          (click)="moveSection(sectionMenuId, 'up'); closeSectionOptionsMenu()"
+        >
+          <span>Move section up</span>
+        </button>
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canMoveSection(sectionMenuId, 'down')"
+          (click)="moveSection(sectionMenuId, 'down'); closeSectionOptionsMenu()"
+        >
+          <span>Move section down</span>
+        </button>
+      </div>
+    }
   </section>
+
+  @if (isMediaManagerOpen()) {
+    <app-project-storefront-media-manager
+      [assets]="mediaAssets()"
+      [isUploading]="isMediaUploading()"
+      (close)="closeMediaManager()"
+      (filesSelected)="uploadMediaFromManager($event)"
+      (confirmSelection)="confirmMediaSelection($event)"
+    />
+  }
 }

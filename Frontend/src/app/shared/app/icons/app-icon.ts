@@ -42,7 +42,14 @@ export type AppIconName =
   | 'invite-plus'
   | 'move-up'
   | 'move-down'
-  | 'more-horizontal';
+  | 'more-horizontal'
+  | 'x'
+  | 'filter'
+  | 'arrow-up-down'
+  | 'list'
+  | 'copy'
+  | 'external-link'
+  | 'upload';
 
 @Component({
   selector: 'app-icon',
@@ -321,6 +328,43 @@ export type AppIconName =
             stroke="none"
             d="M7.25 10.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm4.75 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm4.75 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"
           />
+        }
+        @case ('x') {
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        }
+        @case ('filter') {
+          <path d="M4 5h16" />
+          <path d="M7 12h10" />
+          <path d="M10 19h4" />
+        }
+        @case ('arrow-up-down') {
+          <path d="M8 17V7" />
+          <path d="m5 10 3-3 3 3" />
+          <path d="M16 7v10" />
+          <path d="m13 14 3 3 3-3" />
+        }
+        @case ('list') {
+          <path d="M8 6h13" />
+          <path d="M8 12h13" />
+          <path d="M8 18h13" />
+          <path d="M3 6h.01" />
+          <path d="M3 12h.01" />
+          <path d="M3 18h.01" />
+        }
+        @case ('copy') {
+          <rect x="9" y="9" width="11" height="11" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        }
+        @case ('external-link') {
+          <path d="M14 5h5v5" />
+          <path d="M10 14 19 5" />
+          <path d="M19 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" />
+        }
+        @case ('upload') {
+          <path d="M12 16V4" />
+          <path d="m7 9 5-5 5 5" />
+          <path d="M5 20h14" />
         }
     }
     </svg>
