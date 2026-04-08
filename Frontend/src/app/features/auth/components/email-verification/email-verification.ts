@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -7,22 +7,21 @@ import { AuthService } from '../../../../core/services/auth.service';
   selector: 'app-email-verification',
   standalone: true,
   templateUrl: './email-verification.html',
+  styleUrls: ['./email-verification.scss'],
   imports: [NgIf, RouterModule]
 })
-export class EmailVerificationComponent implements OnInit {
-
-  // HTML uses: loading, success, message, canResend
+export class EmailVerificationComponent implements OnInit, OnDestroy {
   loading = true;
   success = false;
   message = '';
   canResend = false;
 
-  // For resend flow
   isResending = false;
   resendSuccess = '';
   resendError = '';
 
   private userEmail = '';
+  private redirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,7 +50,7 @@ export class EmailVerificationComponent implements OnInit {
         this.canResend = false;
         localStorage.removeItem('pendingVerificationEmail');
 
-        setTimeout(() => this.router.navigate(['/dashboard']), 3000);
+        this.scheduleLoginRedirect(3000);
       },
       error: (err: { status: number; error?: { message?: string } }) => {
         this.loading = false;
@@ -59,10 +58,11 @@ export class EmailVerificationComponent implements OnInit {
         this.canResend = true;
 
         if (err.status === 409) {
-          this.success = true; // already verified — treat as success
+          this.success = true;
           this.message = 'Your email is already verified.';
           this.canResend = false;
-          setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+          localStorage.removeItem('pendingVerificationEmail');
+          this.scheduleLoginRedirect(2000);
         } else if (err.status === 400) {
           this.message = 'This verification link has expired or is invalid.';
         } else {
@@ -72,7 +72,6 @@ export class EmailVerificationComponent implements OnInit {
     });
   }
 
-  // HTML uses: resendVerification()
   resendVerification(): void {
     if (!this.userEmail) {
       this.resendError = 'No email address found. Please log in again.';
@@ -95,12 +94,27 @@ export class EmailVerificationComponent implements OnInit {
     });
   }
 
-  // HTML uses: goToLogin(), goToRegister()
   goToLogin(): void {
-    this.router.navigate(['/login']);
+    void this.router.navigate(['/login']);
   }
 
   goToRegister(): void {
-    this.router.navigate(['/register']);
+    void this.router.navigate(['/register']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+  }
+
+  private scheduleLoginRedirect(delayMs: number): void {
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+
+    this.redirectTimeoutId = setTimeout(() => {
+      void this.router.navigate(['/login']);
+    }, delayMs);
   }
 }
