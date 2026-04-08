@@ -912,7 +912,7 @@
 
             <button type="button" class="storefront-editor__context-toolbar-trigger storefront-editor__context-toolbar-trigger--link">
               <app-icon name="external-link" [size]="14"></app-icon>
-              <span>Lien</span>
+              <span>Link</span>
             </button>
 
             <span class="storefront-editor__context-toolbar-divider"></span>
@@ -932,80 +932,116 @@
 
               @if (activeTextToolbarMenu() === 'color') {
                 <div class="storefront-editor__context-toolbar-color-panel">
+                  <div class="storefront-editor__context-toolbar-color-panel-header">
+                    <h3>Color picker</h3>
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-color-panel-close"
+                      (click)="toggleTextToolbarMenu('color')"
+                      aria-label="Close color picker"
+                    >
+                      <app-icon name="x" [size]="14"></app-icon>
+                    </button>
+                  </div>
+
                   <div class="storefront-editor__context-toolbar-color-panel-tabs">
                     <button
                       type="button"
                       class="storefront-editor__context-toolbar-color-panel-tab"
-                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeColorPickerTab() === 'picker'"
-                      (click)="setActiveColorPickerTab('picker')"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeColorPickerTab() === 'brand'"
+                      (click)="setActiveColorPickerTab('brand')"
                     >
-                      Picker
+                      Brand
                     </button>
                     <button
                       type="button"
                       class="storefront-editor__context-toolbar-color-panel-tab"
-                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeColorPickerTab() === 'saved'"
-                      (click)="setActiveColorPickerTab('saved')"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeColorPickerTab() === 'custom'"
+                      (click)="setActiveColorPickerTab('custom')"
                     >
-                      Saved
+                      Custom
                     </button>
                   </div>
 
-                  @if (activeColorPickerTab() === 'picker') {
+                  @if (activeColorPickerTab() === 'custom') {
                     <div class="storefront-editor__context-toolbar-color-panel-body">
-                      <label class="storefront-editor__context-toolbar-color-input-wrap">
-                        <input
-                          type="color"
-                          class="storefront-editor__context-toolbar-color-input"
-                          [ngModel]="paragraph.props.color"
-                          (ngModelChange)="updateSelectedParagraphColor($event)"
-                          aria-label="Paragraph color"
-                        />
-                      </label>
+                      <div
+                        class="storefront-editor__context-toolbar-color-canvas"
+                        [style.--color-picker-hue]="customColorCanvasBackground()"
+                        (mousedown)="startCustomColorCanvasDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-canvas-knob"
+                          [style.left]="customColorCanvasHandleLeft()"
+                          [style.top]="customColorCanvasHandleTop()"
+                        ></span>
+                      </div>
+
+                      <div
+                        class="storefront-editor__context-toolbar-color-spectrum"
+                        (mousedown)="startCustomColorHueDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-spectrum-thumb"
+                          [style.left]="customColorSpectrumHandleLeft()"
+                        ></span>
+                      </div>
 
                       <div class="storefront-editor__context-toolbar-color-meta">
-                        <span class="storefront-editor__context-toolbar-color-hex">{{ paragraph.props.color }}</span>
-                        <button
-                          type="button"
-                          class="storefront-editor__context-toolbar-color-save"
-                          (click)="saveSelectedParagraphColor()"
-                        >
-                          Save color
-                        </button>
+                        <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                        <label class="storefront-editor__context-toolbar-color-hex">
+                          <span>#</span>
+                          <input
+                            type="text"
+                            [value]="customColorHexValue()"
+                            (change)="updateCustomColorHex($any($event.target).value)"
+                            aria-label="Hex color"
+                          />
+                        </label>
+                        <span
+                          class="storefront-editor__context-toolbar-color-current"
+                          [style.background]="paragraph.props.color"
+                        ></span>
                       </div>
+
+                      <button
+                        type="button"
+                        class="storefront-editor__context-toolbar-color-brand-save"
+                        (click)="saveSelectedParagraphColor()"
+                      >
+                        <span aria-hidden="true">♡</span>
+                        <span>Save to brand</span>
+                      </button>
                     </div>
                   } @else {
                     <div class="storefront-editor__context-toolbar-color-panel-body">
-                      <div class="storefront-editor__context-toolbar-saved-colors">
-                        @for (savedColor of savedParagraphColors(); track savedColor) {
-                          <div
-                            class="storefront-editor__context-toolbar-saved-color-wrap"
-                            [class.storefront-editor__context-toolbar-saved-color-wrap--active]="paragraph.props.color === savedColor"
+                      <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                      <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                        @for (savedColor of brandParagraphColors(); track savedColor) {
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-saved-color"
+                            [class.storefront-editor__context-toolbar-saved-color--active]="paragraph.props.color === savedColor"
+                            [class.storefront-editor__context-toolbar-saved-color--transparent]="savedColor === 'transparent'"
+                            [style.--saved-color]="savedColor === 'transparent' ? 'transparent' : savedColor"
+                            (click)="applySavedParagraphColor(savedColor)"
+                            [attr.aria-label]="'Apply color ' + savedColor"
                           >
-                            <button
-                              type="button"
-                              class="storefront-editor__context-toolbar-saved-color"
-                              [style.--saved-color]="savedColor"
-                              (click)="applySavedParagraphColor(savedColor)"
-                              [attr.aria-label]="'Apply color ' + savedColor"
-                            >
-                              <span></span>
-                            </button>
-                            <button
-                              type="button"
-                              class="storefront-editor__context-toolbar-saved-color-remove"
-                              (click)="removeSavedParagraphColor(savedColor, $event)"
-                              aria-label="Remove saved color"
-                            >
-                              <app-icon name="x" [size]="10"></app-icon>
-                            </button>
-                          </div>
+                            <span></span>
+                          </button>
                         }
                       </div>
 
-                      @if (!savedParagraphColors().length) {
-                        <p class="storefront-editor__context-toolbar-color-empty">Save colors here to reuse them fast.</p>
-                      }
+                      <button
+                        type="button"
+                        class="storefront-editor__context-toolbar-color-brand-save storefront-editor__context-toolbar-color-brand-save--secondary"
+                        (click)="setActiveColorPickerTab('custom')"
+                      >
+                        <span aria-hidden="true">✎</span>
+                        <span>Edit colors</span>
+                      </button>
                     </div>
                   }
                 </div>
