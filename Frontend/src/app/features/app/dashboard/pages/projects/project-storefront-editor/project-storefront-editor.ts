@@ -77,6 +77,7 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
+  private static readonly SECTION_LABEL_PROP_KEY = 'editorLabel';
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -222,6 +223,9 @@ export class ProjectStorefrontEditor {
   readonly isEditingComponentName = signal(false);
   readonly editingComponentNameId = signal<string | null>(null);
   readonly editingComponentNameValue = signal('');
+  readonly isEditingSectionName = signal(false);
+  readonly editingSectionNameId = signal<string | null>(null);
+  readonly editingSectionNameValue = signal('');
   readonly isEditingComponentText = signal(false);
   readonly editingComponentTextId = signal<string | null>(null);
   readonly editingComponentTextValue = signal('');
@@ -467,11 +471,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
   @HostListener('window:keydown', ['$event'])
   handleZoomShortcuts(event: KeyboardEvent): void {
-    if (this.isEditingComponentName() || this.isEditingComponentText()) {
+    if (this.isEditingComponentName() || this.isEditingComponentText() || this.isEditingSectionName()) {
       if (event.key === 'Escape') {
         event.preventDefault();
         this.cancelComponentNameEditing();
         this.cancelComponentTextEditing();
+        this.cancelSectionNameEditing();
       }
       return;
     }
@@ -497,6 +502,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedComponentIds().length) {
       event.preventDefault();
       this.deleteSelectedComponents();
+      return;
+    }
+
+    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedSectionId() && !this.hasComponentSelection()) {
+      event.preventDefault();
+      this.removeSection(this.selectedSectionId()!);
       return;
     }
 
@@ -1628,6 +1639,68 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.editingComponentNameValue.set(component.name || 'Untitled');
   }
 
+  startEditingSectionName(sectionId: string, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const section = this.sections().find((item) => item.id === sectionId);
+    if (!section) {
+      return;
+    }
+
+    this.selectSection(sectionId);
+    this.isEditingSectionName.set(true);
+    this.editingSectionNameId.set(sectionId);
+    this.editingSectionNameValue.set(this.sectionLabel(section));
+  }
+
+  finishEditingSectionName(): void {
+    const sectionId = this.editingSectionNameId();
+    if (!sectionId) {
+      this.cancelSectionNameEditing();
+      return;
+    }
+
+    const nextName = this.editingSectionNameValue().trim() || 'Section';
+    this.applyStorefrontMutation(
+      (storefront) => ({
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections: storefront.draftHomepage.sections.map((section) =>
+            section.id === sectionId
+              ? {
+                  ...section,
+                  props: {
+                    ...section.props,
+                    [ProjectStorefrontEditor.SECTION_LABEL_PROP_KEY]: nextName,
+                  },
+                }
+              : section
+          ),
+        },
+      }),
+      { selectedSectionId: sectionId, syncRail: true }
+    );
+    this.cancelSectionNameEditing();
+  }
+
+  cancelSectionNameEditing(): void {
+    this.isEditingSectionName.set(false);
+    this.editingSectionNameId.set(null);
+    this.editingSectionNameValue.set('');
+  }
+
+  onSectionNameInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.finishEditingSectionName();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelSectionNameEditing();
+    }
+  }
+
   finishEditingComponentName(): void {
     const sectionId = this.selectedSectionId();
     const componentId = this.editingComponentNameId();
@@ -2538,6 +2611,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   sectionLabel(section: StorefrontHomepageSection): string {
+    const customLabel = this.readStringProp(section, ProjectStorefrontEditor.SECTION_LABEL_PROP_KEY).trim();
+    if (customLabel) {
+      return customLabel;
+    }
+
     switch (section.type) {
       case 'announcement-bar':
         return 'Announcement Bar';

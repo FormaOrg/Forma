@@ -716,6 +716,8 @@
   gap: 0;
   position: relative;
   z-index: 30;
+  overflow: clip;
+  border-radius: 20px 20px 0 0;
 }
 
 .storefront-editor__preview-toolbar {
@@ -2599,7 +2601,6 @@
   top: 0;
   left: 0;
   z-index: 2;
-  pointer-events: auto;
   padding: 6px 10px;
   border-radius: 0 0 8px 0;
   background: #355cff;
@@ -2608,12 +2609,32 @@
   font-weight: 500;
   line-height: 1;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
   transition: opacity 160ms ease;
+  cursor: text;
 }
 
 .storefront-editor__preview-section-shell--selected .storefront-editor__preview-section-tag {
   opacity: 1;
+}
+
+.storefront-editor__preview-section-name-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  min-width: 136px;
+  height: 28px;
+  padding: 4px 9px;
+  border: 1px solid #355cff;
+  border-radius: 0 0 8px 0;
+  background: #1e293b;
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  outline: none;
 }
 
 .storefront-editor__preview-floating-rail {
@@ -3071,7 +3092,8 @@
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: text;
 }
 
 .storefront-editor__preview-component-name-label-text {
@@ -3311,8 +3333,7 @@
   background: transparent;
   color: #111827;
   font: inherit;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.84rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
