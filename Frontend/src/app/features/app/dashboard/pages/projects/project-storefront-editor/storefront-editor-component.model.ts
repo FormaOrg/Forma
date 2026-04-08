@@ -26,6 +26,12 @@ export interface StorefrontEditorHeadingProps {
 
 export interface StorefrontEditorParagraphProps {
   text: string;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 400 | 500 | 600 | 700;
+  fontStyle: 'normal' | 'italic';
+  textDecoration: 'none' | 'underline';
+  color: string;
   align: StorefrontEditorTextAlign;
 }
 
@@ -174,6 +180,12 @@ export function createStorefrontEditorComponentNode(
         name: 'Paragraph',
         props: {
           text: 'Tell visitors what this section is about and why it matters.',
+          fontFamily: 'Fira Sans',
+          fontSize: 15,
+          fontWeight: 400,
+          fontStyle: 'normal',
+          textDecoration: 'none',
+          color: '#1f2937',
           align: 'left',
         },
       };
