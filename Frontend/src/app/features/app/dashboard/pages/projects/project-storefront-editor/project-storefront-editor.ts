@@ -8,6 +8,8 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
 import {
   ProjectStorefront,
+  StorefrontHomepageDocument,
+  StorefrontEditorManagedPage,
   StorefrontEditorSession,
   StorefrontEditorSnapshot,
   StorefrontEditorViewport,
@@ -35,6 +37,7 @@ import {
 import {
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
+  StorefrontEditorParagraphNode,
   createStorefrontEditorComponentNode,
 } from './storefront-editor-component.model';
 import {
@@ -47,6 +50,14 @@ type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 type PagesPanelLayoutMode = 'grid' | 'rows';
 type ComponentSelectionBox = { x: number; y: number; width: number; height: number };
+type StorefrontPageDesignTemplate = {
+  id: string;
+  name: string;
+  description: string;
+  category: StorefrontPageDesignCategory;
+  accent: 'linen' | 'cobalt' | 'ink' | 'sand';
+};
+type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type SectionLibraryCategory =
   | 'Welcome'
   | 'About'
@@ -74,10 +85,12 @@ export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
   private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
+  private static readonly PAGES_MANAGER_CLOSE_MS = 180;
   private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
   private static readonly SECTION_LABEL_PROP_KEY = 'editorLabel';
+  private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -101,7 +114,10 @@ export class ProjectStorefrontEditor {
 
   private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private managePagesCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private sectionLibraryCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private pageDesignPickerCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private suppressNextComponentClickSelectionId: string | null = null;
   private justFinishedComponentSelectionBox = false;
   private activeComponentDrag:
@@ -164,6 +180,8 @@ export class ProjectStorefrontEditor {
         height: number;
       }
     | null = null;
+  private activeColorCanvasDrag = false;
+  private activeColorHueDrag = false;
 
   readonly project = signal<Project | null>(null);
   readonly storefront = signal<ProjectStorefront | null>(null);
@@ -192,9 +210,17 @@ export class ProjectStorefrontEditor {
   );
   readonly componentAttachSectionId = signal<string | null>(null);
   readonly isPagesPanelOpen = signal(false);
+  readonly isPagesPanelClosing = signal(false);
+  readonly isManagePagesOpen = signal(false);
+  readonly isManagePagesClosing = signal(false);
   readonly isMediaManagerOpen = signal(false);
-  readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
-  readonly pageCardMenuId = signal<string | null>(null);
+readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
+readonly pagesManagerSearch = signal('');
+readonly isAddPageMenuOpen = signal(false);
+readonly isPageDesignPickerOpen = signal(false);
+readonly isPageDesignPickerClosing = signal(false);
+readonly activePageDesignCategory = signal<StorefrontPageDesignCategory>('Business');
+readonly pageCardMenuId = signal<string | null>(null);
   readonly pageCardMenuTop = signal(0);
   readonly pageCardMenuLeft = signal(0);
   readonly sectionLibraryTargetId = signal<string | null>(null);
@@ -202,8 +228,10 @@ export class ProjectStorefrontEditor {
   readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Welcome');
   readonly canScrollAddElementsTabsLeft = signal(false);
   readonly canScrollAddElementsTabsRight = signal(false);
-  readonly canScrollSectionLibraryTabsLeft = signal(false);
-  readonly canScrollSectionLibraryTabsRight = signal(false);
+readonly canScrollSectionLibraryTabsLeft = signal(false);
+readonly canScrollSectionLibraryTabsRight = signal(false);
+readonly canScrollPageDesignTabsLeft = signal(false);
+readonly canScrollPageDesignTabsRight = signal(false);
   readonly sectionOptionsMenuId = signal<string | null>(null);
   readonly draggedSectionId = signal<string | null>(null);
   readonly draggedComponentId = signal<string | null>(null);
@@ -226,6 +254,9 @@ export class ProjectStorefrontEditor {
   readonly isEditingSectionName = signal(false);
   readonly editingSectionNameId = signal<string | null>(null);
   readonly editingSectionNameValue = signal('');
+  readonly isEditingPageName = signal(false);
+  readonly editingPageNameId = signal<string | null>(null);
+  readonly editingPageNameValue = signal('');
   readonly isEditingComponentText = signal(false);
   readonly editingComponentTextId = signal<string | null>(null);
   readonly editingComponentTextValue = signal('');
@@ -247,6 +278,19 @@ readonly hasPreviewStageScrollbar = signal(false);
 
   readonly isEcommerceProject = computed(() => this.project()?.type === 'ECOMMERCE');
   readonly sections = computed(() => this.workingStorefront()?.draftHomepage.sections ?? []);
+  readonly managedPages = computed(() => this.editorSession().managedPages ?? this.buildDefaultManagedPages());
+  readonly selectedManagedPageId = computed(() => this.editorSession().selectedManagedPageId ?? 'home');
+  readonly selectedManagedPage = computed(
+    () => this.managedPages().find((page) => page.id === this.selectedManagedPageId()) ?? this.managedPages()[0] ?? null
+  );
+  readonly filteredManagedPages = computed(() => {
+    const query = this.pagesManagerSearch().trim().toLowerCase();
+    if (!query) {
+      return this.managedPages();
+    }
+
+    return this.managedPages().filter((page) => page.name.toLowerCase().includes(query));
+  });
   readonly pageSettingsSelected = computed(() => this.selectedSectionId() === null);
 readonly selectedSection = computed<StorefrontHomepageSection | null>(
   () => this.sections().find((section) => section.id === this.selectedSectionId()) ?? null
@@ -274,6 +318,41 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const selectedIds = new Set(this.selectedComponentIds());
     return this.readSectionComponents(section).filter((component) => selectedIds.has(component.id));
   });
+  readonly selectedParagraphComponent = computed<StorefrontEditorParagraphNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'paragraph' ? component : null;
+  });
+  readonly isParagraphToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedParagraphComponent() !== null
+  );
+  readonly activeTextToolbarMenu = signal<'font-family' | 'font-size' | 'color' | null>(null);
+  readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
+  readonly savedParagraphColors = signal<string[]>([]);
+  readonly customPickerHue = signal(206);
+  readonly customPickerSaturation = signal(74);
+  readonly customPickerBrightness = signal(22);
+  readonly brandParagraphColors = computed(() => {
+    const defaults = ['#ffffff', '#edf4fb', '#bcd1e7', '#091b2f', '#082237', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8', 'transparent'];
+    const merged = [...defaults, ...this.savedParagraphColors()];
+    const unique: string[] = [];
+    for (const color of merged) {
+      const normalized = color.trim().toLowerCase();
+      if (normalized && !unique.includes(normalized)) {
+        unique.push(normalized);
+      }
+    }
+    return unique.slice(0, 10);
+  });
+  readonly customColorCanvasBackground = computed(() => `hsl(${this.customPickerHue()} 100% 50%)`);
+  readonly customColorCanvasHandleLeft = computed(() => `${this.customPickerSaturation()}%`);
+  readonly customColorCanvasHandleTop = computed(() => `${100 - this.customPickerBrightness()}%`);
+  readonly customColorSpectrumHandleLeft = computed(() => `${(this.customPickerHue() / 360) * 100}%`);
+  readonly customColorHexValue = computed(() => {
+    const color = this.selectedParagraphComponent()?.props.color ?? '#082237';
+    return color.replace('#', '').toUpperCase();
+  });
+  readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
+  readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
   readonly selectedComponentGroupId = computed(() => {
       const selected = this.selectedComponent();
       return selected?.groupId ?? null;
@@ -336,14 +415,16 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       .slice(0, maxItems);
   });
   readonly previewTitle = computed(() => this.workingStorefront()?.draftHomepage.seo.title || this.storeName());
-  readonly selectedPageLabel = computed(() => 'Home');
+  readonly selectedPageLabel = computed(() => this.selectedManagedPage()?.name || 'Home');
   readonly hasFloatingUi = computed(
     () =>
       this.isFormaMenuOpen() ||
       this.isAccountMenuOpen() ||
       this.isZoomMenuOpen() ||
       this.isAddElementsPanelVisible() ||
-      this.isPagesPanelOpen() ||
+      this.isPagesPanelVisible() ||
+      this.isManagePagesVisible() ||
+      this.isPageDesignPickerVisible() ||
       this.isSectionLibraryVisible() ||
       this.isMediaManagerOpen() ||
       this.isSectionLibraryOpen() ||
@@ -351,7 +432,8 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   );
   readonly hasBlockingOverlay = computed(
     () =>
-      this.isPagesPanelOpen() ||
+      this.isManagePagesVisible() ||
+      this.isPageDesignPickerVisible() ||
       this.isSectionLibraryVisible() ||
       this.isMediaManagerOpen() ||
       this.isSectionLibraryOpen()
@@ -359,7 +441,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly isAddElementsPanelVisible = computed(
     () => this.isAddElementsPanelOpen() || this.isAddElementsPanelClosing()
   );
-  readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !== null);
+readonly isPagesPanelVisible = computed(() => this.isPagesPanelOpen() || this.isPagesPanelClosing());
+readonly isManagePagesVisible = computed(() => this.isManagePagesOpen() || this.isManagePagesClosing());
+readonly isPageDesignPickerVisible = computed(() => this.isPageDesignPickerOpen() || this.isPageDesignPickerClosing());
+readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !== null);
   readonly isSectionLibraryVisible = computed(
     () => this.isSectionLibraryOpen() || this.isSectionLibraryClosing()
   );
@@ -423,6 +508,47 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly visibleSectionLibraryTemplates = computed(() =>
     this.sectionLibraryTemplates.filter((template) => template.category === this.activeSectionLibraryCategory())
   );
+  readonly pageDesignTemplates: StorefrontPageDesignTemplate[] = [
+    {
+      id: 'about',
+      name: 'About',
+      description: 'Tell the story behind the brand and introduce the team.',
+      category: 'Business',
+      accent: 'linen',
+    },
+    {
+      id: 'contact',
+      name: 'Contact',
+      description: 'Give visitors a clean way to reach you and ask questions.',
+      category: 'Business',
+      accent: 'cobalt',
+    },
+    {
+      id: 'privacy-policy',
+      name: 'Privacy Policy',
+      description: 'Start from a legal-style layout for policies and business info.',
+      category: 'Policy',
+      accent: 'sand',
+    },
+    {
+      id: 'shipping-policy',
+      name: 'Shipping Policy',
+      description: 'Use a policy page layout focused on delivery details and returns.',
+      category: 'Policy',
+      accent: 'ink',
+    },
+    {
+      id: 'product-page',
+      name: 'Product Page',
+      description: 'Begin with a commerce-focused page title and supporting details.',
+      category: 'Store',
+      accent: 'cobalt',
+    },
+  ];
+  readonly pageDesignCategories: StorefrontPageDesignCategory[] = ['Business', 'Store', 'Info', 'Policy'];
+  readonly visiblePageDesignTemplates = computed(() =>
+    this.pageDesignTemplates.filter((template) => template.category === this.activePageDesignCategory())
+  );
   readonly addElementsCategories = STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES;
   readonly addElementsFeaturedShortcuts = STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS;
   readonly addElementsLibraryItems = STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS;
@@ -434,9 +560,13 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     );
   });
 
-  constructor() {
-    effect(() => {
-      const selectedSectionId = this.selectedSectionId();
+constructor() {
+effect(() => {
+  this.savedParagraphColors.set(this.readSavedParagraphColors());
+});
+
+ effect(() => {
+   const selectedSectionId = this.selectedSectionId();
       if (!selectedSectionId) {
         this.isSelectedSectionRailVisible.set(false);
         return;
@@ -452,10 +582,13 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       if (this.addElementsPanelCloseTimer) {
         clearTimeout(this.addElementsPanelCloseTimer);
       }
-      if (this.sectionLibraryCloseTimer) {
-        clearTimeout(this.sectionLibraryCloseTimer);
-      }
-    });
+   if (this.sectionLibraryCloseTimer) {
+     clearTimeout(this.sectionLibraryCloseTimer);
+   }
+   if (this.pageDesignPickerCloseTimer) {
+     clearTimeout(this.pageDesignPickerCloseTimer);
+   }
+ });
     this.loadEditor();
   }
 
@@ -610,10 +743,40 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   handleDocumentMouseDown(event: MouseEvent): void {
     const target = event.target;
     if (!(target instanceof Element)) {
+      this.isFormaMenuOpen.set(false);
+      this.isAccountMenuOpen.set(false);
+      this.isZoomMenuOpen.set(false);
+      this.isAddPageMenuOpen.set(false);
       this.sectionOptionsMenuId.set(null);
       this.pageCardMenuId.set(null);
+      this.activeTextToolbarMenu.set(null);
       this.closeComponentContextMenu();
       return;
+    }
+
+    if ((this.isFormaMenuOpen() || this.isAccountMenuOpen() || this.isZoomMenuOpen()) &&
+      !target.closest('.storefront-editor__floating-shell')) {
+      this.isFormaMenuOpen.set(false);
+      this.isAccountMenuOpen.set(false);
+      this.isZoomMenuOpen.set(false);
+    }
+
+    if (this.isAddPageMenuOpen()) {
+      if (!target.closest('.storefront-editor__add-page-menu, .storefront-editor__pages-primary')) {
+        this.isAddPageMenuOpen.set(false);
+      }
+    }
+
+    if (this.isPagesPanelOpen()) {
+      if (!target.closest('.storefront-editor__pages-panel, .storefront-editor__page-trigger, .storefront-editor__page-card-menu--floating')) {
+        this.closePagesPanel();
+      }
+    }
+
+    if (this.isAddElementsPanelOpen() && !this.isLibraryComponentDragging()) {
+      if (!target.closest('.storefront-editor__add-elements-panel, .storefront-editor__add-button')) {
+        this.closeAddElementsPanel();
+      }
     }
 
     if (this.sectionOptionsMenuId()) {
@@ -628,6 +791,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       }
     }
 
+    if (this.activeTextToolbarMenu()) {
+      if (!target.closest('.storefront-editor__context-toolbar-shell')) {
+        this.activeTextToolbarMenu.set(null);
+      }
+    }
+
     if (this.isComponentContextMenuOpen()) {
       if (!target.closest('.storefront-editor__component-context-menu')) {
         this.closeComponentContextMenu();
@@ -637,6 +806,18 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
   @HostListener('document:mousemove', ['$event'])
   handleComponentPointerMove(event: MouseEvent): void {
+    if (this.activeColorCanvasDrag) {
+      event.preventDefault();
+      this.updateCustomColorFromCanvasEvent(event);
+      return;
+    }
+
+    if (this.activeColorHueDrag) {
+      event.preventDefault();
+      this.updateCustomColorFromHueEvent(event);
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -728,6 +909,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
   @HostListener('document:mouseup', ['$event'])
   handleComponentPointerUp(event: MouseEvent): void {
+    if (this.activeColorCanvasDrag || this.activeColorHueDrag) {
+      this.activeColorCanvasDrag = false;
+      this.activeColorHueDrag = false;
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       this.finishAddElementsComponentDrag(event);
       return;
@@ -799,8 +986,9 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
           const snapshot = this.normalizeStorefront(storefront);
           this.storefront.set(snapshot);
           this.workingStorefront.set(this.cloneStorefront(snapshot));
-          const editorSession = this.normalizeEditorSession(snapshot.editorSession);
+          const editorSession = this.normalizeEditorSession(snapshot.editorSession, snapshot.draftHomepage);
           this.editorSession.set(editorSession);
+          this.loadSelectedManagedPageIntoWorkingStorefront(editorSession.selectedManagedPageId ?? 'home', editorSession.managedPages ?? []);
           this.undoStack.set([]);
           this.redoStack.set([]);
           this.selectedSectionId.set(editorSession.selectedSectionId);
@@ -1800,9 +1988,75 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   }
 
   togglePagesPanel(): void {
-    const next = !this.isPagesPanelOpen();
+    if (this.isPagesPanelOpen()) {
+      this.closePagesPanel();
+      return;
+    }
+
+    if (this.pagesPanelCloseTimer) {
+      clearTimeout(this.pagesPanelCloseTimer);
+      this.pagesPanelCloseTimer = null;
+    }
+
     this.closeFloatingUi();
-    this.isPagesPanelOpen.set(next);
+    this.isPagesPanelClosing.set(false);
+    this.isPagesPanelOpen.set(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.scrollPagesPanelToActivePage());
+    });
+  }
+
+  closePagesPanel(): void {
+    if (!this.isPagesPanelVisible()) {
+      return;
+    }
+
+    if (this.pagesPanelCloseTimer) {
+      clearTimeout(this.pagesPanelCloseTimer);
+    }
+
+    this.isPagesPanelOpen.set(false);
+    this.isPagesPanelClosing.set(true);
+    this.pagesPanelCloseTimer = setTimeout(() => {
+      this.isPagesPanelClosing.set(false);
+      this.pagesPanelCloseTimer = null;
+    }, ProjectStorefrontEditor.PAGES_MANAGER_CLOSE_MS);
+  }
+
+  openManagePages(): void {
+    if (this.managePagesCloseTimer) {
+      clearTimeout(this.managePagesCloseTimer);
+      this.managePagesCloseTimer = null;
+    }
+
+  this.closeFloatingUi();
+  this.pagesManagerSearch.set('');
+  this.isAddPageMenuOpen.set(false);
+  this.isPageDesignPickerOpen.set(false);
+  this.isPageDesignPickerClosing.set(false);
+  this.isManagePagesClosing.set(false);
+  this.isManagePagesOpen.set(true);
+}
+
+  closeManagePages(): void {
+    if (!this.isManagePagesVisible()) {
+      return;
+    }
+
+    if (this.managePagesCloseTimer) {
+      clearTimeout(this.managePagesCloseTimer);
+    }
+
+  this.isManagePagesOpen.set(false);
+  this.isManagePagesClosing.set(true);
+  this.isAddPageMenuOpen.set(false);
+  this.isPageDesignPickerOpen.set(false);
+  this.isPageDesignPickerClosing.set(false);
+  this.pageCardMenuId.set(null);
+    this.managePagesCloseTimer = setTimeout(() => {
+      this.isManagePagesClosing.set(false);
+      this.managePagesCloseTimer = null;
+    }, ProjectStorefrontEditor.PAGES_MANAGER_CLOSE_MS);
   }
 
   openSectionLibrary(sectionId: string): void {
@@ -1874,8 +2128,11 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.isFormaMenuOpen.set(false);
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
+    this.activeTextToolbarMenu.set(null);
     this.closeAddElementsPanel();
-    this.isPagesPanelOpen.set(false);
+    this.closePagesPanel();
+    this.closeManagePages();
+    this.closePageDesignPicker();
     this.isMediaManagerOpen.set(false);
     this.pageCardMenuId.set(null);
     this.closeSectionLibrary();
@@ -2081,6 +2338,128 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   window.open(`/store/${projectId}?preview=editor`, '_blank', 'noopener');
 }
 
+  updateSelectedParagraphFontFamily(value: string): void {
+    this.updateSelectedParagraphProps({ fontFamily: value });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  updateSelectedParagraphFontSize(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  setSelectedParagraphAlignment(align: StorefrontEditorParagraphNode['props']['align']): void {
+    this.updateSelectedParagraphProps({ align });
+  }
+
+  toggleSelectedParagraphBold(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      fontWeight: component.props.fontWeight >= 600 ? 400 : 700,
+    });
+  }
+
+  toggleSelectedParagraphItalic(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      fontStyle: component.props.fontStyle === 'italic' ? 'normal' : 'italic',
+    });
+  }
+
+  toggleSelectedParagraphUnderline(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      textDecoration: component.props.textDecoration === 'underline' ? 'none' : 'underline',
+    });
+  }
+
+  updateSelectedParagraphColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+    if (normalized !== 'transparent') {
+      this.syncCustomColorPickerFromHex(normalized);
+    }
+    this.updateSelectedParagraphProps({ color: normalized });
+  }
+
+  toggleTextToolbarMenu(menu: 'font-family' | 'font-size' | 'color'): void {
+    const next = this.activeTextToolbarMenu() === menu ? null : menu;
+    this.activeTextToolbarMenu.set(next);
+    if (next === 'color') {
+      this.activeColorPickerTab.set('brand');
+      this.syncCustomColorPickerFromHex(this.selectedParagraphComponent()?.props.color ?? '#082237');
+    }
+  }
+
+  setActiveColorPickerTab(tab: 'brand' | 'custom'): void {
+    this.activeColorPickerTab.set(tab);
+  }
+
+  saveSelectedParagraphColor(): void {
+    const color = this.selectedParagraphComponent()?.props.color;
+    if (!color) {
+      return;
+    }
+
+    const normalized = color.trim().toLowerCase();
+    const next = [normalized, ...this.savedParagraphColors().filter((item) => item !== normalized)].slice(0, 12);
+    this.savedParagraphColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
+    this.activeColorPickerTab.set('brand');
+  }
+
+  applySavedParagraphColor(color: string): void {
+    this.updateSelectedParagraphColor(color);
+  }
+
+  startCustomColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeColorCanvasDrag = true;
+    this.updateCustomColorFromCanvasEvent(event);
+  }
+
+  startCustomColorHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeColorHueDrag = true;
+    this.updateCustomColorFromHueEvent(event);
+  }
+
+  updateCustomColorHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+    this.updateSelectedParagraphColor(normalized);
+  }
+
+  removeSavedParagraphColor(color: string, event: MouseEvent): void {
+    event.stopPropagation();
+    const next = this.savedParagraphColors().filter((item) => item !== color);
+    this.savedParagraphColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
+  }
+
   triggerPublishFromMenu(): void {
     this.closeFloatingUi();
     this.publishStorefront();
@@ -2196,8 +2575,249 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   selectHomePage(): void {
+    this.selectManagedPage('home');
+  }
+
+  selectManagedPage(pageId: string): void {
     this.pageCardMenuId.set(null);
-    this.isPagesPanelOpen.set(false);
+    this.switchManagedPage(pageId);
+    this.closePagesPanel();
+    this.closeManagePages();
+  }
+
+  togglePagesLayout(): void {
+    this.pagesPanelLayout.set(this.pagesPanelLayout() === 'grid' ? 'rows' : 'grid');
+  }
+
+toggleAddPageMenu(event?: MouseEvent): void {
+  event?.stopPropagation();
+  this.isPageDesignPickerOpen.set(false);
+  this.isPageDesignPickerClosing.set(false);
+  this.isAddPageMenuOpen.update((open) => !open);
+}
+
+  openPageDesignPicker(): void {
+  if (this.pageDesignPickerCloseTimer) {
+    clearTimeout(this.pageDesignPickerCloseTimer);
+    this.pageDesignPickerCloseTimer = null;
+  }
+  if (this.managePagesCloseTimer) {
+    clearTimeout(this.managePagesCloseTimer);
+    this.managePagesCloseTimer = null;
+  }
+  this.isAddPageMenuOpen.set(false);
+  this.isManagePagesOpen.set(false);
+  this.isManagePagesClosing.set(false);
+  this.pageCardMenuId.set(null);
+  this.activePageDesignCategory.set('Business');
+  this.isPageDesignPickerClosing.set(false);
+  this.isPageDesignPickerOpen.set(true);
+  setTimeout(() => this.updatePageDesignTabScrollState(), 0);
+}
+
+closePageDesignPicker(): void {
+  if (!this.isPageDesignPickerOpen() && !this.isPageDesignPickerClosing()) {
+    return;
+  }
+
+  if (this.pageDesignPickerCloseTimer) {
+    clearTimeout(this.pageDesignPickerCloseTimer);
+  }
+
+  this.isPageDesignPickerOpen.set(false);
+  this.isPageDesignPickerClosing.set(true);
+  this.pageDesignPickerCloseTimer = setTimeout(() => {
+    this.isPageDesignPickerClosing.set(false);
+    this.canScrollPageDesignTabsLeft.set(false);
+    this.canScrollPageDesignTabsRight.set(false);
+    this.pageDesignPickerCloseTimer = null;
+  }, ProjectStorefrontEditor.SECTION_LIBRARY_CLOSE_MS);
+}
+
+setPageDesignCategory(category: StorefrontPageDesignCategory): void {
+  this.activePageDesignCategory.set(category);
+  setTimeout(() => this.updatePageDesignTabScrollState(), 0);
+}
+
+scrollPageDesignTabs(direction: 'left' | 'right'): void {
+  const tabs = this.getPageDesignTabsElement();
+  if (!tabs) {
+    return;
+  }
+
+  const delta = Math.max(180, Math.round(tabs.clientWidth * 0.45));
+  tabs.scrollBy({
+    left: direction === 'right' ? delta : -delta,
+    behavior: 'smooth',
+  });
+
+  setTimeout(() => this.updatePageDesignTabScrollState(), 220);
+}
+
+updatePageDesignTabScrollState(): void {
+  const tabs = this.getPageDesignTabsElement();
+  if (!tabs) {
+    this.canScrollPageDesignTabsLeft.set(false);
+    this.canScrollPageDesignTabsRight.set(false);
+    return;
+  }
+
+  const maxScrollLeft = Math.max(0, tabs.scrollWidth - tabs.clientWidth);
+  this.canScrollPageDesignTabsLeft.set(tabs.scrollLeft > 4);
+  this.canScrollPageDesignTabsRight.set(tabs.scrollLeft < maxScrollLeft - 4);
+}
+
+  createBlankPage(): void {
+    this.createManagedPage({
+      kind: 'blank',
+      name: 'New page',
+      designId: null,
+    });
+  }
+
+  createDesignedPage(template: StorefrontPageDesignTemplate): void {
+    this.createManagedPage({
+      kind: 'designed',
+      name: template.name,
+      designId: template.id,
+    });
+  }
+
+  handleGeneratePageWithAi(): void {
+    this.isAddPageMenuOpen.set(false);
+    this.toastService.info('Generate with AI is coming soon.');
+  }
+
+  duplicateManagedPage(pageId: string): void {
+    const page = this.managedPages().find((item) => item.id === pageId);
+    if (!page) {
+      return;
+    }
+
+    this.createManagedPage({
+      kind: page.kind === 'home' ? 'designed' : page.kind,
+      name: page.name,
+      designId: page.designId,
+      draftDocument: page.draftDocument ?? this.buildDefaultManagedPageDocument(page.name, page.kind, page.designId),
+    });
+  }
+
+  renameManagedPage(pageId: string): void {
+    const page = this.managedPages().find((item) => item.id === pageId);
+    if (!page) {
+      return;
+    }
+    this.isEditingPageName.set(true);
+    this.editingPageNameId.set(pageId);
+    this.editingPageNameValue.set(page.name);
+    this.pageCardMenuId.set(null);
+    setTimeout(() => {
+      const input = document.querySelector(
+        `.storefront-editor__page-name-input[data-page-name-input-id="${pageId}"]`
+      );
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  setManagedPageAsHome(pageId: string): void {
+    const pages = this.captureManagedPagesWithCurrentDraft();
+    const target = pages.find((item) => item.id === pageId);
+    if (!target || target.kind === 'home') {
+      this.pageCardMenuId.set(null);
+      return;
+    }
+
+    const nextPages = pages.map((page) => {
+      if (page.id === pageId) {
+        return {
+          ...page,
+          kind: 'home' as const,
+        };
+      }
+
+      if (page.kind === 'home') {
+        return {
+          ...page,
+          kind: page.designId ? ('designed' as const) : ('blank' as const),
+        };
+      }
+
+      return page;
+    });
+
+    this.switchManagedPage(pageId, nextPages);
+    this.pageCardMenuId.set(null);
+  }
+
+  isManagedPageHome(pageId: string): boolean {
+    return this.managedPages().some((page) => page.id === pageId && page.kind === 'home');
+  }
+
+  deleteManagedPage(pageId: string): void {
+    const pages = this.captureManagedPagesWithCurrentDraft();
+    const target = pages.find((page) => page.id === pageId);
+    if (!target || target.kind === 'home') {
+      return;
+    }
+
+    const nextPages = pages.filter((page) => page.id !== pageId);
+    const nextSelectedId = this.selectedManagedPageId() === pageId ? 'home' : this.selectedManagedPageId();
+    this.switchManagedPage(nextSelectedId, nextPages);
+    this.pageCardMenuId.set(null);
+  }
+
+  openManagedPageSeoSettings(): void {
+    this.pageCardMenuId.set(null);
+    this.toastService.info('SEO and accessibility settings are coming soon.');
+  }
+
+  openManagedPageSettings(): void {
+    this.pageCardMenuId.set(null);
+    this.toastService.info('Page settings are coming soon.');
+  }
+
+  finishEditingPageName(): void {
+    const pageId = this.editingPageNameId();
+    if (!pageId) {
+      this.cancelPageNameEditing();
+      return;
+    }
+
+    const nextName = this.editingPageNameValue().trim() || 'New page';
+    const uniqueName = this.createUniquePageName(nextName, pageId);
+    const nextPages = this.managedPages().map((page) =>
+      page.id === pageId
+        ? {
+            ...page,
+            name: uniqueName,
+          }
+        : page
+    );
+
+    this.updateEditorSessionPages(nextPages, this.selectedManagedPageId());
+    this.cancelPageNameEditing();
+  }
+
+  cancelPageNameEditing(): void {
+    this.isEditingPageName.set(false);
+    this.editingPageNameId.set(null);
+    this.editingPageNameValue.set('');
+  }
+
+  onPageNameInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.finishEditingPageName();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelPageNameEditing();
+    }
   }
 
   updateStoreName(value: string): void {
@@ -3269,6 +3889,177 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     );
   }
 
+  private updateSelectedParagraphProps(
+    patch: Partial<StorefrontEditorParagraphNode['props']>
+  ): void {
+    const sectionId = this.selectedSectionId();
+    const component = this.selectedParagraphComponent();
+    if (!sectionId || !component) {
+      return;
+    }
+
+    this.updateComponentNode(sectionId, component.id, (current) =>
+      current.type === 'paragraph'
+        ? {
+            ...current,
+            props: {
+              ...current.props,
+              ...patch,
+            },
+          }
+        : current
+    );
+  }
+
+  private readSavedParagraphColors(): string[] {
+    try {
+      const raw = localStorage.getItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === 'string').slice(0, 12)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private updateCustomColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__context-toolbar-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.customPickerSaturation.set(saturation);
+    this.customPickerBrightness.set(brightness);
+    this.commitCustomColorPicker();
+  }
+
+  private updateCustomColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__context-toolbar-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.customPickerHue.set(Math.round(ratio * 360));
+    this.commitCustomColorPicker();
+  }
+
+  private commitCustomColorPicker(): void {
+    const hex = this.hsvToHex(this.customPickerHue(), this.customPickerSaturation(), this.customPickerBrightness());
+    this.updateSelectedParagraphProps({ color: hex });
+  }
+
+  private syncCustomColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.customPickerHue.set(h);
+    this.customPickerSaturation.set(s);
+    this.customPickerBrightness.set(v);
+  }
+
+  private normalizeHexColor(value: string | null | undefined): string | null {
+    const raw = String(value ?? '').trim();
+    if (!raw) {
+      return null;
+    }
+
+    if (raw.toLowerCase() === 'transparent') {
+      return 'transparent';
+    }
+
+    const prefixed = raw.startsWith('#') ? raw : `#${raw}`;
+    if (!/^#([0-9a-fA-F]{6})$/.test(prefixed)) {
+      return null;
+    }
+
+    return prefixed.toLowerCase();
+  }
+
+  private hexToHsv(hex: string): { h: number; s: number; v: number } {
+    const normalized = hex.replace('#', '');
+    const r = parseInt(normalized.slice(0, 2), 16) / 255;
+    const g = parseInt(normalized.slice(2, 4), 16) / 255;
+    const b = parseInt(normalized.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    let h = 0;
+
+    if (delta !== 0) {
+      if (max === r) {
+        h = ((g - b) / delta) % 6;
+      } else if (max === g) {
+        h = (b - r) / delta + 2;
+      } else {
+        h = (r - g) / delta + 4;
+      }
+    }
+
+    h = Math.round(h * 60);
+    if (h < 0) {
+      h += 360;
+    }
+
+    const s = max === 0 ? 0 : Math.round((delta / max) * 100);
+    const v = Math.round(max * 100);
+
+    return { h, s, v };
+  }
+
+  private hsvToHex(h: number, s: number, v: number): string {
+    const saturation = this.clamp(s, 0, 100) / 100;
+    const value = this.clamp(v, 0, 100) / 100;
+    const c = value * saturation;
+    const hueSegment = ((h % 360) + 360) % 360 / 60;
+    const x = c * (1 - Math.abs((hueSegment % 2) - 1));
+    const m = value - c;
+    let r = 0;
+    let g = 0;
+    let b = 0;
+
+    if (hueSegment >= 0 && hueSegment < 1) {
+      r = c; g = x; b = 0;
+    } else if (hueSegment < 2) {
+      r = x; g = c; b = 0;
+    } else if (hueSegment < 3) {
+      r = 0; g = c; b = x;
+    } else if (hueSegment < 4) {
+      r = 0; g = x; b = c;
+    } else if (hueSegment < 5) {
+      r = x; g = 0; b = c;
+    } else {
+      r = c; g = 0; b = x;
+    }
+
+    const toHex = (channel: number) =>
+      Math.round((channel + m) * 255)
+        .toString(16)
+        .padStart(2, '0');
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, value));
+  }
+
   private updateSectionComponents(
     sectionId: string,
     updater: (components: StorefrontEditorComponentNode[]) => StorefrontEditorComponentNode[],
@@ -3538,32 +4329,49 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   private createDefaultEditorSession(): StorefrontEditorSession {
+    const defaultHomepage = this.buildDefaultHomepageDocument('Storefront');
     return {
       selectedSectionId: null,
       viewport: 'desktop',
       zoomPercent: 120,
       undoStack: [],
       redoStack: [],
+      managedPages: this.buildDefaultManagedPages(defaultHomepage),
+      selectedManagedPageId: 'home',
     };
   }
 
-  private normalizeEditorSession(session: StorefrontEditorSession | null | undefined): StorefrontEditorSession {
+  private normalizeEditorSession(
+    session: StorefrontEditorSession | null | undefined,
+    homeDraftDocument?: StorefrontHomepageDocument | null
+  ): StorefrontEditorSession {
+    const fallbackHomeDraftDocument =
+      homeDraftDocument ?? this.workingStorefront()?.draftHomepage ?? this.storefront()?.draftHomepage ?? null;
+    const managedPages = this.normalizeManagedPages(session?.managedPages, fallbackHomeDraftDocument);
     return {
       selectedSectionId: null,
       viewport: session?.viewport === 'mobile' ? 'mobile' : 'desktop',
       zoomPercent: this.clampZoom(session?.zoomPercent),
       undoStack: [],
       redoStack: [],
+      managedPages,
+      selectedManagedPageId:
+        session?.selectedManagedPageId && managedPages.some((page) => page.id === session.selectedManagedPageId)
+          ? session.selectedManagedPageId
+          : 'home',
     };
   }
 
   private buildPersistedEditorSession(): StorefrontEditorSession {
+    const managedPages = this.captureManagedPagesWithCurrentDraft();
     return {
       selectedSectionId: null,
       viewport: this.viewport(),
       zoomPercent: this.clampZoom(this.zoomPercent()),
       undoStack: [],
       redoStack: [],
+      managedPages,
+      selectedManagedPageId: this.selectedManagedPageId(),
     };
   }
 
@@ -3571,12 +4379,16 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     storefront: ProjectStorefront,
     selectedSectionId: string | null
   ): StorefrontEditorSnapshot {
+    const selectedManagedPageId = this.selectedManagedPageId();
+    const managedPages = this.captureManagedPagesWithDraft(storefront, selectedManagedPageId);
     return {
       storeName: storefront.storeName,
       themeKey: storefront.themeKey,
       activePageKey: storefront.activePageKey,
-      draftHomepage: JSON.parse(JSON.stringify(storefront.draftHomepage)) as ProjectStorefront['draftHomepage'],
+      draftHomepage: JSON.parse(JSON.stringify(this.resolveManagedPageDocument(selectedManagedPageId, storefront, managedPages))) as ProjectStorefront['draftHomepage'],
       selectedSectionId,
+      managedPages: JSON.parse(JSON.stringify(managedPages)) as StorefrontEditorManagedPage[],
+      selectedManagedPageId,
     };
   }
 
@@ -3597,7 +4409,14 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       this.selectedComponentId.set(null);
       this.selectedComponentIds.set([]);
       this.isolatedGroupComponentId.set(null);
-      this.syncEditorSessionState({ selectedSectionId: snapshot.selectedSectionId }, false);
+      this.syncEditorSessionState(
+        {
+          selectedSectionId: snapshot.selectedSectionId,
+          managedPages: this.normalizeManagedPages(snapshot.managedPages),
+          selectedManagedPageId: snapshot.selectedManagedPageId ?? 'home',
+        },
+        false
+      );
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
   }
 
@@ -3641,7 +4460,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   private syncEditorSessionState(
-    patch: Partial<Pick<StorefrontEditorSession, 'selectedSectionId' | 'viewport' | 'zoomPercent'>>,
+    patch: Partial<
+      Pick<
+        StorefrontEditorSession,
+        'selectedSectionId' | 'viewport' | 'zoomPercent' | 'managedPages' | 'selectedManagedPageId'
+      >
+    >,
     scheduleAutosave = true
   ): void {
     this.editorSession.update((session) => ({
@@ -3679,13 +4503,18 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     }
 
     this.isAutosaving.set(true);
+    const managedPages = this.captureManagedPagesWithCurrentDraft();
+    const persistedDraftHomepage = this.resolveManagedPageDocument('home', storefront, managedPages);
     return this.projectStorefrontService
       .updateStorefront(projectId, {
         storeName: storefront.storeName,
         themeKey: storefront.themeKey,
         activePageKey: storefront.activePageKey,
-        draftHomepage: storefront.draftHomepage,
-        editorSession: this.buildPersistedEditorSession(),
+        draftHomepage: persistedDraftHomepage,
+        editorSession: {
+          ...this.buildPersistedEditorSession(),
+          managedPages,
+        },
       })
       .pipe(
         finalize(() => this.isAutosaving.set(false)),
@@ -3711,8 +4540,9 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   ): void {
     this.storefront.set(snapshot);
     this.workingStorefront.set(this.cloneStorefront(snapshot));
-    const editorSession = this.normalizeEditorSession(snapshot.editorSession);
+    const editorSession = this.normalizeEditorSession(snapshot.editorSession, snapshot.draftHomepage);
     this.editorSession.set(editorSession);
+    this.loadSelectedManagedPageIntoWorkingStorefront(editorSession.selectedManagedPageId ?? 'home', editorSession.managedPages ?? []);
       this.selectedSectionId.set(editorSession.selectedSectionId);
       this.selectedComponentId.set(null);
       this.selectedComponentIds.set([]);
@@ -3730,17 +4560,373 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     storefront: ProjectStorefront,
     editorSession: StorefrontEditorSession
   ): string {
+    const managedPages = this.normalizeManagedPages(editorSession.managedPages, storefront.draftHomepage).map((page) =>
+      page.id === editorSession.selectedManagedPageId
+        ? {
+            ...page,
+            draftDocument: this.cloneHomepageDocument(storefront.draftHomepage),
+          }
+        : page
+    );
     return JSON.stringify({
       storeName: storefront.storeName,
       themeKey: storefront.themeKey,
       activePageKey: storefront.activePageKey,
-      draftHomepage: storefront.draftHomepage,
+      draftHomepage: this.resolveManagedPageDocument('home', storefront, managedPages),
       editorSession: {
         selectedSectionId: editorSession.selectedSectionId,
         viewport: editorSession.viewport,
         zoomPercent: this.clampZoom(editorSession.zoomPercent),
+        managedPages,
+        selectedManagedPageId: editorSession.selectedManagedPageId,
       },
     });
+  }
+
+  private buildDefaultManagedPages(homeDraftDocument?: StorefrontHomepageDocument): StorefrontEditorManagedPage[] {
+    return [
+      {
+        id: 'home',
+        name: 'Home',
+        kind: 'home',
+        designId: null,
+        draftDocument: this.cloneHomepageDocument(homeDraftDocument ?? this.buildDefaultHomepageDocument('Storefront')),
+      },
+    ];
+  }
+
+  private normalizeManagedPages(
+    pages: StorefrontEditorSession['managedPages'] | StorefrontEditorSnapshot['managedPages'],
+    homeDraftDocument?: StorefrontHomepageDocument | null
+  ): StorefrontEditorManagedPage[] {
+    const normalized: StorefrontEditorManagedPage[] = [];
+    const fallbackStoreName = this.resolveStorefrontFallbackName();
+    const normalizedHomeDraft = this.normalizeManagedPageDocument(
+      homeDraftDocument ?? this.buildDefaultHomepageDocument(fallbackStoreName),
+      'Home',
+      'home',
+      null
+    );
+
+    if (Array.isArray(pages)) {
+      for (const page of pages) {
+        if (!page || typeof page !== 'object') {
+          continue;
+        }
+
+        const id = typeof page.id === 'string' && page.id.trim() ? page.id.trim() : `page-${normalized.length + 1}`;
+        const name = typeof page.name === 'string' && page.name.trim() ? page.name.trim() : 'New page';
+        const kind =
+          page.kind === 'home' || page.kind === 'blank' || page.kind === 'designed' ? page.kind : 'blank';
+
+        normalized.push({
+          id,
+          name,
+          kind,
+          designId: typeof page.designId === 'string' && page.designId.trim() ? page.designId.trim() : null,
+          draftDocument: this.normalizeManagedPageDocument(page.draftDocument, name, kind, typeof page.designId === 'string' && page.designId.trim() ? page.designId.trim() : null),
+        });
+      }
+    }
+
+    if (!normalized.length) {
+      return this.buildDefaultManagedPages(normalizedHomeDraft);
+    }
+
+    const explicitHomeIndex = normalized.findIndex((page) => page.kind === 'home');
+    const fallbackHomeIndex = normalized.findIndex((page) => page.id === 'home');
+    const homeIndex = explicitHomeIndex >= 0 ? explicitHomeIndex : fallbackHomeIndex >= 0 ? fallbackHomeIndex : 0;
+
+    for (let index = 0; index < normalized.length; index += 1) {
+      const page = normalized[index];
+      if (index === homeIndex) {
+        normalized[index] = {
+          ...page,
+          kind: 'home',
+          draftDocument: this.cloneHomepageDocument(page.draftDocument ?? normalizedHomeDraft),
+        };
+        continue;
+      }
+
+      if (page.kind === 'home') {
+        normalized[index] = {
+          ...page,
+          kind: page.designId ? ('designed' as const) : ('blank' as const),
+        };
+      }
+
+      if (!normalized[index].draftDocument) {
+        normalized[index] = {
+          ...normalized[index],
+          draftDocument: this.buildDefaultManagedPageDocument(
+            normalized[index].name,
+            normalized[index].kind,
+            normalized[index].designId
+          ),
+        };
+      }
+    }
+
+    return normalized;
+  }
+
+  private cloneHomepageDocument(document: StorefrontHomepageDocument): StorefrontHomepageDocument {
+    return JSON.parse(JSON.stringify(document)) as StorefrontHomepageDocument;
+  }
+
+  private resolveStorefrontFallbackName(): string {
+    return (
+      this.workingStorefront()?.storeName?.trim() ||
+      this.storefront()?.storeName?.trim() ||
+      this.project()?.storeTitle?.trim() ||
+      this.project()?.name?.trim() ||
+      'Storefront'
+    );
+  }
+
+  private buildDefaultManagedPageDocument(
+    pageName: string,
+    kind: StorefrontEditorManagedPage['kind'],
+    designId: string | null
+  ): StorefrontHomepageDocument {
+    const storeName = this.resolveStorefrontFallbackName();
+    const document = this.buildDefaultHomepageDocument(storeName);
+    const safePageName = pageName.trim() || 'New page';
+    const title =
+      kind === 'home' ? storeName : safePageName;
+    document.seo = {
+      title,
+      description: kind === 'blank' ? '' : `Content for ${safePageName}.`,
+    };
+    document.sections = document.sections.map((section) => {
+      if (section.type === 'hero') {
+        const currentDescription =
+          typeof (section.props as Record<string, unknown>)['description'] === 'string'
+            ? ((section.props as Record<string, unknown>)['description'] as string)
+            : '';
+        return {
+          ...section,
+          props: {
+            ...section.props,
+            eyebrow: kind === 'home' ? 'New store' : designId ? 'Designed page' : 'Blank page',
+            title,
+            description:
+              kind === 'home'
+                ? currentDescription
+                : kind === 'blank'
+                  ? 'Start building this page from a clean canvas.'
+                  : `Customize the ${safePageName} page layout and content.`,
+          },
+        };
+      }
+      return section;
+    });
+    return this.cloneHomepageDocument(document);
+  }
+
+  private normalizeManagedPageDocument(
+    document: unknown,
+    pageName: string,
+    kind: StorefrontEditorManagedPage['kind'],
+    designId: string | null
+  ): StorefrontHomepageDocument {
+    const fallback = this.buildDefaultManagedPageDocument(pageName, kind, designId);
+    if (
+      !document ||
+      typeof document !== 'object' ||
+      !Array.isArray((document as Partial<StorefrontHomepageDocument>).sections)
+    ) {
+      return fallback;
+    }
+
+    const candidate = document as Partial<StorefrontHomepageDocument>;
+    return {
+      version:
+        typeof candidate.version === 'number' && Number.isFinite(candidate.version) ? candidate.version : 1,
+      pageKey: 'home',
+      seo: {
+        title:
+          typeof candidate.seo?.title === 'string' && candidate.seo.title.trim()
+            ? candidate.seo.title
+            : fallback.seo.title,
+        description:
+          typeof candidate.seo?.description === 'string' ? candidate.seo.description : fallback.seo.description,
+      },
+      sections: candidate.sections!.map((section) => this.normalizeSection(section, this.resolveStorefrontFallbackName())),
+    };
+  }
+
+  private captureManagedPagesWithCurrentDraft(): StorefrontEditorManagedPage[] {
+    const storefront = this.workingStorefront();
+    return storefront ? this.captureManagedPagesWithDraft(storefront, this.selectedManagedPageId()) : this.normalizeManagedPages(this.managedPages());
+  }
+
+  private captureManagedPagesWithDraft(
+    storefront: ProjectStorefront,
+    selectedManagedPageId: string
+  ): StorefrontEditorManagedPage[] {
+    return this.normalizeManagedPages(this.managedPages(), storefront.draftHomepage).map((page) =>
+      page.id === selectedManagedPageId
+        ? {
+            ...page,
+            draftDocument: this.cloneHomepageDocument(storefront.draftHomepage),
+          }
+        : {
+            ...page,
+            draftDocument: this.cloneHomepageDocument(
+              page.draftDocument ?? this.buildDefaultManagedPageDocument(page.name, page.kind, page.designId)
+            ),
+          }
+    );
+  }
+
+  private resolveManagedPageDocument(
+    pageId: string,
+    storefront: ProjectStorefront,
+    managedPages: StorefrontEditorManagedPage[]
+  ): StorefrontHomepageDocument {
+    const targetPage = managedPages.find((page) => page.id === pageId);
+    if (targetPage?.draftDocument) {
+      return this.cloneHomepageDocument(targetPage.draftDocument);
+    }
+
+    if (pageId === 'home') {
+      return this.cloneHomepageDocument(storefront.draftHomepage);
+    }
+
+    return this.buildDefaultManagedPageDocument(targetPage?.name ?? 'New page', targetPage?.kind ?? 'blank', targetPage?.designId ?? null);
+  }
+
+  private updateEditorSessionPages(pages: StorefrontEditorManagedPage[], selectedManagedPageId: string): void {
+    this.syncEditorSessionState(
+      {
+        managedPages: this.normalizeManagedPages(pages),
+        selectedManagedPageId,
+      },
+      true
+    );
+  }
+
+  private scrollPagesPanelToActivePage(): void {
+    const panel = document.querySelector('.storefront-editor__pages-panel .storefront-editor__pages-section');
+    const activeId = this.selectedManagedPageId();
+    if (!(panel instanceof HTMLElement) || !activeId) {
+      return;
+    }
+
+    const activeCard = panel.querySelector(`[data-managed-page-id="${activeId}"]`);
+    if (!(activeCard instanceof HTMLElement)) {
+      return;
+    }
+
+    const panelRect = panel.getBoundingClientRect();
+    const cardRect = activeCard.getBoundingClientRect();
+    const nextScrollTop =
+      activeCard.offsetTop - panel.clientHeight / 2 + activeCard.offsetHeight / 2;
+
+    if (cardRect.top < panelRect.top || cardRect.bottom > panelRect.bottom) {
+      panel.scrollTo({
+        top: Math.max(0, nextScrollTop),
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  private switchManagedPage(pageId: string, pages: StorefrontEditorManagedPage[] = this.captureManagedPagesWithCurrentDraft()): void {
+    const storefront = this.workingStorefront();
+    if (!storefront) {
+      this.updateEditorSessionPages(pages, pageId);
+      return;
+    }
+
+    const normalizedPages = this.normalizeManagedPages(pages, storefront.draftHomepage);
+    const nextPage = normalizedPages.find((page) => page.id === pageId);
+    if (!nextPage) {
+      return;
+    }
+
+    const nextDocument = this.cloneHomepageDocument(
+      nextPage.draftDocument ?? this.buildDefaultManagedPageDocument(nextPage.name, nextPage.kind, nextPage.designId)
+    );
+
+    this.workingStorefront.set({
+      ...this.cloneStorefront(storefront),
+      draftHomepage: nextDocument,
+    });
+
+    this.selectedSectionId.set(null);
+    this.selectedComponentId.set(null);
+    this.selectedComponentIds.set([]);
+    this.isolatedGroupComponentId.set(null);
+    this.syncEditorSessionState(
+      {
+        selectedSectionId: null,
+        managedPages: normalizedPages,
+        selectedManagedPageId: pageId,
+      },
+      false
+    );
+    this.scheduleAutosave();
+  }
+
+  private loadSelectedManagedPageIntoWorkingStorefront(
+    selectedManagedPageId: string,
+    managedPages: StorefrontEditorManagedPage[]
+  ): void {
+    const storefront = this.workingStorefront();
+    if (!storefront) {
+      return;
+    }
+
+    const nextDocument = this.resolveManagedPageDocument(selectedManagedPageId, storefront, managedPages);
+    this.workingStorefront.set({
+      ...storefront,
+      draftHomepage: nextDocument,
+    });
+  }
+
+  private createManagedPage(config: {
+    kind: 'blank' | 'designed';
+    name: string;
+    designId: string | null;
+    draftDocument?: StorefrontHomepageDocument | null;
+  }): void {
+    const pageName = this.createUniquePageName(config.name);
+    const nextPage: StorefrontEditorManagedPage = {
+      id: `page-${Date.now()}`,
+      name: pageName,
+      kind: config.kind,
+      designId: config.designId,
+      draftDocument: this.cloneHomepageDocument(
+        config.draftDocument ?? this.buildDefaultManagedPageDocument(pageName, config.kind, config.designId)
+      ),
+    };
+
+  this.switchManagedPage(nextPage.id, [...this.captureManagedPagesWithCurrentDraft(), nextPage]);
+  this.isAddPageMenuOpen.set(false);
+  this.isPageDesignPickerOpen.set(false);
+  this.isPageDesignPickerClosing.set(false);
+}
+
+  private createUniquePageName(baseName: string, ignorePageId: string | null = null): string {
+    const trimmed = baseName.trim() || 'New page';
+    const existingNames = new Set(
+      this.managedPages()
+        .filter((page) => page.id !== ignorePageId)
+        .map((page) => page.name.trim().toLowerCase())
+    );
+    if (!existingNames.has(trimmed.toLowerCase())) {
+      return trimmed;
+    }
+
+    let suffix = 1;
+    let candidate = `${trimmed} (${suffix})`;
+    while (existingNames.has(candidate.toLowerCase())) {
+      suffix += 1;
+      candidate = `${trimmed} (${suffix})`;
+    }
+
+    return candidate;
   }
 
   private clampZoom(zoomPercent: number | null | undefined): number {
@@ -3863,7 +5049,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
         : this.buildDefaultHomepageDocument(fallbackStoreName);
 
     snapshot.draftHomepage = normalizedHomepage;
-    snapshot.editorSession = this.normalizeEditorSession(snapshot.editorSession);
+    snapshot.editorSession = this.normalizeEditorSession(snapshot.editorSession, normalizedHomepage);
     snapshot.publishedHomepage = snapshot.publishedHomepage
       ? {
           ...snapshot.publishedHomepage,
@@ -4040,11 +5226,15 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     return `${days} day${days === 1 ? '' : 's'} ago`;
   }
 
-  private getSectionLibraryTabsElement(): HTMLElement | null {
-    return document.querySelector('.storefront-editor__section-library-tabs');
-  }
+private getSectionLibraryTabsElement(): HTMLElement | null {
+  return document.querySelector('.storefront-editor__section-library-tabs');
+}
 
-  private getAddElementsTabsElement(): HTMLElement | null {
-    return document.querySelector('.storefront-editor__add-elements-tabs-scroll');
-  }
+private getPageDesignTabsElement(): HTMLElement | null {
+  return document.querySelector('.storefront-editor__page-design-tabs');
+}
+
+private getAddElementsTabsElement(): HTMLElement | null {
+  return document.querySelector('.storefront-editor__add-elements-tabs-scroll');
+}
 }
