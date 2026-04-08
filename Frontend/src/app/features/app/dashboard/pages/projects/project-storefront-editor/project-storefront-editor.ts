@@ -165,6 +165,8 @@ export class ProjectStorefrontEditor {
         height: number;
       }
     | null = null;
+  private activeColorCanvasDrag = false;
+  private activeColorHueDrag = false;
 
   readonly project = signal<Project | null>(null);
   readonly storefront = signal<ProjectStorefront | null>(null);
@@ -280,8 +282,31 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedParagraphComponent() !== null
   );
   readonly activeTextToolbarMenu = signal<'font-family' | 'font-size' | 'color' | null>(null);
-  readonly activeColorPickerTab = signal<'picker' | 'saved'>('picker');
+  readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedParagraphColors = signal<string[]>([]);
+  readonly customPickerHue = signal(206);
+  readonly customPickerSaturation = signal(74);
+  readonly customPickerBrightness = signal(22);
+  readonly brandParagraphColors = computed(() => {
+    const defaults = ['#ffffff', '#edf4fb', '#bcd1e7', '#091b2f', '#082237', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8', 'transparent'];
+    const merged = [...defaults, ...this.savedParagraphColors()];
+    const unique: string[] = [];
+    for (const color of merged) {
+      const normalized = color.trim().toLowerCase();
+      if (normalized && !unique.includes(normalized)) {
+        unique.push(normalized);
+      }
+    }
+    return unique.slice(0, 10);
+  });
+  readonly customColorCanvasBackground = computed(() => `hsl(${this.customPickerHue()} 100% 50%)`);
+  readonly customColorCanvasHandleLeft = computed(() => `${this.customPickerSaturation()}%`);
+  readonly customColorCanvasHandleTop = computed(() => `${100 - this.customPickerBrightness()}%`);
+  readonly customColorSpectrumHandleLeft = computed(() => `${(this.customPickerHue() / 360) * 100}%`);
+  readonly customColorHexValue = computed(() => {
+    const color = this.selectedParagraphComponent()?.props.color ?? '#082237';
+    return color.replace('#', '').toUpperCase();
+  });
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
   readonly selectedComponentGroupId = computed(() => {
@@ -651,6 +676,18 @@ effect(() => {
 
   @HostListener('document:mousemove', ['$event'])
   handleComponentPointerMove(event: MouseEvent): void {
+    if (this.activeColorCanvasDrag) {
+      event.preventDefault();
+      this.updateCustomColorFromCanvasEvent(event);
+      return;
+    }
+
+    if (this.activeColorHueDrag) {
+      event.preventDefault();
+      this.updateCustomColorFromHueEvent(event);
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -742,6 +779,12 @@ effect(() => {
 
   @HostListener('document:mouseup', ['$event'])
   handleComponentPointerUp(event: MouseEvent): void {
+    if (this.activeColorCanvasDrag || this.activeColorHueDrag) {
+      this.activeColorCanvasDrag = false;
+      this.activeColorHueDrag = false;
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       this.finishAddElementsComponentDrag(event);
       return;
@@ -2074,18 +2117,26 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   updateSelectedParagraphColor(value: string): void {
-    this.updateSelectedParagraphProps({ color: value });
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+    if (normalized !== 'transparent') {
+      this.syncCustomColorPickerFromHex(normalized);
+    }
+    this.updateSelectedParagraphProps({ color: normalized });
   }
 
   toggleTextToolbarMenu(menu: 'font-family' | 'font-size' | 'color'): void {
     const next = this.activeTextToolbarMenu() === menu ? null : menu;
     this.activeTextToolbarMenu.set(next);
     if (next === 'color') {
-      this.activeColorPickerTab.set('picker');
+      this.activeColorPickerTab.set('brand');
+      this.syncCustomColorPickerFromHex(this.selectedParagraphComponent()?.props.color ?? '#082237');
     }
   }
 
-  setActiveColorPickerTab(tab: 'picker' | 'saved'): void {
+  setActiveColorPickerTab(tab: 'brand' | 'custom'): void {
     this.activeColorPickerTab.set(tab);
   }
 
@@ -2099,11 +2150,33 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     const next = [normalized, ...this.savedParagraphColors().filter((item) => item !== normalized)].slice(0, 12);
     this.savedParagraphColors.set(next);
     localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
-    this.activeColorPickerTab.set('saved');
+    this.activeColorPickerTab.set('brand');
   }
 
   applySavedParagraphColor(color: string): void {
     this.updateSelectedParagraphColor(color);
+  }
+
+  startCustomColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeColorCanvasDrag = true;
+    this.updateCustomColorFromCanvasEvent(event);
+  }
+
+  startCustomColorHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeColorHueDrag = true;
+    this.updateCustomColorFromHueEvent(event);
+  }
+
+  updateCustomColorHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+    this.updateSelectedParagraphColor(normalized);
   }
 
   removeSavedParagraphColor(color: string, event: MouseEvent): void {
@@ -3332,6 +3405,139 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     } catch {
       return [];
     }
+  }
+
+  private updateCustomColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__context-toolbar-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.customPickerSaturation.set(saturation);
+    this.customPickerBrightness.set(brightness);
+    this.commitCustomColorPicker();
+  }
+
+  private updateCustomColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__context-toolbar-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.customPickerHue.set(Math.round(ratio * 360));
+    this.commitCustomColorPicker();
+  }
+
+  private commitCustomColorPicker(): void {
+    const hex = this.hsvToHex(this.customPickerHue(), this.customPickerSaturation(), this.customPickerBrightness());
+    this.updateSelectedParagraphProps({ color: hex });
+  }
+
+  private syncCustomColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.customPickerHue.set(h);
+    this.customPickerSaturation.set(s);
+    this.customPickerBrightness.set(v);
+  }
+
+  private normalizeHexColor(value: string | null | undefined): string | null {
+    const raw = String(value ?? '').trim();
+    if (!raw) {
+      return null;
+    }
+
+    if (raw.toLowerCase() === 'transparent') {
+      return 'transparent';
+    }
+
+    const prefixed = raw.startsWith('#') ? raw : `#${raw}`;
+    if (!/^#([0-9a-fA-F]{6})$/.test(prefixed)) {
+      return null;
+    }
+
+    return prefixed.toLowerCase();
+  }
+
+  private hexToHsv(hex: string): { h: number; s: number; v: number } {
+    const normalized = hex.replace('#', '');
+    const r = parseInt(normalized.slice(0, 2), 16) / 255;
+    const g = parseInt(normalized.slice(2, 4), 16) / 255;
+    const b = parseInt(normalized.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    let h = 0;
+
+    if (delta !== 0) {
+      if (max === r) {
+        h = ((g - b) / delta) % 6;
+      } else if (max === g) {
+        h = (b - r) / delta + 2;
+      } else {
+        h = (r - g) / delta + 4;
+      }
+    }
+
+    h = Math.round(h * 60);
+    if (h < 0) {
+      h += 360;
+    }
+
+    const s = max === 0 ? 0 : Math.round((delta / max) * 100);
+    const v = Math.round(max * 100);
+
+    return { h, s, v };
+  }
+
+  private hsvToHex(h: number, s: number, v: number): string {
+    const saturation = this.clamp(s, 0, 100) / 100;
+    const value = this.clamp(v, 0, 100) / 100;
+    const c = value * saturation;
+    const hueSegment = ((h % 360) + 360) % 360 / 60;
+    const x = c * (1 - Math.abs((hueSegment % 2) - 1));
+    const m = value - c;
+    let r = 0;
+    let g = 0;
+    let b = 0;
+
+    if (hueSegment >= 0 && hueSegment < 1) {
+      r = c; g = x; b = 0;
+    } else if (hueSegment < 2) {
+      r = x; g = c; b = 0;
+    } else if (hueSegment < 3) {
+      r = 0; g = c; b = x;
+    } else if (hueSegment < 4) {
+      r = 0; g = x; b = c;
+    } else if (hueSegment < 5) {
+      r = x; g = 0; b = c;
+    } else {
+      r = c; g = 0; b = x;
+    }
+
+    const toHex = (channel: number) =>
+      Math.round((channel + m) * 255)
+        .toString(16)
+        .padStart(2, '0');
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, value));
   }
 
   private updateSectionComponents(
