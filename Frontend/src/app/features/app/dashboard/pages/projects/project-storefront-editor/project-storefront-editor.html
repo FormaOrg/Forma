@@ -655,51 +655,7 @@
             <button type="button">See all</button>
           </div>
 
-          @if (selectedSection(); as selectedSection) {
-            <div class="storefront-editor__components-structure">
-              <div class="storefront-editor__components-structure-head">
-                <div>
-                  <strong>Components in {{ sectionLabel(selectedSection) }}</strong>
-                  <small>{{ selectedSectionComponents().length }} layer{{ selectedSectionComponents().length === 1 ? '' : 's' }}</small>
-                </div>
-                @if (selectedComponent()) {
-                  <button type="button" (click)="removeSelectedComponent()">Delete selected</button>
-                }
-              </div>
-
-              @if (selectedSectionComponents().length) {
-                <div class="storefront-editor__components-structure-list">
-                  @for (component of selectedSectionComponents(); track component.id) {
-                    <button
-                      type="button"
-                      class="storefront-editor__components-structure-item"
-                      [class.storefront-editor__components-structure-item--selected]="isComponentSelected(component.id)"
-                      [class.storefront-editor__components-structure-item--drop-target]="componentReorderTargetId() === component.id"
-                      draggable="true"
-                      (click)="selectComponent(selectedSection.id, component.id, $event)"
-                      (dragstart)="startComponentReorder(component.id, $event)"
-                      (dragover)="allowComponentDrop($event, component.id)"
-                      (dragleave)="clearComponentDropTarget()"
-                      (drop)="dropComponentReorder($event, component.id)"
-                      (dragend)="endComponentReorder()"
-                    >
-                      <span class="storefront-editor__components-structure-handle">⋮⋮</span>
-                      <span class="storefront-editor__components-structure-copy">
-                        <strong>{{ component.name }}</strong>
-                        <small>{{ componentKindLabel(component.type) }}</small>
-                      </span>
-                    </button>
-                  }
-                </div>
-              } @else {
-                <div class="storefront-editor__components-structure-empty">
-                  Click a card below to add the first component to this section.
-                </div>
-              }
-            </div>
-          }
-
-          <div class="storefront-editor__add-elements-grid">
+            <div class="storefront-editor__add-elements-grid">
             @for (item of visibleAddElementsLibraryItems(); track item.id) {
                 <button
                   type="button"
@@ -1327,57 +1283,67 @@
         [style.left.px]="componentContextMenuPosition().x"
         [style.top.px]="componentContextMenuPosition().y"
         (click)="$event.stopPropagation()"
-      >
-        <button type="button" class="storefront-editor__component-context-item" [disabled]="!selectedComponentIds().length" (click)="copySelectedComponents()">
-          <span>Copy</span>
-        </button>
-        <button type="button" class="storefront-editor__component-context-item" [disabled]="!componentClipboard()" (click)="pasteComponentFromClipboard()">
-          <span>Paste</span>
-        </button>
-        <div class="storefront-editor__component-context-divider"></div>
-        <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
-          <span>Duplicate</span>
-        </button>
-        <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsToFront()">
-          <span>Bring to front</span>
-        </button>
-        <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsForward()">
-          <span>Bring forward</span>
-        </button>
-        <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsBackward()">
-          <span>Send backward</span>
-        </button>
-        <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsToBack()">
-          <span>Send to back</span>
-        </button>
-        <div class="storefront-editor__component-context-divider"></div>
-        <button
-          type="button"
-          class="storefront-editor__component-context-item"
-          [disabled]="selectedComponentIds().length < 2"
-          (click)="groupSelectedComponents()"
         >
-          <span>Group</span>
-        </button>
-        <button
-          type="button"
-          class="storefront-editor__component-context-item"
-          [disabled]="!selectedComponentGroupId()"
-          (click)="ungroupSelectedComponents()"
-        >
-          <span>Ungroup</span>
-        </button>
-        <div class="storefront-editor__component-context-divider"></div>
-        <button
-          type="button"
-          class="storefront-editor__component-context-item storefront-editor__component-context-item--danger"
-          [disabled]="!selectedComponentIds().length"
-          (click)="deleteSelectedComponents()"
-        >
-          <span>Delete</span>
-        </button>
-      </div>
-    }
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="!selectedComponentIds().length" (click)="copySelectedComponents()">
+            <span>Copy</span>
+            <small>Ctrl + C</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="!componentClipboard()" (click)="pasteComponentFromClipboard()">
+            <span>Paste</span>
+            <small>Ctrl + V</small>
+          </button>
+          <div class="storefront-editor__component-context-divider"></div>
+          <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
+            <span>Duplicate</span>
+            <small>Ctrl + D</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsToFront()">
+            <span>Bring to front</span>
+            <small>Shift + ]</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsForward()">
+            <span>Bring forward</span>
+            <small>]</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsBackward()">
+            <span>Send backward</span>
+            <small>[</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsToBack()">
+            <span>Send to back</span>
+            <small>Shift + [</small>
+          </button>
+          <div class="storefront-editor__component-context-divider"></div>
+          <button
+            type="button"
+            class="storefront-editor__component-context-item"
+            [disabled]="selectedComponentIds().length < 2"
+            (click)="groupSelectedComponents()"
+          >
+            <span>Group</span>
+            <small>Ctrl + G</small>
+          </button>
+          <button
+            type="button"
+            class="storefront-editor__component-context-item"
+            [disabled]="!selectedComponentGroupId()"
+            (click)="ungroupSelectedComponents()"
+          >
+            <span>Ungroup</span>
+            <small>Ctrl + Shift + G</small>
+          </button>
+          <div class="storefront-editor__component-context-divider"></div>
+          <button
+            type="button"
+            class="storefront-editor__component-context-item storefront-editor__component-context-item--danger"
+            [disabled]="!selectedComponentIds().length"
+            (click)="deleteSelectedComponents()"
+          >
+            <span>Delete</span>
+            <small>Del</small>
+          </button>
+        </div>
+      }
 
     @if (sectionOptionsMenuId(); as sectionMenuId) {
       <div

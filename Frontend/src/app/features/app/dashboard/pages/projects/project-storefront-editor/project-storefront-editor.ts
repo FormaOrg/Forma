@@ -902,6 +902,18 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     }, ProjectStorefrontEditor.ADD_ELEMENTS_PANEL_CLOSE_MS);
   }
 
+  closeAddElementsPanelImmediately(): void {
+    if (this.addElementsPanelCloseTimer) {
+      clearTimeout(this.addElementsPanelCloseTimer);
+      this.addElementsPanelCloseTimer = null;
+    }
+
+    this.isAddElementsPanelOpen.set(false);
+    this.isAddElementsPanelClosing.set(false);
+    this.canScrollAddElementsTabsLeft.set(false);
+    this.canScrollAddElementsTabsRight.set(false);
+  }
+
   scrollAddElementsTabs(direction: 'left' | 'right'): void {
     const tabs = this.getAddElementsTabsElement();
     if (!tabs) {
@@ -953,6 +965,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     }
 
     const rect = target.getBoundingClientRect();
+    this.closeAddElementsPanelImmediately();
     this.activeAddElementsComponentDrag = {
       itemId: item.id,
       pointerOffsetX: event.clientX - rect.left,
