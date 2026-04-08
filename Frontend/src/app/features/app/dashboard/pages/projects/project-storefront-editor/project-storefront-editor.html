@@ -1030,7 +1030,7 @@
                                 (dblclick)="startEditingComponentName(section.id, component.id, $event)"
                               >
                                 <span class="storefront-editor__preview-component-name-label-text">
-                                  {{ componentTypeLabel(component) }} · {{ componentDisplayName(component) }}
+                                  {{ componentDisplayName(component) }}
                                 </span>
                               </span>
                               @if (isEditingComponentName() && editingComponentNameId() === component.id) {
@@ -1094,7 +1094,25 @@
                         </div>
                         <div class="storefront-editor__preview-section-chrome">
                           <div class="storefront-editor__preview-section-border"></div>
-                          <span class="storefront-editor__preview-section-tag">{{ sectionLabel(section) }}</span>
+                          @if (!(isEditingSectionName() && editingSectionNameId() === section.id)) {
+                            <span
+                              class="storefront-editor__preview-section-tag"
+                              (dblclick)="startEditingSectionName(section.id, $event)"
+                            >
+                              {{ sectionLabel(section) }}
+                            </span>
+                          } @else {
+                            <input
+                              type="text"
+                              class="storefront-editor__preview-section-name-input"
+                              [value]="editingSectionNameValue()"
+                              (input)="editingSectionNameValue.set($any($event.target).value)"
+                              (keydown)="onSectionNameInputKeydown($event)"
+                              (blur)="finishEditingSectionName()"
+                              (click)="$event.stopPropagation()"
+                              autofocus
+                            />
+                          }
                           <button
                             type="button"
                             class="storefront-editor__preview-section-edit"
