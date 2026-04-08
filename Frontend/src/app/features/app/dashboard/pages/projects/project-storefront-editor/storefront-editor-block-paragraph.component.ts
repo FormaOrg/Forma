@@ -5,7 +5,20 @@ import { StorefrontEditorParagraphNode } from './storefront-editor-component.mod
 @Component({
   selector: 'app-storefront-editor-block-paragraph',
   standalone: true,
-  template: `<span class="storefront-editor-block-paragraph">{{ node().props.text }}</span>`,
+  template: `
+    <span
+      class="storefront-editor-block-paragraph"
+      [style.font-family]="node().props.fontFamily"
+      [style.font-size.px]="node().props.fontSize"
+      [style.font-weight]="node().props.fontWeight"
+      [style.font-style]="node().props.fontStyle"
+      [style.text-decoration]="node().props.textDecoration"
+      [style.color]="node().props.color"
+      [style.text-align]="node().props.align"
+    >
+      {{ node().props.text }}
+    </span>
+  `,
   styles: [`
     :host {
       display: block;
@@ -16,9 +29,8 @@ import { StorefrontEditorParagraphNode } from './storefront-editor-component.mod
       display: block;
       width: 100%;
       color: rgba(17, 24, 39, 0.78);
-      font-size: 0.9rem;
       line-height: 1.5;
-      text-align: var(--storefront-editor-text-align, left);
+      white-space: pre-wrap;
     }
   `],
 })

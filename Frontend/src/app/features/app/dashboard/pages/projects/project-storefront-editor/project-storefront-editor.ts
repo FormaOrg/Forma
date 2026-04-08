@@ -35,6 +35,7 @@ import {
 import {
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
+  StorefrontEditorParagraphNode,
   createStorefrontEditorComponentNode,
 } from './storefront-editor-component.model';
 import {
@@ -77,6 +78,7 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
+  private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -270,6 +272,18 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const selectedIds = new Set(this.selectedComponentIds());
     return this.readSectionComponents(section).filter((component) => selectedIds.has(component.id));
   });
+  readonly selectedParagraphComponent = computed<StorefrontEditorParagraphNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'paragraph' ? component : null;
+  });
+  readonly isParagraphToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedParagraphComponent() !== null
+  );
+  readonly activeTextToolbarMenu = signal<'font-family' | 'font-size' | 'color' | null>(null);
+  readonly activeColorPickerTab = signal<'picker' | 'saved'>('picker');
+  readonly savedParagraphColors = signal<string[]>([]);
+  readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
+  readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
   readonly selectedComponentGroupId = computed(() => {
       const selected = this.selectedComponent();
       return selected?.groupId ?? null;
@@ -430,9 +444,13 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     );
   });
 
-  constructor() {
-    effect(() => {
-      const selectedSectionId = this.selectedSectionId();
+constructor() {
+effect(() => {
+  this.savedParagraphColors.set(this.readSavedParagraphColors());
+});
+
+ effect(() => {
+   const selectedSectionId = this.selectedSectionId();
       if (!selectedSectionId) {
         this.isSelectedSectionRailVisible.set(false);
         return;
@@ -601,6 +619,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     if (!(target instanceof Element)) {
       this.sectionOptionsMenuId.set(null);
       this.pageCardMenuId.set(null);
+      this.activeTextToolbarMenu.set(null);
       this.closeComponentContextMenu();
       return;
     }
@@ -614,6 +633,12 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     if (this.pageCardMenuId()) {
       if (!target.closest('.storefront-editor__page-card-menu, .storefront-editor__page-card-more')) {
         this.pageCardMenuId.set(null);
+      }
+    }
+
+    if (this.activeTextToolbarMenu()) {
+      if (!target.closest('.storefront-editor__context-toolbar-shell')) {
+        this.activeTextToolbarMenu.set(null);
       }
     }
 
@@ -1788,6 +1813,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     this.isFormaMenuOpen.set(false);
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
+    this.activeTextToolbarMenu.set(null);
     this.closeAddElementsPanel();
     this.isPagesPanelOpen.set(false);
     this.isMediaManagerOpen.set(false);
@@ -1994,6 +2020,98 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   window.open(`/store/${projectId}?preview=editor`, '_blank', 'noopener');
 }
+
+  updateSelectedParagraphFontFamily(value: string): void {
+    this.updateSelectedParagraphProps({ fontFamily: value });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  updateSelectedParagraphFontSize(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  setSelectedParagraphAlignment(align: StorefrontEditorParagraphNode['props']['align']): void {
+    this.updateSelectedParagraphProps({ align });
+  }
+
+  toggleSelectedParagraphBold(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      fontWeight: component.props.fontWeight >= 600 ? 400 : 700,
+    });
+  }
+
+  toggleSelectedParagraphItalic(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      fontStyle: component.props.fontStyle === 'italic' ? 'normal' : 'italic',
+    });
+  }
+
+  toggleSelectedParagraphUnderline(): void {
+    const component = this.selectedParagraphComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({
+      textDecoration: component.props.textDecoration === 'underline' ? 'none' : 'underline',
+    });
+  }
+
+  updateSelectedParagraphColor(value: string): void {
+    this.updateSelectedParagraphProps({ color: value });
+  }
+
+  toggleTextToolbarMenu(menu: 'font-family' | 'font-size' | 'color'): void {
+    const next = this.activeTextToolbarMenu() === menu ? null : menu;
+    this.activeTextToolbarMenu.set(next);
+    if (next === 'color') {
+      this.activeColorPickerTab.set('picker');
+    }
+  }
+
+  setActiveColorPickerTab(tab: 'picker' | 'saved'): void {
+    this.activeColorPickerTab.set(tab);
+  }
+
+  saveSelectedParagraphColor(): void {
+    const color = this.selectedParagraphComponent()?.props.color;
+    if (!color) {
+      return;
+    }
+
+    const normalized = color.trim().toLowerCase();
+    const next = [normalized, ...this.savedParagraphColors().filter((item) => item !== normalized)].slice(0, 12);
+    this.savedParagraphColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
+    this.activeColorPickerTab.set('saved');
+  }
+
+  applySavedParagraphColor(color: string): void {
+    this.updateSelectedParagraphColor(color);
+  }
+
+  removeSavedParagraphColor(color: string, event: MouseEvent): void {
+    event.stopPropagation();
+    const next = this.savedParagraphColors().filter((item) => item !== color);
+    this.savedParagraphColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
+  }
 
   triggerPublishFromMenu(): void {
     this.closeFloatingUi();
@@ -3176,6 +3294,44 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSectionComponents(sectionId, (components) =>
       components.map((component) => (component.id === componentId ? updater(component) : component))
     );
+  }
+
+  private updateSelectedParagraphProps(
+    patch: Partial<StorefrontEditorParagraphNode['props']>
+  ): void {
+    const sectionId = this.selectedSectionId();
+    const component = this.selectedParagraphComponent();
+    if (!sectionId || !component) {
+      return;
+    }
+
+    this.updateComponentNode(sectionId, component.id, (current) =>
+      current.type === 'paragraph'
+        ? {
+            ...current,
+            props: {
+              ...current.props,
+              ...patch,
+            },
+          }
+        : current
+    );
+  }
+
+  private readSavedParagraphColors(): string[] {
+    try {
+      const raw = localStorage.getItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === 'string').slice(0, 12)
+        : [];
+    } catch {
+      return [];
+    }
   }
 
   private updateSectionComponents(
