@@ -27,6 +27,20 @@ import { AuthService } from '../../../../../../core/services/auth.service';
 import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
 import {
+  ComponentSelectionBox,
+  EditorSidebarMode,
+  PagesPanelLayoutMode,
+  SectionInsertMode,
+  SectionLibraryCategory,
+  SectionLibraryTemplate,
+  StorefrontPageDesignCategory,
+  StorefrontPageDesignTemplate,
+  STOREFRONT_EDITOR_PAGE_DESIGN_CATEGORIES,
+  STOREFRONT_EDITOR_PAGE_DESIGN_TEMPLATES,
+  STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES,
+  STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES,
+} from './config/storefront-editor-feature-domains';
+import {
   STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES,
   STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS,
   STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS,
@@ -45,34 +59,32 @@ import {
   StorefrontMediaManagerAsset,
 } from './project-storefront-media-manager';
 import { StorefrontEditorComponentHostComponent } from './storefront-editor-component-host.component';
-
-type SectionInsertMode = 'append' | 'after-selected';
-type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
-type PagesPanelLayoutMode = 'grid' | 'rows';
-type ComponentSelectionBox = { x: number; y: number; width: number; height: number };
-type StorefrontPageDesignTemplate = {
-  id: string;
-  name: string;
-  description: string;
-  category: StorefrontPageDesignCategory;
-  accent: 'linen' | 'cobalt' | 'ink' | 'sand';
-};
-type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
-type SectionLibraryCategory =
-  | 'Welcome'
-  | 'About'
-  | 'Portfolio'
-  | 'Services'
-  | 'Products'
-  | 'Promote & Engage';
-type SectionLibraryTemplate = {
-  id: string;
-  title: string;
-  category: SectionLibraryCategory;
-  type: StorefrontSectionType;
-  layout: 'wide' | 'standard' | 'tall';
-  accent: 'cobalt' | 'linen' | 'ink' | 'sand' | 'sky' | 'charcoal';
-};
+import {
+  buildStorefrontMediaManagerAssets,
+  describeStorefrontMediaAsset,
+} from './domains/storefront-editor-media.domain';
+import {
+  buildDefaultManagedPageDocument as buildDefaultManagedPageDocumentForEditor,
+  buildDefaultManagedPages as buildDefaultManagedPagesForEditor,
+  captureManagedPagesWithDraft as captureManagedPagesWithDraftForEditor,
+  cloneStorefrontHomepageDocument,
+  createUniqueManagedPageName,
+  normalizeManagedPageDocument as normalizeManagedPageDocumentForEditor,
+  normalizeManagedPages as normalizeManagedPagesForEditor,
+  resolveManagedPageDocument as resolveManagedPageDocumentForEditor,
+} from './domains/storefront-editor-pages.domain';
+import {
+  buildDefaultStorefrontHomepageDocument,
+  buildStorefrontSection,
+  createStorefrontSectionId,
+  normalizeStorefrontData,
+  normalizeStorefrontSection,
+  normalizeStorefrontSectionType,
+} from './domains/storefront-editor-storefront.domain';
+import {
+  clampStorefrontEditorZoom,
+  formatStorefrontEditorRelativeTime,
+} from './utils/storefront-editor-shared.utils';
 
 @Component({
   selector: 'app-project-storefront-editor',
@@ -487,65 +499,13 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     'featured-products',
     'footer',
   ];
-  readonly sectionLibraryCategories: SectionLibraryCategory[] = [
-    'Welcome',
-    'About',
-    'Portfolio',
-    'Services',
-    'Products',
-    'Promote & Engage',
-  ];
-  readonly sectionLibraryTemplates: SectionLibraryTemplate[] = [
-    { id: 'hero-cobalt', title: 'Shop Our Latest Collection', category: 'Welcome', type: 'hero', layout: 'wide', accent: 'cobalt' },
-    { id: 'hero-editorial', title: 'Explore My Latest Work', category: 'Portfolio', type: 'hero', layout: 'standard', accent: 'linen' },
-    { id: 'hero-services', title: 'Efficient Services & Solutions', category: 'Services', type: 'hero', layout: 'tall', accent: 'ink' },
-    { id: 'hero-business', title: 'Reach Your Business Potential', category: 'Promote & Engage', type: 'hero', layout: 'tall', accent: 'sky' },
-    { id: 'products-fashion', title: 'Shop Our Unique Products', category: 'Products', type: 'featured-products', layout: 'standard', accent: 'sand' },
-    { id: 'footer-minimal', title: 'Elegant Footer Details', category: 'About', type: 'footer', layout: 'standard', accent: 'charcoal' },
-    { id: 'announcement-editorial', title: 'Highlight a Quick Announcement', category: 'Welcome', type: 'announcement-bar', layout: 'wide', accent: 'linen' },
-    { id: 'products-beauty', title: 'Discover Modern Products', category: 'Products', type: 'featured-products', layout: 'wide', accent: 'charcoal' },
-  ];
+  readonly sectionLibraryCategories: SectionLibraryCategory[] = STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES;
+  readonly sectionLibraryTemplates: SectionLibraryTemplate[] = STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES;
   readonly visibleSectionLibraryTemplates = computed(() =>
     this.sectionLibraryTemplates.filter((template) => template.category === this.activeSectionLibraryCategory())
   );
-  readonly pageDesignTemplates: StorefrontPageDesignTemplate[] = [
-    {
-      id: 'about',
-      name: 'About',
-      description: 'Tell the story behind the brand and introduce the team.',
-      category: 'Business',
-      accent: 'linen',
-    },
-    {
-      id: 'contact',
-      name: 'Contact',
-      description: 'Give visitors a clean way to reach you and ask questions.',
-      category: 'Business',
-      accent: 'cobalt',
-    },
-    {
-      id: 'privacy-policy',
-      name: 'Privacy Policy',
-      description: 'Start from a legal-style layout for policies and business info.',
-      category: 'Policy',
-      accent: 'sand',
-    },
-    {
-      id: 'shipping-policy',
-      name: 'Shipping Policy',
-      description: 'Use a policy page layout focused on delivery details and returns.',
-      category: 'Policy',
-      accent: 'ink',
-    },
-    {
-      id: 'product-page',
-      name: 'Product Page',
-      description: 'Begin with a commerce-focused page title and supporting details.',
-      category: 'Store',
-      accent: 'cobalt',
-    },
-  ];
-  readonly pageDesignCategories: StorefrontPageDesignCategory[] = ['Business', 'Store', 'Info', 'Policy'];
+  readonly pageDesignTemplates: StorefrontPageDesignTemplate[] = STOREFRONT_EDITOR_PAGE_DESIGN_TEMPLATES;
+  readonly pageDesignCategories: StorefrontPageDesignCategory[] = STOREFRONT_EDITOR_PAGE_DESIGN_CATEGORIES;
   readonly visiblePageDesignTemplates = computed(() =>
     this.pageDesignTemplates.filter((template) => template.category === this.activePageDesignCategory())
   );
@@ -4584,94 +4544,24 @@ updatePageDesignTabScrollState(): void {
   }
 
   private buildDefaultManagedPages(homeDraftDocument?: StorefrontHomepageDocument): StorefrontEditorManagedPage[] {
-    return [
-      {
-        id: 'home',
-        name: 'Home',
-        kind: 'home',
-        designId: null,
-        draftDocument: this.cloneHomepageDocument(homeDraftDocument ?? this.buildDefaultHomepageDocument('Storefront')),
-      },
-    ];
+    return buildDefaultManagedPagesForEditor(homeDraftDocument, (storeName) =>
+      this.buildDefaultHomepageDocument(storeName)
+    );
   }
 
   private normalizeManagedPages(
     pages: StorefrontEditorSession['managedPages'] | StorefrontEditorSnapshot['managedPages'],
     homeDraftDocument?: StorefrontHomepageDocument | null
   ): StorefrontEditorManagedPage[] {
-    const normalized: StorefrontEditorManagedPage[] = [];
-    const fallbackStoreName = this.resolveStorefrontFallbackName();
-    const normalizedHomeDraft = this.normalizeManagedPageDocument(
-      homeDraftDocument ?? this.buildDefaultHomepageDocument(fallbackStoreName),
-      'Home',
-      'home',
-      null
-    );
-
-    if (Array.isArray(pages)) {
-      for (const page of pages) {
-        if (!page || typeof page !== 'object') {
-          continue;
-        }
-
-        const id = typeof page.id === 'string' && page.id.trim() ? page.id.trim() : `page-${normalized.length + 1}`;
-        const name = typeof page.name === 'string' && page.name.trim() ? page.name.trim() : 'New page';
-        const kind =
-          page.kind === 'home' || page.kind === 'blank' || page.kind === 'designed' ? page.kind : 'blank';
-
-        normalized.push({
-          id,
-          name,
-          kind,
-          designId: typeof page.designId === 'string' && page.designId.trim() ? page.designId.trim() : null,
-          draftDocument: this.normalizeManagedPageDocument(page.draftDocument, name, kind, typeof page.designId === 'string' && page.designId.trim() ? page.designId.trim() : null),
-        });
-      }
-    }
-
-    if (!normalized.length) {
-      return this.buildDefaultManagedPages(normalizedHomeDraft);
-    }
-
-    const explicitHomeIndex = normalized.findIndex((page) => page.kind === 'home');
-    const fallbackHomeIndex = normalized.findIndex((page) => page.id === 'home');
-    const homeIndex = explicitHomeIndex >= 0 ? explicitHomeIndex : fallbackHomeIndex >= 0 ? fallbackHomeIndex : 0;
-
-    for (let index = 0; index < normalized.length; index += 1) {
-      const page = normalized[index];
-      if (index === homeIndex) {
-        normalized[index] = {
-          ...page,
-          kind: 'home',
-          draftDocument: this.cloneHomepageDocument(page.draftDocument ?? normalizedHomeDraft),
-        };
-        continue;
-      }
-
-      if (page.kind === 'home') {
-        normalized[index] = {
-          ...page,
-          kind: page.designId ? ('designed' as const) : ('blank' as const),
-        };
-      }
-
-      if (!normalized[index].draftDocument) {
-        normalized[index] = {
-          ...normalized[index],
-          draftDocument: this.buildDefaultManagedPageDocument(
-            normalized[index].name,
-            normalized[index].kind,
-            normalized[index].designId
-          ),
-        };
-      }
-    }
-
-    return normalized;
+    return normalizeManagedPagesForEditor(pages, homeDraftDocument, {
+      fallbackStoreName: this.resolveStorefrontFallbackName(),
+      buildDefaultHomepageDocument: (storeName) => this.buildDefaultHomepageDocument(storeName),
+      normalizeSection: (section, storeName) => this.normalizeSection(section, storeName),
+    });
   }
 
   private cloneHomepageDocument(document: StorefrontHomepageDocument): StorefrontHomepageDocument {
-    return JSON.parse(JSON.stringify(document)) as StorefrontHomepageDocument;
+    return cloneStorefrontHomepageDocument(document);
   }
 
   private resolveStorefrontFallbackName(): string {
@@ -4689,39 +4579,11 @@ updatePageDesignTabScrollState(): void {
     kind: StorefrontEditorManagedPage['kind'],
     designId: string | null
   ): StorefrontHomepageDocument {
-    const storeName = this.resolveStorefrontFallbackName();
-    const document = this.buildDefaultHomepageDocument(storeName);
-    const safePageName = pageName.trim() || 'New page';
-    const title =
-      kind === 'home' ? storeName : safePageName;
-    document.seo = {
-      title,
-      description: kind === 'blank' ? '' : `Content for ${safePageName}.`,
-    };
-    document.sections = document.sections.map((section) => {
-      if (section.type === 'hero') {
-        const currentDescription =
-          typeof (section.props as Record<string, unknown>)['description'] === 'string'
-            ? ((section.props as Record<string, unknown>)['description'] as string)
-            : '';
-        return {
-          ...section,
-          props: {
-            ...section.props,
-            eyebrow: kind === 'home' ? 'New store' : designId ? 'Designed page' : 'Blank page',
-            title,
-            description:
-              kind === 'home'
-                ? currentDescription
-                : kind === 'blank'
-                  ? 'Start building this page from a clean canvas.'
-                  : `Customize the ${safePageName} page layout and content.`,
-          },
-        };
-      }
-      return section;
+    return buildDefaultManagedPageDocumentForEditor(pageName, kind, designId, {
+      fallbackStoreName: this.resolveStorefrontFallbackName(),
+      buildDefaultHomepageDocument: (storeName) => this.buildDefaultHomepageDocument(storeName),
+      normalizeSection: (section, storeName) => this.normalizeSection(section, storeName),
     });
-    return this.cloneHomepageDocument(document);
   }
 
   private normalizeManagedPageDocument(
@@ -4730,30 +4592,11 @@ updatePageDesignTabScrollState(): void {
     kind: StorefrontEditorManagedPage['kind'],
     designId: string | null
   ): StorefrontHomepageDocument {
-    const fallback = this.buildDefaultManagedPageDocument(pageName, kind, designId);
-    if (
-      !document ||
-      typeof document !== 'object' ||
-      !Array.isArray((document as Partial<StorefrontHomepageDocument>).sections)
-    ) {
-      return fallback;
-    }
-
-    const candidate = document as Partial<StorefrontHomepageDocument>;
-    return {
-      version:
-        typeof candidate.version === 'number' && Number.isFinite(candidate.version) ? candidate.version : 1,
-      pageKey: 'home',
-      seo: {
-        title:
-          typeof candidate.seo?.title === 'string' && candidate.seo.title.trim()
-            ? candidate.seo.title
-            : fallback.seo.title,
-        description:
-          typeof candidate.seo?.description === 'string' ? candidate.seo.description : fallback.seo.description,
-      },
-      sections: candidate.sections!.map((section) => this.normalizeSection(section, this.resolveStorefrontFallbackName())),
-    };
+    return normalizeManagedPageDocumentForEditor(document, pageName, kind, designId, {
+      fallbackStoreName: this.resolveStorefrontFallbackName(),
+      buildDefaultHomepageDocument: (storeName) => this.buildDefaultHomepageDocument(storeName),
+      normalizeSection: (section, storeName) => this.normalizeSection(section, storeName),
+    });
   }
 
   private captureManagedPagesWithCurrentDraft(): StorefrontEditorManagedPage[] {
@@ -4765,18 +4608,15 @@ updatePageDesignTabScrollState(): void {
     storefront: ProjectStorefront,
     selectedManagedPageId: string
   ): StorefrontEditorManagedPage[] {
-    return this.normalizeManagedPages(this.managedPages(), storefront.draftHomepage).map((page) =>
-      page.id === selectedManagedPageId
-        ? {
-            ...page,
-            draftDocument: this.cloneHomepageDocument(storefront.draftHomepage),
-          }
-        : {
-            ...page,
-            draftDocument: this.cloneHomepageDocument(
-              page.draftDocument ?? this.buildDefaultManagedPageDocument(page.name, page.kind, page.designId)
-            ),
-          }
+    return captureManagedPagesWithDraftForEditor(
+      storefront,
+      selectedManagedPageId,
+      this.managedPages(),
+      {
+        fallbackStoreName: this.resolveStorefrontFallbackName(),
+        buildDefaultHomepageDocument: (storeName) => this.buildDefaultHomepageDocument(storeName),
+        normalizeSection: (section, storeName) => this.normalizeSection(section, storeName),
+      }
     );
   }
 
@@ -4785,16 +4625,11 @@ updatePageDesignTabScrollState(): void {
     storefront: ProjectStorefront,
     managedPages: StorefrontEditorManagedPage[]
   ): StorefrontHomepageDocument {
-    const targetPage = managedPages.find((page) => page.id === pageId);
-    if (targetPage?.draftDocument) {
-      return this.cloneHomepageDocument(targetPage.draftDocument);
-    }
-
-    if (pageId === 'home') {
-      return this.cloneHomepageDocument(storefront.draftHomepage);
-    }
-
-    return this.buildDefaultManagedPageDocument(targetPage?.name ?? 'New page', targetPage?.kind ?? 'blank', targetPage?.designId ?? null);
+    return resolveManagedPageDocumentForEditor(pageId, storefront, managedPages, {
+      fallbackStoreName: this.resolveStorefrontFallbackName(),
+      buildDefaultHomepageDocument: (storeName) => this.buildDefaultHomepageDocument(storeName),
+      normalizeSection: (section, storeName) => this.normalizeSection(section, storeName),
+    });
   }
 
   private updateEditorSessionPages(pages: StorefrontEditorManagedPage[], selectedManagedPageId: string): void {
@@ -4909,33 +4744,11 @@ updatePageDesignTabScrollState(): void {
 }
 
   private createUniquePageName(baseName: string, ignorePageId: string | null = null): string {
-    const trimmed = baseName.trim() || 'New page';
-    const existingNames = new Set(
-      this.managedPages()
-        .filter((page) => page.id !== ignorePageId)
-        .map((page) => page.name.trim().toLowerCase())
-    );
-    if (!existingNames.has(trimmed.toLowerCase())) {
-      return trimmed;
-    }
-
-    let suffix = 1;
-    let candidate = `${trimmed} (${suffix})`;
-    while (existingNames.has(candidate.toLowerCase())) {
-      suffix += 1;
-      candidate = `${trimmed} (${suffix})`;
-    }
-
-    return candidate;
+    return createUniqueManagedPageName(baseName, this.managedPages(), ignorePageId);
   }
 
   private clampZoom(zoomPercent: number | null | undefined): number {
-    const parsed = Number(zoomPercent);
-    if (!Number.isFinite(parsed)) {
-      return 120;
-    }
-
-    return Math.min(200, Math.max(50, Math.round(parsed)));
+    return clampStorefrontEditorZoom(zoomPercent);
   }
 
   private updatePreviewStageScrollbarState(): void {
@@ -4962,223 +4775,52 @@ updatePageDesignTabScrollState(): void {
     }>,
     catalogProducts: ProjectCatalogProduct[]
   ): StorefrontMediaManagerAsset[] {
-    const assets = new Map<string, StorefrontMediaManagerAsset>();
-
-    for (const media of projectMedia) {
-      assets.set(media.fileUrl, {
-        id: media.id,
-        name: media.fileName,
-        url: media.fileUrl,
-        type: media.type,
-        fileSize: media.fileSize,
-        uploadedAt: media.uploadedAt,
-        sourceLabel: 'Site files',
-        description: this.describeMediaAsset(media.type, media.fileSize),
-        origin: 'PROJECT',
-      });
-    }
-
-    for (const product of catalogProducts) {
-      if (!product.imageUrl || assets.has(product.imageUrl)) {
-        continue;
-      }
-
-      assets.set(product.imageUrl, {
-        id: product.id * 1000,
-        name: product.name,
-        url: product.imageUrl,
-        type: 'IMAGE',
-        fileSize: 0,
-        uploadedAt: product.updatedAt || product.createdAt,
-        sourceLabel: 'Catalog',
-        description: product.category || 'Product image',
-        origin: 'CATALOG',
-      });
-    }
-
-    return Array.from(assets.values());
+    return buildStorefrontMediaManagerAssets(
+      projectMedia,
+      catalogProducts,
+      (fileSize) => this.uploadService.formatFileSize(fileSize)
+    );
   }
 
   private describeMediaAsset(type: 'IMAGE' | 'VIDEO' | 'DOCUMENT', fileSize: number): string {
-    const label = type === 'IMAGE' ? 'Image' : type === 'VIDEO' ? 'Video' : 'Document';
-    if (!fileSize) {
-      return label;
-    }
-
-    return `${label} - ${this.uploadService.formatFileSize(fileSize)}`;
+    return describeStorefrontMediaAsset(type, fileSize, (size) => this.uploadService.formatFileSize(size));
   }
 
   private normalizeStorefront(storefront: ProjectStorefront): ProjectStorefront {
-    const snapshot = this.cloneStorefront(storefront);
-    const fallbackStoreName =
-      snapshot.storeName?.trim() ||
-      this.project()?.storeTitle?.trim() ||
-      this.project()?.name?.trim() ||
-      'Storefront';
-
-    snapshot.storeName = fallbackStoreName;
-    snapshot.themeKey = snapshot.themeKey?.trim() || 'commerce-minimal';
-    snapshot.activePageKey = 'home';
-
-    const draftHomepage = snapshot.draftHomepage;
-    const normalizedHomepage =
-      draftHomepage &&
-      typeof draftHomepage === 'object' &&
-      Array.isArray(draftHomepage.sections) &&
-      draftHomepage.sections.length
-        ? {
-            version:
-              typeof draftHomepage.version === 'number' && Number.isFinite(draftHomepage.version)
-                ? draftHomepage.version
-                : 1,
-            pageKey: 'home' as const,
-            seo: {
-              title:
-                typeof draftHomepage.seo?.title === 'string' && draftHomepage.seo.title.trim()
-                  ? draftHomepage.seo.title
-                  : fallbackStoreName,
-              description:
-                typeof draftHomepage.seo?.description === 'string'
-                  ? draftHomepage.seo.description
-                  : '',
-            },
-            sections: draftHomepage.sections.map((section) =>
-              this.normalizeSection(section, fallbackStoreName)
-            ),
-          }
-        : this.buildDefaultHomepageDocument(fallbackStoreName);
-
-    snapshot.draftHomepage = normalizedHomepage;
-    snapshot.editorSession = this.normalizeEditorSession(snapshot.editorSession, normalizedHomepage);
-    snapshot.publishedHomepage = snapshot.publishedHomepage
-      ? {
-          ...snapshot.publishedHomepage,
-          pageKey: 'home',
-          seo: {
-            title:
-              typeof snapshot.publishedHomepage.seo?.title === 'string' &&
-              snapshot.publishedHomepage.seo.title.trim()
-                ? snapshot.publishedHomepage.seo.title
-                : normalizedHomepage.seo.title,
-            description:
-              typeof snapshot.publishedHomepage.seo?.description === 'string'
-                ? snapshot.publishedHomepage.seo.description
-                : '',
-          },
-          sections: Array.isArray(snapshot.publishedHomepage.sections)
-            ? snapshot.publishedHomepage.sections.map((section) =>
-                this.normalizeSection(section, fallbackStoreName)
-              )
-            : normalizedHomepage.sections,
-        }
-      : null;
-
-    return snapshot;
+    return normalizeStorefrontData(storefront, {
+      fallbackStoreName:
+        storefront.storeName?.trim() ||
+        this.project()?.storeTitle?.trim() ||
+        this.project()?.name?.trim() ||
+        'Storefront',
+      normalizeEditorSession: (session, homeDraftDocument) =>
+        this.normalizeEditorSession(session, homeDraftDocument),
+    });
   }
 
   private buildDefaultHomepageDocument(storeName: string): ProjectStorefront['draftHomepage'] {
-    return {
-      version: 1,
-      pageKey: 'home',
-      seo: {
-        title: storeName,
-        description: '',
-      },
-      sections: [
-        this.buildSection('announcement-bar', storeName),
-        this.buildSection('hero', storeName),
-        this.buildSection('featured-products', storeName),
-        this.buildSection('footer', storeName),
-      ],
-    };
+    return buildDefaultStorefrontHomepageDocument(storeName, (type, name) => this.buildSection(type, name));
   }
 
   private normalizeSection(
     section: Partial<StorefrontHomepageSection> | null | undefined,
     storeName: string
   ): StorefrontHomepageSection {
-    const safeType = this.normalizeSectionType(section?.type);
-    const baseSection = this.buildSection(safeType, storeName);
-    const props =
-      section?.props && typeof section.props === 'object' && !Array.isArray(section.props)
-        ? { ...baseSection.props, ...section.props }
-        : baseSection.props;
-
-    return {
-      ...baseSection,
-      id:
-        typeof section?.id === 'string' && section.id.trim()
-          ? section.id
-          : this.createSectionId(safeType),
-      enabled: typeof section?.enabled === 'boolean' ? section.enabled : true,
-      props,
-    };
+    return normalizeStorefrontSection(
+      section,
+      storeName,
+      (type, name) => this.buildSection(type, name),
+      (type) => this.normalizeSectionType(type),
+      (type) => this.createSectionId(type)
+    );
   }
 
   private normalizeSectionType(type: unknown): StorefrontSectionType {
-    switch (type) {
-      case 'announcement-bar':
-      case 'hero':
-      case 'featured-products':
-      case 'footer':
-        return type;
-      default:
-        return 'hero';
-    }
+    return normalizeStorefrontSectionType(type);
   }
 
   private buildSection(type: StorefrontSectionType, storeName: string): StorefrontHomepageSection {
-    switch (type) {
-      case 'announcement-bar':
-        return {
-          id: this.createSectionId(type),
-          type,
-          enabled: true,
-          props: {
-            text: 'Welcome to your storefront',
-            linkLabel: 'Browse products',
-            linkHref: '/products',
-          },
-        };
-      case 'featured-products':
-        return {
-          id: this.createSectionId(type),
-          type,
-          enabled: true,
-          props: {
-            title: 'Featured products',
-            productIds: [],
-            maxItems: 4,
-          },
-        };
-      case 'footer':
-        return {
-          id: this.createSectionId(type),
-          type,
-          enabled: true,
-          props: {
-            brandText: storeName,
-            contactEmail: 'store@example.com',
-            contactPhone: '+216 00 000 000',
-          },
-        };
-      default:
-        return {
-          id: this.createSectionId(type),
-          type,
-          enabled: true,
-          props: {
-            eyebrow: 'New store',
-            title: storeName,
-            description:
-              'Introduce your brand, highlight what makes the catalog special, and guide visitors toward your products.',
-            primaryCtaLabel: 'Browse products',
-            primaryCtaHref: '/products',
-            secondaryCtaLabel: 'Featured picks',
-            secondaryCtaHref: '#featured',
-          },
-        };
-    }
+    return buildStorefrontSection(type, storeName, (sectionType) => this.createSectionId(sectionType));
   }
 
   private createSection(type: StorefrontSectionType): StorefrontHomepageSection {
@@ -5186,44 +4828,11 @@ updatePageDesignTabScrollState(): void {
   }
 
   private createSectionId(type: StorefrontSectionType): string {
-    return `${type}-${Math.random().toString(36).slice(2, 10)}`;
+    return createStorefrontSectionId(type);
   }
 
   private formatRelativeTime(value: string | null | undefined): string | null {
-    if (!value) {
-      return null;
-    }
-
-    const timestamp = new Date(value).getTime();
-    if (Number.isNaN(timestamp)) {
-      return null;
-    }
-
-    const diffMs = Date.now() - timestamp;
-    if (!Number.isFinite(diffMs) || diffMs < 0) {
-      return 'just now';
-    }
-
-    const minute = 60_000;
-    const hour = 60 * minute;
-    const day = 24 * hour;
-
-    if (diffMs < minute) {
-      return 'just now';
-    }
-
-    if (diffMs < hour) {
-      const minutes = Math.max(1, Math.round(diffMs / minute));
-      return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-    }
-
-    if (diffMs < day) {
-      const hours = Math.max(1, Math.round(diffMs / hour));
-      return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-    }
-
-    const days = Math.max(1, Math.round(diffMs / day));
-    return `${days} day${days === 1 ? '' : 's'} ago`;
+    return formatStorefrontEditorRelativeTime(value);
   }
 
 private getSectionLibraryTabsElement(): HTMLElement | null {
