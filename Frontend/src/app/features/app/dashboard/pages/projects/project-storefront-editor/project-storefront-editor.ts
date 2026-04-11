@@ -45,6 +45,11 @@ import {
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
   StorefrontEditorParagraphNode,
+  StorefrontEditorProductFeedNode,
+  StorefrontEditorTextNode,
+  StorefrontEditorTextStylePreset,
+  buildStorefrontEditorProductFeedProps,
+  buildStorefrontEditorTextProps,
   createStorefrontEditorComponentNode,
 } from './storefront-editor-component.model';
 import {
@@ -98,12 +103,28 @@ type ButtonToolbarMenu =
   | 'shadow'
   | 'spacing'
   | null;
+type ProductFeedToolbarMenu = 'designs' | 'settings' | 'color' | null;
+type ProductFeedSettingsSection =
+  | 'category'
+  | 'settings'
+  | 'layout'
+  | 'design'
+  | 'add-to-cart'
+  | 'filters'
+  | 'sorting';
 type StorefrontEditorButtonDesignPreset = {
   id: string;
   label: string;
   text: string;
   iconName?: StorefrontEditorButtonNode['props']['iconName'];
   patch: Partial<StorefrontEditorButtonNode['props']>;
+};
+type StorefrontEditorProductFeedDesignPreset = {
+  id: StorefrontEditorProductFeedNode['props']['designPreset'];
+  label: string;
+  description: string;
+  previewImageSrc: string;
+  patch?: Partial<StorefrontEditorProductFeedNode['props']>;
 };
 type StorefrontPageDesignTemplate = {
   id: string;
@@ -387,27 +408,39 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const selectedIds = new Set(this.selectedComponentIds());
     return this.readSectionComponents(section).filter((component) => selectedIds.has(component.id));
   });
-  readonly selectedParagraphComponent = computed<StorefrontEditorParagraphNode | null>(() => {
+  readonly selectedTextComponent = computed<StorefrontEditorTextNode | null>(() => {
     const component = this.selectedComponent();
-    return component?.type === 'paragraph' ? component : null;
+    return component?.type === 'text' ? component : null;
   });
   readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
     const component = this.selectedComponent();
     return component?.type === 'button' ? component : null;
   });
+  readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'product-feed' ? component : null;
+  });
   readonly isParagraphToolbarVisible = computed(
-    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedParagraphComponent() !== null
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedTextComponent() !== null
   );
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
   );
-  readonly activeTextToolbarMenu = signal<'font-family' | 'font-size' | 'color' | null>(null);
+  readonly isProductFeedToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
+  );
+  readonly activeTextToolbarMenu = signal<'style' | 'font-family' | 'link' | 'alignment' | 'color' | null>(null);
   readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedParagraphColors = signal<string[]>([]);
   readonly customPickerHue = signal(206);
   readonly customPickerSaturation = signal(74);
   readonly customPickerBrightness = signal(22);
+  readonly textFontSearch = signal('');
+  readonly textLinkPageId = signal<string>('home');
+  readonly textLinkOpenMode = signal<'current' | 'new'>('current');
   readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
+  readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
+  readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
   readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedButtonColors = signal<string[]>([]);
   readonly buttonCustomPickerHue = signal(228);
@@ -415,6 +448,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly buttonCustomPickerBrightness = signal(96);
   readonly buttonEditTextValue = signal('');
   readonly buttonLinkValue = signal('');
+  readonly productFeedTextColorValue = signal('#202124');
   readonly brandParagraphColors = computed(() => {
     const defaults = ['#ffffff', '#edf4fb', '#bcd1e7', '#091b2f', '#082237', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8', 'transparent'];
     const merged = [...defaults, ...this.savedParagraphColors()];
@@ -432,7 +466,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly customColorCanvasHandleTop = computed(() => `${100 - this.customPickerBrightness()}%`);
   readonly customColorSpectrumHandleLeft = computed(() => `${(this.customPickerHue() / 360) * 100}%`);
   readonly customColorHexValue = computed(() => {
-    const color = this.selectedParagraphComponent()?.props.color ?? '#082237';
+    const color = this.selectedTextComponent()?.props.color ?? '#082237';
     return color.replace('#', '').toUpperCase();
   });
   readonly brandButtonColors = computed(() => {
@@ -457,6 +491,25 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   });
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
+  readonly textStylePresets: ReadonlyArray<{ id: StorefrontEditorTextStylePreset; sampleSize: string }> = [
+    { id: 'Heading 1', sampleSize: '180px' },
+    { id: 'Heading 2', sampleSize: '64px' },
+    { id: 'Heading 3', sampleSize: '48px' },
+    { id: 'Heading 4', sampleSize: '34px' },
+    { id: 'Heading 5', sampleSize: '24px' },
+    { id: 'Heading 6', sampleSize: '18px' },
+    { id: 'Paragraph 1', sampleSize: '24px' },
+    { id: 'Paragraph 2', sampleSize: '18px' },
+    { id: 'Paragraph 3', sampleSize: '14px' },
+  ];
+  readonly filteredTextFontFamilies = computed(() => {
+    const query = this.textFontSearch().trim().toLowerCase();
+    if (!query) {
+      return this.paragraphFontFamilies;
+    }
+
+    return this.paragraphFontFamilies.filter((fontFamily) => fontFamily.toLowerCase().includes(query));
+  });
   readonly buttonTextPresets = ['Paragraph 1', 'Paragraph 2', 'Heading 4'] as const;
   readonly buttonFontFamilies = ['Fira Mono', 'Fira Sans', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly buttonFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
@@ -609,6 +662,54 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       },
     },
   ];
+  readonly productFeedDesignPresets: ReadonlyArray<StorefrontEditorProductFeedDesignPreset> = [
+    {
+      id: 'grid-gallery',
+      label: 'Grid gallery',
+      description: 'Classic 4-column product grid with clean pricing.',
+      previewImageSrc: 'assets/app/project/editor/grid gallery/default.png',
+    },
+    {
+      id: 'filter-gallery',
+      label: 'Filtered gallery',
+      description: 'Sidebar filters, sort menu, and color swatches.',
+      previewImageSrc: 'assets/app/project/editor/grid gallery/filtered.png',
+    },
+    {
+      id: 'gallery-add-to-cart',
+      label: 'Add to cart',
+      description: 'Product cards with direct Add to Cart buttons.',
+      previewImageSrc: 'assets/app/project/editor/grid gallery/add_to_cart.png',
+    },
+    {
+      id: 'gallery-quick-add',
+      label: 'Quick add overlay',
+      description: 'Overlay plus actions and color swatches.',
+      previewImageSrc: 'assets/app/project/editor/grid gallery/quick_add.png',
+    },
+    {
+      id: 'gallery-minimal',
+      label: 'Minimal gallery',
+      description: 'Large rounded cards with extra whitespace.',
+      previewImageSrc: 'assets/app/project/editor/grid gallery/minimal.png',
+    },
+  ];
+  readonly productFeedSettingsSections: ReadonlyArray<{ id: ProductFeedSettingsSection; label: string }> = [
+    { id: 'category', label: 'Category' },
+    { id: 'settings', label: 'Settings' },
+    { id: 'layout', label: 'Layout' },
+    { id: 'design', label: 'Design' },
+    { id: 'add-to-cart', label: 'Add to Cart' },
+    { id: 'filters', label: 'Filters' },
+    { id: 'sorting', label: 'Sorting' },
+  ];
+  readonly productFeedCategories = computed(() => {
+    const categories = this.products()
+      .map((product) => (product.category ?? '').trim())
+      .filter((category): category is string => category.length > 0);
+
+    return ['all', ...categories.filter((category, index) => categories.indexOf(category) === index)];
+  });
   readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['props']['shadow']; label: string }> = [
     { id: 'none', label: 'None' },
     { id: 'soft', label: 'Soft' },
@@ -789,6 +890,16 @@ effect(() => {
   this.buttonLinkValue.set(this.selectedButtonComponent()!.props.href);
 });
 
+effect(() => {
+  if (!this.selectedProductFeedComponent()) {
+    this.activeProductFeedToolbarMenu.set(null);
+    this.activeProductFeedSettingsSection.set('category');
+    return;
+  }
+
+  this.productFeedTextColorValue.set(this.selectedProductFeedComponent()!.props.textColor);
+});
+
  effect(() => {
    const selectedSectionId = this.selectedSectionId();
       if (!selectedSectionId) {
@@ -847,6 +958,12 @@ effect(() => {
     if (event.key === 'Escape' && this.activeButtonToolbarMenu()) {
       event.preventDefault();
       this.activeButtonToolbarMenu.set(null);
+      return;
+    }
+
+    if (event.key === 'Escape' && this.activeProductFeedToolbarMenu()) {
+      event.preventDefault();
+      this.activeProductFeedToolbarMenu.set(null);
       return;
     }
 
@@ -985,6 +1102,10 @@ effect(() => {
    return;
  }
 
+    if (this.isEditingComponentText() && !target.closest('.storefront-editor__preview-component-text-editor')) {
+      this.finishEditingComponentText();
+    }
+
     if ((this.isFormaMenuOpen() || this.isAccountMenuOpen() || this.isZoomMenuOpen()) &&
       !target.closest('.storefront-editor__floating-shell')) {
       this.isFormaMenuOpen.set(false);
@@ -1028,15 +1149,25 @@ effect(() => {
    }
  }
 
- if (this.activeButtonToolbarMenu()) {
-   if (
-     !target.closest(
-       '.storefront-editor__context-toolbar-shell, .storefront-editor__button-toolbar-designs-panel, .storefront-editor__button-toolbar-side-panel'
-     )
-   ) {
-     this.activeButtonToolbarMenu.set(null);
-   }
- }
+if (this.activeButtonToolbarMenu()) {
+  if (
+    !target.closest(
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__button-toolbar-designs-panel, .storefront-editor__button-toolbar-side-panel'
+    )
+  ) {
+    this.activeButtonToolbarMenu.set(null);
+  }
+}
+
+if (this.activeProductFeedToolbarMenu()) {
+  if (
+    !target.closest(
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__product-feed-toolbar-designs-panel, .storefront-editor__product-feed-toolbar-side-panel'
+    )
+  ) {
+    this.activeProductFeedToolbarMenu.set(null);
+  }
+}
 
  if (this.isComponentContextMenuOpen()) {
    if (!target.closest('.storefront-editor__component-context-menu')) {
@@ -1753,6 +1884,8 @@ handleComponentPointerUp(event: MouseEvent): void {
 
   componentKindLabel(type: StorefrontEditorComponentType): string {
     switch (type) {
+      case 'text':
+        return 'Text';
       case 'heading':
         return 'Heading';
       case 'paragraph':
@@ -1769,6 +1902,8 @@ handleComponentPointerUp(event: MouseEvent): void {
         return 'Product feed';
       case 'blog-feed':
         return 'Blog feed';
+      default:
+        return 'Component';
     }
   }
 
@@ -2375,10 +2510,11 @@ handleComponentPointerUp(event: MouseEvent): void {
   closeFloatingUi(): void {
     this.isFormaMenuOpen.set(false);
     this.isAccountMenuOpen.set(false);
-    this.isZoomMenuOpen.set(false);
-    this.activeTextToolbarMenu.set(null);
-    this.activeButtonToolbarMenu.set(null);
-    this.closeAddElementsPanel();
+  this.isZoomMenuOpen.set(false);
+  this.activeTextToolbarMenu.set(null);
+  this.activeButtonToolbarMenu.set(null);
+  this.activeProductFeedToolbarMenu.set(null);
+  this.closeAddElementsPanel();
     this.closePagesPanel();
     this.closeManagePages();
     this.closePageDesignPicker();
@@ -2602,12 +2738,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.activeTextToolbarMenu.set(null);
   }
 
-  setSelectedParagraphAlignment(align: StorefrontEditorParagraphNode['props']['align']): void {
+  setSelectedParagraphAlignment(align: StorefrontEditorTextNode['props']['align']): void {
     this.updateSelectedParagraphProps({ align });
+    this.activeTextToolbarMenu.set(null);
   }
 
   toggleSelectedParagraphBold(): void {
-    const component = this.selectedParagraphComponent();
+    const component = this.selectedTextComponent();
     if (!component) {
       return;
     }
@@ -2618,7 +2755,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   toggleSelectedParagraphItalic(): void {
-    const component = this.selectedParagraphComponent();
+    const component = this.selectedTextComponent();
     if (!component) {
       return;
     }
@@ -2629,7 +2766,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   toggleSelectedParagraphUnderline(): void {
-    const component = this.selectedParagraphComponent();
+    const component = this.selectedTextComponent();
     if (!component) {
       return;
     }
@@ -2650,12 +2787,21 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedParagraphProps({ color: normalized });
   }
 
-  toggleTextToolbarMenu(menu: 'font-family' | 'font-size' | 'color'): void {
+  toggleTextToolbarMenu(menu: 'style' | 'font-family' | 'link' | 'alignment' | 'color'): void {
     const next = this.activeTextToolbarMenu() === menu ? null : menu;
     this.activeTextToolbarMenu.set(next);
+    if (next === 'font-family') {
+      this.textFontSearch.set('');
+    }
     if (next === 'color') {
       this.activeColorPickerTab.set('brand');
-      this.syncCustomColorPickerFromHex(this.selectedParagraphComponent()?.props.color ?? '#082237');
+      this.syncCustomColorPickerFromHex(this.selectedTextComponent()?.props.color ?? '#082237');
+    }
+    if (next === 'link') {
+      const component = this.selectedTextComponent();
+      const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
+      this.textLinkPageId.set(linkedPage);
+      this.textLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
     }
   }
 
@@ -2664,7 +2810,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   saveSelectedParagraphColor(): void {
-    const color = this.selectedParagraphComponent()?.props.color;
+    const color = this.selectedTextComponent()?.props.color;
     if (!color) {
       return;
     }
@@ -2678,6 +2824,90 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   applySavedParagraphColor(color: string): void {
     this.updateSelectedParagraphColor(color);
+  }
+
+  updateSelectedTextStyle(style: StorefrontEditorTextStylePreset): void {
+    const component = this.selectedTextComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps(
+      buildStorefrontEditorTextProps(style, {
+        text: component.props.text,
+        color: component.props.color,
+        align: component.props.align,
+        href: component.props.href,
+        openInNewTab: component.props.openInNewTab,
+        fontStyle: component.props.fontStyle,
+        textDecoration: component.props.textDecoration,
+      })
+    );
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  updateTextFontSearch(value: string): void {
+    this.textFontSearch.set(value);
+  }
+
+  setTextLinkPage(pageId: string): void {
+    this.textLinkPageId.set(pageId);
+  }
+
+  setTextLinkOpenMode(mode: 'current' | 'new'): void {
+    this.textLinkOpenMode.set(mode);
+  }
+
+  saveSelectedTextLink(): void {
+    const href = this.buildManagedPageHref(this.textLinkPageId());
+    this.updateSelectedParagraphProps({
+      href,
+      openInNewTab: this.textLinkOpenMode() === 'new',
+    });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  removeSelectedTextLink(): void {
+    this.updateSelectedParagraphProps({
+      href: '',
+      openInNewTab: false,
+    });
+    this.activeTextToolbarMenu.set(null);
+  }
+
+  textStylePreviewFontSize(style: StorefrontEditorTextStylePreset): number {
+    return buildStorefrontEditorTextProps(style).fontSize;
+  }
+
+  private buildManagedPageHref(pageId: string): string {
+    if (pageId === 'home') {
+      return '/';
+    }
+
+    const page = this.managedPages().find((item) => item.id === pageId);
+    if (!page) {
+      return '/';
+    }
+
+    const slug = page.name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    return slug ? `/${slug}` : '/';
+  }
+
+  private findManagedPageIdForHref(href: string): string {
+    const normalizedHref = href.trim();
+    if (!normalizedHref || normalizedHref === '/') {
+      return 'home';
+    }
+
+    const match = this.managedPages().find((page) => this.buildManagedPageHref(page.id) === normalizedHref);
+    return match?.id ?? 'home';
   }
 
   startCustomColorCanvasDrag(event: MouseEvent): void {
@@ -2725,6 +2955,129 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       this.activeButtonColorPickerTab.set('brand');
       this.syncButtonCustomColorPickerFromHex(this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff');
     }
+  }
+
+  toggleProductFeedToolbarMenu(menu: Exclude<ProductFeedToolbarMenu, null>): void {
+    const next = this.activeProductFeedToolbarMenu() === menu ? null : menu;
+    this.activeProductFeedToolbarMenu.set(next);
+
+    if (next === 'settings') {
+      this.activeProductFeedSettingsSection.set('category');
+    }
+
+    if (next === 'color') {
+      this.productFeedTextColorValue.set(this.selectedProductFeedComponent()?.props.textColor ?? '#202124');
+    }
+  }
+
+  setActiveProductFeedSettingsSection(section: ProductFeedSettingsSection): void {
+    this.activeProductFeedSettingsSection.set(section);
+  }
+
+  applyProductFeedDesignPreset(preset: StorefrontEditorProductFeedDesignPreset): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps(
+      buildStorefrontEditorProductFeedProps(preset.id, {
+        category: component.props.category,
+        textColor: component.props.textColor,
+      })
+    );
+    this.activeProductFeedToolbarMenu.set(null);
+  }
+
+  setSelectedProductFeedCategory(category: string): void {
+    this.updateSelectedProductFeedProps({ category });
+  }
+
+  updateSelectedProductFeedTextColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.productFeedTextColorValue.set(normalized);
+    this.updateSelectedProductFeedProps({ textColor: normalized });
+  }
+
+  toggleSelectedProductFeedShowBadges(): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ showBadges: !component.props.showBadges });
+  }
+
+  toggleSelectedProductFeedShowComparePrice(): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ showCompareAtPrice: !component.props.showCompareAtPrice });
+  }
+
+  toggleSelectedProductFeedShowColorDots(): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ showColorDots: !component.props.showColorDots });
+  }
+
+  toggleSelectedProductFeedShowFilters(): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ showFilters: !component.props.showFilters });
+  }
+
+  toggleSelectedProductFeedShowSort(): void {
+    const component = this.selectedProductFeedComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ showSort: !component.props.showSort });
+  }
+
+  setSelectedProductFeedAddToCartMode(mode: StorefrontEditorProductFeedNode['props']['quickAddStyle']): void {
+    this.updateSelectedProductFeedProps({
+      quickAddStyle: mode,
+      showAddToCart: mode !== 'none',
+    });
+  }
+
+  updateSelectedProductFeedLimit(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedProductFeedProps({ limit: Math.max(1, Math.min(12, Math.round(parsed))) });
+  }
+
+  updateSelectedProductFeedColumns(value: string | number): void {
+    const parsed = Number(value);
+    const columns = parsed === 5 ? 5 : parsed === 4 ? 4 : 3;
+    this.updateSelectedProductFeedProps({ columns });
+  }
+
+  openProjectCatalogManager(): void {
+    const projectId = this.projectId();
+    if (!projectId) {
+      return;
+    }
+
+    const url = this.router.serializeUrl(this.router.createUrlTree(['/app/projects', projectId, 'catalog']));
+    window.open(url, '_blank', 'noopener');
   }
 
   updateSelectedButtonTextValue(value: string): void {
@@ -3813,7 +4166,9 @@ updatePageDesignTabScrollState(): void {
     ];
 
     return Array.isArray(value)
-      ? (JSON.parse(JSON.stringify(value)) as StorefrontEditorComponentNode[])
+      ? (JSON.parse(JSON.stringify(value)) as StorefrontEditorComponentNode[]).map((component) =>
+          this.normalizeLegacyTextComponent(component)
+        )
       : [];
   }
 
@@ -3851,10 +4206,12 @@ updatePageDesignTabScrollState(): void {
     return height > 0 ? height : null;
   }
 
-  componentTypeLabel(component: StorefrontEditorComponentNode): string {
-    switch (component.type) {
-      case 'heading':
-        return 'Heading';
+componentTypeLabel(component: StorefrontEditorComponentNode): string {
+  switch (component.type) {
+    case 'text':
+      return 'Text';
+    case 'heading':
+      return 'Heading';
       case 'paragraph':
         return 'Text';
       case 'image':
@@ -4472,14 +4829,47 @@ updatePageDesignTabScrollState(): void {
   }
 
   private canEditComponentText(component: StorefrontEditorComponentNode): boolean {
-    return component.type === 'heading' || component.type === 'paragraph' || component.type === 'button';
+    return component.type === 'text' || component.type === 'button';
+  }
+
+  private normalizeLegacyTextComponent(component: StorefrontEditorComponentNode): StorefrontEditorComponentNode {
+    if (component.type === 'heading') {
+      const textStyle = (`Heading ${component.props.level}` as StorefrontEditorTextStylePreset);
+      return {
+        ...component,
+        type: 'text',
+        name: 'Text',
+        props: buildStorefrontEditorTextProps(textStyle, {
+          text: component.props.text,
+          align: component.props.align,
+        }),
+      } as StorefrontEditorTextNode;
+    }
+
+    if (component.type === 'paragraph') {
+      return {
+        ...component,
+        type: 'text',
+        name: 'Text',
+        props: buildStorefrontEditorTextProps('Paragraph 2', {
+          text: component.props.text,
+          fontFamily: component.props.fontFamily,
+          fontSize: component.props.fontSize,
+          fontWeight: component.props.fontWeight,
+          fontStyle: component.props.fontStyle,
+          textDecoration: component.props.textDecoration,
+          color: component.props.color,
+          align: component.props.align,
+        }),
+      } as StorefrontEditorTextNode;
+    }
+
+    return component;
   }
 
   private readEditableComponentText(component: StorefrontEditorComponentNode): string {
     switch (component.type) {
-      case 'heading':
-        return component.props.text;
-      case 'paragraph':
+      case 'text':
         return component.props.text;
       case 'button':
         return component.props.label;
@@ -4493,9 +4883,7 @@ updatePageDesignTabScrollState(): void {
     value: string
   ): StorefrontEditorComponentNode {
     switch (component.type) {
-      case 'heading':
-        return { ...component, props: { ...component.props, text: value } };
-      case 'paragraph':
+      case 'text':
         return { ...component, props: { ...component.props, text: value } };
       case 'button':
         return { ...component, props: { ...component.props, label: value } };
@@ -4515,16 +4903,16 @@ updatePageDesignTabScrollState(): void {
   }
 
   private updateSelectedParagraphProps(
-    patch: Partial<StorefrontEditorParagraphNode['props']>
+    patch: Partial<StorefrontEditorTextNode['props']>
   ): void {
     const sectionId = this.selectedSectionId();
-    const component = this.selectedParagraphComponent();
+    const component = this.selectedTextComponent();
     if (!sectionId || !component) {
       return;
     }
 
     this.updateComponentNode(sectionId, component.id, (current) =>
-      current.type === 'paragraph'
+      current.type === 'text'
         ? {
             ...current,
             props: {
@@ -4536,9 +4924,9 @@ updatePageDesignTabScrollState(): void {
     );
   }
 
-  private updateSelectedButtonProps(
-    patch: Partial<StorefrontEditorButtonNode['props']>
-  ): void {
+private updateSelectedButtonProps(
+  patch: Partial<StorefrontEditorButtonNode['props']>
+): void {
     const sectionId = this.selectedSectionId();
     const component = this.selectedButtonComponent();
     if (!sectionId || !component) {
@@ -4555,8 +4943,30 @@ updatePageDesignTabScrollState(): void {
             },
           }
         : current
-    );
+  );
+}
+
+private updateSelectedProductFeedProps(
+  patch: Partial<StorefrontEditorProductFeedNode['props']>
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedProductFeedComponent();
+  if (!sectionId || !component) {
+    return;
   }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'product-feed'
+      ? {
+          ...current,
+          props: {
+            ...current.props,
+            ...patch,
+          },
+        }
+      : current
+  );
+}
 
   private readSavedParagraphColors(): string[] {
     try {
