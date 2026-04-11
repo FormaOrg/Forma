@@ -49,6 +49,7 @@ export interface StorefrontEditorAddElementsLibraryItem {
   componentType: StorefrontEditorComponentType;
   description: string;
   preview: StorefrontEditorAddElementsCardPreview;
+  previewImageSrc?: string;
   keywords: readonly string[];
 }
 

@@ -1,6 +1,9 @@
 import { Component, input } from '@angular/core';
 
+import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
+
 import { StorefrontEditorComponentNode } from './storefront-editor-component.model';
+import { StorefrontEditorBlockTextComponent } from './storefront-editor-block-text.component';
 import { StorefrontEditorBlockHeadingComponent } from './storefront-editor-block-heading.component';
 import { StorefrontEditorBlockParagraphComponent } from './storefront-editor-block-paragraph.component';
 import { StorefrontEditorBlockImageComponent } from './storefront-editor-block-image.component';
@@ -14,6 +17,7 @@ import { StorefrontEditorBlockBlogFeedComponent } from './storefront-editor-bloc
   selector: 'app-storefront-editor-component-host',
   standalone: true,
   imports: [
+    StorefrontEditorBlockTextComponent,
     StorefrontEditorBlockHeadingComponent,
     StorefrontEditorBlockParagraphComponent,
     StorefrontEditorBlockImageComponent,
@@ -34,6 +38,9 @@ import { StorefrontEditorBlockBlogFeedComponent } from './storefront-editor-bloc
   `],
   template: `
     @switch (node().type) {
+      @case ('text') {
+        <app-storefront-editor-block-text [node]="$any(node())" />
+      }
       @case ('heading') {
         <app-storefront-editor-block-heading [node]="$any(node())" />
       }
@@ -53,7 +60,7 @@ import { StorefrontEditorBlockBlogFeedComponent } from './storefront-editor-bloc
         <app-storefront-editor-block-graphic [node]="$any(node())" />
       }
       @case ('product-feed') {
-        <app-storefront-editor-block-product-feed [node]="$any(node())" />
+        <app-storefront-editor-block-product-feed [node]="$any(node())" [products]="products()" />
       }
       @case ('blog-feed') {
         <app-storefront-editor-block-blog-feed [node]="$any(node())" />
@@ -63,4 +70,5 @@ import { StorefrontEditorBlockBlogFeedComponent } from './storefront-editor-bloc
 })
 export class StorefrontEditorComponentHostComponent {
   readonly node = input.required<StorefrontEditorComponentNode>();
+  readonly products = input<ProjectCatalogProduct[]>([]);
 }
