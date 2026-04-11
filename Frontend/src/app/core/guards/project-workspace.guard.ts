@@ -34,6 +34,21 @@ export class ProjectWorkspaceGuard implements CanActivateChild {
       return of(this.router.createUrlTree(['/app/projects']));
     }
 
+    const cachedType = this.projectWorkspaceContextService.getProjectType(projectId);
+    if (cachedType) {
+      const allowedPaths = getProjectWorkspaceAllowedPaths(cachedType);
+
+      if (allowedPaths.includes(requestedPath)) {
+        return of(true);
+      }
+
+      return of(this.router.createUrlTree([
+        '/app/projects',
+        projectId,
+        getProjectWorkspaceDefaultPath(cachedType),
+      ]));
+    }
+
     return this.projectService.getProjectById(projectId).pipe(
       map((project) => {
         this.projectWorkspaceContextService.setProjectType(projectId, project.type);
