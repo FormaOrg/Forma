@@ -82,22 +82,13 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS: readonly Storefr
 
 export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEditorAddElementsLibraryItem[] = [
   {
-    id: 'heading',
-    title: 'Heading',
+    id: 'text',
+    title: 'Text',
     category: 'Text',
-    componentType: 'heading',
-    description: 'Large title text for hero sections and content blocks.',
+    componentType: 'text',
+    description: 'Flexible text block with heading and paragraph styles.',
     preview: 'headline',
-    keywords: ['title', 'headline', 'hero', 'heading'],
-  },
-  {
-    id: 'paragraph',
-    title: 'Paragraph',
-    category: 'Text',
-    componentType: 'paragraph',
-    description: 'Body copy for descriptions, details, and supporting content.',
-    preview: 'paragraph',
-    keywords: ['text', 'copy', 'body', 'description', 'paragraph'],
+    keywords: ['text', 'copy', 'body', 'description', 'paragraph', 'title', 'headline', 'hero', 'heading'],
   },
   {
     id: 'image',
@@ -142,6 +133,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     componentType: 'product-feed',
     description: 'Catalog-driven product strip for storefront sections.',
     preview: 'product-feed',
+    previewImageSrc: 'assets/app/project/editor/grid gallery/default.png',
     keywords: ['catalog', 'products', 'shop', 'price', 'store'],
   },
   {
