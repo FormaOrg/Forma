@@ -25,6 +25,7 @@ export class AuthService {
   private readonly rememberKey = 'forma_remember_me';
   private readonly loginVerificationKey = 'forma_login_verification';
   private readonly sessionValidationTtlMs = 10000;
+  private readonly sessionValidationKey = 'forma_session_validation';
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.loadUserFromStorage());
   currentUser$ = this.currentUserSubject.asObservable();
   private lastValidatedToken: string | null = null;
@@ -38,6 +39,7 @@ export class AuthService {
     private activityRealtimeService: ActivityRealtimeService,
     private themeService: ThemeService
   ) {
+    this.migrateSessionToLocalStorage();
     const storedUser = this.currentUserSubject.value;
     if (storedUser) {
       void this.applyUserPreferences(storedUser);
@@ -177,6 +179,12 @@ export class AuthService {
     }
 
     const now = Date.now();
+    if (this.isSessionValidationCached(token, now)) {
+      this.lastValidatedToken = token;
+      this.lastSessionValidationAt = now;
+      return of(true);
+    }
+
     if (
       this.lastValidatedToken === token &&
       now - this.lastSessionValidationAt < this.sessionValidationTtlMs
@@ -188,6 +196,7 @@ export class AuthService {
       map(() => {
         this.lastValidatedToken = token;
         this.lastSessionValidationAt = now;
+        this.cacheSessionValidation(token, now);
         return true;
       }),
       catchError(() => {
@@ -236,14 +245,12 @@ export class AuthService {
     }
 
     const persistForLongTerm = rememberMe ?? this.isRememberedSession();
-    const targetStorage = persistForLongTerm ? localStorage : sessionStorage;
-    const otherStorage = persistForLongTerm ? sessionStorage : localStorage;
 
-    this.clearSessionStorage(otherStorage);
-    targetStorage.setItem(this.tokenKey, response.accessToken);
-    targetStorage.setItem(this.refreshTokenKey, response.refreshToken);
-    targetStorage.setItem(this.userKey, JSON.stringify(response.user));
-    targetStorage.setItem(this.rememberKey, String(persistForLongTerm));
+    this.clearSessionStorage(sessionStorage);
+    localStorage.setItem(this.tokenKey, response.accessToken);
+    localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+    localStorage.setItem(this.userKey, JSON.stringify(response.user));
+    localStorage.setItem(this.rememberKey, String(persistForLongTerm));
     this.lastValidatedToken = response.accessToken;
     this.lastSessionValidationAt = Date.now();
     this.currentUserSubject.next(response.user);
@@ -251,9 +258,7 @@ export class AuthService {
   }
 
   async updateStoredUser(user: AuthUser): Promise<void> {
-    const isRemembered = this.isRememberedSession();
-    const storage = isRemembered ? localStorage : sessionStorage;
-    storage.setItem(this.userKey, JSON.stringify(user));
+    localStorage.setItem(this.userKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
     await this.applyUserPreferences(user);
   }
@@ -280,11 +285,54 @@ export class AuthService {
     return localStorage.getItem(key) ?? sessionStorage.getItem(key);
   }
 
+  private cacheSessionValidation(token: string, validatedAt: number): void {
+    localStorage.setItem(this.sessionValidationKey, JSON.stringify({ token, validatedAt }));
+  }
+
+  private isSessionValidationCached(token: string, now: number): boolean {
+    try {
+      const raw = localStorage.getItem(this.sessionValidationKey);
+      if (!raw) {
+        return false;
+      }
+
+      const parsed = JSON.parse(raw) as { token?: string; validatedAt?: number };
+      return parsed.token === token
+        && typeof parsed.validatedAt === 'number'
+        && now - parsed.validatedAt < this.sessionValidationTtlMs;
+    } catch {
+      return false;
+    }
+  }
+
+  private migrateSessionToLocalStorage(): void {
+    const hasLocalToken = !!localStorage.getItem(this.tokenKey);
+    const sessionToken = sessionStorage.getItem(this.tokenKey);
+
+    if (hasLocalToken || !sessionToken) {
+      return;
+    }
+
+    const sessionRefreshToken = sessionStorage.getItem(this.refreshTokenKey);
+    const sessionUser = sessionStorage.getItem(this.userKey);
+    const sessionRemember = sessionStorage.getItem(this.rememberKey);
+
+    localStorage.setItem(this.tokenKey, sessionToken);
+    if (sessionRefreshToken) {
+      localStorage.setItem(this.refreshTokenKey, sessionRefreshToken);
+    }
+    if (sessionUser) {
+      localStorage.setItem(this.userKey, sessionUser);
+    }
+    localStorage.setItem(this.rememberKey, sessionRemember ?? 'true');
+  }
+
   private clearSessionStorage(storage: Storage): void {
     storage.removeItem(this.tokenKey);
     storage.removeItem(this.refreshTokenKey);
     storage.removeItem(this.userKey);
     storage.removeItem(this.rememberKey);
+    storage.removeItem(this.sessionValidationKey);
   }
 
   private isRememberedSession(): boolean {
