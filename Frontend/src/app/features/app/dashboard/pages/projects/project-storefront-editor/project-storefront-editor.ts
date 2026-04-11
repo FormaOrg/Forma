@@ -37,6 +37,7 @@ import {
 import {
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
+  StorefrontEditorButtonNode,
   StorefrontEditorParagraphNode,
   createStorefrontEditorComponentNode,
 } from './storefront-editor-component.model';
@@ -50,6 +51,28 @@ type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 type PagesPanelLayoutMode = 'grid' | 'rows';
 type ComponentSelectionBox = { x: number; y: number; width: number; height: number };
+type RotationHandleCorner = 'nw' | 'ne' | 'se' | 'sw';
+type ButtonToolbarMenu =
+  | 'designs'
+  | 'edit-text'
+  | 'link'
+  | 'customize-icon'
+  | 'display-elements'
+  | 'settings'
+  | 'colors'
+  | 'text'
+  | 'borders'
+  | 'corners'
+  | 'shadow'
+  | 'spacing'
+  | null;
+type StorefrontEditorButtonDesignPreset = {
+  id: string;
+  label: string;
+  text: string;
+  iconName?: StorefrontEditorButtonNode['props']['iconName'];
+  patch: Partial<StorefrontEditorButtonNode['props']>;
+};
 type StorefrontPageDesignTemplate = {
   id: string;
   name: string;
@@ -57,6 +80,7 @@ type StorefrontPageDesignTemplate = {
   category: StorefrontPageDesignCategory;
   accent: 'linen' | 'cobalt' | 'ink' | 'sand';
 };
+type MediaManagerPurpose = 'general' | 'button-icon';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type SectionLibraryCategory =
   | 'Welcome'
@@ -91,6 +115,15 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
   private static readonly SECTION_LABEL_PROP_KEY = 'editorLabel';
   private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
+  private static readonly SAVED_BUTTON_COLORS_STORAGE_KEY = 'forma_saved_button_colors';
+  private static readonly ROTATION_CURSOR_HOTSPOT = 12;
+  private static readonly ROTATION_CURSOR_SIZE = 24;
+  private static readonly ROTATION_HANDLE_CURSOR_IMAGES: Record<RotationHandleCorner, string> = {
+    nw: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKfSURBVFhH7ZU7aFRREIbP/c9/5p69WYiJyGIUtQlIrCxEfDXWSsTeIoKVYKkokeADFdTCB4hioZWWotgpdlaiCJJKCwNGU1gbtbgym73LeIwx2exa5YNb3DMz/z/nPuY4t0KXKechzekZqbElze0JlVmkXBHKmyKEzf+1iXYDkDvesyQ5U+T5zp43YQ1aJkHA26QvCXzLEQ4k8e5gRecjUo4CmPVAWaMcsbFUa0lYoYoh52JObic5BuAcgOtwuOjhp1yWldpELnKyyk81F83vtmVJx5EAXAPwCUD555WVWTZ3RZEvVV2quyis8YZ6fVUAb6iB9yjh8JMOz+Bwnll2GMC+vhhHCbxXc5LT+oQ6bsCai/e7CXzw3usuZ6KXE3mer7M5CoF7mkNysghh2MZS/QWxhQFhP4AfKiyU+41abY2NKyKyEcArfQUEX66OsWHjqf6C2MLc+x1Nc/gyhnDcxixCPp1rkE8ajUZhY6n+P6kK+1zfgAemVDgXOWVFFZsbEPTdT4w7l6U5S8IWE7ir5lHkgV3/W36KzVs0VXGN3KL/MYCvRVEMLiTadjSkOYvCCgTwZnOQeBm362lNV6lM1juXA/gM4PtgjGt7at7emoHkNt09yedpTEk1OiYVrhByTH87gmfSWEWq1RGVmFDOCuRqdQ/nJpoDJcsO6X2/yCahPA4hjPakAQCv9XcLDLda4peRZTqEdg25oQhgsvVBnu5JA8G5YZ3vums9z51zF7SBQmQvnHuUISsD8HCrc+xJA0pr5M42j1PnpvU00yk4N9vxYo9z3uanWh1jRWMIB+l9+yzXS8i39Xq93+alGsvGiscQjun3oI9dyI8DyZGb1nYNayKUS0K+q5Ejdj2t6TrWLCXN7RmpsZLmrLBcfgG/U6awxLbKxgAAAABJRU5ErkJggg==',
+    ne: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKhSURBVFhH7ZZBiE1RGMe/8z//893zXm+mKfEQUVhYSGoKsVHKQkzKWshKspwyKcUoCoWoyU5TrOzsJjU7KykLNkxGocmaKF2dN3Omb05DY+Y9K796de/5vvP//9+5p3uuyH/+QL0IZU/PKI0tZW/XsWZBZCuBSYVe/icBrHnl/T4An733tUJv9TyANY8hHAfwDUBdMdy3tUw5f0VY4RjCeXpfA/geVc/Z2mKUWssiiyl5LS25c66G4KOIXBeRmxC5RPIkycENItXCCLOUmn9FFlFy2sF1AnRC5B9Qe/jaA+n6QwDvRnLnwggrCJEFGuQOJaeSOYGppupBde4AnTtB8ArJibRCOQyBsaY0V604hBUYqKqNSr6EQ+1FnhwTga23VDdVXi8C+JLCEHin4vfbnlJ/SViBVqs1QPJZehwAXoUQttl6Isa4NgYdTyEA/AjAEVsv9ZeEFdglwgA+Ssut0Elbs1SqI6knhai832trpf6SsAKJyvuREMJQvl+sJ4YwPPc43m/u6+vP46X2klkov5Df9SnDeHp/BPCeHbf9f40V+p1YrqV9A2AGkJ9BZH7PlP1dZz5dOry8H4ZHHYA7dryc03WyUUNkDUTSGTKzXiT2PMD8XzRQMDF7iHF3WUuUGsumFM5AcDk9BpKny1qm1FoWWSwAQ8rwOMa4Lt3TuVNpBQBczT0KHYvUGz0JQGB07kX0QkTonDs0F+B2x5x84D3TirztSYC02ZR8mkwJPGw1Goc714LRSD3r2TGfaYawvScBEu12u0ngeT6c5o7v6c5eAL+2qmqP7S+1lo0VbTcaq0m+yd8S4lznyA4IR21fqbFirHi/6haSn7J5g3rG1su5XcOaRMbBqNXrSvWCHS/ndB1rVlL29ozSOFH2/MfyC2eVpgMgU3wWAAAAAElFTkSuQmCC',
+    se: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKhSURBVFhH7ZU9aBVBFIVnz5y5O+/lQUxEHiaiNgGJlYWIf421ErG3iGAlWCpKJPiDCmrhD4hioZWWotgpdlaiCJJKCwNGU1gbY7Fy83bDzRCTmPeeVT7YYufee86d2Z0Z59boMMUipDldIzW2pLkdx5rVyGEhPwrlqh1PazqGNenL80Ehv2TICu99EUM4aeNpbdtY8Uaj0SvkhyzLiuphq4kjNi/VWDVWdL9znsBrAIUHJtUczk3pO4CZ3PvdNj/VWhWV2A7nGIAnuuxw7mld5ACyTE0uR8qJsonp4NxQVxrIvZzzLZOJATcQc+/3lg1c03hguKv/A4B3XWkghDAilGe9Ilv1nVl2dG7Wzo1XOQK5IZQLXWkgheB5D18IOZrGKlKtVZMKKyRf6SchuTONKalGR6jE+2PcCOAXgG+bnMu7aloxP7XWDzmmsw/gHTue1qwIK1CR5ihVrF6v9wP4oQ3UyO1L1SzLvOMi/C0vijzW7UbggR23+SvCFo85lxEYDwgjVtDmKLnIWTXXU7DH9fRV46n2sljRZrNZF/K5Cgv5wsYsMYRTuu0AzLZ15NrC9TE2Cb4pj9G3IrLFxpVmrbZBKI/KU242IByy8VR/SWxhPYQhkhPl93xoY0qe54PRy2k938ucz+L9PpuT6i/LvDi5i+TU3FUKfOqJcQTAQWbZMThcosNLOPz2Xlcm0+12e3Ojsa4tc6UqjiLfq7tcDcpPkD5fA3CTjsPWWEl1V0wlkIuc0X3ssqzw8JNwuALgFoCLJEd1hQaciwttW6Sa/4QVqlGOl9frjN7nNrYYqdaqsaI5wmECP0lfCHjPORdsXEnrO4I1qOf5HpLT3rOIkPtdNbYsaCKEbUJ5HynX/1sDim0iJc3tGqmxkuas0S5/AKB7prDOJAedAAAAAElFTkSuQmCC',
+    sw: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKoSURBVFhH7ZYxaFRBFEXf3Lnz/uyyCYLoqigKmsJCRAioaCMIFqJBsBYVKxFLQRGEGEFBBRWFYCcBrezsgpDOSgQLbTQYQSVYGxRk5X3zw2SiYbPZTZUDy+7/7859d2f+zqzIKovQ+ge5pmfkjVNybddJmxWql6MW7yLjYHo/H9M10iY16jkPtMS5Fsmv/arb03o+dtmk5gHheNXczb5Ivm/WautSXe7RMalpoyj2EfwBj5aHnwLQIvDRe2/vr5rNZj3V514dUZnVQ9hJctqTrUg9T8GIBWjUakcJPLHPSr7YJBJ7EoDkB+9pTR7bNYB71tQ5d0RECOC1RzkTIz0JEKm3FTpaXQO4US6Bc2fKeowbleFZAIZ6EiCH5Fl7FiAYzmsVuVfH5MZGQe4tZ0AwnteM3KNrVA3sYQMwDZGZmsj6njeumPuK5Z6A+7YMwftL6f18TNeZCyAyAMhvm4lGo7FmsQBz6RbRtE1qFMCH9L6lDGPp/f/pc1LdkqgMtvX19RP4ZLthDGHeUhipNoQwVHh/Zb6iwxCpQeH9fgC/bCMqVBc0qFDohGkC+HSPCNNa7t8WqUEAjpUhypnQsRjjhrReakIYAPDWoTzAXqbPjZH7t0VqoOIPVocTgO+F16sN1a2p5oQIvMhzuPLseLOmKLak9dy/LVKDutTXEhi1I9umuzwpyXGC1+ncKXXuUF31MIFJO8qVnKyRu5YVwEhDGJHcHcAHAD5XYWznhHPlq/ovYcuh5FQ1LvddEvMj/GWzSEFykORpiFwTkTsicguCLxbAZkjJm5U+9+yI+REWElUvAPhp+0cM4WJay72WRWpcUTA8KpcCmIkhnExr+fiuUTVQ6N3ZX8i3wvsDK9LcSAIME5gIIjtWrLmRNsvJtT0jb2zkmlVS/gAQwqYDxl3EgAAAAABJRU5ErkJggg==',
+  };
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -182,6 +215,9 @@ export class ProjectStorefrontEditor {
     | null = null;
   private activeColorCanvasDrag = false;
   private activeColorHueDrag = false;
+  private activeButtonColorCanvasDrag = false;
+  private activeButtonColorHueDrag = false;
+  private readonly rotationHandleCursorCache = new Map<string, string>();
 
   readonly project = signal<Project | null>(null);
   readonly storefront = signal<ProjectStorefront | null>(null);
@@ -247,7 +283,7 @@ readonly canScrollPageDesignTabsRight = signal(false);
   readonly componentContextMenuSectionId = signal<string | null>(null);
   readonly componentContextMenuComponentId = signal<string | null>(null);
   readonly sectionContextMenuPosition = signal({ x: 0, y: 0 });
-  readonly componentClipboard = signal<StorefrontEditorComponentNode | null>(null);
+  readonly componentClipboard = signal<StorefrontEditorComponentNode[] | null>(null);
   readonly isEditingComponentName = signal(false);
   readonly editingComponentNameId = signal<string | null>(null);
   readonly editingComponentNameValue = signal('');
@@ -273,6 +309,7 @@ readonly hasPreviewStageScrollbar = signal(false);
   readonly isPublishing = signal(false);
   readonly isUnpublishing = signal(false);
   readonly isMediaUploading = signal(false);
+  readonly mediaManagerPurpose = signal<MediaManagerPurpose>('general');
   readonly errorMessage = signal('');
   readonly mediaAssets = signal<StorefrontMediaManagerAsset[]>([]);
 
@@ -322,8 +359,15 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'paragraph' ? component : null;
   });
+  readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'button' ? component : null;
+  });
   readonly isParagraphToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedParagraphComponent() !== null
+  );
+  readonly isButtonToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
   );
   readonly activeTextToolbarMenu = signal<'font-family' | 'font-size' | 'color' | null>(null);
   readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
@@ -331,6 +375,14 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly customPickerHue = signal(206);
   readonly customPickerSaturation = signal(74);
   readonly customPickerBrightness = signal(22);
+  readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
+  readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
+  readonly savedButtonColors = signal<string[]>([]);
+  readonly buttonCustomPickerHue = signal(228);
+  readonly buttonCustomPickerSaturation = signal(72);
+  readonly buttonCustomPickerBrightness = signal(96);
+  readonly buttonEditTextValue = signal('');
+  readonly buttonLinkValue = signal('');
   readonly brandParagraphColors = computed(() => {
     const defaults = ['#ffffff', '#edf4fb', '#bcd1e7', '#091b2f', '#082237', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8', 'transparent'];
     const merged = [...defaults, ...this.savedParagraphColors()];
@@ -351,8 +403,186 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const color = this.selectedParagraphComponent()?.props.color ?? '#082237';
     return color.replace('#', '').toUpperCase();
   });
+  readonly brandButtonColors = computed(() => {
+    const defaults = ['#0f172a', '#355cff', '#1f4d30', '#ffe066', '#ffffff', '#f8fafc', '#111827', '#e5ecff', '#ffefe5', 'transparent'];
+    const merged = [...defaults, ...this.savedButtonColors()];
+    const unique: string[] = [];
+    for (const color of merged) {
+      const normalized = color.trim().toLowerCase();
+      if (normalized && !unique.includes(normalized)) {
+        unique.push(normalized);
+      }
+    }
+    return unique.slice(0, 10);
+  });
+  readonly buttonCustomColorCanvasBackground = computed(() => `hsl(${this.buttonCustomPickerHue()} 100% 50%)`);
+  readonly buttonCustomColorCanvasHandleLeft = computed(() => `${this.buttonCustomPickerSaturation()}%`);
+  readonly buttonCustomColorCanvasHandleTop = computed(() => `${100 - this.buttonCustomPickerBrightness()}%`);
+  readonly buttonCustomColorSpectrumHandleLeft = computed(() => `${(this.buttonCustomPickerHue() / 360) * 100}%`);
+  readonly buttonCustomColorHexValue = computed(() => {
+    const color = this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff';
+    return color.replace('#', '').toUpperCase();
+  });
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
+  readonly buttonTextPresets = ['Paragraph 1', 'Paragraph 2', 'Heading 4'] as const;
+  readonly buttonFontFamilies = ['Fira Mono', 'Fira Sans', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
+  readonly buttonFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
+  readonly buttonFontWeights: ReadonlyArray<StorefrontEditorButtonNode['props']['fontWeight']> = [400, 500, 600, 700];
+  readonly buttonIconChoices: ReadonlyArray<StorefrontEditorButtonNode['props']['iconName']> = [
+    'external-link',
+    'invite-plus',
+    'sparkles',
+    'package',
+    'wand',
+    'eye',
+  ];
+  readonly buttonDesignPresets: ReadonlyArray<StorefrontEditorButtonDesignPreset> = [
+    {
+      id: 'valuation',
+      label: 'GET A VALUATION',
+      text: 'Get a valuation',
+      iconName: 'external-link',
+      patch: {
+        label: 'Get a valuation',
+        backgroundColor: '#020817',
+        textColor: '#ffffff',
+        borderColor: '#020817',
+        borderWidth: 0,
+        borderStyle: 'none',
+        radius: 18,
+        shadow: 'none',
+        showIcon: true,
+        iconName: 'external-link',
+        iconPosition: 'left',
+        fontFamily: 'Fira Sans',
+        fontWeight: 600,
+      },
+    },
+    {
+      id: 'learn-more',
+      label: 'LEARN MORE',
+      text: 'Learn more',
+      iconName: 'external-link',
+      patch: {
+        label: 'Learn more',
+        backgroundColor: '#0f172a',
+        textColor: '#ffffff',
+        borderColor: '#0f172a',
+        borderWidth: 0,
+        borderStyle: 'none',
+        radius: 8,
+        shadow: 'none',
+        showIcon: true,
+        iconName: 'external-link',
+        iconPosition: 'right',
+        fontWeight: 700,
+      },
+    },
+    {
+      id: 'contact-plus',
+      label: 'Contact Us',
+      text: 'Contact Us',
+      iconName: 'invite-plus',
+      patch: {
+        label: 'Contact Us',
+        backgroundColor: '#2b5133',
+        textColor: '#ffffff',
+        borderColor: '#2b5133',
+        borderWidth: 0,
+        borderStyle: 'none',
+        radius: 10,
+        shadow: 'soft',
+        showIcon: true,
+        iconName: 'invite-plus',
+        iconPosition: 'right',
+      },
+    },
+    {
+      id: 'best-sellers',
+      label: 'Best Sellers',
+      text: 'Best Sellers',
+      iconName: 'external-link',
+      patch: {
+        label: 'Best Sellers',
+        backgroundColor: '#d9fb7c',
+        textColor: '#193117',
+        borderColor: '#193117',
+        borderWidth: 2,
+        borderStyle: 'solid',
+        radius: 10,
+        shadow: 'none',
+        showIcon: true,
+        iconName: 'external-link',
+        iconPosition: 'right',
+        fontWeight: 500,
+      },
+    },
+    {
+      id: 'check-availability',
+      label: 'Check Availability',
+      text: 'Check availability',
+      iconName: 'external-link',
+      patch: {
+        label: 'Check Availability',
+        backgroundColor: '#ffffff',
+        textColor: '#101828',
+        borderColor: '#101828',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        radius: 999,
+        shadow: 'none',
+        showIcon: true,
+        iconName: 'external-link',
+        iconPosition: 'right',
+        fontWeight: 400,
+      },
+    },
+    {
+      id: 'start-now',
+      label: 'Start Now',
+      text: 'Start Now',
+      patch: {
+        label: 'Start Now',
+        backgroundColor: '#ffe066',
+        textColor: '#18181b',
+        borderColor: '#18181b',
+        borderWidth: 4,
+        borderStyle: 'solid',
+        radius: 8,
+        shadow: 'none',
+        showIcon: false,
+        fontFamily: 'Fira Sans',
+        fontWeight: 500,
+      },
+    },
+    {
+      id: 'book-now',
+      label: 'Book Now',
+      text: 'Book Now',
+      iconName: 'sparkles',
+      patch: {
+        label: 'Book Now',
+        backgroundColor: '#355cff',
+        textColor: '#ffffff',
+        borderColor: '#355cff',
+        borderWidth: 0,
+        borderStyle: 'none',
+        radius: 999,
+        shadow: 'strong',
+        showIcon: true,
+        iconName: 'external-link',
+        iconPosition: 'right',
+        fontWeight: 500,
+      },
+    },
+  ];
+  readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['props']['shadow']; label: string }> = [
+    { id: 'none', label: 'None' },
+    { id: 'soft', label: 'Soft' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'strong', label: 'Strong' },
+  ];
   readonly selectedComponentGroupId = computed(() => {
       const selected = this.selectedComponent();
       return selected?.groupId ?? null;
@@ -565,6 +795,20 @@ effect(() => {
   this.savedParagraphColors.set(this.readSavedParagraphColors());
 });
 
+effect(() => {
+  this.savedButtonColors.set(this.readSavedButtonColors());
+});
+
+effect(() => {
+  if (!this.selectedButtonComponent()) {
+    this.activeButtonToolbarMenu.set(null);
+    return;
+  }
+
+  this.buttonEditTextValue.set(this.selectedButtonComponent()!.props.label);
+  this.buttonLinkValue.set(this.selectedButtonComponent()!.props.href);
+});
+
  effect(() => {
    const selectedSectionId = this.selectedSectionId();
       if (!selectedSectionId) {
@@ -617,6 +861,12 @@ effect(() => {
     if (event.key === 'Escape' && this.isComponentContextMenuOpen()) {
       event.preventDefault();
       this.closeComponentContextMenu();
+      return;
+    }
+
+    if (event.key === 'Escape' && this.activeButtonToolbarMenu()) {
+      event.preventDefault();
+      this.activeButtonToolbarMenu.set(null);
       return;
     }
 
@@ -747,12 +997,13 @@ effect(() => {
       this.isAccountMenuOpen.set(false);
       this.isZoomMenuOpen.set(false);
       this.isAddPageMenuOpen.set(false);
-      this.sectionOptionsMenuId.set(null);
-      this.pageCardMenuId.set(null);
-      this.activeTextToolbarMenu.set(null);
-      this.closeComponentContextMenu();
-      return;
-    }
+   this.sectionOptionsMenuId.set(null);
+   this.pageCardMenuId.set(null);
+   this.activeTextToolbarMenu.set(null);
+   this.activeButtonToolbarMenu.set(null);
+   this.closeComponentContextMenu();
+   return;
+ }
 
     if ((this.isFormaMenuOpen() || this.isAccountMenuOpen() || this.isZoomMenuOpen()) &&
       !target.closest('.storefront-editor__floating-shell')) {
@@ -791,15 +1042,25 @@ effect(() => {
       }
     }
 
-    if (this.activeTextToolbarMenu()) {
-      if (!target.closest('.storefront-editor__context-toolbar-shell')) {
-        this.activeTextToolbarMenu.set(null);
-      }
-    }
+ if (this.activeTextToolbarMenu()) {
+   if (!target.closest('.storefront-editor__context-toolbar-shell')) {
+     this.activeTextToolbarMenu.set(null);
+   }
+ }
 
-    if (this.isComponentContextMenuOpen()) {
-      if (!target.closest('.storefront-editor__component-context-menu')) {
-        this.closeComponentContextMenu();
+ if (this.activeButtonToolbarMenu()) {
+   if (
+     !target.closest(
+       '.storefront-editor__context-toolbar-shell, .storefront-editor__button-toolbar-designs-panel, .storefront-editor__button-toolbar-side-panel'
+     )
+   ) {
+     this.activeButtonToolbarMenu.set(null);
+   }
+ }
+
+ if (this.isComponentContextMenuOpen()) {
+   if (!target.closest('.storefront-editor__component-context-menu')) {
+     this.closeComponentContextMenu();
       }
     }
   }
@@ -812,11 +1073,23 @@ effect(() => {
       return;
     }
 
-    if (this.activeColorHueDrag) {
-      event.preventDefault();
-      this.updateCustomColorFromHueEvent(event);
-      return;
-    }
+  if (this.activeColorHueDrag) {
+    event.preventDefault();
+    this.updateCustomColorFromHueEvent(event);
+    return;
+  }
+
+  if (this.activeButtonColorCanvasDrag) {
+    event.preventDefault();
+    this.updateButtonCustomColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeButtonColorHueDrag) {
+    event.preventDefault();
+    this.updateButtonCustomColorFromHueEvent(event);
+    return;
+  }
 
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
@@ -908,17 +1181,23 @@ effect(() => {
   }
 
   @HostListener('document:mouseup', ['$event'])
-  handleComponentPointerUp(event: MouseEvent): void {
-    if (this.activeColorCanvasDrag || this.activeColorHueDrag) {
-      this.activeColorCanvasDrag = false;
-      this.activeColorHueDrag = false;
-      return;
-    }
+handleComponentPointerUp(event: MouseEvent): void {
+  if (this.activeColorCanvasDrag || this.activeColorHueDrag) {
+    this.activeColorCanvasDrag = false;
+    this.activeColorHueDrag = false;
+    return;
+  }
 
-    if (this.activeAddElementsComponentDrag) {
-      this.finishAddElementsComponentDrag(event);
-      return;
-    }
+  if (this.activeButtonColorCanvasDrag || this.activeButtonColorHueDrag) {
+    this.activeButtonColorCanvasDrag = false;
+    this.activeButtonColorHueDrag = false;
+    return;
+  }
+
+  if (this.activeAddElementsComponentDrag) {
+    this.finishAddElementsComponentDrag(event);
+    return;
+  }
 
     this.activeComponentDrag = null;
     this.activeResize = null;
@@ -1451,13 +1730,14 @@ effect(() => {
       return;
     }
 
-    const component =
-      this.readSectionComponents(section).find((item) => selectedIds.has(item.id)) ?? null;
-    if (!component) {
+    const componentsToCopy = this.getSelectedComponentsForBatchAction(section);
+    if (!componentsToCopy.length) {
       return;
     }
 
-    this.componentClipboard.set(JSON.parse(JSON.stringify(component)) as StorefrontEditorComponentNode);
+    this.componentClipboard.set(
+      JSON.parse(JSON.stringify(componentsToCopy)) as StorefrontEditorComponentNode[]
+    );
     this.closeComponentContextMenu();
   }
 
@@ -1476,24 +1756,19 @@ effect(() => {
       (max, component) => Math.max(max, component.zIndex || 0),
       0
     );
-    const nextComponent = JSON.parse(JSON.stringify(clipboard)) as StorefrontEditorComponentNode;
-    nextComponent.id = `${clipboard.type}-${Date.now()}`;
-    nextComponent.frame = {
-      ...nextComponent.frame,
-      x: Math.max(0, nextComponent.frame.x + 20),
-      y: Math.max(0, nextComponent.frame.y + 20),
-    };
-    nextComponent.zIndex = maxZIndex + 1;
-    nextComponent.groupId = undefined;
+    const { clones, nextIds } = this.cloneComponentsForBatchInsert(clipboard, maxZIndex + 1, 20);
+    if (!clones.length) {
+      return;
+    }
 
-    this.updateSectionComponents(sectionId, (components) => [...components, nextComponent], {
+    this.updateSectionComponents(sectionId, (components) => [...components, ...clones], {
       selectedSectionId: sectionId,
       syncRail: true,
     });
-      this.selectedComponentId.set(nextComponent.id);
-      this.selectedComponentIds.set([nextComponent.id]);
-      this.isolatedGroupComponentId.set(null);
-      this.closeComponentContextMenu();
+    this.selectedComponentId.set(nextIds[nextIds.length - 1] ?? null);
+    this.selectedComponentIds.set(nextIds);
+    this.isolatedGroupComponentId.set(null);
+    this.closeComponentContextMenu();
   }
 
   componentKindLabel(type: StorefrontEditorComponentType): string {
@@ -1715,22 +1990,15 @@ effect(() => {
 
           const components = this.readSectionComponents(item);
           let nextZIndex = components.reduce((max, component) => Math.max(max, component.zIndex ?? 1), 0) + 1;
-          const duplicates = components
-            .filter((component) => selectedIds.includes(component.id))
-            .map((component) => {
-              const clone = JSON.parse(JSON.stringify(component)) as StorefrontEditorComponentNode;
-              clone.id = createStorefrontEditorComponentNode(component.type).id;
-              clone.frame = {
-                ...clone.frame,
-                x: clone.frame.x + 24,
-                y: clone.frame.y + 24,
-              };
-              clone.zIndex = nextZIndex++;
-              nextIds.push(clone.id);
-              return clone;
-            });
+          const selectedComponents = this.getSelectedComponentsForBatchAction(item);
+          const { clones, nextIds: duplicateIds } = this.cloneComponentsForBatchInsert(
+            selectedComponents,
+            nextZIndex,
+            24
+          );
+          nextIds.push(...duplicateIds);
 
-          return this.writeSectionComponents(item, [...components, ...duplicates]);
+          return this.writeSectionComponents(item, [...components, ...clones]);
         }),
       },
     }), { syncRail: false });
@@ -2129,6 +2397,7 @@ effect(() => {
     this.isAccountMenuOpen.set(false);
     this.isZoomMenuOpen.set(false);
     this.activeTextToolbarMenu.set(null);
+    this.activeButtonToolbarMenu.set(null);
     this.closeAddElementsPanel();
     this.closePagesPanel();
     this.closeManagePages();
@@ -2460,6 +2729,286 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
   }
 
+  toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
+    const next = this.activeButtonToolbarMenu() === menu ? null : menu;
+    this.activeButtonToolbarMenu.set(next);
+
+    if (next === 'edit-text') {
+      this.buttonEditTextValue.set(this.selectedButtonComponent()?.props.label ?? '');
+    }
+
+    if (next === 'link' || next === 'settings') {
+      this.buttonLinkValue.set(this.selectedButtonComponent()?.props.href ?? '');
+    }
+
+    if (next === 'colors') {
+      this.activeButtonColorPickerTab.set('brand');
+      this.syncButtonCustomColorPickerFromHex(this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff');
+    }
+  }
+
+  updateSelectedButtonTextValue(value: string): void {
+    this.buttonEditTextValue.set(value);
+    this.updateSelectedButtonProps({ label: value });
+  }
+
+  updateSelectedButtonLinkValue(value: string): void {
+    this.buttonLinkValue.set(value);
+    this.updateSelectedButtonProps({ href: value });
+  }
+
+  updateSelectedButtonTextPreset(value: StorefrontEditorButtonNode['props']['textPreset']): void {
+    const nextPatch: Partial<StorefrontEditorButtonNode['props']> = { textPreset: value };
+
+    switch (value) {
+      case 'Paragraph 1':
+        nextPatch.fontFamily = 'Fira Sans';
+        nextPatch.fontSize = 16;
+        nextPatch.fontWeight = 500;
+        break;
+      case 'Heading 4':
+        nextPatch.fontFamily = 'Poppins';
+        nextPatch.fontSize = 18;
+        nextPatch.fontWeight = 600;
+        break;
+      case 'Paragraph 2':
+      default:
+        nextPatch.fontFamily = 'Fira Mono';
+        nextPatch.fontSize = 15;
+        nextPatch.fontWeight = 500;
+        break;
+    }
+
+    this.updateSelectedButtonProps(nextPatch);
+  }
+
+  updateSelectedButtonFontFamily(value: string): void {
+    this.updateSelectedButtonProps({ fontFamily: value });
+  }
+
+  updateSelectedButtonFontSize(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+  }
+
+  updateSelectedButtonFontWeight(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    const nextWeight = [400, 500, 600, 700].includes(parsed) ? (parsed as 400 | 500 | 600 | 700) : 500;
+    this.updateSelectedButtonProps({ fontWeight: nextWeight });
+  }
+
+  updateSelectedButtonTextColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ textColor: normalized });
+  }
+
+  updateSelectedButtonBackgroundColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+    if (normalized !== 'transparent') {
+      this.syncButtonCustomColorPickerFromHex(normalized);
+    }
+
+    this.updateSelectedButtonProps({ backgroundColor: normalized });
+  }
+
+  updateSelectedButtonBorderStyle(value: StorefrontEditorButtonNode['props']['borderStyle']): void {
+    this.updateSelectedButtonProps({
+      borderStyle: value,
+      borderWidth: value === 'none' ? 0 : Math.max(this.selectedButtonComponent()?.props.borderWidth ?? 1, 1),
+    });
+  }
+
+  updateSelectedButtonBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ borderWidth: Math.max(0, Math.min(12, Math.round(parsed))) });
+  }
+
+  updateSelectedButtonBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ borderColor: normalized });
+  }
+
+  updateSelectedButtonRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
+  }
+
+  updateSelectedButtonShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
+    this.updateSelectedButtonProps({ shadow: value });
+  }
+
+  updateSelectedButtonPadding(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ padding: Math.max(6, Math.min(40, Math.round(parsed))) });
+  }
+
+  toggleSelectedButtonShowText(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    if (component.props.showText && !component.props.showIcon) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ showText: !component.props.showText });
+  }
+
+  toggleSelectedButtonShowIcon(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    if (component.props.showIcon && !component.props.showText) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ showIcon: !component.props.showIcon });
+  }
+
+  updateSelectedButtonIconName(value: StorefrontEditorButtonNode['props']['iconName']): void {
+    this.updateSelectedButtonProps({ iconName: value, customIconSrc: null, showIcon: true });
+  }
+
+  updateSelectedButtonIconMotion(value: StorefrontEditorButtonNode['props']['iconMotion']): void {
+    this.updateSelectedButtonProps({ iconMotion: value });
+  }
+
+  updateSelectedButtonCustomIcon(value: string | null): void {
+    this.updateSelectedButtonProps({ customIconSrc: value, showIcon: true });
+  }
+
+  toggleSelectedButtonIconPosition(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({
+      iconPosition: component.props.iconPosition === 'left' ? 'right' : 'left',
+      showIcon: true,
+    });
+  }
+
+  applyButtonDesignPreset(preset: StorefrontEditorButtonDesignPreset): void {
+    this.updateSelectedButtonProps(preset.patch);
+    this.buttonEditTextValue.set(preset.patch.label ?? this.buttonEditTextValue());
+  }
+
+  setActiveButtonColorPickerTab(tab: 'brand' | 'custom'): void {
+    this.activeButtonColorPickerTab.set(tab);
+  }
+
+  saveSelectedButtonColor(): void {
+    const color = this.selectedButtonComponent()?.props.backgroundColor;
+    if (!color) {
+      return;
+    }
+
+    const normalized = color.trim().toLowerCase();
+    const next = [normalized, ...this.savedButtonColors().filter((item) => item !== normalized)].slice(0, 12);
+    this.savedButtonColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_BUTTON_COLORS_STORAGE_KEY, JSON.stringify(next));
+    this.activeButtonColorPickerTab.set('brand');
+  }
+
+  applySavedButtonColor(color: string): void {
+    this.updateSelectedButtonBackgroundColor(color);
+  }
+
+  startButtonCustomColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeButtonColorCanvasDrag = true;
+    this.updateButtonCustomColorFromCanvasEvent(event);
+  }
+
+  startButtonCustomColorHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeButtonColorHueDrag = true;
+    this.updateButtonCustomColorFromHueEvent(event);
+  }
+
+  updateButtonCustomColorHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedButtonBackgroundColor(normalized);
+  }
+
+  removeSavedButtonColor(color: string, event: MouseEvent): void {
+    event.stopPropagation();
+    const next = this.savedButtonColors().filter((item) => item !== color);
+    this.savedButtonColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_BUTTON_COLORS_STORAGE_KEY, JSON.stringify(next));
+  }
+
+  buttonDesignPreviewStyle(preset: StorefrontEditorButtonDesignPreset): Record<string, string> {
+    const patch = preset.patch;
+    const backgroundColor = patch.backgroundColor ?? '#0f172a';
+    const textColor = patch.textColor ?? '#ffffff';
+    const borderStyle = patch.borderStyle ?? 'none';
+    const borderWidth = borderStyle === 'none' ? 0 : patch.borderWidth ?? 1;
+    const borderColor = patch.borderColor ?? backgroundColor;
+    const radius = patch.radius ?? 12;
+    const fontFamily = patch.fontFamily ?? 'Fira Sans';
+    const fontWeight = patch.fontWeight ?? 500;
+
+    return {
+      background: backgroundColor,
+      color: textColor,
+      borderStyle,
+      borderWidth: `${borderWidth}px`,
+      borderColor: borderStyle === 'none' ? 'transparent' : borderColor,
+      borderRadius: `${radius}px`,
+      fontFamily,
+      fontWeight: String(fontWeight),
+      boxShadow: this.getButtonShadowCssValue(patch.shadow ?? 'none'),
+    };
+  }
+
+  buttonShadowPreviewStyle(shadow: StorefrontEditorButtonNode['props']['shadow']): Record<string, string> {
+    return {
+      boxShadow: this.getButtonShadowCssValue(shadow),
+    };
+  }
+
   triggerPublishFromMenu(): void {
     this.closeFloatingUi();
     this.publishStorefront();
@@ -2472,11 +3021,19 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   openMediaManager(): void {
     this.closeFloatingUi();
+    this.mediaManagerPurpose.set('general');
+    this.isMediaManagerOpen.set(true);
+  }
+
+  openMediaManagerForButtonIcon(): void {
+    this.closeFloatingUi();
+    this.mediaManagerPurpose.set('button-icon');
     this.isMediaManagerOpen.set(true);
   }
 
   closeMediaManager(): void {
     this.isMediaManagerOpen.set(false);
+    this.mediaManagerPurpose.set('general');
   }
 
   uploadMediaFromManager(files: FileList): void {
@@ -2539,6 +3096,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
           },
           error: () => this.toastService.error('Unable to import this Pexels photo right now.'),
         });
+      return;
+    }
+
+    if (this.mediaManagerPurpose() === 'button-icon') {
+      this.updateSelectedButtonCustomIcon(asset.url);
+      this.toastService.success(`${asset.name} selected as button icon.`);
+      this.closeMediaManager();
       return;
     }
 
@@ -3347,6 +3911,34 @@ updatePageDesignTabScrollState(): void {
     return normalized > 110 && normalized < 290;
   }
 
+  getRotationHandleCursor(rotation: number, corner: RotationHandleCorner): string {
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const cacheKey = `${corner}:${normalizedRotation}`;
+    const cached = this.rotationHandleCursorCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const size = ProjectStorefrontEditor.ROTATION_CURSOR_SIZE;
+    const hotspot = ProjectStorefrontEditor.ROTATION_CURSOR_HOTSPOT;
+    const imageHref = ProjectStorefrontEditor.ROTATION_HANDLE_CURSOR_IMAGES[corner];
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <image
+          href="${imageHref}"
+          x="0"
+          y="0"
+          width="${size}"
+          height="${size}"
+          transform="rotate(${normalizedRotation} ${size / 2} ${size / 2})"
+        />
+      </svg>
+    `.replace(/\s+/g, ' ').trim();
+    const cursor = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") ${hotspot} ${hotspot}, grab`;
+    this.rotationHandleCursorCache.set(cacheKey, cursor);
+    return cursor;
+  }
+
   sectionTypeIcon(type: StorefrontSectionType): 'layout-grid' | 'package' | 'settings' {
     switch (type) {
       case 'featured-products':
@@ -3569,6 +4161,59 @@ updatePageDesignTabScrollState(): void {
       width: right - left,
       height: bottom - top,
     };
+  }
+
+  private getSelectedComponentsForBatchAction(
+    section: StorefrontHomepageSection
+  ): StorefrontEditorComponentNode[] {
+    const components = this.readSectionComponents(section);
+    const selectedIds = new Set(this.selectedComponentIds());
+    if (!selectedIds.size) {
+      return [];
+    }
+
+    const selectedGroupId = this.selectedComponentGroupId();
+    if (selectedGroupId && selectedIds.has(this.selectedComponentId() ?? '')) {
+      return components.filter((component) => component.groupId === selectedGroupId);
+    }
+
+    return components.filter((component) => selectedIds.has(component.id));
+  }
+
+  private cloneComponentsForBatchInsert(
+    sourceComponents: StorefrontEditorComponentNode[],
+    startingZIndex: number,
+    offset: number
+  ): { clones: StorefrontEditorComponentNode[]; nextIds: string[] } {
+    const groupIdMap = new Map<string, string>();
+    const nextIds: string[] = [];
+    let nextZIndex = startingZIndex;
+    const batchSeed = Date.now();
+
+    const clones = sourceComponents.map((component) => {
+      const clone = JSON.parse(JSON.stringify(component)) as StorefrontEditorComponentNode;
+      clone.id = createStorefrontEditorComponentNode(component.type).id;
+      clone.frame = {
+        ...clone.frame,
+        x: clone.frame.x + offset,
+        y: clone.frame.y + offset,
+      };
+      clone.zIndex = nextZIndex++;
+
+      if (component.groupId) {
+        if (!groupIdMap.has(component.groupId)) {
+          groupIdMap.set(component.groupId, `component-group-${batchSeed}-${groupIdMap.size + 1}`);
+        }
+        clone.groupId = groupIdMap.get(component.groupId);
+      } else {
+        clone.groupId = undefined;
+      }
+
+      nextIds.push(clone.id);
+      return clone;
+    });
+
+    return { clones, nextIds };
   }
 
   private reorderSelectedComponentDepth(direction: 'front' | 'back'): void {
@@ -3911,9 +4556,47 @@ updatePageDesignTabScrollState(): void {
     );
   }
 
+  private updateSelectedButtonProps(
+    patch: Partial<StorefrontEditorButtonNode['props']>
+  ): void {
+    const sectionId = this.selectedSectionId();
+    const component = this.selectedButtonComponent();
+    if (!sectionId || !component) {
+      return;
+    }
+
+    this.updateComponentNode(sectionId, component.id, (current) =>
+      current.type === 'button'
+        ? {
+            ...current,
+            props: {
+              ...current.props,
+              ...patch,
+            },
+          }
+        : current
+    );
+  }
+
   private readSavedParagraphColors(): string[] {
     try {
       const raw = localStorage.getItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === 'string').slice(0, 12)
+      : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private readSavedButtonColors(): string[] {
+    try {
+      const raw = localStorage.getItem(ProjectStorefrontEditor.SAVED_BUTTON_COLORS_STORAGE_KEY);
       if (!raw) {
         return [];
       }
@@ -3962,6 +4645,45 @@ updatePageDesignTabScrollState(): void {
     this.updateSelectedParagraphProps({ color: hex });
   }
 
+  private updateButtonCustomColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__button-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.buttonCustomPickerSaturation.set(saturation);
+    this.buttonCustomPickerBrightness.set(brightness);
+    this.commitButtonCustomColorPicker();
+  }
+
+  private updateButtonCustomColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__button-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.buttonCustomPickerHue.set(Math.round(ratio * 360));
+    this.commitButtonCustomColorPicker();
+  }
+
+  private commitButtonCustomColorPicker(): void {
+    const hex = this.hsvToHex(
+      this.buttonCustomPickerHue(),
+      this.buttonCustomPickerSaturation(),
+      this.buttonCustomPickerBrightness()
+    );
+    this.updateSelectedButtonProps({ backgroundColor: hex });
+  }
+
   private syncCustomColorPickerFromHex(color: string): void {
     const normalized = this.normalizeHexColor(color);
     if (!normalized || normalized === 'transparent') {
@@ -3972,6 +4694,32 @@ updatePageDesignTabScrollState(): void {
     this.customPickerHue.set(h);
     this.customPickerSaturation.set(s);
     this.customPickerBrightness.set(v);
+  }
+
+  private syncButtonCustomColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.buttonCustomPickerHue.set(h);
+    this.buttonCustomPickerSaturation.set(s);
+    this.buttonCustomPickerBrightness.set(v);
+  }
+
+  private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['shadow']): string {
+    switch (shadow) {
+      case 'soft':
+        return '0 10px 24px rgba(15, 23, 42, 0.12)';
+      case 'medium':
+        return '0 14px 30px rgba(15, 23, 42, 0.18)';
+      case 'strong':
+        return '0 18px 36px rgba(15, 23, 42, 0.26)';
+      case 'none':
+      default:
+        return 'none';
+    }
   }
 
   private normalizeHexColor(value: string | null | undefined): string | null {

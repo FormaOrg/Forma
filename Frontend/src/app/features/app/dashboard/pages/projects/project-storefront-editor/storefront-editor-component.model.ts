@@ -46,6 +46,24 @@ export interface StorefrontEditorButtonProps {
   label: string;
   href: string;
   variant: 'primary' | 'secondary';
+  textPreset: 'Paragraph 1' | 'Paragraph 2' | 'Heading 4';
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 400 | 500 | 600 | 700;
+  textColor: string;
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  borderStyle: 'none' | 'solid';
+  radius: number;
+  shadow: 'none' | 'soft' | 'medium' | 'strong';
+  padding: number;
+  showText: boolean;
+  showIcon: boolean;
+  iconName: 'external-link' | 'invite-plus' | 'sparkles' | 'package' | 'wand' | 'eye';
+  customIconSrc: string | null;
+  iconMotion: 'static' | 'animated';
+  iconPosition: 'left' | 'right';
 }
 
 export interface StorefrontEditorContainerProps {
@@ -208,6 +226,24 @@ export function createStorefrontEditorComponentNode(
           label: 'Button',
           href: '',
           variant: 'primary',
+          textPreset: 'Paragraph 2',
+          fontFamily: 'Fira Mono',
+          fontSize: 15,
+          fontWeight: 500,
+          textColor: '#ffffff',
+          backgroundColor: '#0f172a',
+          borderColor: '#0f172a',
+          borderWidth: 0,
+          borderStyle: 'none',
+          radius: 12,
+          shadow: 'none',
+          padding: 18,
+          showText: true,
+          showIcon: false,
+          iconName: 'external-link',
+          customIconSrc: null,
+          iconMotion: 'static',
+          iconPosition: 'right',
         },
       };
     case 'container':
