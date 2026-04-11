@@ -922,11 +922,11 @@
                       <span class="storefront-editor__add-elements-demo-graphic"></span>
                     }
                     @case ('product-feed') {
-                      <span class="storefront-editor__add-elements-demo-product-feed">
-                        <span class="storefront-editor__add-elements-demo-product-card"></span>
-                        <span class="storefront-editor__add-elements-demo-product-card"></span>
-                        <span class="storefront-editor__add-elements-demo-product-card"></span>
-                      </span>
+                      <img
+                        [src]="item.previewImageSrc!"
+                        alt=""
+                        class="storefront-editor__add-elements-demo-preview-image"
+                      />
                     }
                     @case ('blog-feed') {
                       <span class="storefront-editor__add-elements-demo-blog-feed">
