@@ -1,4 +1,5 @@
 export type StorefrontEditorComponentType =
+  | 'text'
   | 'heading'
   | 'paragraph'
   | 'image'
@@ -10,12 +11,36 @@ export type StorefrontEditorComponentType =
 
 export type StorefrontEditorTextAlign = 'left' | 'center' | 'right';
 export type StorefrontEditorSlotName = 'default' | 'content' | 'media' | 'actions';
+export type StorefrontEditorTextStylePreset =
+  | 'Heading 1'
+  | 'Heading 2'
+  | 'Heading 3'
+  | 'Heading 4'
+  | 'Heading 5'
+  | 'Heading 6'
+  | 'Paragraph 1'
+  | 'Paragraph 2'
+  | 'Paragraph 3';
 
 export interface StorefrontEditorComponentFrame {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+export interface StorefrontEditorTextProps {
+  text: string;
+  textStyle: StorefrontEditorTextStylePreset;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 400 | 500 | 600 | 700;
+  fontStyle: 'normal' | 'italic';
+  textDecoration: 'none' | 'underline';
+  color: string;
+  align: StorefrontEditorTextAlign;
+  href: string;
+  openInNewTab: boolean;
 }
 
 export interface StorefrontEditorHeadingProps {
@@ -82,6 +107,20 @@ export interface StorefrontEditorProductFeedProps {
   title: string;
   source: 'manual' | 'catalog';
   limit: number;
+  designPreset: 'grid-gallery' | 'filter-gallery' | 'gallery-add-to-cart' | 'gallery-quick-add' | 'gallery-minimal';
+  category: string;
+  textColor: string;
+  badgeTextColor: string;
+  badgeBackgroundColor: string;
+  showBadges: boolean;
+  showCompareAtPrice: boolean;
+  showColorDots: boolean;
+  showFilters: boolean;
+  showSort: boolean;
+  showAddToCart: boolean;
+  quickAddStyle: 'button' | 'overlay' | 'none';
+  columns: 3 | 4 | 5;
+  imageRadius: number;
 }
 
 export interface StorefrontEditorBlogFeedProps {
@@ -103,6 +142,7 @@ export interface StorefrontEditorComponentBase<TType extends StorefrontEditorCom
   children: StorefrontEditorComponentNode[];
 }
 
+export type StorefrontEditorTextNode = StorefrontEditorComponentBase<'text', StorefrontEditorTextProps>;
 export type StorefrontEditorHeadingNode = StorefrontEditorComponentBase<'heading', StorefrontEditorHeadingProps>;
 export type StorefrontEditorParagraphNode = StorefrontEditorComponentBase<'paragraph', StorefrontEditorParagraphProps>;
 export type StorefrontEditorImageNode = StorefrontEditorComponentBase<'image', StorefrontEditorImageProps>;
@@ -113,6 +153,7 @@ export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'pro
 export type StorefrontEditorBlogFeedNode = StorefrontEditorComponentBase<'blog-feed', StorefrontEditorBlogFeedProps>;
 
 export type StorefrontEditorComponentNode =
+  | StorefrontEditorTextNode
   | StorefrontEditorHeadingNode
   | StorefrontEditorParagraphNode
   | StorefrontEditorImageNode
@@ -146,6 +187,8 @@ function getDefaultStorefrontEditorComponentFrame(
   type: StorefrontEditorComponentType
 ): StorefrontEditorComponentFrame {
   switch (type) {
+    case 'text':
+      return { x: 32, y: 120, width: 320, height: 92 };
     case 'heading':
       return { x: 32, y: 32, width: 280, height: 64 };
     case 'paragraph':
@@ -165,6 +208,198 @@ function getDefaultStorefrontEditorComponentFrame(
   }
 }
 
+export function buildStorefrontEditorTextProps(
+  textStyle: StorefrontEditorTextStylePreset,
+  overrides: Partial<StorefrontEditorTextProps> = {}
+): StorefrontEditorTextProps {
+  const baseByStyle: Record<
+    StorefrontEditorTextStylePreset,
+    Omit<StorefrontEditorTextProps, 'text' | 'textStyle' | 'href' | 'openInNewTab'>
+  > = {
+    'Heading 1': {
+      fontFamily: 'Playfair Display',
+      fontSize: 48,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Heading 2': {
+      fontFamily: 'Playfair Display',
+      fontSize: 36,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Heading 3': {
+      fontFamily: 'Poppins',
+      fontSize: 28,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Heading 4': {
+      fontFamily: 'Poppins',
+      fontSize: 22,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Heading 5': {
+      fontFamily: 'Poppins',
+      fontSize: 18,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Heading 6': {
+      fontFamily: 'Poppins',
+      fontSize: 15,
+      fontWeight: 600,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#18263c',
+      align: 'left',
+    },
+    'Paragraph 1': {
+      fontFamily: 'Fira Sans',
+      fontSize: 18,
+      fontWeight: 400,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#1f2937',
+      align: 'left',
+    },
+    'Paragraph 2': {
+      fontFamily: 'Fira Sans',
+      fontSize: 15,
+      fontWeight: 400,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#1f2937',
+      align: 'left',
+    },
+    'Paragraph 3': {
+      fontFamily: 'Fira Mono',
+      fontSize: 13,
+      fontWeight: 400,
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#4b5563',
+      align: 'left',
+    },
+  };
+
+  return {
+    text: textStyle.startsWith('Heading') ? 'Heading' : 'Tell visitors what this section is about and why it matters.',
+    textStyle,
+    href: '',
+    openInNewTab: false,
+    ...baseByStyle[textStyle],
+    ...overrides,
+  };
+}
+
+export function buildStorefrontEditorProductFeedProps(
+  designPreset: StorefrontEditorProductFeedProps['designPreset'],
+  overrides: Partial<StorefrontEditorProductFeedProps> = {}
+): StorefrontEditorProductFeedProps {
+  const baseByPreset: Record<
+    StorefrontEditorProductFeedProps['designPreset'],
+    Omit<StorefrontEditorProductFeedProps, 'title' | 'source' | 'limit' | 'designPreset' | 'category'>
+  > = {
+    'grid-gallery': {
+      textColor: '#202124',
+      badgeTextColor: '#ffffff',
+      badgeBackgroundColor: '#111111',
+      showBadges: true,
+      showCompareAtPrice: true,
+      showColorDots: false,
+      showFilters: false,
+      showSort: false,
+      showAddToCart: false,
+      quickAddStyle: 'none',
+      columns: 4,
+      imageRadius: 0,
+    },
+    'filter-gallery': {
+      textColor: '#202124',
+      badgeTextColor: '#ffffff',
+      badgeBackgroundColor: '#111111',
+      showBadges: true,
+      showCompareAtPrice: true,
+      showColorDots: true,
+      showFilters: true,
+      showSort: true,
+      showAddToCart: false,
+      quickAddStyle: 'none',
+      columns: 3,
+      imageRadius: 18,
+    },
+    'gallery-add-to-cart': {
+      textColor: '#202124',
+      badgeTextColor: '#5c5d62',
+      badgeBackgroundColor: '#ffffff',
+      showBadges: true,
+      showCompareAtPrice: true,
+      showColorDots: false,
+      showFilters: false,
+      showSort: false,
+      showAddToCart: true,
+      quickAddStyle: 'button',
+      columns: 4,
+      imageRadius: 0,
+    },
+    'gallery-quick-add': {
+      textColor: '#202124',
+      badgeTextColor: '#ffffff',
+      badgeBackgroundColor: '#111111',
+      showBadges: false,
+      showCompareAtPrice: true,
+      showColorDots: true,
+      showFilters: false,
+      showSort: false,
+      showAddToCart: true,
+      quickAddStyle: 'overlay',
+      columns: 5,
+      imageRadius: 0,
+    },
+    'gallery-minimal': {
+      textColor: '#202124',
+      badgeTextColor: '#ffffff',
+      badgeBackgroundColor: '#111111',
+      showBadges: true,
+      showCompareAtPrice: true,
+      showColorDots: false,
+      showFilters: false,
+      showSort: false,
+      showAddToCart: false,
+      quickAddStyle: 'none',
+      columns: 3,
+      imageRadius: 24,
+    },
+  };
+
+  return {
+    title: 'Grid gallery',
+    source: 'catalog',
+    limit: designPreset === 'gallery-quick-add' ? 5 : designPreset === 'gallery-minimal' ? 3 : designPreset === 'grid-gallery' ? 8 : 3,
+    designPreset,
+    category: 'all',
+    ...baseByPreset[designPreset],
+    ...overrides,
+  };
+}
+
 function createStorefrontEditorComponentBase<TType extends StorefrontEditorComponentType>(type: TType) {
   return {
     id: createStorefrontEditorComponentId(type),
@@ -182,6 +417,12 @@ export function createStorefrontEditorComponentNode(
   type: StorefrontEditorComponentType
 ): StorefrontEditorComponentNode {
   switch (type) {
+    case 'text':
+      return {
+        ...createStorefrontEditorComponentBase('text'),
+        name: 'Text',
+        props: buildStorefrontEditorTextProps('Paragraph 2'),
+      };
     case 'heading':
       return {
         ...createStorefrontEditorComponentBase('heading'),
@@ -269,12 +510,8 @@ export function createStorefrontEditorComponentNode(
     case 'product-feed':
       return {
         ...createStorefrontEditorComponentBase('product-feed'),
-        name: 'Product feed',
-        props: {
-          title: 'Featured products',
-          source: 'catalog',
-          limit: 4,
-        },
+        name: 'Grid gallery',
+        props: buildStorefrontEditorProductFeedProps('grid-gallery'),
       };
     case 'blog-feed':
       return {
