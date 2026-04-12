@@ -1,18 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { StorefrontEditorImageNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-image',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <span class="storefront-editor-block-image" [ngStyle]="frameStyle()">
       @if (node().props.src; as src) {
-        <span class="storefront-editor-block-image__stage" [ngStyle]="imageStageStyle()">
-          <img [src]="src" [alt]="node().props.alt || 'Image'" [ngStyle]="imageStyle()" />
-        </span>
+        @if (usesCroppedStage()) {
+          <span class="storefront-editor-block-image__stage" [ngStyle]="imageStageStyle()">
+            <img [src]="src" [alt]="node().props.alt || 'Image'" [ngStyle]="imageStyle()" />
+          </span>
+        } @else {
+          <img
+            class="storefront-editor-block-image__full-image"
+            [src]="src"
+            [alt]="node().props.alt || 'Image'"
+            [ngStyle]="fullImageStyle()"
+          />
+        }
       } @else {
         <span>Image</span>
       }
@@ -48,6 +58,12 @@ import { StorefrontEditorImageNode } from '../storefront-editor-component.model'
       display: block;
     }
 
+    .storefront-editor-block-image__full-image {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     .storefront-editor-block-image__stage {
       position: absolute;
       overflow: hidden;
@@ -79,12 +95,19 @@ export class StorefrontEditorBlockImageComponent {
     };
   });
 
-  readonly imageStyle = computed<Record<string, string>>(() => ({
+  readonly imageStyle = computed<Record<string, string>>(() => {
+    const crop = this.resolveCropRect();
+    return {
+      objectFit: this.resolveObjectFit(),
+      width: `${100 / crop.width}%`,
+      height: `${100 / crop.height}%`,
+      left: `${-(crop.x / crop.width) * 100}%`,
+      top: `${-(crop.y / crop.height) * 100}%`,
+    };
+  });
+
+  readonly fullImageStyle = computed<Record<string, string>>(() => ({
     objectFit: this.resolveObjectFit(),
-    width: `${100 / this.resolveCropRect().width}%`,
-    height: `${100 / this.resolveCropRect().height}%`,
-    left: `${-(this.resolveCropRect().x / this.resolveCropRect().width) * 100}%`,
-    top: `${-(this.resolveCropRect().y / this.resolveCropRect().height) * 100}%`,
   }));
 
   readonly imageStageStyle = computed<Record<string, string>>(() => {
@@ -98,6 +121,15 @@ export class StorefrontEditorBlockImageComponent {
       width: `${bounds.width}px`,
       height: `${bounds.height}px`,
     };
+  });
+
+  readonly usesCroppedStage = computed(() => {
+    if (this.disableCrop()) {
+      return false;
+    }
+
+    const crop = this.resolveCropRect();
+    return crop.x > 0 || crop.y > 0 || crop.width < 0.9999 || crop.height < 0.9999;
   });
 
   private resolveObjectFit(): string {
