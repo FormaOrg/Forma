@@ -1,6 +1,6 @@
 export type StorefrontStatus = 'DRAFT' | 'PUBLISHED';
 export type StorefrontPageKey = 'home';
-export type StorefrontEditorViewport = 'desktop' | 'mobile';
+export type StorefrontEditorViewport = 'desktop' | 'tablet' | 'mobile';
 export type StorefrontEditorManagedPageKind = 'home' | 'blank' | 'designed';
 export type StorefrontSectionType =
   | 'announcement-bar'

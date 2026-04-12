@@ -36,6 +36,7 @@ export type AppIconName =
   | 'zoom-plus'
   | 'cloud-check'
   | 'device-desktop'
+  | 'device-tablet'
   | 'device-mobile'
   | 'account-settings'
   | 'logout-door'
@@ -266,6 +267,13 @@ export type AppIconName =
             fill="currentColor"
             stroke="none"
             d="M16 6c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2h-3.25v1.5h1.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h1.5V15H8c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h8ZM8 7.5c-.28 0-.5.22-.5.5v5c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V8c0-.28-.22-.5-.5-.5H8Z"
+          />
+        }
+        @case ('device-tablet') {
+          <path
+            fill="currentColor"
+            stroke="none"
+            d="M15.5 5.5A1.5 1.5 0 0 1 17 7v10a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 17V7a1.5 1.5 0 0 1 1.5-1.5h7Zm-7 1.5v10h7V7h-7Zm3.15 8.75a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7Z"
           />
         }
         @case ('device-mobile') {
