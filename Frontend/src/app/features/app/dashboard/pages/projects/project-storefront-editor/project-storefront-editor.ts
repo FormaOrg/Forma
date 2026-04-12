@@ -138,19 +138,20 @@ type StorefrontPageDesignTemplate = {
 type MediaManagerPurpose = 'general' | 'button-icon';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type SectionLibraryCategory =
-  | 'Welcome'
-  | 'About'
-  | 'Portfolio'
-  | 'Services'
-  | 'Products'
-  | 'Promote & Engage';
+  | 'Essentials'
+  | 'Promotions'
+  | 'Catalog'
+  | 'Contact'
+  | 'Footer';
 type SectionLibraryTemplate = {
   id: string;
   title: string;
+  description: string;
   category: SectionLibraryCategory;
   type: StorefrontSectionType;
   layout: 'wide' | 'standard' | 'tall';
   accent: 'cobalt' | 'linen' | 'ink' | 'sand' | 'sky' | 'charcoal';
+  props?: Record<string, unknown>;
 };
 
 @Component({
@@ -317,7 +318,7 @@ readonly pageCardMenuId = signal<string | null>(null);
   readonly pageCardMenuLeft = signal(0);
   readonly sectionLibraryTargetId = signal<string | null>(null);
   readonly isSectionLibraryClosing = signal(false);
-  readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Welcome');
+readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Essentials');
   readonly canScrollAddElementsTabsLeft = signal(false);
   readonly canScrollAddElementsTabsRight = signal(false);
   readonly canScrollAddElementsSubmenuLeft = signal(false);
@@ -853,6 +854,7 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     'announcement-bar',
     'hero',
     'featured-products',
+    'contact',
     'footer',
   ];
   readonly sectionLibraryCategories: SectionLibraryCategory[] = STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES;
@@ -2509,7 +2511,7 @@ handleComponentPointerUp(event: MouseEvent): void {
     }
     this.isPagesPanelOpen.set(false);
     this.sectionOptionsMenuId.set(null);
-    this.activeSectionLibraryCategory.set('Welcome');
+  this.activeSectionLibraryCategory.set('Essentials');
     this.isSectionLibraryClosing.set(false);
     this.sectionLibraryTargetId.set(sectionId);
     setTimeout(() => this.updateSectionLibraryTabScrollState(), 0);
@@ -3857,10 +3859,14 @@ updatePageDesignTabScrollState(): void {
     }
   }
 
-  addSection(type: StorefrontSectionType, mode: SectionInsertMode = 'after-selected'): void {
+  addSection(
+    type: StorefrontSectionType,
+    mode: SectionInsertMode = 'after-selected',
+    props?: Record<string, unknown>
+  ): void {
     let insertedId: string | null = null;
     this.applyStorefrontMutation((storefront) => {
-      const section = this.createSection(type);
+      const section = this.createSection(type, props);
       insertedId = section.id;
       const sections = [...storefront.draftHomepage.sections];
       const selectedSectionId = this.selectedSectionId();
@@ -3882,13 +3888,13 @@ updatePageDesignTabScrollState(): void {
     }, { selectedSectionId: insertedId, syncRail: true });
   }
 
-  addSectionFromLibrary(type: StorefrontSectionType): void {
+  addSectionFromLibrary(template: SectionLibraryTemplate): void {
     const targetSectionId = this.sectionLibraryTargetId();
     if (targetSectionId) {
       this.selectedSectionId.set(targetSectionId);
     }
 
-    this.addSection(type, 'after-selected');
+    this.addSection(template.type, 'after-selected', template.props);
     this.closeSectionLibrary();
   }
 
@@ -4198,6 +4204,8 @@ updatePageDesignTabScrollState(): void {
         return 'Announcement Bar';
       case 'featured-products':
         return 'Featured Products';
+      case 'contact':
+        return 'Contact';
       case 'footer':
         return 'Footer';
       default:
@@ -4215,6 +4223,8 @@ updatePageDesignTabScrollState(): void {
       }
       case 'footer':
         return this.readStringProp(section, 'brandText');
+      case 'contact':
+        return this.readStringProp(section, 'title') || this.readStringProp(section, 'email');
       default:
         return this.readStringProp(section, 'title');
     }
@@ -4337,11 +4347,13 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
   }
 
   sectionTypeIcon(type: StorefrontSectionType): 'layout-grid' | 'package' | 'settings' {
-    switch (type) {
-      case 'featured-products':
-        return 'package';
-      case 'footer':
-        return 'settings';
+  switch (type) {
+    case 'featured-products':
+      return 'package';
+    case 'contact':
+      return 'layout-grid';
+    case 'footer':
+      return 'settings';
       default:
         return 'layout-grid';
     }
@@ -4353,10 +4365,12 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
         return 'Highlight a quick message, notice, or promo banner.';
       case 'hero':
         return 'Lead with a headline, supporting copy, and primary actions.';
-      case 'featured-products':
-        return 'Feature selected catalog products in a curated section.';
-      case 'footer':
-        return 'Add brand details and contact information at the bottom.';
+    case 'featured-products':
+      return 'Feature selected catalog products in a curated section.';
+    case 'contact':
+      return 'Show customers how to reach you with email, phone, and location details.';
+    case 'footer':
+      return 'Add brand details and contact information at the bottom.';
     }
   }
 
@@ -4364,10 +4378,12 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     switch (type) {
       case 'announcement-bar':
         return 'Announcement';
-      case 'featured-products':
-        return 'Products';
-      case 'footer':
-        return 'Footer';
+    case 'featured-products':
+      return 'Products';
+    case 'contact':
+      return 'Contact';
+    case 'footer':
+      return 'Footer';
       default:
         return 'Welcome';
     }
@@ -6061,9 +6077,20 @@ private updateSelectedProductFeedProps(
     return buildStorefrontSection(type, storeName, (sectionType) => this.createSectionId(sectionType));
   }
 
-  private createSection(type: StorefrontSectionType): StorefrontHomepageSection {
-    return this.buildSection(type, this.storeName());
+private createSection(type: StorefrontSectionType, props?: Record<string, unknown>): StorefrontHomepageSection {
+  const section = this.buildSection(type, this.storeName());
+  if (!props) {
+    return section;
   }
+
+  return {
+    ...section,
+    props: {
+      ...section.props,
+      ...props,
+    },
+  };
+}
 
   private createSectionId(type: StorefrontSectionType): string {
     return createStorefrontSectionId(type);

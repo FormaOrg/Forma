@@ -16,40 +16,115 @@ export type StorefrontPageDesignTemplate = {
 };
 
 export type SectionLibraryCategory =
-  | 'Welcome'
-  | 'About'
-  | 'Portfolio'
-  | 'Services'
-  | 'Products'
-  | 'Promote & Engage';
+  | 'Essentials'
+  | 'Promotions'
+  | 'Catalog'
+  | 'Contact'
+  | 'Footer';
 
 export type SectionLibraryTemplate = {
   id: string;
   title: string;
+  description: string;
   category: SectionLibraryCategory;
   type: StorefrontSectionType;
   layout: 'wide' | 'standard' | 'tall';
   accent: 'cobalt' | 'linen' | 'ink' | 'sand' | 'sky' | 'charcoal';
+  props?: Record<string, unknown>;
 };
 
 export const STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES: SectionLibraryCategory[] = [
-  'Welcome',
-  'About',
-  'Portfolio',
-  'Services',
-  'Products',
-  'Promote & Engage',
+  'Essentials',
+  'Promotions',
+  'Catalog',
+  'Contact',
+  'Footer',
 ];
 
 export const STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES: SectionLibraryTemplate[] = [
-  { id: 'hero-cobalt', title: 'Shop Our Latest Collection', category: 'Welcome', type: 'hero', layout: 'wide', accent: 'cobalt' },
-  { id: 'hero-editorial', title: 'Explore My Latest Work', category: 'Portfolio', type: 'hero', layout: 'standard', accent: 'linen' },
-  { id: 'hero-services', title: 'Efficient Services & Solutions', category: 'Services', type: 'hero', layout: 'tall', accent: 'ink' },
-  { id: 'hero-business', title: 'Reach Your Business Potential', category: 'Promote & Engage', type: 'hero', layout: 'tall', accent: 'sky' },
-  { id: 'products-fashion', title: 'Shop Our Unique Products', category: 'Products', type: 'featured-products', layout: 'standard', accent: 'sand' },
-  { id: 'footer-minimal', title: 'Elegant Footer Details', category: 'About', type: 'footer', layout: 'standard', accent: 'charcoal' },
-  { id: 'announcement-editorial', title: 'Highlight a Quick Announcement', category: 'Welcome', type: 'announcement-bar', layout: 'wide', accent: 'linen' },
-  { id: 'products-beauty', title: 'Discover Modern Products', category: 'Products', type: 'featured-products', layout: 'wide', accent: 'charcoal' },
+  {
+    id: 'main-hero',
+    title: 'Main Hero',
+    description: 'A primary landing section with a clear headline and two calls to action.',
+    category: 'Essentials',
+    type: 'hero',
+    layout: 'wide',
+    accent: 'cobalt',
+    props: {
+      eyebrow: 'New collection',
+      title: 'Launch your storefront with confidence',
+      description: 'Show what you sell, why it matters, and where shoppers should go next.',
+      primaryCtaLabel: 'Shop now',
+      primaryCtaHref: '/products',
+      secondaryCtaLabel: 'View featured picks',
+      secondaryCtaHref: '#featured',
+      editorLabel: 'Main Hero',
+    },
+  },
+  {
+    id: 'promo-bar',
+    title: 'Promotion Bar',
+    description: 'A compact top banner for sales, shipping notices, or limited-time offers.',
+    category: 'Promotions',
+    type: 'announcement-bar',
+    layout: 'wide',
+    accent: 'linen',
+    props: {
+      text: 'Free shipping on orders over 150 TND',
+      linkLabel: 'Shop offers',
+      linkHref: '/products',
+      editorLabel: 'Promotion Bar',
+    },
+  },
+  {
+    id: 'featured-grid',
+    title: 'Featured Products',
+    description: 'A product spotlight section wired to the catalog and ready for selected items.',
+    category: 'Catalog',
+    type: 'featured-products',
+    layout: 'standard',
+    accent: 'sand',
+    props: {
+      title: 'Best sellers this week',
+      maxItems: 4,
+      editorLabel: 'Featured Products',
+    },
+  },
+  {
+    id: 'contact-card',
+    title: 'Contact Section',
+    description: 'Share your support email, phone, location, and a direct contact CTA.',
+    category: 'Contact',
+    type: 'contact',
+    layout: 'standard',
+    accent: 'sky',
+    props: {
+      eyebrow: 'Need help?',
+      title: 'We are here for product questions and custom orders',
+      description: 'Add your best contact channels so customers know exactly how to reach you.',
+      email: 'support@store.com',
+      phone: '+216 71 000 000',
+      address: 'Lac 2, Tunis',
+      ctaLabel: 'Contact support',
+      ctaHref: 'mailto:support@store.com',
+      editorLabel: 'Contact Section',
+    },
+  },
+  {
+    id: 'store-footer',
+    title: 'Store Footer',
+    description: 'A practical footer with brand text plus key contact details at the bottom.',
+    category: 'Footer',
+    type: 'footer',
+    layout: 'standard',
+    accent: 'charcoal',
+    props: {
+      brandText: 'Your Store',
+      contactEmail: 'hello@store.com',
+      contactPhone: '+216 00 000 000',
+      editorLabel: 'Store Footer',
+    },
+  },
 ];
 
 export const STOREFRONT_EDITOR_PAGE_DESIGN_TEMPLATES: StorefrontPageDesignTemplate[] = [
