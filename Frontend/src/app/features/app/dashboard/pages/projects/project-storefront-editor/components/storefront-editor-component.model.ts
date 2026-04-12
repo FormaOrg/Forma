@@ -42,6 +42,7 @@ export type StorefrontEditorResponsiveFrames = Partial<
 
 export interface StorefrontEditorTextProps {
   text: string;
+  richTextHtml: string;
   textStyle: StorefrontEditorTextStylePreset;
   fontFamily: string;
   fontSize: number;
@@ -50,6 +51,8 @@ export interface StorefrontEditorTextProps {
   textDecoration: 'none' | 'underline';
   color: string;
   align: StorefrontEditorTextAlign;
+  lineHeight: number;
+  letterSpacing: number;
   href: string;
   openInNewTab: boolean;
 }
@@ -285,11 +288,29 @@ export function buildStorefrontEditorTextProps(
   textStyle: StorefrontEditorTextStylePreset,
   overrides: Partial<StorefrontEditorTextProps> = {}
 ): StorefrontEditorTextProps {
+  const lineHeight =
+    textStyle === 'Heading 1' ? 1 :
+    textStyle === 'Heading 2' ? 1.04 :
+    textStyle === 'Heading 3' ? 1.08 :
+    textStyle === 'Heading 4' ? 1.14 :
+    textStyle === 'Heading 5' ? 1.2 :
+    textStyle === 'Heading 6' ? 1.24 :
+    textStyle === 'Paragraph 1' ? 1.55 :
+    textStyle === 'Paragraph 2' ? 1.5 :
+    1.42;
+  const letterSpacing =
+    textStyle === 'Heading 1' ? -0.06 :
+    textStyle === 'Heading 2' ? -0.05 :
+    textStyle === 'Heading 3' ? -0.03 :
+    textStyle.startsWith('Heading') ? -0.02 :
+    0;
+
   const baseByStyle: Record<
     StorefrontEditorTextStylePreset,
     Omit<StorefrontEditorTextProps, 'text' | 'textStyle' | 'href' | 'openInNewTab'>
   > = {
     'Heading 1': {
+      richTextHtml: '',
       fontFamily: 'Playfair Display',
       fontSize: 48,
       fontWeight: 600,
@@ -297,8 +318,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Heading 2': {
+      richTextHtml: '',
       fontFamily: 'Playfair Display',
       fontSize: 36,
       fontWeight: 600,
@@ -306,8 +330,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Heading 3': {
+      richTextHtml: '',
       fontFamily: 'Poppins',
       fontSize: 28,
       fontWeight: 600,
@@ -315,8 +342,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Heading 4': {
+      richTextHtml: '',
       fontFamily: 'Poppins',
       fontSize: 22,
       fontWeight: 600,
@@ -324,8 +354,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Heading 5': {
+      richTextHtml: '',
       fontFamily: 'Poppins',
       fontSize: 18,
       fontWeight: 600,
@@ -333,8 +366,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Heading 6': {
+      richTextHtml: '',
       fontFamily: 'Poppins',
       fontSize: 15,
       fontWeight: 600,
@@ -342,8 +378,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#18263c',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Paragraph 1': {
+      richTextHtml: '',
       fontFamily: 'Fira Sans',
       fontSize: 18,
       fontWeight: 400,
@@ -351,8 +390,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#1f2937',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Paragraph 2': {
+      richTextHtml: '',
       fontFamily: 'Fira Sans',
       fontSize: 15,
       fontWeight: 400,
@@ -360,8 +402,11 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#1f2937',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
     'Paragraph 3': {
+      richTextHtml: '',
       fontFamily: 'Fira Mono',
       fontSize: 13,
       fontWeight: 400,
@@ -369,6 +414,8 @@ export function buildStorefrontEditorTextProps(
       textDecoration: 'none',
       color: '#4b5563',
       align: 'left',
+      lineHeight,
+      letterSpacing,
     },
   };
 

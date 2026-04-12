@@ -529,8 +529,8 @@ readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode
   readonly isSectionToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedSection() !== null && !this.hasComponentSelection()
   );
-  readonly isParagraphToolbarVisible = computed(
-    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedTextComponent() !== null
+readonly isParagraphToolbarVisible = computed(
+    () => this.selectedComponentIds().length === 1 && this.selectedTextComponent() !== null
   );
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
@@ -538,7 +538,9 @@ readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode
   readonly isProductFeedToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
   );
-readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color' | null>(null);
+readonly activeTextToolbarMenu = signal<
+  'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color' | 'typography' | 'highlight' | null
+>(null);
   readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedParagraphColors = signal<string[]>([]);
   readonly customPickerHue = signal(206);
@@ -671,6 +673,9 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
   ];
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
+  readonly textLineHeightOptions = [0.95, 1, 1.1, 1.2, 1.35, 1.5, 1.7, 2];
+  readonly textLetterSpacingOptions = [-0.08, -0.04, -0.02, 0, 0.02, 0.04, 0.08, 0.12];
+  readonly textHighlightColors = ['#fff3a3', '#c7f9cc', '#bfdbfe', '#fbcfe8', '#fecaca', '#e9d5ff', 'transparent'];
   readonly textStylePresets: ReadonlyArray<{ id: StorefrontEditorTextStylePreset; sampleSize: string }> = [
     { id: 'Heading 1', sampleSize: '180px' },
     { id: 'Heading 2', sampleSize: '64px' },
@@ -3226,6 +3231,7 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.isEditingComponentText.set(true);
     this.editingComponentTextId.set(componentId);
     this.editingComponentTextValue.set(this.readEditableComponentText(component));
+    setTimeout(() => this.focusActiveTextEditor(), 0);
   }
 
   finishEditingComponentText(): void {
@@ -3236,7 +3242,9 @@ this.finalizeDraggedComponentsLayoutSnap();
       return;
     }
 
-    const nextValue = this.editingComponentTextValue();
+    const nextValue = this.isEditingSelectedTextComponent()
+      ? this.readActiveTextEditorHtml()
+      : this.editingComponentTextValue();
     this.updateComponentNode(sectionId, componentId, (component) => this.writeEditableComponentText(component, nextValue));
     this.cancelComponentTextEditing();
   }
@@ -3245,6 +3253,25 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.isEditingComponentText.set(false);
     this.editingComponentTextId.set(null);
     this.editingComponentTextValue.set('');
+  }
+
+  onRichTextEditorInput(event: Event): void {
+    event.stopPropagation();
+  }
+
+  preserveRichTextEditing(event: MouseEvent): void {
+    event.stopPropagation();
+  }
+
+  onComponentTextEditorBlur(): void {
+    setTimeout(() => {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement && activeElement.closest('.storefront-editor__context-toolbar-shell')) {
+        return;
+      }
+
+      this.finishEditingComponentText();
+    }, 0);
   }
 
   onComponentTextInputKeydown(event: KeyboardEvent): void {
@@ -3258,6 +3285,30 @@ this.finalizeDraggedComponentsLayoutSnap();
       event.preventDefault();
       this.cancelComponentTextEditing();
     }
+  }
+
+  applyRichTextCommand(command: 'bold' | 'italic' | 'underline' | 'insertUnorderedList' | 'insertOrderedList'): void {
+    if (!this.focusActiveTextEditor()) {
+      return;
+    }
+
+    document.execCommand(command);
+    this.syncEditingTextValueFromDom();
+  }
+
+  applyRichTextHighlight(color: string): void {
+    if (!this.focusActiveTextEditor()) {
+      return;
+    }
+
+    if (color === 'transparent') {
+      document.execCommand('removeFormat');
+    } else {
+      document.execCommand('hiliteColor', false, color);
+      document.execCommand('backColor', false, color);
+    }
+    this.syncEditingTextValueFromDom();
+    this.activeTextToolbarMenu.set(null);
   }
 
   beginSectionResize(sectionId: string, event: MouseEvent): void {
@@ -3706,6 +3757,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return;
     }
 
+    if (this.isEditingSelectedTextComponent()) {
+      this.applyRichTextCommand('bold');
+      return;
+    }
+
     this.updateSelectedParagraphProps({
       fontWeight: component.props.fontWeight >= 600 ? 400 : 700,
     });
@@ -3717,6 +3773,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return;
     }
 
+    if (this.isEditingSelectedTextComponent()) {
+      this.applyRichTextCommand('italic');
+      return;
+    }
+
     this.updateSelectedParagraphProps({
       fontStyle: component.props.fontStyle === 'italic' ? 'normal' : 'italic',
     });
@@ -3725,6 +3786,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   toggleSelectedParagraphUnderline(): void {
     const component = this.selectedTextComponent();
     if (!component) {
+      return;
+    }
+
+    if (this.isEditingSelectedTextComponent()) {
+      this.applyRichTextCommand('underline');
       return;
     }
 
@@ -3744,7 +3810,9 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedParagraphProps({ color: normalized });
   }
 
-  toggleTextToolbarMenu(menu: 'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color'): void {
+  toggleTextToolbarMenu(
+    menu: 'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color' | 'typography' | 'highlight'
+  ): void {
     const next = this.activeTextToolbarMenu() === menu ? null : menu;
     this.activeTextToolbarMenu.set(next);
     if (next === 'font-family') {
@@ -3792,8 +3860,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedParagraphProps(
       buildStorefrontEditorTextProps(style, {
         text: component.props.text,
+        richTextHtml: component.props.richTextHtml,
         color: component.props.color,
         align: component.props.align,
+        lineHeight: component.props.lineHeight,
+        letterSpacing: component.props.letterSpacing,
         href: component.props.href,
         openInNewTab: component.props.openInNewTab,
         fontStyle: component.props.fontStyle,
@@ -3815,8 +3886,54 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.textLinkOpenMode.set(mode);
   }
 
+  updateSelectedParagraphLineHeight(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({ lineHeight: this.clamp(parsed, 0.8, 3) });
+  }
+
+  updateSelectedParagraphLetterSpacing(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedParagraphProps({ letterSpacing: this.clamp(parsed, -0.12, 0.24) });
+  }
+
+  toggleSelectedTextList(style: 'bullet' | 'number'): void {
+    if (!this.isEditingSelectedTextComponent()) {
+      this.startEditingSelectedTextComponent();
+      return;
+    }
+
+    this.applyRichTextCommand(style === 'bullet' ? 'insertUnorderedList' : 'insertOrderedList');
+  }
+
   saveSelectedTextLink(): void {
     const href = this.buildManagedPageHref(this.textLinkPageId());
+    if (this.isEditingSelectedTextComponent()) {
+      if (!this.focusActiveTextEditor()) {
+        return;
+      }
+
+      document.execCommand('createLink', false, href);
+      if (this.textLinkOpenMode() === 'new') {
+        const selection = window.getSelection();
+        const anchor = selection?.anchorNode instanceof Element
+          ? selection.anchorNode.closest('a')
+          : selection?.anchorNode?.parentElement?.closest('a');
+        anchor?.setAttribute('target', '_blank');
+        anchor?.setAttribute('rel', 'noreferrer noopener');
+      }
+      this.syncEditingTextValueFromDom();
+      this.activeTextToolbarMenu.set(null);
+      return;
+    }
+
     this.updateSelectedParagraphProps({
       href,
       openInNewTab: this.textLinkOpenMode() === 'new',
@@ -3825,6 +3942,17 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   removeSelectedTextLink(): void {
+    if (this.isEditingSelectedTextComponent()) {
+      if (!this.focusActiveTextEditor()) {
+        return;
+      }
+
+      document.execCommand('unlink');
+      this.syncEditingTextValueFromDom();
+      this.activeTextToolbarMenu.set(null);
+      return;
+    }
+
     this.updateSelectedParagraphProps({
       href: '',
       openInNewTab: false,
@@ -3834,6 +3962,19 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   textStylePreviewFontSize(style: StorefrontEditorTextStylePreset): number {
     return Math.min(buildStorefrontEditorTextProps(style).fontSize, 22);
+  }
+
+  startEditingSelectedTextComponent(): void {
+    const sectionId = this.selectedSectionId();
+    const component = this.selectedTextComponent();
+    if (!sectionId || !component) {
+      return;
+    }
+
+    this.isEditingComponentText.set(true);
+    this.editingComponentTextId.set(component.id);
+    this.editingComponentTextValue.set(this.readEditableComponentText(component));
+    setTimeout(() => this.focusActiveTextEditor(), 0);
   }
 
   private buildManagedPageHref(pageId: string): string {
@@ -6810,13 +6951,27 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
       } as StorefrontEditorTextNode;
     }
 
+    if (component.type === 'text') {
+      const defaults = buildStorefrontEditorTextProps(component.props.textStyle ?? 'Paragraph 2');
+      return {
+        ...component,
+        props: {
+          ...defaults,
+          ...component.props,
+          richTextHtml: component.props.richTextHtml ?? '',
+          lineHeight: component.props.lineHeight ?? defaults.lineHeight,
+          letterSpacing: component.props.letterSpacing ?? defaults.letterSpacing,
+        },
+      };
+    }
+
     return component;
   }
 
   private readEditableComponentText(component: StorefrontEditorComponentNode): string {
     switch (component.type) {
       case 'text':
-        return component.props.text;
+        return component.props.richTextHtml || this.plainTextToRichTextHtml(component.props.text);
       case 'button':
         return component.props.label;
       default:
@@ -6830,7 +6985,14 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
   ): StorefrontEditorComponentNode {
     switch (component.type) {
       case 'text':
-        return { ...component, props: { ...component.props, text: value } };
+        return {
+          ...component,
+          props: {
+            ...component.props,
+            text: this.richTextHtmlToPlainText(value),
+            richTextHtml: this.normalizeRichTextHtml(value),
+          },
+        };
       case 'button':
         return { ...component, props: { ...component.props, label: value } };
       default:
@@ -6889,6 +7051,71 @@ private updateComponentTree(
           }
         : current
     );
+  }
+
+  private isEditingSelectedTextComponent(): boolean {
+    return this.isEditingComponentText() && this.selectedTextComponent() !== null;
+  }
+
+  private focusActiveTextEditor(): HTMLElement | null {
+    const componentId = this.editingComponentTextId();
+    if (!componentId) {
+      return null;
+    }
+
+    const editor = document.querySelector(
+      `.storefront-editor__preview-component-text-editor[data-component-id="${componentId}"]`
+    );
+    if (!(editor instanceof HTMLElement)) {
+      return null;
+    }
+
+    editor.focus();
+    return editor;
+  }
+
+  private readActiveTextEditorHtml(): string {
+    const editor = this.focusActiveTextEditor();
+    return editor?.innerHTML ?? this.editingComponentTextValue();
+  }
+
+  private syncEditingTextValueFromDom(): void {
+    const editor = this.focusActiveTextEditor();
+    if (!editor) {
+      return;
+    }
+
+    this.editingComponentTextValue.set(editor.innerHTML);
+  }
+
+  private plainTextToRichTextHtml(value: string): string {
+    return this.escapeHtml(value).replace(/\n/g, '<br>');
+  }
+
+  private richTextHtmlToPlainText(value: string): string {
+    const element = document.createElement('div');
+    element.innerHTML = value;
+    return element.innerText.replace(/\r\n/g, '\n').trim();
+  }
+
+  private normalizeRichTextHtml(value: string): string {
+    const html = value.trim();
+    if (!html) {
+      return '';
+    }
+
+    return html
+      .replace(/<div><br><\/div>/gi, '<br>')
+      .replace(/<p><br><\/p>/gi, '<br>');
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
 private updateSelectedButtonProps(

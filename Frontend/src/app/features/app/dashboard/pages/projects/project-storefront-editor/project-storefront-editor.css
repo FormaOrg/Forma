@@ -781,6 +781,31 @@
   box-shadow: 0 24px 54px rgba(15, 23, 42, 0.16);
 }
 
+.storefront-editor__text-typography-popup,
+.storefront-editor__text-highlight-popup {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  z-index: 1215;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.16);
+  border-radius: 16px;
+}
+
+.storefront-editor__text-typography-popup {
+  width: 236px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.storefront-editor__text-highlight-popup {
+  width: 192px;
+  padding: 14px;
+}
+
 .storefront-editor__text-style-popup {
   transform: translateX(-50%);
   width: 320px;
@@ -822,6 +847,49 @@
   color: #202124;
   font-size: 0.96rem;
   font-weight: 600;
+}
+
+.storefront-editor__text-typography-field {
+  display: grid;
+  gap: 6px;
+  color: #334155;
+  font-size: 0.82rem;
+}
+
+.storefront-editor__text-typography-field span {
+  font-weight: 600;
+}
+
+.storefront-editor__text-typography-field select {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  padding: 0 12px;
+  font: inherit;
+}
+
+.storefront-editor__text-highlight-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.storefront-editor__text-highlight-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: var(--highlight-color, #fff3a3);
+}
+
+.storefront-editor__text-highlight-swatch--transparent {
+  background:
+    linear-gradient(135deg, transparent calc(50% - 1px), rgba(239, 68, 68, 0.85) 50%, transparent calc(50% + 1px)),
+    #fff;
 }
 
 .storefront-editor__text-style-option {
@@ -7106,6 +7174,29 @@
   resize: none;
   outline: none;
   box-shadow: none;
+}
+
+.storefront-editor__preview-component-text-editor--rich {
+  overflow: auto;
+  white-space: normal;
+}
+
+.storefront-editor__preview-component-text-editor--rich:empty::before {
+  content: 'Type here';
+  color: rgba(100, 116, 139, 0.7);
+}
+
+.storefront-editor__preview-component-text-editor--rich :where(p, ul, ol) {
+  margin: 0;
+}
+
+.storefront-editor__preview-component-text-editor--rich :where(ul, ol) {
+  padding-left: 1.2em;
+}
+
+.storefront-editor__preview-component-text-editor--rich :where(a) {
+  color: inherit;
+  text-decoration: underline;
 }
 
 .storefront-editor__preview-component-heading {

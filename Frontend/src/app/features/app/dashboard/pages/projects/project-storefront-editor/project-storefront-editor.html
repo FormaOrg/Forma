@@ -1630,11 +1630,12 @@
       }
   
     <div class="storefront-editor__body">
-    <div
-      class="storefront-editor__context-toolbar-shell"
-      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
-      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
-    >
+  <div
+    class="storefront-editor__context-toolbar-shell"
+    [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
+    [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
+    (mousedown)="preserveRichTextEditing($event)"
+  >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
           <div
             class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__section-toolbar"
@@ -2468,7 +2469,63 @@
               U
             </button>
 
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-icon"
+              (click)="toggleSelectedTextList('bullet')"
+              aria-label="Bullet list"
+            >
+              ••
+            </button>
+
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-icon"
+              (click)="toggleSelectedTextList('number')"
+              aria-label="Numbered list"
+            >
+              1.
+            </button>
+
             <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__context-toolbar-trigger storefront-editor__context-toolbar-trigger--size"
+                (click)="toggleTextToolbarMenu('typography')"
+              >
+                <span>Spacing</span>
+              </button>
+
+              @if (activeTextToolbarMenu() === 'typography') {
+                <div class="storefront-editor__text-typography-popup">
+                  <div class="storefront-editor__text-alignment-popup-title">Spacing</div>
+                  <label class="storefront-editor__text-typography-field">
+                    <span>Line height</span>
+                    <select
+                      [value]="textComponent.props.lineHeight"
+                      (change)="updateSelectedParagraphLineHeight($any($event.target).value)"
+                    >
+                      @for (option of textLineHeightOptions; track option) {
+                        <option [value]="option">{{ option }}</option>
+                      }
+                    </select>
+                  </label>
+                  <label class="storefront-editor__text-typography-field">
+                    <span>Letter spacing</span>
+                    <select
+                      [value]="textComponent.props.letterSpacing"
+                      (change)="updateSelectedParagraphLetterSpacing($any($event.target).value)"
+                    >
+                      @for (option of textLetterSpacingOptions; track option) {
+                        <option [value]="option">{{ option }}em</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+              }
+            </div>
 
             <div class="storefront-editor__context-toolbar-floating-shell">
               <button
@@ -2546,6 +2603,37 @@
                         <path d="M3 5.5h14M3 9h14M3 12.5h14M3 16h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                       </svg>
                     </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__context-toolbar-icon"
+                (click)="toggleTextToolbarMenu('highlight')"
+                aria-label="Highlight"
+              >
+                <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+                  <path d="M5 13.5h10v2H5z" fill="currentColor"></path>
+                  <path d="m7 11 4.7-4.7 2 2L9 13H7v-2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+
+              @if (activeTextToolbarMenu() === 'highlight') {
+                <div class="storefront-editor__text-highlight-popup">
+                  <div class="storefront-editor__text-alignment-popup-title">Highlight</div>
+                  <div class="storefront-editor__text-highlight-swatch-grid">
+                    @for (color of textHighlightColors; track color) {
+                      <button
+                        type="button"
+                        class="storefront-editor__text-highlight-swatch"
+                        [class.storefront-editor__text-highlight-swatch--transparent]="color === 'transparent'"
+                        [style.--highlight-color]="color"
+                        (click)="applyRichTextHighlight(color)"
+                      ></button>
+                    }
                   </div>
                 </div>
               }
@@ -3739,15 +3827,39 @@
                               </span>
                             }
                             @if (isEditingComponentText() && editingComponentTextId() === component.id) {
-                              <textarea
-                                class="storefront-editor__preview-component-text-editor"
-                                [value]="editingComponentTextValue()"
-                                (input)="editingComponentTextValue.set($any($event.target).value)"
-                                (keydown)="onComponentTextInputKeydown($event)"
-                                (blur)="finishEditingComponentText()"
-                                (mousedown)="$event.stopPropagation()"
-                                (click)="$event.stopPropagation()"
-                              ></textarea>
+                              @if (component.type === 'text') {
+                                <div
+                                  class="storefront-editor__preview-component-text-editor storefront-editor__preview-component-text-editor--rich"
+                                  [attr.data-component-id]="component.id"
+                                  [style.font-family]="component.props.fontFamily"
+                                  [style.font-size.px]="component.props.fontSize"
+                                  [style.font-weight]="component.props.fontWeight"
+                                  [style.font-style]="component.props.fontStyle"
+                                  [style.text-decoration]="component.props.textDecoration"
+                                  [style.color]="component.props.color"
+                                  [style.text-align]="component.props.align"
+                                  [style.line-height]="component.props.lineHeight"
+                                  [style.letter-spacing.em]="component.props.letterSpacing"
+                                  [innerHTML]="editingComponentTextValue()"
+                                  contenteditable="true"
+                                  spellcheck="true"
+                                  (input)="onRichTextEditorInput($event)"
+                                  (keydown)="onComponentTextInputKeydown($event)"
+                                  (blur)="onComponentTextEditorBlur()"
+                                  (mousedown)="$event.stopPropagation()"
+                                  (click)="$event.stopPropagation()"
+                                ></div>
+                              } @else {
+                                <textarea
+                                  class="storefront-editor__preview-component-text-editor"
+                                  [value]="editingComponentTextValue()"
+                                  (input)="editingComponentTextValue.set($any($event.target).value)"
+                                  (keydown)="onComponentTextInputKeydown($event)"
+                                  (blur)="onComponentTextEditorBlur()"
+                                  (mousedown)="$event.stopPropagation()"
+                                  (click)="$event.stopPropagation()"
+                                ></textarea>
+                              }
                             }
                           </button>
                         }
