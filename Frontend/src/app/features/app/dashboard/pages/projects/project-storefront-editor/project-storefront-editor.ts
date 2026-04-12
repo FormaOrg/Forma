@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, of, switchMap } from 'rxjs';
@@ -52,9 +52,14 @@ import {
   StorefrontEditorProductFeedNode,
   StorefrontEditorTextNode,
   StorefrontEditorTextStylePreset,
+  buildStorefrontEditorImageSourceMetadata,
   buildStorefrontEditorProductFeedProps,
   buildStorefrontEditorTextProps,
   createStorefrontEditorComponentNode,
+  normalizeStorefrontEditorImageCropRect,
+  resolveStorefrontEditorImageAspectRatio,
+  resolveStorefrontEditorImageDisplayMode,
+  resolveStorefrontEditorImageViewportBounds,
 } from './components/storefront-editor-component.model';
 import {
   ProjectStorefrontMediaManager,
@@ -376,6 +381,7 @@ export class ProjectStorefrontEditor {
         startCrop: { x: number; y: number; width: number; height: number };
       }
     | null = null;
+  private readonly pendingImageSourceMetadataKeys = new Set<string>();
   private activeRotation:
     | {
         sectionId: string;
@@ -1418,6 +1424,7 @@ effect(() => {
 
 effect(() => {
   const image = this.selectedImageComponent();
+  const sectionId = this.selectedSectionId();
   if (!image) {
     this.activeImageToolbarMenu.set(null);
     this.isImageSettingsLinkPopupOpen.set(false);
@@ -1427,13 +1434,20 @@ effect(() => {
     return;
   }
 
+  if (sectionId) {
+    this.ensureImageSourceMetadata(sectionId, image);
+  }
+
   if (this.croppingImageComponentId() && this.croppingImageComponentId() !== image.id) {
     this.exitImageCropMode();
   }
 
-  const linkedPage = this.findManagedPageIdForHref(image.props.href ?? '');
-  this.imageLinkPageId.set(linkedPage);
-  this.imageLinkOpenMode.set(image.props.openInNewTab ? 'new' : 'current');
+  this.syncManagedPageLinkSelection(
+    image.props.href ?? '',
+    image.props.openInNewTab ?? false,
+    this.imageLinkPageId,
+    this.imageLinkOpenMode
+  );
 });
 
 effect(() => {
@@ -4174,9 +4188,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     }
     if (next === 'link') {
       const component = this.selectedTextComponent();
-      const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
-      this.textLinkPageId.set(linkedPage);
-      this.textLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
+      this.syncManagedPageLinkSelection(
+        component?.props.href ?? '',
+        component?.props.openInNewTab ?? false,
+        this.textLinkPageId,
+        this.textLinkOpenMode
+      );
     }
   }
 
@@ -4328,9 +4345,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
     if (next === 'link' || next === 'settings') {
       const component = this.selectedImageComponent();
-      const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
-      this.imageLinkPageId.set(linkedPage);
-      this.imageLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
+      this.syncManagedPageLinkSelection(
+        component?.props.href ?? '',
+        component?.props.openInNewTab ?? false,
+        this.imageLinkPageId,
+        this.imageLinkOpenMode
+      );
     }
   }
 
@@ -4388,9 +4408,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.isImageSettingsLinkPopupOpen.set(next);
 
     const component = this.selectedImageComponent();
-    const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
-    this.imageLinkPageId.set(linkedPage);
-    this.imageLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
+    this.syncManagedPageLinkSelection(
+      component?.props.href ?? '',
+      component?.props.openInNewTab ?? false,
+      this.imageLinkPageId,
+      this.imageLinkOpenMode
+    );
     setTimeout(() => this.syncImageSettingsLinkPopupPlacement(anchor), 0);
   }
 
@@ -4628,44 +4651,14 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   private resolveNormalizedImageCropRect(component: StorefrontEditorImageNode): { x: number; y: number; width: number; height: number } {
-    const width = Math.max(0.01, this.clampUnit(component.props.cropWidth ?? 1));
-    const height = Math.max(0.01, this.clampUnit(component.props.cropHeight ?? 1));
-    const x = Math.min(this.clampUnit(component.props.cropX ?? 0), 1 - width);
-    const y = Math.min(this.clampUnit(component.props.cropY ?? 0), 1 - height);
-    return { x, y, width, height };
+    return normalizeStorefrontEditorImageCropRect(component.props);
   }
 
   private resolveImageCropViewportRect(
     component: StorefrontEditorImageNode,
     frame: StorefrontEditorComponentNode['frame'] = component.frame
   ): { x: number; y: number; width: number; height: number } {
-    const frameWidth = frame.width;
-    const frameHeight = frame.height;
-    if (component.props.displayMode === 'fill') {
-      return { x: 0, y: 0, width: frameWidth, height: frameHeight };
-    }
-
-    const frameAspectRatio = frameWidth > 0 && frameHeight > 0 ? frameWidth / frameHeight : 1;
-    const imageAspectRatio = this.parseImageAspectRatio(component.props.aspectRatio, frameAspectRatio);
-    if (imageAspectRatio >= frameAspectRatio) {
-      const width = frameWidth;
-      const height = width / imageAspectRatio;
-      return {
-        x: 0,
-        y: (frameHeight - height) / 2,
-        width,
-        height,
-      };
-    }
-
-    const height = frameHeight;
-    const width = height * imageAspectRatio;
-    return {
-      x: (frameWidth - width) / 2,
-      y: 0,
-      width,
-      height,
-    };
+    return resolveStorefrontEditorImageViewportBounds(component.props, frame.width, frame.height);
   }
 
   private resolveImageCropEditingFrame(component: StorefrontEditorImageNode): StorefrontEditorComponentNode['frame'] {
@@ -4699,13 +4692,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       || Math.abs(outerWidth - component.frame.width) > epsilon
       || Math.abs(outerHeight - component.frame.height) > epsilon;
 
-    if (!isDefaultCrop || hasStoredOuter || component.props.displayMode !== 'fill') {
+    if (!isDefaultCrop || hasStoredOuter || resolveStorefrontEditorImageDisplayMode(component.props) !== 'fill') {
       return;
     }
 
     const frame = component.frame;
     const frameAspectRatio = frame.width > 0 && frame.height > 0 ? frame.width / frame.height : 1;
-    const imageAspectRatio = this.parseImageAspectRatio(component.props.aspectRatio, frameAspectRatio);
+    const imageAspectRatio = resolveStorefrontEditorImageAspectRatio(component.props, frameAspectRatio);
 
     if (Math.abs(imageAspectRatio - frameAspectRatio) <= epsilon) {
       return;
@@ -4783,29 +4776,6 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
           }
         : current
     );
-  }
-
-  private parseImageAspectRatio(value: string | null | undefined, fallback: number): number {
-    if (!value) {
-      return fallback;
-    }
-
-    const normalized = value.replace(':', '/');
-    const [widthRaw, heightRaw] = normalized.split('/').map((part) => Number(part.trim()));
-    if (Number.isFinite(widthRaw) && Number.isFinite(heightRaw) && heightRaw > 0) {
-      return widthRaw / heightRaw;
-    }
-
-    const numeric = Number(value);
-    return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
-  }
-
-  private clampUnit(value: number): number {
-    if (!Number.isFinite(value)) {
-      return 0;
-    }
-
-    return Math.max(0, Math.min(1, value));
   }
 
   private findImageComponentLocation(componentId: string): { sectionId: string; component: StorefrontEditorImageNode } | null {
@@ -4917,6 +4887,16 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
     const match = this.managedPages().find((page) => this.buildManagedPageHref(page.id) === normalizedHref);
     return match?.id ?? 'home';
+  }
+
+  private syncManagedPageLinkSelection(
+    href: string,
+    openInNewTab: boolean,
+    pageIdSignal: WritableSignal<string>,
+    openModeSignal: WritableSignal<'current' | 'new'>
+  ): void {
+    pageIdSignal.set(this.findManagedPageIdForHref(href));
+    openModeSignal.set(openInNewTab ? 'new' : 'current');
   }
 
   startCustomColorCanvasDrag(event: MouseEvent): void {
@@ -7026,12 +7006,7 @@ sectionSurfaceStyle(section: StorefrontHomepageSection | null): Record<string, s
 }
 
 imageDisplayMode(component: StorefrontEditorImageNode | null): 'fill' | 'fit' | 'aspect' {
-  const value = component?.props.displayMode;
-  if (value === 'fit' || value === 'aspect' || value === 'fill') {
-    return value;
-  }
-
-  return component?.props.objectFit === 'contain' ? 'fit' : 'fill';
+  return component ? resolveStorefrontEditorImageDisplayMode(component.props) : 'fill';
 }
 
 imageBorderStyle(component: StorefrontEditorImageNode | null): 'solid' | 'dashed' | 'dotted' | 'double' {
@@ -8131,6 +8106,42 @@ patch: Partial<StorefrontEditorImageNode['props']>
 this.updateImageComponentProps(sectionId, component.id, patch);
 }
 
+private ensureImageSourceMetadata(sectionId: string, component: StorefrontEditorImageNode): void {
+  if (!component.props.src || this.hasImageSourceMetadata(component)) {
+    return;
+  }
+
+  const requestKey = `${sectionId}:${component.id}:${component.props.src}`;
+  if (this.pendingImageSourceMetadataKeys.has(requestKey)) {
+    return;
+  }
+
+  this.pendingImageSourceMetadataKeys.add(requestKey);
+  void this.resolveImageAssetDimensions(component.props.src)
+    .then((dimensions) => {
+      if (!dimensions) {
+        return;
+      }
+
+      this.updateComponentNode(sectionId, component.id, (current) =>
+        current.type === 'image'
+          && current.props.src === component.props.src
+          && !this.hasImageSourceMetadata(current)
+          ? {
+              ...current,
+              props: {
+                ...current.props,
+                ...buildStorefrontEditorImageSourceMetadata(dimensions.width, dimensions.height),
+              },
+            }
+          : current
+      );
+    })
+    .finally(() => {
+      this.pendingImageSourceMetadataKeys.delete(requestKey);
+    });
+}
+
 private async applySelectedImageAsset(asset: StorefrontMediaManagerAsset): Promise<void> {
   const sectionId = this.selectedSectionId();
   const image = this.selectedImageComponent();
@@ -8142,9 +8153,13 @@ private async applySelectedImageAsset(asset: StorefrontMediaManagerAsset): Promi
   const nextFrame = dimensions
     ? this.computeImageFrameForAspectRatio(image.frame, dimensions.width / Math.max(dimensions.height, 1))
     : image.frame;
-  const nextAspectRatio = dimensions
-    ? this.formatImageAspectRatio(dimensions.width, dimensions.height)
-    : image.props.aspectRatio;
+  const nextSourceMetadata = dimensions
+    ? buildStorefrontEditorImageSourceMetadata(dimensions.width, dimensions.height)
+    : {
+        sourceWidth: image.props.sourceWidth ?? null,
+        sourceHeight: image.props.sourceHeight ?? null,
+        aspectRatio: image.props.aspectRatio,
+      };
 
   this.updateComponentNode(sectionId, image.id, (current) =>
     current.type === 'image'
@@ -8155,7 +8170,7 @@ private async applySelectedImageAsset(asset: StorefrontMediaManagerAsset): Promi
             ...current.props,
             src: asset.url,
             alt: asset.name,
-            aspectRatio: nextAspectRatio,
+            ...nextSourceMetadata,
             cropX: 0,
             cropY: 0,
             cropWidth: 1,
@@ -8190,6 +8205,12 @@ private async resolveImageAssetDimensions(url: string): Promise<{ width: number;
   });
 }
 
+private hasImageSourceMetadata(component: Pick<StorefrontEditorImageNode, 'props'>): boolean {
+  const width = Number(component.props.sourceWidth ?? 0);
+  const height = Number(component.props.sourceHeight ?? 0);
+  return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0;
+}
+
 private computeImageFrameForAspectRatio(
   frame: StorefrontEditorComponentNode['frame'],
   aspectRatio: number
@@ -8205,24 +8226,6 @@ private computeImageFrameForAspectRatio(
     width,
     height,
   };
-}
-
-private formatImageAspectRatio(width: number, height: number): string {
-  const safeWidth = Math.max(1, Math.round(width));
-  const safeHeight = Math.max(1, Math.round(height));
-  const divisor = this.greatestCommonDivisor(safeWidth, safeHeight);
-  return `${safeWidth / divisor} / ${safeHeight / divisor}`;
-}
-
-private greatestCommonDivisor(left: number, right: number): number {
-  let a = Math.abs(left);
-  let b = Math.abs(right);
-  while (b !== 0) {
-    const remainder = a % b;
-    a = b;
-    b = remainder;
-  }
-  return Math.max(a, 1);
 }
 
 private updateImageComponentProps(
