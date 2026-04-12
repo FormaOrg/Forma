@@ -144,6 +144,9 @@ export interface StorefrontEditorContainerProps {
   layout: 'stack' | 'row' | 'grid';
   gap: number;
   padding: number;
+  justify: 'start' | 'center' | 'end' | 'space-between';
+  align: 'start' | 'center' | 'end' | 'stretch';
+  wrap: boolean;
   backgroundColor: string;
 }
 
@@ -631,6 +634,9 @@ export function createStorefrontEditorComponentNode(
           layout: 'stack',
           gap: 16,
           padding: 24,
+          justify: 'start',
+          align: 'stretch',
+          wrap: false,
           backgroundColor: 'transparent',
         },
       };

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 
 import { ProjectCatalogProduct } from '../../../../../../../core/models/project-catalog.model';
@@ -22,6 +23,7 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
   selector: 'app-storefront-editor-component-host',
   standalone: true,
   imports: [
+    CommonModule,
     StorefrontEditorBlockTextComponent,
     StorefrontEditorBlockHeadingComponent,
     StorefrontEditorBlockParagraphComponent,
