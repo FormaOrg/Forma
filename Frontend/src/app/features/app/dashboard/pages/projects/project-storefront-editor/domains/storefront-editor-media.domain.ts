@@ -1,6 +1,6 @@
 import { ProjectCatalogProduct } from '../../../../../../../core/models/project-catalog.model';
 
-import { StorefrontMediaManagerAsset } from '../project-storefront-media-manager';
+import { StorefrontMediaManagerAsset } from '../components/media-manager/project-storefront-media-manager';
 
 type ProjectMediaAsset = {
   id: number;

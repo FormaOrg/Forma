@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { StorefrontEditorParagraphNode } from './storefront-editor-component.model';
+import { StorefrontEditorParagraphNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-paragraph',

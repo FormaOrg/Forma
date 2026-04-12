@@ -1,17 +1,17 @@
 import { Component, input } from '@angular/core';
 
-import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
+import { ProjectCatalogProduct } from '../../../../../../../core/models/project-catalog.model';
 
 import { StorefrontEditorComponentNode } from './storefront-editor-component.model';
-import { StorefrontEditorBlockTextComponent } from './storefront-editor-block-text.component';
-import { StorefrontEditorBlockHeadingComponent } from './storefront-editor-block-heading.component';
-import { StorefrontEditorBlockParagraphComponent } from './storefront-editor-block-paragraph.component';
-import { StorefrontEditorBlockImageComponent } from './storefront-editor-block-image.component';
-import { StorefrontEditorBlockButtonComponent } from './storefront-editor-block-button.component';
-import { StorefrontEditorBlockContainerComponent } from './storefront-editor-block-container.component';
-import { StorefrontEditorBlockGraphicComponent } from './storefront-editor-block-graphic.component';
-import { StorefrontEditorBlockProductFeedComponent } from './storefront-editor-block-product-feed.component';
-import { StorefrontEditorBlockBlogFeedComponent } from './storefront-editor-block-blog-feed.component';
+import { StorefrontEditorBlockTextComponent } from './blocks/storefront-editor-block-text.component';
+import { StorefrontEditorBlockHeadingComponent } from './blocks/storefront-editor-block-heading.component';
+import { StorefrontEditorBlockParagraphComponent } from './blocks/storefront-editor-block-paragraph.component';
+import { StorefrontEditorBlockImageComponent } from './blocks/storefront-editor-block-image.component';
+import { StorefrontEditorBlockButtonComponent } from './blocks/storefront-editor-block-button.component';
+import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-editor-block-container.component';
+import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
+import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-editor-block-product-feed.component';
+import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-editor-block-blog-feed.component';
 
 @Component({
   selector: 'app-storefront-editor-component-host',
