@@ -1,3 +1,5 @@
+import { StorefrontEditorViewport } from '../../../../../../../core/models/project-storefront.model';
+
 export type StorefrontEditorComponentType =
   | 'text'
   | 'heading'
@@ -33,6 +35,10 @@ export interface StorefrontEditorComponentFrame {
   width: number;
   height: number;
 }
+
+export type StorefrontEditorResponsiveFrames = Partial<
+  Record<Exclude<StorefrontEditorViewport, 'desktop'>, StorefrontEditorComponentFrame>
+>;
 
 export interface StorefrontEditorTextProps {
   text: string;
@@ -181,6 +187,7 @@ export interface StorefrontEditorComponentBase<TType extends StorefrontEditorCom
   groupId?: string;
   rotation: number;
   frame: StorefrontEditorComponentFrame;
+  responsiveFrames?: StorefrontEditorResponsiveFrames;
   props: TProps;
   children: StorefrontEditorComponentNode[];
 }
