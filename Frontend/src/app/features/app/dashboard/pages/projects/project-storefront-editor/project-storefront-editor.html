@@ -4119,6 +4119,39 @@
             <span>Lock aspect ratio</span>
             <small>{{ lockAspectRatioEnabled() ? 'On' : 'Off' }}</small>
           </button>
+          @if (selectedContainerComponent(); as selectedContainer) {
+            <div class="storefront-editor__component-context-divider"></div>
+            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerLayout()">
+              <span>Container layout</span>
+              <small>{{ selectedContainer.props.layout }}</small>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerGap(-4)">
+              <span>Gap -</span>
+              <small>{{ selectedContainer.props.gap }}px</small>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerGap(4)">
+              <span>Gap +</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerPadding(-4)">
+              <span>Padding -</span>
+              <small>{{ selectedContainer.props.padding }}px</small>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerPadding(4)">
+              <span>Padding +</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerJustify()">
+              <span>Justify</span>
+              <small>{{ selectedContainer.props.justify }}</small>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerAlign()">
+              <span>Align</span>
+              <small>{{ selectedContainer.props.align }}</small>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item" (click)="toggleSelectedContainerWrap()">
+              <span>Wrap</span>
+              <small>{{ selectedContainer.props.wrap ? 'On' : 'Off' }}</small>
+            </button>
+          }
           <div class="storefront-editor__component-context-divider"></div>
           <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
             <span>Duplicate</span>

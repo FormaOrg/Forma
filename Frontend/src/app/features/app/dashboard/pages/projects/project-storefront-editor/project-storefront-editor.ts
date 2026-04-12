@@ -46,6 +46,7 @@ import {
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
+  StorefrontEditorContainerNode,
   StorefrontEditorParagraphNode,
   StorefrontEditorProductFeedNode,
   StorefrontEditorTextNode,
@@ -513,11 +514,15 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'text' ? component : null;
   });
-  readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
-    const component = this.selectedComponent();
-    return component?.type === 'button' ? component : null;
-  });
-  readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
+readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'button' ? component : null;
+});
+readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'container' ? component : null;
+});
+readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
     const component = this.selectedComponent();
     return component?.type === 'product-feed' ? component : null;
   });
@@ -2044,6 +2049,69 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.closeComponentContextMenu();
   }
 
+  cycleSelectedContainerLayout(): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    const layouts: StorefrontEditorContainerNode['props']['layout'][] = ['stack', 'row', 'grid'];
+    const currentIndex = layouts.indexOf(component.props.layout);
+    const nextLayout = layouts[(currentIndex + 1) % layouts.length] ?? 'stack';
+    this.updateSelectedContainerProps({ layout: nextLayout });
+  }
+
+  adjustSelectedContainerGap(delta: number): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({ gap: Math.max(0, component.props.gap + delta) });
+  }
+
+  adjustSelectedContainerPadding(delta: number): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({ padding: Math.max(0, component.props.padding + delta) });
+  }
+
+  cycleSelectedContainerJustify(): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    const options: StorefrontEditorContainerNode['props']['justify'][] = ['start', 'center', 'end', 'space-between'];
+    const currentIndex = options.indexOf(component.props.justify);
+    const next = options[(currentIndex + 1) % options.length] ?? 'start';
+    this.updateSelectedContainerProps({ justify: next });
+  }
+
+  cycleSelectedContainerAlign(): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    const options: StorefrontEditorContainerNode['props']['align'][] = ['start', 'center', 'end', 'stretch'];
+    const currentIndex = options.indexOf(component.props.align);
+    const next = options[(currentIndex + 1) % options.length] ?? 'stretch';
+    this.updateSelectedContainerProps({ align: next });
+  }
+
+  toggleSelectedContainerWrap(): void {
+    const component = this.selectedContainerComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({ wrap: !component.props.wrap });
+  }
+
   toggleFormaMenu(): void {
     const next = !this.isFormaMenuOpen();
     this.closeFloatingUi();
@@ -2334,6 +2402,11 @@ this.finalizeDraggedComponentsLayoutSnap();
     const layoutPlacement = this.resolveSectionLayoutPlacementForComponent(selectedSection.id, nextComponent);
     if (layoutPlacement) {
       Object.assign(nextComponent, this.writeComponentFrame(nextComponent, layoutPlacement.frame));
+    }
+    if (this.insertComponentIntoSelectedContainerIfPossible(selectedSection.id, nextComponent)) {
+      this.closeAddElementsPanel();
+      this.closeAddElementsLibraryModal();
+      return;
     }
     this.insertComponentIntoSection(selectedSection.id, nextComponent, {
       syncRail: true,
@@ -6765,15 +6838,36 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     }
   }
 
-  private updateComponentNode(
-    sectionId: string,
-    componentId: string,
-    updater: (component: StorefrontEditorComponentNode) => StorefrontEditorComponentNode
-  ): void {
-    this.updateSectionComponents(sectionId, (components) =>
-      components.map((component) => (component.id === componentId ? updater(component) : component))
-    );
-  }
+private updateComponentNode(
+  sectionId: string,
+  componentId: string,
+  updater: (component: StorefrontEditorComponentNode) => StorefrontEditorComponentNode
+): void {
+  this.updateSectionComponents(sectionId, (components) =>
+    this.updateComponentTree(components, componentId, updater)
+  );
+}
+
+private updateComponentTree(
+  components: StorefrontEditorComponentNode[],
+  componentId: string,
+  updater: (component: StorefrontEditorComponentNode) => StorefrontEditorComponentNode
+): StorefrontEditorComponentNode[] {
+  return components.map((component) => {
+    if (component.id === componentId) {
+      return updater(component);
+    }
+
+    if (!component.children.length) {
+      return component;
+    }
+
+    return {
+      ...component,
+      children: this.updateComponentTree(component.children, componentId, updater),
+    };
+  });
+}
 
   private updateSelectedParagraphProps(
     patch: Partial<StorefrontEditorTextNode['props']>
@@ -6798,7 +6892,7 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
   }
 
 private updateSelectedButtonProps(
-  patch: Partial<StorefrontEditorButtonNode['props']>
+patch: Partial<StorefrontEditorButtonNode['props']>
 ): void {
     const sectionId = this.selectedSectionId();
     const component = this.selectedButtonComponent();
@@ -6816,6 +6910,28 @@ private updateSelectedButtonProps(
             },
           }
         : current
+  );
+}
+
+private updateSelectedContainerProps(
+  patch: Partial<StorefrontEditorContainerNode['props']>
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedContainerComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'container'
+      ? {
+          ...current,
+          props: {
+            ...current.props,
+            ...patch,
+          },
+        }
+      : current
   );
 }
 
@@ -7683,12 +7799,74 @@ private insertComponentIntoSection(
     },
   }), mutationOptions);
   this.selectedComponentId.set(component.id);
-  this.selectedComponentIds.set([component.id]);
+this.selectedComponentIds.set([component.id]);
+this.isolatedGroupComponentId.set(null);
+}
+
+private insertComponentIntoSelectedContainerIfPossible(
+  sectionId: string,
+  component: StorefrontEditorComponentNode
+): boolean {
+  const selectedContainer = this.selectedContainerComponent();
+  if (!selectedContainer) {
+    return false;
+  }
+
+  this.appendComponentToContainer(sectionId, selectedContainer.id, component);
+  return true;
+}
+
+private appendComponentToContainer(
+  sectionId: string,
+  containerId: string,
+  component: StorefrontEditorComponentNode
+): void {
+  const childComponent = {
+    ...component,
+    frame: {
+      ...component.frame,
+      x: 0,
+      y: 0,
+    },
+    responsiveFrames: undefined,
+  };
+
+  this.updateComponentNode(sectionId, containerId, (current) =>
+    current.type === 'container'
+      ? {
+          ...current,
+          children: [...current.children, childComponent],
+        }
+      : current
+  );
+  this.selectedComponentId.set(containerId);
+  this.selectedComponentIds.set([containerId]);
   this.isolatedGroupComponentId.set(null);
 }
 
-  private buildLibraryComponentForSection(
-    item: StorefrontEditorAddElementsLibraryItem,
+private getContainerDropTargetAtPoint(
+  clientX: number,
+  clientY: number
+): { sectionId: string; containerId: string } | null {
+  const target = document.elementFromPoint(clientX, clientY);
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const containerContent = target.closest('[data-editor-container-id]');
+  const sectionContent = target.closest('.storefront-editor__preview-section-content[data-section-content-id]');
+  if (!(containerContent instanceof HTMLElement) || !(sectionContent instanceof HTMLElement)) {
+    return null;
+  }
+
+  return {
+    sectionId: sectionContent.dataset['sectionContentId'] ?? '',
+    containerId: containerContent.dataset['editorContainerId'] ?? '',
+  };
+}
+
+private buildLibraryComponentForSection(
+  item: StorefrontEditorAddElementsLibraryItem,
     sectionId: string,
     frameOverride?: StorefrontEditorComponentNode['frame']
   ): StorefrontEditorComponentNode {
@@ -7886,6 +8064,7 @@ private insertComponentIntoSection(
       return;
     }
 
+    const targetContainer = this.getContainerDropTargetAtPoint(event.clientX, event.clientY);
     const targetSection =
       this.componentAttachSectionId() ??
       this.getSectionContentElementAtPoint(event.clientX, event.clientY)?.dataset['sectionContentId'] ??
@@ -7894,6 +8073,11 @@ private insertComponentIntoSection(
 
     if (targetSection && item) {
       const nextComponent = this.buildLibraryComponentForSection(item, targetSection);
+      if (targetContainer?.sectionId === targetSection) {
+        this.appendComponentToContainer(targetSection, targetContainer.containerId, nextComponent);
+        this.endAddElementsComponentDrag();
+        return;
+      }
       const nextFrame =
         this.getDropFrameFromClientPoint(targetSection, item.componentType, event.clientX, event.clientY) ??
         this.getComponentFrame(nextComponent);
