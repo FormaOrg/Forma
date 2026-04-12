@@ -6,8 +6,7 @@ export type StorefrontEditorAddElementsCategory =
   | 'Image'
   | 'Button'
   | 'Graphics'
-  | 'Forma Store'
-  | 'Forma Blog';
+  | 'Forma Store';
 
 export type StorefrontEditorAddElementsCategoryIcon =
   | 'all'
@@ -15,8 +14,7 @@ export type StorefrontEditorAddElementsCategoryIcon =
   | 'image'
   | 'button'
   | 'graphics'
-  | 'store'
-  | 'blog';
+  | 'store';
 
 export type StorefrontEditorAddElementsCardPreview =
   | 'headline'
@@ -25,8 +23,7 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'button'
   | 'container'
   | 'graphic'
-  | 'product-feed'
-  | 'blog-feed';
+  | 'product-feed';
 
 export interface StorefrontEditorAddElementsCategoryOption {
   id: StorefrontEditorAddElementsCategory;
@@ -66,7 +63,6 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES: readonly StorefrontEdito
   { id: 'Button', label: 'Button', icon: 'button' },
   { id: 'Graphics', label: 'Graphics', icon: 'graphics' },
   { id: 'Forma Store', label: 'Forma Store', icon: 'store' },
-  { id: 'Forma Blog', label: 'Forma Blog', icon: 'blog' },
 ];
 
 export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
@@ -104,11 +100,6 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
     { id: 'all', label: 'All' },
     { id: 'grid-gallery', label: 'Grid gallery' },
     { id: 'featured-products', label: 'Featured products' },
-  ],
-  'Forma Blog': [
-    { id: 'all', label: 'All' },
-    { id: 'recent-posts', label: 'Recent posts' },
-    { id: 'featured-articles', label: 'Featured articles' },
   ],
 };
 
@@ -190,16 +181,6 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     preview: 'product-feed',
     previewImageSrc: 'assets/app/project/editor/grid gallery/default.png',
     keywords: ['catalog', 'products', 'shop', 'price', 'store'],
-  },
-  {
-    id: 'blog-feed',
-    title: 'Blog feed',
-    category: 'Forma Blog',
-    subcategoryIds: ['all', 'recent-posts', 'featured-articles'],
-    componentType: 'blog-feed',
-    description: 'Recent articles list for editorial and marketing sections.',
-    preview: 'blog-feed',
-    keywords: ['blog', 'posts', 'articles', 'editorial', 'news'],
   },
 ];
 
