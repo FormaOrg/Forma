@@ -1632,11 +1632,473 @@
     <div class="storefront-editor__body">
     <div
       class="storefront-editor__context-toolbar-shell"
-      [class.storefront-editor__context-toolbar-shell--visible]="isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
-      [attr.aria-hidden]="!(isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
+      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
+      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
     >
+        @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__section-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+                [class.storefront-editor__button-toolbar-text-trigger--active]="activeSectionToolbarMenu() === 'layout'"
+                (click)="toggleSectionToolbarMenu('layout')"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M17 5c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h10Zm-3 12.5h3c.28 0 .5-.22.5-.5v-4.25H14v4.75ZM6.5 17c0 .28.22.5.5.5h5.5v-4.75h-6V17ZM7 6.5c-.28 0-.5.22-.5.5v4.25H10V6.5H7Zm4.5 4.75h6V7c0-.28-.22-.5-.5-.5h-5.5v4.75Z"></path>
+                </svg>
+                <span>Change Layout</span>
+              </button>
+
+              @if (activeSectionToolbarMenu() === 'layout') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-layout-menu">
+                  <div class="storefront-editor__section-layout-grid">
+                    @for (layoutPreset of sectionLayoutPresets; track layoutPreset.id) {
+                      <button
+                        type="button"
+                        class="storefront-editor__section-layout-choice"
+                        [class.storefront-editor__section-layout-choice--active]="sectionLayoutPresetId(activeSection) === layoutPreset.id"
+                        (click)="applySelectedSectionLayoutPreset(layoutPreset.id)"
+                        [attr.aria-label]="layoutPreset.label"
+                      >
+                        @if (layoutPreset.id === 'none') {
+                          <span class="storefront-editor__section-layout-choice-none"></span>
+                        } @else {
+                          <span
+                            class="storefront-editor__section-layout-preview"
+                            [ngStyle]="sectionLayoutPreviewGridStyle(layoutPreset)"
+                          >
+                            @for (cell of layoutPreset.cells; track $index) {
+                              <span
+                                class="storefront-editor__section-layout-preview-cell"
+                                [ngStyle]="sectionLayoutPreviewCellStyle(cell)"
+                              ></span>
+                            }
+                          </span>
+                        }
+                      </button>
+                    }
+                  </div>
+
+                  @if (sectionShowsLayoutControls(activeSection)) {
+                    <div class="storefront-editor__section-layout-steppers">
+                      <div class="storefront-editor__section-layout-stepper-block">
+                        <div class="storefront-editor__section-layout-stepper">
+                          <button type="button" (click)="adjustSelectedSectionLayoutColumns(-1)" [disabled]="sectionLayoutColumns(activeSection) <= 1">−</button>
+                          <span>{{ sectionLayoutColumns(activeSection) }}</span>
+                          <button type="button" (click)="adjustSelectedSectionLayoutColumns(1)" [disabled]="sectionLayoutColumns(activeSection) >= 6">+</button>
+                        </div>
+                        <span>Columns</span>
+                      </div>
+
+                      <div class="storefront-editor__section-layout-stepper-block">
+                        <div class="storefront-editor__section-layout-stepper">
+                          <button type="button" (click)="adjustSelectedSectionLayoutRows(-1)" [disabled]="sectionLayoutRows(activeSection) <= 1">−</button>
+                          <span>{{ sectionLayoutRows(activeSection) }}</span>
+                          <button type="button" (click)="adjustSelectedSectionLayoutRows(1)" [disabled]="sectionLayoutRows(activeSection) >= 6">+</button>
+                        </div>
+                        <span>Rows</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+                [class.storefront-editor__button-toolbar-text-trigger--active]="activeSectionToolbarMenu() === 'background'"
+                (click)="toggleSectionToolbarMenu('background')"
+                [style.--toolbar-color]="sectionBackgroundColor(activeSection) ?? '#ffffff'"
+              >
+                <span class="storefront-editor__context-toolbar-color-ring" aria-hidden="true">
+                  <span class="storefront-editor__context-toolbar-color-swatch"></span>
+                </span>
+                <span>Replace Background</span>
+              </button>
+
+              @if (activeSectionToolbarMenu() === 'background') {
+                <div class="storefront-editor__context-toolbar-color-panel storefront-editor__section-background-panel storefront-editor__section-toolbar-popup">
+                  <div class="storefront-editor__section-background-mode-row">
+                    <button type="button" class="storefront-editor__section-background-mode storefront-editor__section-background-mode--active" aria-label="Color background" [style.--section-background-icon-color]="sectionBackgroundColor(activeSection) ?? '#ffffff'">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="4.75" width="14.5" height="14.5" rx="2.2" stroke="currentColor" stroke-width="1.5" [attr.fill]="sectionBackgroundColor(activeSection) ?? '#ffffff'"></rect>
+                      </svg>
+                    </button>
+                    <button type="button" class="storefront-editor__section-background-mode" disabled aria-label="Image background">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="5.25" width="14.5" height="13.5" rx="2.2" stroke="currentColor" stroke-width="1.5"></rect>
+                        <circle cx="10" cy="10" r="1.8" fill="currentColor"></circle>
+                        <path d="M7.5 16.25 11 12.75l2.4 2.4 1.9-1.9 1.2 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="storefront-editor__section-background-mode" disabled aria-label="Video background">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="6.25" width="10.5" height="11.5" rx="2.2" stroke="currentColor" stroke-width="1.5"></rect>
+                        <path d="m15.5 10.25 3.75-2v7.5l-3.75-2z" fill="currentColor"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="storefront-editor__context-toolbar-color-panel-tabs">
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-color-panel-tab"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeSectionBackgroundTab() === 'brand'"
+                      (click)="setActiveSectionBackgroundTab('brand')"
+                    >
+                      Brand
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-color-panel-tab"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeSectionBackgroundTab() === 'custom'"
+                      (click)="setActiveSectionBackgroundTab('custom')"
+                    >
+                      Custom
+                    </button>
+                  </div>
+
+                  @if (activeSectionBackgroundTab() === 'custom') {
+                    <div class="storefront-editor__context-toolbar-color-panel-body">
+                      <div
+                        class="storefront-editor__context-toolbar-color-canvas storefront-editor__section-background-color-canvas"
+                        [style.--color-picker-hue]="sectionBackgroundCustomColorCanvasBackground()"
+                        (mousedown)="startSectionBackgroundColorCanvasDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-canvas-knob"
+                          [style.left]="sectionBackgroundCustomColorCanvasHandleLeft()"
+                          [style.top]="sectionBackgroundCustomColorCanvasHandleTop()"
+                        ></span>
+                      </div>
+
+                      <div
+                        class="storefront-editor__context-toolbar-color-spectrum storefront-editor__section-background-color-spectrum"
+                        (mousedown)="startSectionBackgroundHueDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-spectrum-thumb"
+                          [style.left]="sectionBackgroundCustomColorSpectrumHandleLeft()"
+                        ></span>
+                      </div>
+
+                      <div class="storefront-editor__context-toolbar-color-meta">
+                        <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                        <label class="storefront-editor__context-toolbar-color-hex">
+                          <span>#</span>
+                          <input
+                            type="text"
+                            [value]="sectionBackgroundHexValue()"
+                            (change)="updateSectionBackgroundHex($any($event.target).value)"
+                            aria-label="Section background color"
+                          />
+                        </label>
+                        <span
+                          class="storefront-editor__context-toolbar-color-current"
+                          [style.background]="sectionBackgroundColor(activeSection) ?? '#ffffff'"
+                        ></span>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="storefront-editor__context-toolbar-color-panel-body">
+                      <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                      <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                        @for (brandColor of brandSectionBackgroundColors; track brandColor) {
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-saved-color"
+                            [class.storefront-editor__context-toolbar-saved-color--active]="sectionBackgroundColor(activeSection) === brandColor"
+                            [style.--saved-color]="brandColor"
+                            (click)="updateSelectedSectionBackgroundColor(brandColor)"
+                          >
+                            <span></span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeSectionToolbarMenu() === 'borders'"
+                (click)="toggleSectionToolbarMenu('borders')"
+                aria-label="Borders"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M17.75 16a1.25 1.25 0 0 1 0 2.5H6.25a1.25 1.25 0 0 1 0-2.5h11.5Zm.25-5.5c.55 0 1 .45 1 1s-.45 1-1 1H6c-.55 0-1-.45-1-1s.45-1 1-1h12Zm.25-5c.41 0 .75.34.75.75s-.34.75-.75.75H5.75C5.34 7 5 6.66 5 6.25s.34-.75.75-.75h12.5Z"></path>
+                </svg>
+              </button>
+
+              @if (activeSectionToolbarMenu() === 'borders') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__section-toolbar-popup--borders">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Borders</h3>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-inline-fields storefront-editor__button-toolbar-inline-fields--borders">
+                    <div class="storefront-editor__section-borders-color-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--round storefront-editor__section-border-color-trigger"
+                        [style.background]="sectionBorderColor(activeSection)"
+                        (click)="toggleSectionBorderColorPicker()"
+                        aria-label="Section border color"
+                      ></button>
+
+                      @if (isSectionBorderColorPickerOpen()) {
+                        <div class="storefront-editor__context-toolbar-color-panel storefront-editor__section-borders-color-panel storefront-editor__section-toolbar-popup">
+                          <div class="storefront-editor__context-toolbar-color-panel-header">
+                            <h3>Color Picker</h3>
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-close"
+                              (click)="toggleSectionBorderColorPicker()"
+                              aria-label="Close border color picker"
+                            >
+                              ×
+                            </button>
+                          </div>
+
+                          <div class="storefront-editor__context-toolbar-color-panel-tabs">
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-tab"
+                              [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeSectionBorderColorTab() === 'brand'"
+                              (click)="setActiveSectionBorderColorTab('brand')"
+                            >
+                              Brand
+                            </button>
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-tab"
+                              [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeSectionBorderColorTab() === 'custom'"
+                              (click)="setActiveSectionBorderColorTab('custom')"
+                            >
+                              Custom
+                            </button>
+                          </div>
+
+                          @if (activeSectionBorderColorTab() === 'custom') {
+                            <div class="storefront-editor__context-toolbar-color-panel-body">
+                              <div
+                                class="storefront-editor__context-toolbar-color-canvas storefront-editor__section-borders-color-canvas"
+                                [style.--color-picker-hue]="sectionBorderCustomColorCanvasBackground()"
+                                (mousedown)="startSectionBorderColorCanvasDrag($event)"
+                              >
+                                <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-canvas-knob"
+                                  [style.left]="sectionBorderCustomColorCanvasHandleLeft()"
+                                  [style.top]="sectionBorderCustomColorCanvasHandleTop()"
+                                ></span>
+                              </div>
+
+                              <div
+                                class="storefront-editor__context-toolbar-color-spectrum storefront-editor__section-borders-color-spectrum"
+                                (mousedown)="startSectionBorderHueDrag($event)"
+                              >
+                                <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-spectrum-thumb"
+                                  [style.left]="sectionBorderCustomColorSpectrumHandleLeft()"
+                                ></span>
+                              </div>
+
+                              <div class="storefront-editor__context-toolbar-color-meta">
+                                <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                                <label class="storefront-editor__context-toolbar-color-hex">
+                                  <span>#</span>
+                                  <input
+                                    type="text"
+                                    [value]="sectionBorderHexValue()"
+                                    (change)="updateSectionBorderHex($any($event.target).value)"
+                                    aria-label="Section border color"
+                                  />
+                                </label>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-current"
+                                  [style.background]="sectionBorderColor(activeSection)"
+                                ></span>
+                              </div>
+                            </div>
+                          } @else {
+                            <div class="storefront-editor__context-toolbar-color-panel-body">
+                              <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                              <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                                @for (brandColor of brandSectionBorderColors; track brandColor) {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__context-toolbar-saved-color"
+                                    [class.storefront-editor__context-toolbar-saved-color--active]="sectionBorderColor(activeSection) === brandColor"
+                                    [style.--saved-color]="brandColor"
+                                    (click)="updateSelectedSectionBorderColor(brandColor)"
+                                  >
+                                    <span></span>
+                                  </button>
+                                }
+                              </div>
+
+                              <div class="storefront-editor__context-toolbar-brand-label">Saved colors</div>
+                              <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                                @for (savedColor of savedSectionBorderColors().length ? savedSectionBorderColors() : [sectionBorderColor(activeSection)]; track savedColor) {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__context-toolbar-saved-color"
+                                    [class.storefront-editor__context-toolbar-saved-color--active]="sectionBorderColor(activeSection) === savedColor"
+                                    [style.--saved-color]="savedColor"
+                                    (click)="applySavedSectionBorderColor(savedColor)"
+                                  >
+                                    <span></span>
+                                  </button>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <label class="storefront-editor__button-toolbar-field storefront-editor__button-toolbar-field--numeric">
+                      <div class="storefront-editor__button-toolbar-field-input-wrap storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="sectionBorderWidth(activeSection)" (input)="updateSelectedSectionBorderWidth($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">px</span>
+                      </div>
+                    </label>
+
+                    <div class="storefront-editor__section-border-style-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__section-border-style-trigger"
+                        (click)="toggleSectionBorderStylePicker()"
+                        aria-label="Section border style"
+                      >
+                        <span class="storefront-editor__section-border-style-preview">
+                          <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + sectionBorderStyle(activeSection)"></span>
+                        </span>
+                        <span class="storefront-editor__section-border-style-chevron" aria-hidden="true">
+                          <svg fill="currentColor" viewBox="0 0 8 5" width="8" height="5">
+                            <g>
+                              <path d="M7.852.852 4 4.712.146.85a.496.496 0 0 1 .7-.701L4 3.298 7.153.148a.494.494 0 0 1 .699 0l.001.001a.499.499 0 0 1-.001.703Z"></path>
+                            </g>
+                          </svg>
+                        </span>
+                      </button>
+
+                      @if (isSectionBorderStylePickerOpen()) {
+                        <div class="storefront-editor__section-border-style-menu storefront-editor__section-toolbar-popup">
+                          @for (borderStyle of sectionBorderStyleOptions; track borderStyle.id) {
+                            <button
+                              type="button"
+                              class="storefront-editor__section-border-style-option"
+                              [class.storefront-editor__section-border-style-option--active]="sectionBorderStyle(activeSection) === borderStyle.id"
+                              (click)="updateSelectedSectionBorderStyle(borderStyle.id)"
+                            >
+                              <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + borderStyle.id"></span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeSectionToolbarMenu() === 'corners'"
+                (click)="toggleSectionToolbarMenu('corners')"
+                aria-label="Corners"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M17 5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c.27 0 .5.23.5.5v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-1.1-.9-2-2-2ZM7 5c-1.1 0-2 .9-2 2v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-.27.23-.5.5-.5h3.25c.41 0 .75-.34.75-.75S10.66 5 10.25 5H7Zm10.5 12c0 .27-.23.5-.5.5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c1.1 0 2-.9 2-2v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17ZM7 17.5c-.27 0-.5-.23-.5-.5v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17c0 1.1.9 2 2 2h3.25c.41 0 .75-.34.75-.75s-.34-.75-.75-.75H7Z"></path>
+                </svg>
+              </button>
+
+              @if (activeSectionToolbarMenu() === 'corners') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Corners</h3>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-option-row">
+                    @for (radiusOption of [0, 8, 14, 20, 999]; track radiusOption) {
+                      <button type="button" class="storefront-editor__button-toolbar-choice" [class.storefront-editor__button-toolbar-choice--active]="sectionRadius(activeSection) === radiusOption" (click)="updateSelectedSectionRadius(radiusOption)">
+                        <span class="storefront-editor__button-toolbar-choice-box storefront-editor__button-toolbar-choice-box--radius storefront-editor__section-corner-preview" [style.--button-radius-preview.px]="radiusOption === 999 ? 999 : radiusOption === 20 ? 12 : radiusOption === 14 ? 8 : radiusOption === 8 ? 4 : 0"></span>
+                      </button>
+                    }
+                  </div>
+
+                  <label class="storefront-editor__button-toolbar-slider-block">
+                    <span>Radius</span>
+                    <div class="storefront-editor__button-toolbar-slider-row">
+                      <input type="range" min="0" max="64" [value]="sectionRadius(activeSection)" (input)="updateSelectedSectionRadius($any($event.target).value)" />
+                      <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="sectionRadius(activeSection)" (input)="updateSelectedSectionRadius($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">px</span>
+                      </label>
+                    </div>
+                  </label>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeSectionToolbarMenu() === 'opacity'"
+                (click)="toggleSectionToolbarMenu('opacity')"
+                aria-label="Opacity"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M6.5 16c.83 0 1.5.67 1.5 1.5S7.33 19 6.5 19 5 18.33 5 17.5 5.67 16 6.5 16Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Zm-9.67-3.37c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 10.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S5 12.83 5 12s.67-1.5 1.5-1.5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75ZM8.58 7.88c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 5C7.33 5 8 5.67 8 6.5S7.33 8 6.5 8 5 7.33 5 6.5 5.67 5 6.5 5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Z"></path>
+                </svg>
+              </button>
+
+              @if (activeSectionToolbarMenu() === 'opacity') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Background opacity</h3>
+                  </div>
+
+                  <label class="storefront-editor__button-toolbar-slider-block storefront-editor__section-opacity-block">
+                    <div class="storefront-editor__button-toolbar-slider-row storefront-editor__section-opacity-row">
+                      <input type="range" min="0" max="100" [value]="sectionOpacity(activeSection)" (input)="updateSelectedSectionOpacity($any($event.target).value)" />
+                      <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="sectionOpacity(activeSection)" (input)="updateSelectedSectionOpacity($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">%</span>
+                      </label>
+                    </div>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
         @if (selectedTextComponent(); as textComponent) {
-          <div class="storefront-editor__context-toolbar">
+          <div
+            class="storefront-editor__context-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
             <div class="storefront-editor__context-toolbar-floating-shell">
               <button
                 type="button"
@@ -1745,7 +2207,11 @@
                 class="storefront-editor__context-toolbar-trigger storefront-editor__context-toolbar-trigger--link"
                 (click)="toggleTextToolbarMenu('link')"
               >
-                <app-icon name="external-link" [size]="14"></app-icon>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                  <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
+                  <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
+                  <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+                </svg>
                 <span>Link</span>
               </button>
 
@@ -1763,7 +2229,11 @@
                       <app-icon name="layout-grid" [size]="15"></app-icon>
                     </button>
                     <button type="button" class="storefront-editor__text-link-popup-tab">
-                      <app-icon name="external-link" [size]="15"></app-icon>
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+                        <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
+                        <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
+                        <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+                      </svg>
                     </button>
                     <button type="button" class="storefront-editor__text-link-popup-tab">
                       <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
@@ -2083,7 +2553,11 @@
           </div>
       }
 
-        <div class="storefront-editor__context-toolbar storefront-editor__button-toolbar" *ngIf="selectedButtonComponent() as button; else productFeedToolbar">
+        <div
+          class="storefront-editor__context-toolbar storefront-editor__button-toolbar"
+          *ngIf="selectedButtonComponent() as button; else productFeedToolbar"
+          animate.enter="storefront-editor__context-toolbar-fade-enter"
+        >
             <button
               type="button"
               class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
@@ -2532,7 +3006,10 @@
 
       <ng-template #productFeedToolbar>
         @if (selectedProductFeedComponent(); as productFeed) {
-          <div class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__product-feed-toolbar">
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__product-feed-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
             <button
               type="button"
               class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
@@ -2998,100 +3475,159 @@
                         @if (isLibraryComponentDragging() && componentAttachSectionId() === section.id) {
                           <div class="storefront-editor__preview-section-attach-indicator">Attach to section</div>
                         }
-                        @switch (section.type) {
-                        @case ('announcement-bar') {
-                          <section class="preview-announcement">
-                            <div class="preview-announcement__inner">
-                              <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
-                              @if (readStringProp(section, 'linkLabel')) {
-                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'linkLabel') }}</a>
-                              }
-                            </div>
-                          </section>
-                        }
-                        @case ('hero') {
-                          @if (isBlankSection(section)) {
-                            <section class="preview-blank-section"></section>
-                          } @else {
-                            <section class="preview-hero">
-                              <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</p>
-                              <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || 'Your headline goes here' }}</h3>
-                              <p class="preview-hero__copy">{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</p>
-                              <div class="preview-hero__actions">
-                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}</a>
-                                <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}</button>
+                        <div
+                          class="storefront-editor__preview-section-surface"
+                          [class.storefront-editor__preview-section-surface--custom-background]="sectionHasCustomBackground(section)"
+                          [ngStyle]="sectionSurfaceStyle(section)"
+                        >
+                          @switch (section.type) {
+                          @case ('announcement-bar') {
+                            <section class="preview-announcement">
+                              <div class="preview-announcement__inner">
+                                <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
+                                @if (readStringProp(section, 'linkLabel')) {
+                                  <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'linkLabel') }}</a>
+                                }
                               </div>
                             </section>
                           }
-                        }
-                        @case ('featured-products') {
-                          <section class="preview-products" id="featured">
-                            <div class="preview-products__head">
-                              <div>
-                                <p class="preview-products__eyebrow">Catalog</p>
-                                <h3 class="preview-products__title">{{ readStringProp(section, 'title') || 'Featured products' }}</h3>
-                              </div>
-                              <span class="preview-products__helper">{{ featuredProductsPreview().length }} selected</span>
-                            </div>
-
-                            @if (featuredProductsPreview().length) {
-                              <div class="preview-products__grid">
-                                @for (product of featuredProductsPreview(); track trackProduct($index, product)) {
-                                  <article class="preview-products__card">
-                                    <div class="preview-products__thumb">
-                                      @if (product.imageUrl) {
-                                        <img [src]="product.imageUrl" [alt]="product.name" />
-                                      } @else {
-                                        <span>No image</span>
-                                      }
-                                    </div>
-                                    <div class="preview-products__body">
-                                      <h4>{{ product.name }}</h4>
-                                      <p>{{ product.category || 'General' }}</p>
-                                      <strong>{{ product.price | number: '1.2-2' }} TND</strong>
-                                    </div>
-                                  </article>
-                                }
-                              </div>
+                          @case ('hero') {
+                            @if (isBlankSection(section)) {
+                              <section class="preview-blank-section"></section>
                             } @else {
-                              <div class="preview-products__empty">Choose products in the catalog to feature them here.</div>
+                              <section class="preview-hero">
+                                <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</p>
+                                <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || 'Your headline goes here' }}</h3>
+                                <p class="preview-hero__copy">{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</p>
+                                <div class="preview-hero__actions">
+                                  <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}</a>
+                                  <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}</button>
+                                </div>
+                              </section>
                             }
-                          </section>
-                        }
-                        @case ('contact') {
-                          <section class="preview-contact">
-                            <div class="preview-contact__copy">
-                              <p class="preview-contact__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Contact' }}</p>
-                              <h3 class="preview-contact__title">{{ readStringProp(section, 'title') || 'Talk to our team' }}</h3>
-                              <p class="preview-contact__description">{{ readStringProp(section, 'description') || 'Add ways customers can reach your store.' }}</p>
-                              <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'ctaLabel') || 'Email us' }}</a>
-                            </div>
-                            <div class="preview-contact__details">
-                              <div>
-                                <span>Email</span>
-                                <strong>{{ readStringProp(section, 'email') || 'hello@store.com' }}</strong>
+                          }
+                          @case ('featured-products') {
+                            <section class="preview-products" id="featured">
+                              <div class="preview-products__head">
+                                <div>
+                                  <p class="preview-products__eyebrow">Catalog</p>
+                                  <h3 class="preview-products__title">{{ readStringProp(section, 'title') || 'Featured products' }}</h3>
+                                </div>
+                                <span class="preview-products__helper">{{ featuredProductsPreview().length }} selected</span>
                               </div>
-                              <div>
-                                <span>Phone</span>
-                                <strong>{{ readStringProp(section, 'phone') || '+216 00 000 000' }}</strong>
+
+                              @if (featuredProductsPreview().length) {
+                                <div class="preview-products__grid">
+                                  @for (product of featuredProductsPreview(); track trackProduct($index, product)) {
+                                    <article class="preview-products__card">
+                                      <div class="preview-products__thumb">
+                                        @if (product.imageUrl) {
+                                          <img [src]="product.imageUrl" [alt]="product.name" />
+                                        } @else {
+                                          <span>No image</span>
+                                        }
+                                      </div>
+                                      <div class="preview-products__body">
+                                        <h4>{{ product.name }}</h4>
+                                        <p>{{ product.category || 'General' }}</p>
+                                        <strong>{{ product.price | number: '1.2-2' }} TND</strong>
+                                      </div>
+                                    </article>
+                                  }
+                                </div>
+                              } @else {
+                                <div class="preview-products__empty">Choose products in the catalog to feature them here.</div>
+                              }
+                            </section>
+                          }
+                          @case ('contact') {
+                            <section class="preview-contact">
+                              <div class="preview-contact__copy">
+                                <p class="preview-contact__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Contact' }}</p>
+                                <h3 class="preview-contact__title">{{ readStringProp(section, 'title') || 'Talk to our team' }}</h3>
+                                <p class="preview-contact__description">{{ readStringProp(section, 'description') || 'Add ways customers can reach your store.' }}</p>
+                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'ctaLabel') || 'Email us' }}</a>
                               </div>
-                              <div>
-                                <span>Location</span>
-                                <strong>{{ readStringProp(section, 'address') || 'Tunis, Tunisia' }}</strong>
+                              <div class="preview-contact__details">
+                                <div>
+                                  <span>Email</span>
+                                  <strong>{{ readStringProp(section, 'email') || 'hello@store.com' }}</strong>
+                                </div>
+                                <div>
+                                  <span>Phone</span>
+                                  <strong>{{ readStringProp(section, 'phone') || '+216 00 000 000' }}</strong>
+                                </div>
+                                <div>
+                                  <span>Location</span>
+                                  <strong>{{ readStringProp(section, 'address') || 'Tunis, Tunisia' }}</strong>
+                                </div>
                               </div>
+                            </section>
+                          }
+                          @case ('footer') {
+                            <footer class="preview-footer">
+                              <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
+                              <div class="preview-footer__meta">
+                                <span>{{ readStringProp(section, 'contactEmail') || 'store@example.com' }}</span>
+                                <span>{{ readStringProp(section, 'contactPhone') || '+216 00 000 000' }}</span>
+                              </div>
+                            </footer>
+                          }
+                          }
+
+                        @if (sectionShowsLayoutOverlay(section)) {
+                          <div
+                            class="storefront-editor__preview-section-layout-guides storefront-editor__preview-section-layout-guides--cells"
+                            [ngStyle]="sectionLayoutOverlayStyle(section)"
+                          >
+                            @for (cell of sectionLayoutOverlayCells(section); track $index) {
+                                <span
+                                  class="storefront-editor__preview-section-layout-cell"
+                                  [ngStyle]="sectionLayoutPreviewCellStyle(cell)"
+                                ></span>
+                              }
                             </div>
-                          </section>
-                        }
-                        @case ('footer') {
-                          <footer class="preview-footer">
-                            <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
-                            <div class="preview-footer__meta">
-                              <span>{{ readStringProp(section, 'contactEmail') || 'store@example.com' }}</span>
-                              <span>{{ readStringProp(section, 'contactPhone') || '+216 00 000 000' }}</span>
+                          @if (sectionShowsLayoutResizers(section)) {
+                            <div class="storefront-editor__preview-section-layout-resizers">
+                              @for (separatorStyle of sectionLayoutVerticalSeparatorStyles(section); track $index) {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__preview-section-layout-resizer storefront-editor__preview-section-layout-resizer--vertical"
+                                  [ngStyle]="separatorStyle"
+                                  (mousedown)="beginSectionLayoutResize(section.id, 'column', $index, $event)"
+                                  aria-label="Resize section columns"
+                                ></button>
+                              }
+
+                              @for (separatorStyle of sectionLayoutHorizontalSeparatorStyles(section); track $index) {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__preview-section-layout-resizer storefront-editor__preview-section-layout-resizer--horizontal"
+                                  [ngStyle]="separatorStyle"
+                                  (mousedown)="beginSectionLayoutResize(section.id, 'row', $index, $event)"
+                                  aria-label="Resize section rows"
+                                ></button>
+                              }
                             </div>
-                          </footer>
+                          } @else if (sectionShowsLayoutWhileDragging(section.id)) {
+                            <div class="storefront-editor__preview-section-layout-resizers">
+                              @for (separatorStyle of sectionLayoutVerticalSeparatorStyles(section); track $index) {
+                                <span
+                                  class="storefront-editor__preview-section-layout-resizer storefront-editor__preview-section-layout-resizer--vertical storefront-editor__preview-section-layout-resizer--passive"
+                                  [ngStyle]="separatorStyle"
+                                ></span>
+                              }
+
+                              @for (separatorStyle of sectionLayoutHorizontalSeparatorStyles(section); track $index) {
+                                <span
+                                  class="storefront-editor__preview-section-layout-resizer storefront-editor__preview-section-layout-resizer--horizontal storefront-editor__preview-section-layout-resizer--passive"
+                                  [ngStyle]="separatorStyle"
+                                ></span>
+                              }
+                            </div>
+                          }
                         }
-                        }
+                        </div>
 
                         @if (selectedSectionId() === section.id && selectedComponentGroupId() && selectedComponentGroupBounds(); as groupBounds) {
                           <div
@@ -3193,15 +3729,6 @@
                             }
                           </button>
                         }
-                        @if (isSelectingComponents() && selectionBoxSectionId() === section.id) {
-                          <div
-                            class="storefront-editor__preview-selection-box"
-                            [style.left.px]="selectionBox().x"
-                            [style.top.px]="selectionBox().y"
-                            [style.width.px]="selectionBox().width"
-                            [style.height.px]="selectionBox().height"
-                          ></div>
-                        }
                         </div>
                         <div class="storefront-editor__preview-section-chrome">
                           <div class="storefront-editor__preview-section-border"></div>
@@ -3268,6 +3795,15 @@
                         </div>
                     </div>
                   }
+                }
+                @if (isSelectingComponents()) {
+                  <div
+                    class="storefront-editor__preview-selection-box"
+                    [style.left.px]="selectionBox().x"
+                    [style.top.px]="selectionBox().y"
+                    [style.width.px]="selectionBox().width"
+                    [style.height.px]="selectionBox().height"
+                  ></div>
                 }
               </div>
             </div>

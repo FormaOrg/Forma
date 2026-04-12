@@ -105,6 +105,7 @@ type ButtonToolbarMenu =
   | 'shadow'
   | 'spacing'
   | null;
+type SectionToolbarMenu = 'layout' | 'background' | 'borders' | 'corners' | 'opacity' | null;
 type ProductFeedToolbarMenu = 'designs' | 'settings' | 'color' | null;
 type ProductFeedSettingsSection =
   | 'category'
@@ -114,6 +115,41 @@ type ProductFeedSettingsSection =
   | 'add-to-cart'
   | 'filters'
   | 'sorting';
+type StorefrontEditorSectionLayoutPresetId =
+  | 'none'
+  | 'single'
+  | 'two-columns'
+  | 'two-rows'
+  | 'three-columns'
+  | 'three-rows'
+  | 'grid-2x2'
+  | 'sidebar-left'
+  | 'sidebar-right';
+type StorefrontEditorSectionLayoutPreset = {
+  id: StorefrontEditorSectionLayoutPresetId;
+  label: string;
+  columns: number;
+  rows: number;
+  previewColumns: number;
+  previewRows: number;
+  cells: ReadonlyArray<{ column: number; row: number; columnSpan?: number; rowSpan?: number }>;
+};
+type StorefrontEditorSectionLayoutAssignment = {
+  componentId: string;
+  column: number;
+  row: number;
+};
+type StorefrontEditorSectionLayoutTrackAxis = 'column' | 'row';
+type StorefrontEditorSectionLayoutCellBounds = {
+  column: number;
+  row: number;
+  columnSpan: number;
+  rowSpan: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 type StorefrontEditorButtonDesignPreset = {
   id: string;
   label: string;
@@ -178,10 +214,26 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
   private static readonly SECTION_LABEL_PROP_KEY = 'editorLabel';
   private static readonly SECTION_BLANK_PROP_KEY = 'editorBlankSection';
+  private static readonly SECTION_LAYOUT_PROP_KEY = 'editorLayoutPreset';
+  private static readonly SECTION_LAYOUT_COLUMNS_PROP_KEY = 'editorLayoutColumns';
+  private static readonly SECTION_LAYOUT_ROWS_PROP_KEY = 'editorLayoutRows';
+  private static readonly SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY = 'editorLayoutColumnSizes';
+  private static readonly SECTION_LAYOUT_ROW_SIZES_PROP_KEY = 'editorLayoutRowSizes';
+  private static readonly SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY = 'editorLayoutAssignments';
+  private static readonly SECTION_BACKGROUND_PROP_KEY = 'editorBackgroundColor';
+  private static readonly SECTION_BORDER_WIDTH_PROP_KEY = 'editorBorderWidth';
+  private static readonly SECTION_BORDER_STYLE_PROP_KEY = 'editorBorderStyle';
+  private static readonly SECTION_BORDER_COLOR_PROP_KEY = 'editorBorderColor';
+  private static readonly SECTION_RADIUS_PROP_KEY = 'editorRadius';
+  private static readonly SECTION_SHADOW_PROP_KEY = 'editorShadow';
+  private static readonly SECTION_OPACITY_PROP_KEY = 'editorOpacity';
+  private static readonly SECTION_LAYOUT_PADDING_PX = 10;
+  private static readonly SECTION_LAYOUT_GAP_PX = 10;
   private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
   private static readonly SAVED_BUTTON_COLORS_STORAGE_KEY = 'forma_saved_button_colors';
-  private static readonly ROTATION_CURSOR_HOTSPOT = 12;
-  private static readonly ROTATION_CURSOR_SIZE = 24;
+  private static readonly SAVED_SECTION_BORDER_COLORS_STORAGE_KEY = 'forma_saved_section_border_colors';
+  private static readonly ROTATION_CURSOR_HOTSPOT = 10;
+  private static readonly ROTATION_CURSOR_SIZE = 20;
   private static readonly ROTATION_HANDLE_CURSOR_IMAGES: Record<RotationHandleCorner, string> = {
     nw: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKfSURBVFhH7ZU7aFRREIbP/c9/5p69WYiJyGIUtQlIrCxEfDXWSsTeIoKVYKkokeADFdTCB4hioZWWotgpdlaiCJJKCwNGU1gbtbgym73LeIwx2exa5YNb3DMz/z/nPuY4t0KXKechzekZqbElze0JlVmkXBHKmyKEzf+1iXYDkDvesyQ5U+T5zp43YQ1aJkHA26QvCXzLEQ4k8e5gRecjUo4CmPVAWaMcsbFUa0lYoYoh52JObic5BuAcgOtwuOjhp1yWldpELnKyyk81F83vtmVJx5EAXAPwCUD555WVWTZ3RZEvVV2quyis8YZ6fVUAb6iB9yjh8JMOz+Bwnll2GMC+vhhHCbxXc5LT+oQ6bsCai/e7CXzw3usuZ6KXE3mer7M5CoF7mkNysghh2MZS/QWxhQFhP4AfKiyU+41abY2NKyKyEcArfQUEX66OsWHjqf6C2MLc+x1Nc/gyhnDcxixCPp1rkE8ajUZhY6n+P6kK+1zfgAemVDgXOWVFFZsbEPTdT4w7l6U5S8IWE7ir5lHkgV3/W36KzVs0VXGN3KL/MYCvRVEMLiTadjSkOYvCCgTwZnOQeBm362lNV6lM1juXA/gM4PtgjGt7at7emoHkNt09yedpTEk1OiYVrhByTH87gmfSWEWq1RGVmFDOCuRqdQ/nJpoDJcsO6X2/yCahPA4hjPakAQCv9XcLDLda4peRZTqEdg25oQhgsvVBnu5JA8G5YZ3vums9z51zF7SBQmQvnHuUISsD8HCrc+xJA0pr5M42j1PnpvU00yk4N9vxYo9z3uanWh1jRWMIB+l9+yzXS8i39Xq93+alGsvGiscQjun3oI9dyI8DyZGb1nYNayKUS0K+q5Ejdj2t6TrWLCXN7RmpsZLmrLBcfgG/U6awxLbKxgAAAABJRU5ErkJggg==',
     ne: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKhSURBVFhH7ZZBiE1RGMe/8z//893zXm+mKfEQUVhYSGoKsVHKQkzKWshKspwyKcUoCoWoyU5TrOzsJjU7KykLNkxGocmaKF2dN3Omb05DY+Y9K796de/5vvP//9+5p3uuyH/+QL0IZU/PKI0tZW/XsWZBZCuBSYVe/icBrHnl/T4An733tUJv9TyANY8hHAfwDUBdMdy3tUw5f0VY4RjCeXpfA/geVc/Z2mKUWssiiyl5LS25c66G4KOIXBeRmxC5RPIkycENItXCCLOUmn9FFlFy2sF1AnRC5B9Qe/jaA+n6QwDvRnLnwggrCJEFGuQOJaeSOYGppupBde4AnTtB8ArJibRCOQyBsaY0V604hBUYqKqNSr6EQ+1FnhwTga23VDdVXi8C+JLCEHin4vfbnlJ/SViBVqs1QPJZehwAXoUQttl6Isa4NgYdTyEA/AjAEVsv9ZeEFdglwgA+Ssut0Elbs1SqI6knhai832trpf6SsAKJyvuREMJQvl+sJ4YwPPc43m/u6+vP46X2klkov5Df9SnDeHp/BPCeHbf9f40V+p1YrqV9A2AGkJ9BZH7PlP1dZz5dOry8H4ZHHYA7dryc03WyUUNkDUTSGTKzXiT2PMD8XzRQMDF7iHF3WUuUGsumFM5AcDk9BpKny1qm1FoWWSwAQ8rwOMa4Lt3TuVNpBQBczT0KHYvUGz0JQGB07kX0QkTonDs0F+B2x5x84D3TirztSYC02ZR8mkwJPGw1Goc714LRSD3r2TGfaYawvScBEu12u0ngeT6c5o7v6c5eAL+2qmqP7S+1lo0VbTcaq0m+yd8S4lznyA4IR21fqbFirHi/6haSn7J5g3rG1su5XcOaRMbBqNXrSvWCHS/ndB1rVlL29ozSOFH2/MfyC2eVpgMgU3wWAAAAAElFTkSuQmCC',
@@ -269,6 +321,17 @@ export class ProjectStorefrontEditor {
           startHeight: number;
         }
       | null = null;
+  private activeSectionLayoutResize:
+    | {
+        sectionId: string;
+        axis: StorefrontEditorSectionLayoutTrackAxis;
+        separatorIndex: number;
+        startClientX: number;
+        startClientY: number;
+        startSizes: number[];
+        availableSize: number;
+      }
+    | null = null;
   private activeAddElementsComponentDrag:
     | {
         itemId: string;
@@ -282,6 +345,10 @@ export class ProjectStorefrontEditor {
   private activeColorHueDrag = false;
   private activeButtonColorCanvasDrag = false;
   private activeButtonColorHueDrag = false;
+  private activeSectionBackgroundColorCanvasDrag = false;
+  private activeSectionBackgroundColorHueDrag = false;
+  private activeSectionBorderColorCanvasDrag = false;
+  private activeSectionBorderColorHueDrag = false;
   private readonly rotationHandleCursorCache = new Map<string, string>();
 
   readonly project = signal<Project | null>(null);
@@ -440,6 +507,9 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'product-feed' ? component : null;
   });
+  readonly isSectionToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedSection() !== null && !this.hasComponentSelection()
+  );
   readonly isParagraphToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedTextComponent() !== null
   );
@@ -458,6 +528,11 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
   readonly textFontSearch = signal('');
   readonly textLinkPageId = signal<string>('home');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
+  readonly activeSectionToolbarMenu = signal<SectionToolbarMenu>(null);
+  readonly activeSectionBackgroundTab = signal<'brand' | 'custom'>('brand');
+  readonly isSectionBorderColorPickerOpen = signal(false);
+  readonly activeSectionBorderColorTab = signal<'brand' | 'custom'>('brand');
+  readonly isSectionBorderStylePickerOpen = signal(false);
   readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
@@ -509,6 +584,72 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
     const color = this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff';
     return color.replace('#', '').toUpperCase();
   });
+  readonly sectionBackgroundCustomPickerHue = signal(0);
+  readonly sectionBackgroundCustomPickerSaturation = signal(0);
+  readonly sectionBackgroundCustomPickerBrightness = signal(100);
+  readonly sectionBackgroundCustomColorCanvasBackground = computed(
+    () => `hsl(${this.sectionBackgroundCustomPickerHue()} 100% 50%)`
+  );
+  readonly sectionBackgroundCustomColorCanvasHandleLeft = computed(
+    () => `${this.sectionBackgroundCustomPickerSaturation()}%`
+  );
+  readonly sectionBackgroundCustomColorCanvasHandleTop = computed(
+    () => `${100 - this.sectionBackgroundCustomPickerBrightness()}%`
+  );
+  readonly sectionBackgroundCustomColorSpectrumHandleLeft = computed(
+    () => `${(this.sectionBackgroundCustomPickerHue() / 360) * 100}%`
+  );
+  readonly sectionBackgroundHexValue = computed(() => {
+    const color = this.sectionBackgroundColor(this.selectedSection()) ?? '#ffffff';
+    return color.replace('#', '').toUpperCase();
+  });
+  readonly brandSectionBackgroundColors = [
+    '#ffffff',
+    '#f8fafc',
+    '#f4f1ef',
+    '#e5ecff',
+    '#ffefe5',
+    '#d9fb7c',
+    '#dbeafe',
+    '#e9d5ff',
+    '#355cff',
+    '#111827',
+  ];
+  readonly savedSectionBorderColors = signal<string[]>([]);
+  readonly sectionBorderCustomPickerHue = signal(224);
+  readonly sectionBorderCustomPickerSaturation = signal(71);
+  readonly sectionBorderCustomPickerBrightness = signal(11);
+  readonly sectionBorderCustomColorCanvasBackground = computed(
+    () => `hsl(${this.sectionBorderCustomPickerHue()} 100% 50%)`
+  );
+  readonly sectionBorderCustomColorCanvasHandleLeft = computed(
+    () => `${this.sectionBorderCustomPickerSaturation()}%`
+  );
+  readonly sectionBorderCustomColorCanvasHandleTop = computed(
+    () => `${100 - this.sectionBorderCustomPickerBrightness()}%`
+  );
+  readonly sectionBorderCustomColorSpectrumHandleLeft = computed(
+    () => `${(this.sectionBorderCustomPickerHue() / 360) * 100}%`
+  );
+  readonly sectionBorderHexValue = computed(() => this.sectionBorderColor(this.selectedSection()).replace('#', '').toUpperCase());
+  readonly brandSectionBorderColors = [
+    '#ffffff',
+    '#e8f1fb',
+    '#b8d0ea',
+    '#071a2e',
+    '#0d2740',
+    '#2f6f10',
+    '#b2d083',
+    '#d5e0ea',
+    '#c0cad6',
+    '#d62828',
+  ];
+  readonly sectionBorderStyleOptions: ReadonlyArray<{ id: 'solid' | 'dashed' | 'dotted' | 'double'; label: string }> = [
+    { id: 'solid', label: 'Solid' },
+    { id: 'dashed', label: 'Dashed' },
+    { id: 'dotted', label: 'Dotted' },
+    { id: 'double', label: 'Double' },
+  ];
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
   readonly textStylePresets: ReadonlyArray<{ id: StorefrontEditorTextStylePreset; sampleSize: string }> = [
@@ -521,6 +662,94 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
     { id: 'Paragraph 1', sampleSize: '24px' },
     { id: 'Paragraph 2', sampleSize: '18px' },
     { id: 'Paragraph 3', sampleSize: '14px' },
+  ];
+  readonly sectionLayoutPresets: ReadonlyArray<StorefrontEditorSectionLayoutPreset> = [
+    { id: 'none', label: 'None', columns: 0, rows: 0, previewColumns: 1, previewRows: 1, cells: [] },
+    {
+      id: 'single',
+      label: 'Single',
+      columns: 1,
+      rows: 1,
+      previewColumns: 1,
+      previewRows: 1,
+      cells: [{ column: 1, row: 1 }],
+    },
+    {
+      id: 'two-columns',
+      label: 'Two columns',
+      columns: 2,
+      rows: 1,
+      previewColumns: 2,
+      previewRows: 1,
+      cells: [{ column: 1, row: 1 }, { column: 2, row: 1 }],
+    },
+    {
+      id: 'two-rows',
+      label: 'Two rows',
+      columns: 1,
+      rows: 2,
+      previewColumns: 1,
+      previewRows: 2,
+      cells: [{ column: 1, row: 1 }, { column: 1, row: 2 }],
+    },
+    {
+      id: 'three-columns',
+      label: 'Three columns',
+      columns: 3,
+      rows: 1,
+      previewColumns: 3,
+      previewRows: 1,
+      cells: [{ column: 1, row: 1 }, { column: 2, row: 1 }, { column: 3, row: 1 }],
+    },
+    {
+      id: 'three-rows',
+      label: 'Three rows',
+      columns: 1,
+      rows: 3,
+      previewColumns: 1,
+      previewRows: 3,
+      cells: [{ column: 1, row: 1 }, { column: 1, row: 2 }, { column: 1, row: 3 }],
+    },
+    {
+      id: 'grid-2x2',
+      label: 'Grid',
+      columns: 2,
+      rows: 2,
+      previewColumns: 2,
+      previewRows: 2,
+      cells: [
+        { column: 1, row: 1 },
+        { column: 2, row: 1 },
+        { column: 1, row: 2 },
+        { column: 2, row: 2 },
+      ],
+    },
+    {
+      id: 'sidebar-left',
+      label: 'Sidebar left',
+      columns: 2,
+      rows: 2,
+      previewColumns: 2,
+      previewRows: 2,
+      cells: [
+        { column: 1, row: 1, rowSpan: 2 },
+        { column: 2, row: 1 },
+        { column: 2, row: 2 },
+      ],
+    },
+    {
+      id: 'sidebar-right',
+      label: 'Sidebar right',
+      columns: 2,
+      rows: 2,
+      previewColumns: 2,
+      previewRows: 2,
+      cells: [
+        { column: 1, row: 1 },
+        { column: 1, row: 2 },
+        { column: 2, row: 1, rowSpan: 2 },
+      ],
+    },
   ];
   readonly filteredTextFontFamilies = computed(() => {
     const query = this.textFontSearch().trim().toLowerCase();
@@ -996,6 +1225,10 @@ effect(() => {
 });
 
 effect(() => {
+  this.savedSectionBorderColors.set(this.readSavedSectionBorderColors());
+});
+
+effect(() => {
   if (!this.selectedButtonComponent()) {
     this.activeButtonToolbarMenu.set(null);
     return;
@@ -1054,6 +1287,7 @@ effect(() => {
     setTimeout(() => {
       this.updatePreviewStageScrollbarState();
       this.syncSelectedSectionRailPosition();
+      this.refreshSectionLayoutAssignments();
     }, 0);
   }
 
@@ -1072,6 +1306,14 @@ effect(() => {
     if (event.key === 'Escape' && this.isComponentContextMenuOpen()) {
       event.preventDefault();
       this.closeComponentContextMenu();
+      return;
+    }
+
+    if (event.key === 'Escape' && this.activeSectionToolbarMenu()) {
+      event.preventDefault();
+      this.activeSectionToolbarMenu.set(null);
+      this.isSectionBorderColorPickerOpen.set(false);
+      this.isSectionBorderStylePickerOpen.set(false);
       return;
     }
 
@@ -1230,6 +1472,9 @@ effect(() => {
    this.sectionOptionsMenuId.set(null);
    this.pageCardMenuId.set(null);
    this.activeTextToolbarMenu.set(null);
+   this.activeSectionToolbarMenu.set(null);
+   this.isSectionBorderColorPickerOpen.set(false);
+   this.isSectionBorderStylePickerOpen.set(false);
    this.activeButtonToolbarMenu.set(null);
    this.closeComponentContextMenu();
    return;
@@ -1288,6 +1533,26 @@ effect(() => {
    }
  }
 
+if (this.activeSectionToolbarMenu()) {
+  if (!target.closest('.storefront-editor__context-toolbar-shell')) {
+    this.activeSectionToolbarMenu.set(null);
+    this.isSectionBorderColorPickerOpen.set(false);
+    this.isSectionBorderStylePickerOpen.set(false);
+  }
+}
+
+if (this.isSectionBorderColorPickerOpen()) {
+  if (!target.closest('.storefront-editor__section-borders-color-panel, .storefront-editor__section-border-color-trigger')) {
+    this.isSectionBorderColorPickerOpen.set(false);
+  }
+}
+
+if (this.isSectionBorderStylePickerOpen()) {
+  if (!target.closest('.storefront-editor__section-border-style-menu, .storefront-editor__section-border-style-trigger')) {
+    this.isSectionBorderStylePickerOpen.set(false);
+  }
+}
+
 if (this.activeButtonToolbarMenu()) {
   if (
     !target.closest(
@@ -1341,6 +1606,30 @@ if (this.activeProductFeedToolbarMenu()) {
     return;
   }
 
+  if (this.activeSectionBackgroundColorCanvasDrag) {
+    event.preventDefault();
+    this.updateSectionBackgroundColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeSectionBackgroundColorHueDrag) {
+    event.preventDefault();
+    this.updateSectionBackgroundColorFromHueEvent(event);
+    return;
+  }
+
+  if (this.activeSectionBorderColorCanvasDrag) {
+    event.preventDefault();
+    this.updateSectionBorderColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeSectionBorderColorHueDrag) {
+    event.preventDefault();
+    this.updateSectionBorderColorFromHueEvent(event);
+    return;
+  }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -1350,6 +1639,12 @@ if (this.activeProductFeedToolbarMenu()) {
     if (this.activeSectionResize) {
       event.preventDefault();
       this.updateResizingSection(event);
+      return;
+    }
+
+    if (this.activeSectionLayoutResize) {
+      event.preventDefault();
+      this.updateSectionLayoutResize(event);
       return;
     }
 
@@ -1444,10 +1739,29 @@ handleComponentPointerUp(event: MouseEvent): void {
     return;
   }
 
+  if (this.activeSectionBackgroundColorCanvasDrag || this.activeSectionBackgroundColorHueDrag) {
+    this.activeSectionBackgroundColorCanvasDrag = false;
+    this.activeSectionBackgroundColorHueDrag = false;
+    return;
+  }
+
+  if (this.activeSectionBorderColorCanvasDrag || this.activeSectionBorderColorHueDrag) {
+    this.activeSectionBorderColorCanvasDrag = false;
+    this.activeSectionBorderColorHueDrag = false;
+    return;
+  }
+
   if (this.activeAddElementsComponentDrag) {
     this.finishAddElementsComponentDrag(event);
     return;
   }
+
+  if (this.activeSectionLayoutResize) {
+    this.activeSectionLayoutResize = null;
+    return;
+  }
+
+  this.finalizeDraggedComponentsLayoutSnap();
 
     this.activeComponentDrag = null;
     this.activeResize = null;
@@ -1547,6 +1861,9 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
     this.isolatedGroupComponentId.set(null);
+    this.activeSectionToolbarMenu.set(null);
+    this.isSectionBorderColorPickerOpen.set(false);
+    this.isSectionBorderStylePickerOpen.set(false);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
@@ -1557,6 +1874,12 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.selectedComponentIds.set([]);
     this.isolatedGroupComponentId.set(null);
     this.sectionOptionsMenuId.set(null);
+    this.activeSectionToolbarMenu.set(null);
+    this.isSectionBorderColorPickerOpen.set(false);
+    this.isSectionBorderStylePickerOpen.set(false);
+    this.activeTextToolbarMenu.set(null);
+    this.activeButtonToolbarMenu.set(null);
+    this.activeProductFeedToolbarMenu.set(null);
     this.syncEditorSessionState({ selectedSectionId: sectionId });
     setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
   }
@@ -1567,13 +1890,19 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.selectedComponentIds.set([]);
     this.isolatedGroupComponentId.set(null);
     this.sectionOptionsMenuId.set(null);
+    this.activeSectionToolbarMenu.set(null);
+    this.isSectionBorderColorPickerOpen.set(false);
+    this.isSectionBorderStylePickerOpen.set(false);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
   setViewport(viewport: StorefrontEditorViewport): void {
     this.viewport.set(viewport);
     this.syncEditorSessionState({ viewport });
-    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
+    setTimeout(() => {
+      this.updatePreviewStageScrollbarState();
+      this.refreshSectionLayoutAssignments();
+    }, 0);
   }
 
   toggleFormaMenu(): void {
@@ -1863,7 +2192,14 @@ handleComponentPointerUp(event: MouseEvent): void {
     }
 
     const nextComponent = this.buildLibraryComponentForSection(item, selectedSection.id);
-    this.insertComponentIntoSection(selectedSection.id, nextComponent, { syncRail: true });
+    const layoutPlacement = this.resolveSectionLayoutPlacementForComponent(selectedSection.id, nextComponent);
+    if (layoutPlacement) {
+      nextComponent.frame = layoutPlacement.frame;
+    }
+    this.insertComponentIntoSection(selectedSection.id, nextComponent, {
+      syncRail: true,
+      layoutAssignment: layoutPlacement?.assignment ?? null,
+    });
     this.closeAddElementsPanel();
     this.closeAddElementsLibraryModal();
   }
@@ -1947,12 +2283,15 @@ handleComponentPointerUp(event: MouseEvent): void {
       return;
     }
 
-    const nextComponent = this.buildLibraryComponentForSection(
-      item,
-      sectionId,
-      this.getDropFrameFromEvent(sectionId, item.componentType, event)
-    );
-    this.insertComponentIntoSection(sectionId, nextComponent, { selectedSectionId: sectionId, syncRail: true });
+    const nextComponent = this.buildLibraryComponentForSection(item, sectionId);
+    nextComponent.frame =
+      this.getDropFrameFromEvent(sectionId, item.componentType, event) ?? nextComponent.frame;
+    const layoutAssignment = this.resolveSectionLayoutAssignmentForFrame(sectionId, nextComponent.id, nextComponent.frame);
+    this.insertComponentIntoSection(sectionId, nextComponent, {
+      selectedSectionId: sectionId,
+      syncRail: true,
+      layoutAssignment,
+    });
     this.endAddElementsComponentDrag();
   }
 
@@ -1965,6 +2304,9 @@ handleComponentPointerUp(event: MouseEvent): void {
 
     event?.stopPropagation();
     this.selectedSectionId.set(sectionId);
+    this.activeSectionToolbarMenu.set(null);
+    this.isSectionBorderColorPickerOpen.set(false);
+    this.isSectionBorderStylePickerOpen.set(false);
     const isToggleSelection = Boolean(event?.ctrlKey || event?.metaKey);
     const currentIds = this.selectedComponentIds();
     if (isToggleSelection) {
@@ -2047,6 +2389,12 @@ handleComponentPointerUp(event: MouseEvent): void {
         height: item.frame.height,
       })),
       };
+
+    this.removeSectionLayoutAssignments(
+      sectionId,
+      orderedComponents.map((item) => item.id),
+      { selectedSectionId: sectionId, syncRail: false }
+    );
 
     this.suppressNextComponentClickSelectionId = componentId;
     this.selectComponent(sectionId, componentId, event);
@@ -2295,7 +2643,12 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.isolatedGroupComponentId.set(null);
     this.closeComponentContextMenu();
 
-    const rect = currentTarget.getBoundingClientRect();
+    const previewCanvas = currentTarget.closest('.storefront-editor__preview-canvas');
+    if (!(previewCanvas instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = previewCanvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
@@ -2486,6 +2839,7 @@ handleComponentPointerUp(event: MouseEvent): void {
     }
 
     this.selectComponent(sectionId, componentId, event);
+    this.removeSectionLayoutAssignments(sectionId, [componentId], { selectedSectionId: sectionId, syncRail: false });
     this.activeResize = {
       sectionId,
       componentId,
@@ -2846,11 +3200,14 @@ handleComponentPointerUp(event: MouseEvent): void {
 
   closeFloatingUi(): void {
     this.isFormaMenuOpen.set(false);
-    this.isAccountMenuOpen.set(false);
+  this.isAccountMenuOpen.set(false);
   this.isZoomMenuOpen.set(false);
   this.isAddPageMenuOpen.set(false);
   this.sectionAddMenuSectionId.set(null);
   this.activeTextToolbarMenu.set(null);
+  this.activeSectionToolbarMenu.set(null);
+  this.isSectionBorderColorPickerOpen.set(false);
+  this.isSectionBorderStylePickerOpen.set(false);
   this.activeButtonToolbarMenu.set(null);
   this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
@@ -2994,7 +3351,10 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.zoomPercent.set(clamped);
     this.isZoomMenuOpen.set(false);
     this.syncEditorSessionState({ zoomPercent: clamped });
-    setTimeout(() => this.updatePreviewStageScrollbarState(), 0);
+    setTimeout(() => {
+      this.updatePreviewStageScrollbarState();
+      this.refreshSectionLayoutAssignments();
+    }, 0);
   }
 
   nudgeZoom(direction: 'in' | 'out'): void {
@@ -3313,6 +3673,318 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     const next = this.savedParagraphColors().filter((item) => item !== color);
     this.savedParagraphColors.set(next);
     localStorage.setItem(ProjectStorefrontEditor.SAVED_PARAGRAPH_COLORS_STORAGE_KEY, JSON.stringify(next));
+  }
+
+  toggleSectionToolbarMenu(menu: Exclude<SectionToolbarMenu, null>): void {
+    const next = this.activeSectionToolbarMenu() === menu ? null : menu;
+    this.sectionAddMenuSectionId.set(null);
+    this.sectionOptionsMenuId.set(null);
+    this.activeSectionToolbarMenu.set(next);
+    if (next !== 'borders') {
+      this.isSectionBorderColorPickerOpen.set(false);
+      this.isSectionBorderStylePickerOpen.set(false);
+    }
+
+    if (next === 'background') {
+      this.activeSectionBackgroundTab.set('brand');
+      this.syncSectionBackgroundColorPickerFromHex(this.sectionBackgroundColor(this.selectedSection()) ?? '#ffffff');
+    }
+  }
+
+  setActiveSectionBackgroundTab(tab: 'brand' | 'custom'): void {
+    this.activeSectionBackgroundTab.set(tab);
+  }
+
+  applySelectedSectionLayoutPreset(presetId: StorefrontEditorSectionLayoutPresetId): void {
+    const preset = this.getSectionLayoutPresetById(presetId);
+    const sectionId = this.selectedSectionId();
+    if (!sectionId) {
+      return;
+    }
+
+    this.updateSectionLayoutStructure(sectionId, (section) => {
+      const nextProps: Record<string, unknown> = {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY]: preset.id,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY]: preset.columns,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY]: preset.rows,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
+          preset.id,
+          'column',
+          preset.columns
+        ),
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
+          preset.id,
+          'row',
+          preset.rows
+        ),
+      };
+
+      if (preset.id === 'none') {
+        nextProps[ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY] = [];
+      }
+
+      return {
+        ...section,
+        props: nextProps,
+      };
+    });
+  }
+
+  adjustSelectedSectionLayoutColumns(delta: number): void {
+    const section = this.selectedSection();
+    if (!section || !this.sectionShowsLayoutControls(section)) {
+      return;
+    }
+
+    const nextValue = Math.max(1, Math.min(6, this.sectionLayoutColumns(section) + delta));
+    const sectionId = section.id;
+    const presetId = this.sectionLayoutPresetId(section);
+    this.updateSectionLayoutStructure(sectionId, (current) => ({
+      ...current,
+      props: {
+        ...current.props,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY]: nextValue,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
+          presetId,
+          'column',
+          nextValue
+        ),
+      },
+    }));
+  }
+
+  adjustSelectedSectionLayoutRows(delta: number): void {
+    const section = this.selectedSection();
+    if (!section || !this.sectionShowsLayoutControls(section)) {
+      return;
+    }
+
+    const nextValue = Math.max(1, Math.min(6, this.sectionLayoutRows(section) + delta));
+    const sectionId = section.id;
+    const presetId = this.sectionLayoutPresetId(section);
+    this.updateSectionLayoutStructure(sectionId, (current) => ({
+      ...current,
+      props: {
+        ...current.props,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY]: nextValue,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
+          presetId,
+          'row',
+          nextValue
+        ),
+      },
+    }));
+  }
+
+  beginSectionLayoutResize(
+    sectionId: string,
+    axis: StorefrontEditorSectionLayoutTrackAxis,
+    separatorIndex: number,
+    event: MouseEvent
+  ): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const section = this.sections().find((candidate) => candidate.id === sectionId) ?? null;
+    const dimensions = this.getSectionContentDimensions(sectionId);
+    if (!section || !dimensions) {
+      return;
+    }
+
+    const trackCount = axis === 'column' ? this.sectionLayoutColumns(section) : this.sectionLayoutRows(section);
+    if (trackCount <= 1) {
+      return;
+    }
+
+    const availableSize = Math.max(
+      1,
+      (axis === 'column' ? dimensions.width : dimensions.height) -
+        (ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX * 2) -
+        (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX * Math.max(0, trackCount - 1))
+    );
+
+    this.activeSectionLayoutResize = {
+      sectionId,
+      axis,
+      separatorIndex,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startSizes:
+        axis === 'column'
+          ? [...this.sectionLayoutColumnTrackSizes(section)]
+          : [...this.sectionLayoutRowTrackSizes(section)],
+      availableSize,
+    };
+  }
+
+  updateSelectedSectionBackgroundColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    if (normalized !== 'transparent') {
+      this.syncSectionBackgroundColorPickerFromHex(normalized);
+    }
+
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_BACKGROUND_PROP_KEY]: normalized,
+      },
+    }));
+  }
+
+  startSectionBackgroundColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeSectionBackgroundColorCanvasDrag = true;
+    this.updateSectionBackgroundColorFromCanvasEvent(event);
+  }
+
+  startSectionBackgroundHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeSectionBackgroundColorHueDrag = true;
+    this.updateSectionBackgroundColorFromHueEvent(event);
+  }
+
+  updateSectionBackgroundHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedSectionBackgroundColor(normalized);
+  }
+
+  updateSelectedSectionBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.syncSectionBorderColorPickerFromHex(normalized);
+    this.rememberSectionBorderColor(normalized);
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_BORDER_COLOR_PROP_KEY]: normalized,
+      },
+    }));
+  }
+
+  updateSelectedSectionBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    const nextWidth = Math.max(0, Math.min(12, Math.round(parsed)));
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_BORDER_WIDTH_PROP_KEY]: nextWidth,
+        [ProjectStorefrontEditor.SECTION_BORDER_STYLE_PROP_KEY]: this.sectionBorderStyle(section),
+      },
+    }));
+  }
+
+  updateSelectedSectionBorderStyle(value: 'solid' | 'dashed' | 'dotted' | 'double'): void {
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_BORDER_STYLE_PROP_KEY]: value,
+        [ProjectStorefrontEditor.SECTION_BORDER_WIDTH_PROP_KEY]: Math.max(this.sectionBorderWidth(section), 1),
+      },
+    }));
+    this.isSectionBorderStylePickerOpen.set(false);
+  }
+
+  updateSelectedSectionRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_RADIUS_PROP_KEY]: Math.max(0, Math.min(999, Math.round(parsed))),
+      },
+    }));
+  }
+
+  updateSelectedSectionOpacity(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_OPACITY_PROP_KEY]: Math.max(0, Math.min(100, Math.round(parsed))),
+      },
+    }));
+  }
+
+  toggleSectionBorderColorPicker(): void {
+    const next = !this.isSectionBorderColorPickerOpen();
+    this.isSectionBorderColorPickerOpen.set(next);
+    if (next) {
+      this.isSectionBorderStylePickerOpen.set(false);
+    }
+    if (next) {
+      this.activeSectionBorderColorTab.set('brand');
+      this.syncSectionBorderColorPickerFromHex(this.sectionBorderColor(this.selectedSection()));
+    }
+  }
+
+  toggleSectionBorderStylePicker(): void {
+    const next = !this.isSectionBorderStylePickerOpen();
+    this.isSectionBorderStylePickerOpen.set(next);
+    if (next) {
+      this.isSectionBorderColorPickerOpen.set(false);
+    }
+  }
+
+  setActiveSectionBorderColorTab(tab: 'brand' | 'custom'): void {
+    this.activeSectionBorderColorTab.set(tab);
+  }
+
+  startSectionBorderColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeSectionBorderColorCanvasDrag = true;
+    this.updateSectionBorderColorFromCanvasEvent(event);
+  }
+
+  startSectionBorderHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeSectionBorderColorHueDrag = true;
+    this.updateSectionBorderColorFromHueEvent(event);
+  }
+
+  updateSectionBorderHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedSectionBorderColor(normalized);
+  }
+
+  applySavedSectionBorderColor(color: string): void {
+    this.updateSelectedSectionBorderColor(color);
   }
 
   toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
@@ -3715,6 +4387,20 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   buttonShadowPreviewStyle(shadow: StorefrontEditorButtonNode['props']['shadow']): Record<string, string> {
     return {
       boxShadow: this.getButtonShadowCssValue(shadow),
+    };
+  }
+
+  sectionLayoutPreviewGridStyle(preset: StorefrontEditorSectionLayoutPreset): Record<string, string> {
+    return {
+      gridTemplateColumns: `repeat(${preset.previewColumns}, minmax(0, 1fr))`,
+      gridTemplateRows: `repeat(${preset.previewRows}, minmax(0, 1fr))`,
+    };
+  }
+
+  sectionLayoutPreviewCellStyle(cell: { column: number; row: number; columnSpan?: number; rowSpan?: number }): Record<string, string> {
+    return {
+      gridColumn: `${cell.column} / span ${cell.columnSpan ?? 1}`,
+      gridRow: `${cell.row} / span ${cell.rowSpan ?? 1}`,
     };
   }
 
@@ -4625,6 +5311,34 @@ updatePageDesignTabScrollState(): void {
       : [];
   }
 
+  readSectionLayoutAssignments(section: StorefrontHomepageSection | null): StorefrontEditorSectionLayoutAssignment[] {
+    const value = (section?.props as Record<string, unknown> | undefined)?.[
+      ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY
+    ];
+
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => {
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+
+        const record = item as Record<string, unknown>;
+        const componentId = typeof record['componentId'] === 'string' ? record['componentId'] : '';
+        const column = typeof record['column'] === 'number' ? Math.max(1, Math.round(record['column'])) : 1;
+        const row = typeof record['row'] === 'number' ? Math.max(1, Math.round(record['row'])) : 1;
+        if (!componentId) {
+          return null;
+        }
+
+        return { componentId, column, row };
+      })
+      .filter((assignment): assignment is StorefrontEditorSectionLayoutAssignment => assignment !== null);
+  }
+
   componentPreviewStyle(component: StorefrontEditorComponentNode): Record<string, string> {
     return {
       left: `${component.frame.x}px`,
@@ -4644,6 +5358,239 @@ updatePageDesignTabScrollState(): void {
 
   isBlankSection(section: StorefrontHomepageSection | null): boolean {
     return this.readBooleanProp(section, ProjectStorefrontEditor.SECTION_BLANK_PROP_KEY);
+  }
+
+  sectionLayoutPresetId(section: StorefrontHomepageSection | null): StorefrontEditorSectionLayoutPresetId {
+    const value = this.readStringProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY) as StorefrontEditorSectionLayoutPresetId;
+    return this.sectionLayoutPresets.some((preset) => preset.id === value) ? value : 'none';
+  }
+
+  sectionLayoutColumns(section: StorefrontHomepageSection | null): number {
+    const preset = this.getSectionLayoutPresetById(this.sectionLayoutPresetId(section));
+    if (preset.id === 'none') {
+      return 0;
+    }
+
+    return Math.max(1, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY, preset.columns));
+  }
+
+  sectionLayoutRows(section: StorefrontHomepageSection | null): number {
+    const preset = this.getSectionLayoutPresetById(this.sectionLayoutPresetId(section));
+    if (preset.id === 'none') {
+      return 0;
+    }
+
+    return Math.max(1, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY, preset.rows));
+  }
+
+  sectionShowsLayoutControls(section: StorefrontHomepageSection | null): boolean {
+    return this.sectionLayoutPresetId(section) !== 'none';
+  }
+
+  sectionLayoutColumnTrackSizes(section: StorefrontHomepageSection | null): number[] {
+    const columns = this.sectionLayoutColumns(section);
+    const presetId = this.sectionLayoutPresetId(section);
+    return this.normalizeSectionLayoutTrackSizes(
+      this.readNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY),
+      columns,
+      this.getDefaultSectionLayoutTrackSizes(presetId, 'column', columns)
+    );
+  }
+
+  sectionLayoutRowTrackSizes(section: StorefrontHomepageSection | null): number[] {
+    const rows = this.sectionLayoutRows(section);
+    const presetId = this.sectionLayoutPresetId(section);
+    return this.normalizeSectionLayoutTrackSizes(
+      this.readNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY),
+      rows,
+      this.getDefaultSectionLayoutTrackSizes(presetId, 'row', rows)
+    );
+  }
+
+  sectionLayoutVerticalGuides(section: StorefrontHomepageSection | null): number[] {
+    const columns = this.sectionLayoutColumns(section);
+    if (columns <= 1) {
+      return [];
+    }
+
+    return Array.from({ length: columns - 1 }, (_, index) => ((index + 1) / columns) * 100);
+  }
+
+  sectionLayoutHorizontalGuides(section: StorefrontHomepageSection | null): number[] {
+    const rows = this.sectionLayoutRows(section);
+    if (rows <= 1) {
+      return [];
+    }
+
+    return Array.from({ length: rows - 1 }, (_, index) => ((index + 1) / rows) * 100);
+  }
+
+  sectionShowsLayoutGuides(section: StorefrontHomepageSection | null): boolean {
+    return this.sectionShowsLayoutControls(section) && (this.sectionLayoutColumns(section) > 1 || this.sectionLayoutRows(section) > 1);
+  }
+
+  sectionShowsLayoutOverlay(section: StorefrontHomepageSection | null): boolean {
+    if (!this.sectionShowsLayoutGuides(section)) {
+      return false;
+    }
+
+    const sectionId = section?.id ?? null;
+    if (!sectionId) {
+      return false;
+    }
+
+    return this.isSectionActivelySelected(sectionId) || this.sectionShowsLayoutWhileDragging(sectionId);
+  }
+
+  sectionShowsLayoutWhileDragging(sectionId: string | null): boolean {
+    if (!sectionId) {
+      return false;
+    }
+
+    if (this.isLibraryComponentDragging() && this.componentAttachSectionId() === sectionId) {
+      return true;
+    }
+
+    return this.activeComponentDrag?.sectionId === sectionId;
+  }
+
+  sectionShowsLayoutResizers(section: StorefrontHomepageSection | null): boolean {
+    const sectionId = section?.id ?? null;
+    return !!sectionId && this.isSectionActivelySelected(sectionId) && this.sectionShowsLayoutGuides(section);
+  }
+
+  sectionLayoutOverlayStyle(section: StorefrontHomepageSection | null): Record<string, string> {
+    const columnTrackSizes = this.sectionLayoutColumnTrackSizes(section);
+    const rowTrackSizes = this.sectionLayoutRowTrackSizes(section);
+
+    return {
+      gridTemplateColumns: columnTrackSizes.length
+        ? columnTrackSizes.map((size) => `${size}%`).join(' ')
+        : 'minmax(0, 1fr)',
+      gridTemplateRows: rowTrackSizes.length
+        ? rowTrackSizes.map((size) => `${size}%`).join(' ')
+        : 'minmax(0, 1fr)',
+    };
+  }
+
+  sectionLayoutOverlayCells(
+    section: StorefrontHomepageSection | null
+  ): Array<{ column: number; row: number; columnSpan?: number; rowSpan?: number }> {
+    const presetId = this.sectionLayoutPresetId(section);
+    const columns = Math.max(1, this.sectionLayoutColumns(section));
+    const rows = Math.max(1, this.sectionLayoutRows(section));
+
+    if (presetId === 'none') {
+      return [];
+    }
+
+    if (presetId === 'sidebar-left' && columns >= 2) {
+      return [
+        { column: 1, row: 1, rowSpan: rows },
+        ...Array.from({ length: rows * (columns - 1) }, (_, index) => ({
+          column: Math.floor(index / rows) + 2,
+          row: (index % rows) + 1,
+        })),
+      ];
+    }
+
+    if (presetId === 'sidebar-right' && columns >= 2) {
+      return [
+        ...Array.from({ length: rows * (columns - 1) }, (_, index) => ({
+          column: Math.floor(index / rows) + 1,
+          row: (index % rows) + 1,
+        })),
+        { column: columns, row: 1, rowSpan: rows },
+      ];
+    }
+
+    return Array.from({ length: rows * columns }, (_, index) => ({
+      column: (index % columns) + 1,
+      row: Math.floor(index / columns) + 1,
+    }));
+  }
+
+  sectionLayoutVerticalSeparatorStyles(section: StorefrontHomepageSection | null): Array<Record<string, string>> {
+    const sizes = this.sectionLayoutColumnTrackSizes(section);
+    if (sizes.length <= 1) {
+      return [];
+    }
+
+    const chrome = (ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX * 2) +
+      (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX * (sizes.length - 1));
+    let cumulative = 0;
+
+    return sizes.slice(0, -1).map((size, index) => {
+      cumulative += size / 100;
+      const left = `calc(${ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX + (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX * index) + (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX / 2)}px + (100% - ${chrome}px) * ${cumulative})`;
+      return { left };
+    });
+  }
+
+  sectionLayoutHorizontalSeparatorStyles(section: StorefrontHomepageSection | null): Array<Record<string, string>> {
+    const sizes = this.sectionLayoutRowTrackSizes(section);
+    if (sizes.length <= 1) {
+      return [];
+    }
+
+    const chrome = (ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX * 2) +
+      (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX * (sizes.length - 1));
+    let cumulative = 0;
+
+    return sizes.slice(0, -1).map((size, index) => {
+      cumulative += size / 100;
+      const top = `calc(${ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX + (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX * index) + (ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX / 2)}px + (100% - ${chrome}px) * ${cumulative})`;
+      return { top };
+    });
+  }
+
+  sectionBackgroundColor(section: StorefrontHomepageSection | null): string | null {
+    const value = this.readStringProp(section, ProjectStorefrontEditor.SECTION_BACKGROUND_PROP_KEY);
+    return this.normalizeHexColor(value);
+  }
+
+  sectionHasCustomBackground(section: StorefrontHomepageSection | null): boolean {
+    return this.sectionBackgroundColor(section) !== null;
+  }
+
+  sectionBorderStyle(section: StorefrontHomepageSection | null): 'solid' | 'dashed' | 'dotted' | 'double' {
+    const value = this.readStringProp(section, ProjectStorefrontEditor.SECTION_BORDER_STYLE_PROP_KEY);
+    return value === 'dashed' || value === 'dotted' || value === 'double' ? value : 'solid';
+  }
+
+  sectionBorderWidth(section: StorefrontHomepageSection | null): number {
+    return Math.max(0, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_BORDER_WIDTH_PROP_KEY, 0));
+  }
+
+  sectionBorderColor(section: StorefrontHomepageSection | null): string {
+    return this.normalizeHexColor(this.readStringProp(section, ProjectStorefrontEditor.SECTION_BORDER_COLOR_PROP_KEY)) ?? '#111827';
+  }
+
+  sectionRadius(section: StorefrontHomepageSection | null): number {
+    return Math.max(0, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_RADIUS_PROP_KEY, 0));
+  }
+
+  sectionShadow(section: StorefrontHomepageSection | null): StorefrontEditorButtonNode['props']['shadow'] {
+    const value = this.readStringProp(section, ProjectStorefrontEditor.SECTION_SHADOW_PROP_KEY);
+    return value === 'soft' || value === 'medium' || value === 'strong' ? value : 'none';
+  }
+
+  sectionOpacity(section: StorefrontHomepageSection | null): number {
+    return Math.max(0, Math.min(100, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_OPACITY_PROP_KEY, 100)));
+  }
+
+  sectionSurfaceStyle(section: StorefrontHomepageSection | null): Record<string, string | null> {
+    const borderStyle = this.sectionBorderStyle(section);
+    const borderWidth = this.sectionBorderWidth(section);
+
+    return {
+      background: this.sectionBackgroundColor(section),
+      borderColor: borderWidth === 0 ? 'transparent' : this.sectionBorderColor(section),
+      borderStyle,
+      borderWidth: `${borderWidth}px`,
+      borderRadius: `${this.sectionRadius(section)}px`,
+      opacity: `${this.sectionOpacity(section) / 100}`,
+    };
   }
 
 componentTypeLabel(component: StorefrontEditorComponentNode): string {
@@ -4802,11 +5749,17 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     section: StorefrontHomepageSection,
     components: StorefrontEditorComponentNode[]
   ): StorefrontHomepageSection {
+    const componentIds = new Set(components.map((component) => component.id));
+    const nextAssignments = this.readSectionLayoutAssignments(section).filter((assignment) =>
+      componentIds.has(assignment.componentId)
+    );
+
     return {
       ...section,
       props: {
         ...section.props,
         [ProjectStorefrontEditor.SECTION_COMPONENTS_PROP_KEY]: components,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY]: nextAssignments,
       },
     };
   }
@@ -4877,16 +5830,18 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
       return;
     }
 
+    const previewCanvas = document.querySelector('.storefront-editor__preview-canvas');
     const container = document.querySelector(
       `.storefront-editor__preview-section-content[data-section-content-id="${this.activeSelectionDrag.sectionId}"]`
     );
-    if (!(container instanceof HTMLElement)) {
+    if (!(previewCanvas instanceof HTMLElement) || !(container instanceof HTMLElement)) {
       return;
     }
 
-    const rect = container.getBoundingClientRect();
-    const currentX = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
-    const currentY = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
+    const previewRect = previewCanvas.getBoundingClientRect();
+    const sectionRect = container.getBoundingClientRect();
+    const currentX = Math.max(0, Math.min(event.clientX - previewRect.left, previewRect.width));
+    const currentY = Math.max(0, Math.min(event.clientY - previewRect.top, previewRect.height));
     const width = currentX - this.activeSelectionDrag.startX;
     const height = currentY - this.activeSelectionDrag.startY;
     const nextBox = {
@@ -4895,12 +5850,14 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
       width: Math.abs(width),
       height: Math.abs(height),
     };
+    const sectionOffsetX = sectionRect.left - previewRect.left;
+    const sectionOffsetY = sectionRect.top - previewRect.top;
 
     this.selectionBox.set(nextBox);
     const section = this.sections().find((item) => item.id === this.activeSelectionDrag?.sectionId) ?? null;
     const selectedIds = section
       ? this.readSectionComponents(section)
-          .filter((component) => this.isComponentInsideSelectionBox(component, nextBox))
+          .filter((component) => this.isComponentInsideSelectionBox(component, nextBox, sectionOffsetX, sectionOffsetY))
           .map((component) => component.id)
       : [];
 
@@ -4925,18 +5882,22 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
 
   private isComponentInsideSelectionBox(
     component: StorefrontEditorComponentNode,
-    box: ComponentSelectionBox
+    box: ComponentSelectionBox,
+    offsetX = 0,
+    offsetY = 0
   ): boolean {
-    const componentRight = component.frame.x + component.frame.width;
-    const componentBottom = component.frame.y + component.frame.height;
+    const componentLeft = offsetX + component.frame.x;
+    const componentTop = offsetY + component.frame.y;
+    const componentRight = componentLeft + component.frame.width;
+    const componentBottom = componentTop + component.frame.height;
     const boxRight = box.x + box.width;
     const boxBottom = box.y + box.height;
 
     return !(
       componentRight < box.x ||
-      component.frame.x > boxRight ||
+      componentLeft > boxRight ||
       componentBottom < box.y ||
-      component.frame.y > boxBottom
+      componentTop > boxBottom
     );
   }
 
@@ -5456,6 +6417,22 @@ private updateSelectedProductFeedProps(
     }
   }
 
+  private readSavedSectionBorderColors(): string[] {
+    try {
+      const raw = localStorage.getItem(ProjectStorefrontEditor.SAVED_SECTION_BORDER_COLORS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === 'string').slice(0, 12)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
   private updateCustomColorFromCanvasEvent(event: MouseEvent): void {
     const element = event.target instanceof HTMLElement
       ? event.target.closest('.storefront-editor__context-toolbar-color-canvas')
@@ -5552,6 +6529,125 @@ private updateSelectedProductFeedProps(
     this.buttonCustomPickerHue.set(h);
     this.buttonCustomPickerSaturation.set(s);
     this.buttonCustomPickerBrightness.set(v);
+  }
+
+  private updateSectionBackgroundColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__section-background-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.sectionBackgroundCustomPickerSaturation.set(saturation);
+    this.sectionBackgroundCustomPickerBrightness.set(brightness);
+    this.commitSectionBackgroundColorPicker();
+  }
+
+  private updateSectionBackgroundColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__section-background-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.sectionBackgroundCustomPickerHue.set(Math.round(ratio * 360));
+    this.commitSectionBackgroundColorPicker();
+  }
+
+  private commitSectionBackgroundColorPicker(): void {
+    const hex = this.hsvToHex(
+      this.sectionBackgroundCustomPickerHue(),
+      this.sectionBackgroundCustomPickerSaturation(),
+      this.sectionBackgroundCustomPickerBrightness()
+    );
+    this.updateSelectedSection((section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_BACKGROUND_PROP_KEY]: hex,
+      },
+    }));
+  }
+
+  private syncSectionBackgroundColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.sectionBackgroundCustomPickerHue.set(h);
+    this.sectionBackgroundCustomPickerSaturation.set(s);
+    this.sectionBackgroundCustomPickerBrightness.set(v);
+  }
+
+  private updateSectionBorderColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__section-borders-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.sectionBorderCustomPickerSaturation.set(saturation);
+    this.sectionBorderCustomPickerBrightness.set(brightness);
+    this.commitSectionBorderColorPicker();
+  }
+
+  private updateSectionBorderColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__section-borders-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.sectionBorderCustomPickerHue.set(Math.round(ratio * 360));
+    this.commitSectionBorderColorPicker();
+  }
+
+  private commitSectionBorderColorPicker(): void {
+    const hex = this.hsvToHex(
+      this.sectionBorderCustomPickerHue(),
+      this.sectionBorderCustomPickerSaturation(),
+      this.sectionBorderCustomPickerBrightness()
+    );
+    this.updateSelectedSectionBorderColor(hex);
+  }
+
+  private syncSectionBorderColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.sectionBorderCustomPickerHue.set(h);
+    this.sectionBorderCustomPickerSaturation.set(s);
+    this.sectionBorderCustomPickerBrightness.set(v);
+  }
+
+  private rememberSectionBorderColor(color: string): void {
+    const normalized = color.trim().toLowerCase();
+    const next = [normalized, ...this.savedSectionBorderColors().filter((item) => item !== normalized)].slice(0, 12);
+    this.savedSectionBorderColors.set(next);
+    localStorage.setItem(ProjectStorefrontEditor.SAVED_SECTION_BORDER_COLORS_STORAGE_KEY, JSON.stringify(next));
+  }
+
+  private getSectionLayoutPresetById(presetId: StorefrontEditorSectionLayoutPresetId): StorefrontEditorSectionLayoutPreset {
+    return this.sectionLayoutPresets.find((preset) => preset.id === presetId) ?? this.sectionLayoutPresets[0];
   }
 
   private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['shadow']): string {
@@ -5654,6 +6750,420 @@ private updateSelectedProductFeedProps(
     return Math.min(max, Math.max(min, value));
   }
 
+  private normalizeSectionLayoutTrackSizes(values: number[], count: number, fallback: number[]): number[] {
+    if (count <= 0) {
+      return [];
+    }
+
+    const source =
+      values.length === count && values.every((value) => Number.isFinite(value) && value > 0)
+        ? values
+        : fallback;
+    const total = source.reduce((sum, value) => sum + value, 0);
+    if (total <= 0) {
+      return Array.from({ length: count }, () => 100 / count);
+    }
+
+    let consumed = 0;
+    return source.map((value, index) => {
+      if (index === source.length - 1) {
+        return Math.max(0, +(100 - consumed).toFixed(4));
+      }
+
+      const normalized = +((value / total) * 100).toFixed(4);
+      consumed += normalized;
+      return normalized;
+    });
+  }
+
+  private getDefaultSectionLayoutTrackSizes(
+    presetId: StorefrontEditorSectionLayoutPresetId,
+    axis: StorefrontEditorSectionLayoutTrackAxis,
+    count: number
+  ): number[] {
+    if (count <= 0) {
+      return [];
+    }
+
+    if (axis === 'column' && count === 2) {
+      if (presetId === 'sidebar-left') {
+        return [34, 66];
+      }
+
+      if (presetId === 'sidebar-right') {
+        return [66, 34];
+      }
+    }
+
+    return Array.from({ length: count }, () => 100 / count);
+  }
+
+  private writeSectionLayoutAssignments(
+    section: StorefrontHomepageSection,
+    assignments: StorefrontEditorSectionLayoutAssignment[]
+  ): StorefrontHomepageSection {
+    const componentIds = new Set(this.readSectionComponents(section).map((component) => component.id));
+    const uniqueAssignments = new Map<string, StorefrontEditorSectionLayoutAssignment>();
+
+    for (const assignment of assignments) {
+      if (!componentIds.has(assignment.componentId)) {
+        continue;
+      }
+
+      uniqueAssignments.set(assignment.componentId, {
+        componentId: assignment.componentId,
+        column: Math.max(1, Math.round(assignment.column)),
+        row: Math.max(1, Math.round(assignment.row)),
+      });
+    }
+
+    return {
+      ...section,
+      props: {
+        ...section.props,
+        [ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY]: Array.from(uniqueAssignments.values()),
+      },
+    };
+  }
+
+  private getSectionContentDimensions(sectionId: string): { width: number; height: number } | null {
+    const container = document.querySelector(
+      `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
+    );
+    if (!(container instanceof HTMLElement)) {
+      return null;
+    }
+
+    const rect = container.getBoundingClientRect();
+    return {
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  private getSectionLayoutCellBounds(
+    section: StorefrontHomepageSection | null,
+    containerWidth: number,
+    containerHeight: number
+  ): StorefrontEditorSectionLayoutCellBounds[] {
+    if (!section || !this.sectionShowsLayoutControls(section)) {
+      return [];
+    }
+
+    const columns = Math.max(1, this.sectionLayoutColumns(section));
+    const rows = Math.max(1, this.sectionLayoutRows(section));
+    const cells = this.sectionLayoutOverlayCells(section);
+    const padding = ProjectStorefrontEditor.SECTION_LAYOUT_PADDING_PX;
+    const gap = ProjectStorefrontEditor.SECTION_LAYOUT_GAP_PX;
+    const columnSizes = this.sectionLayoutColumnTrackSizes(section);
+    const rowSizes = this.sectionLayoutRowTrackSizes(section);
+    const innerWidth = Math.max(1, containerWidth - (padding * 2) - (gap * Math.max(0, columns - 1)));
+    const innerHeight = Math.max(1, containerHeight - (padding * 2) - (gap * Math.max(0, rows - 1)));
+
+    const columnWidths = this.scaleLayoutTracksToPixels(columnSizes, innerWidth);
+    const rowHeights = this.scaleLayoutTracksToPixels(rowSizes, innerHeight);
+    const columnOffsets = this.buildLayoutTrackOffsets(columnWidths, padding, gap);
+    const rowOffsets = this.buildLayoutTrackOffsets(rowHeights, padding, gap);
+
+    return cells.map((cell) => {
+      const columnSpan = Math.max(1, cell.columnSpan ?? 1);
+      const rowSpan = Math.max(1, cell.rowSpan ?? 1);
+      const startColumnIndex = Math.max(0, Math.min(columns - 1, cell.column - 1));
+      const startRowIndex = Math.max(0, Math.min(rows - 1, cell.row - 1));
+      const width =
+        columnWidths.slice(startColumnIndex, startColumnIndex + columnSpan).reduce((sum, value) => sum + value, 0) +
+        (gap * Math.max(0, columnSpan - 1));
+      const height =
+        rowHeights.slice(startRowIndex, startRowIndex + rowSpan).reduce((sum, value) => sum + value, 0) +
+        (gap * Math.max(0, rowSpan - 1));
+
+      return {
+        column: cell.column,
+        row: cell.row,
+        columnSpan,
+        rowSpan,
+        x: columnOffsets[startColumnIndex] ?? padding,
+        y: rowOffsets[startRowIndex] ?? padding,
+        width,
+        height,
+      };
+    });
+  }
+
+  private scaleLayoutTracksToPixels(trackSizes: number[], totalSize: number): number[] {
+    if (!trackSizes.length) {
+      return [];
+    }
+
+    let consumed = 0;
+    return trackSizes.map((size, index) => {
+      if (index === trackSizes.length - 1) {
+        return Math.max(0, totalSize - consumed);
+      }
+
+      const nextValue = Math.max(0, Math.round((size / 100) * totalSize));
+      consumed += nextValue;
+      return nextValue;
+    });
+  }
+
+  private buildLayoutTrackOffsets(trackSizes: number[], padding: number, gap: number): number[] {
+    let cursor = padding;
+    return trackSizes.map((size) => {
+      const offset = cursor;
+      cursor += size + gap;
+      return offset;
+    });
+  }
+
+  private resolveSectionLayoutCellFromAssignment(
+    section: StorefrontHomepageSection | null,
+    assignment: StorefrontEditorSectionLayoutAssignment,
+    cells: StorefrontEditorSectionLayoutCellBounds[]
+  ): StorefrontEditorSectionLayoutCellBounds | null {
+    if (!section || !cells.length) {
+      return null;
+    }
+
+    const exactMatch = cells.find((cell) => cell.column === assignment.column && cell.row === assignment.row);
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    return (
+      [...cells].sort((left, right) => {
+        const leftDistance = Math.abs(left.column - assignment.column) + Math.abs(left.row - assignment.row);
+        const rightDistance = Math.abs(right.column - assignment.column) + Math.abs(right.row - assignment.row);
+        return leftDistance - rightDistance;
+      })[0] ?? null
+    );
+  }
+
+  private getSectionLayoutCellAtLocalPoint(
+    cells: StorefrontEditorSectionLayoutCellBounds[],
+    localX: number,
+    localY: number
+  ): StorefrontEditorSectionLayoutCellBounds | null {
+    const containingCell = cells.find(
+      (cell) =>
+        localX >= cell.x &&
+        localX <= cell.x + cell.width &&
+        localY >= cell.y &&
+        localY <= cell.y + cell.height
+    );
+    if (containingCell) {
+      return containingCell;
+    }
+
+    return (
+      [...cells].sort((left, right) => {
+        const leftDistance = Math.hypot((left.x + left.width / 2) - localX, (left.y + left.height / 2) - localY);
+        const rightDistance = Math.hypot((right.x + right.width / 2) - localX, (right.y + right.height / 2) - localY);
+        return leftDistance - rightDistance;
+      })[0] ?? null
+    );
+  }
+
+  private getNextSectionLayoutInsertionCell(
+    section: StorefrontHomepageSection | null,
+    cells: StorefrontEditorSectionLayoutCellBounds[]
+  ): StorefrontEditorSectionLayoutCellBounds | null {
+    if (!section || !cells.length) {
+      return null;
+    }
+
+    const occupiedCells = new Set(
+      this.readSectionLayoutAssignments(section).map((assignment) => `${assignment.column}:${assignment.row}`)
+    );
+
+    return cells.find((cell) => !occupiedCells.has(`${cell.column}:${cell.row}`)) ?? cells[0] ?? null;
+  }
+
+  private getSnappedComponentFrameForLayoutCell(
+    component: StorefrontEditorComponentNode,
+    cell: StorefrontEditorSectionLayoutCellBounds
+  ): StorefrontEditorComponentNode['frame'] {
+    const inset = 16;
+    const availableWidth = Math.max(60, cell.width - inset * 2);
+    const availableHeight = Math.max(40, cell.height - inset * 2);
+    let width = Math.min(component.frame.width, availableWidth);
+    let height = Math.min(component.frame.height, availableHeight);
+
+    if (component.type === 'product-feed' || component.type === 'image' || component.type === 'container') {
+      width = availableWidth;
+      height = availableHeight;
+    } else if (component.type === 'text' || component.type === 'heading' || component.type === 'paragraph') {
+      width = availableWidth;
+    } else if (component.type === 'button') {
+      width = Math.min(availableWidth, Math.max(component.frame.width, Math.min(availableWidth, 220)));
+    }
+
+    return {
+      ...component.frame,
+      x: Math.round(cell.x + ((cell.width - width) / 2)),
+      y: Math.round(cell.y + ((cell.height - height) / 2)),
+      width: Math.round(width),
+      height: Math.round(height),
+    };
+  }
+
+  private applyLayoutAssignmentsToSectionGeometry(
+    section: StorefrontHomepageSection,
+    containerWidth: number,
+    containerHeight: number
+  ): StorefrontHomepageSection {
+    if (!this.sectionShowsLayoutControls(section)) {
+      return this.writeSectionLayoutAssignments(section, []);
+    }
+
+    const assignments = this.readSectionLayoutAssignments(section);
+    if (!assignments.length) {
+      return section;
+    }
+
+    const cellBounds = this.getSectionLayoutCellBounds(section, containerWidth, containerHeight);
+    if (!cellBounds.length) {
+      return section;
+    }
+
+    const componentIds = new Set(this.readSectionComponents(section).map((component) => component.id));
+    const normalizedAssignments = assignments
+      .filter((assignment) => componentIds.has(assignment.componentId))
+      .map((assignment) => {
+        const resolvedCell = this.resolveSectionLayoutCellFromAssignment(section, assignment, cellBounds);
+        return resolvedCell
+          ? {
+              componentId: assignment.componentId,
+              column: resolvedCell.column,
+              row: resolvedCell.row,
+            }
+          : null;
+      })
+      .filter((assignment): assignment is StorefrontEditorSectionLayoutAssignment => assignment !== null);
+
+    return this.writeSectionLayoutAssignments(section, normalizedAssignments);
+  }
+
+  private updateSectionLayoutStructure(
+    sectionId: string,
+    updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection,
+    options: { selectedSectionId?: string | null; syncRail?: boolean } = { syncRail: true }
+  ): void {
+    const dimensions = this.getSectionContentDimensions(sectionId);
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          let nextSection = updater(section);
+          if (dimensions) {
+            nextSection = this.applyLayoutAssignmentsToSectionGeometry(nextSection, dimensions.width, dimensions.height);
+          }
+
+          return nextSection;
+        }),
+      },
+    }), { selectedSectionId: sectionId, ...options });
+  }
+
+  private removeSectionLayoutAssignments(
+    sectionId: string,
+    componentIds: string[],
+    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
+  ): void {
+    if (!componentIds.length) {
+      return;
+    }
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          return this.writeSectionLayoutAssignments(
+            section,
+            this.readSectionLayoutAssignments(section).filter((assignment) => !componentIds.includes(assignment.componentId))
+          );
+        }),
+      },
+    }), options);
+  }
+
+  private upsertSectionLayoutAssignments(
+    sectionId: string,
+    assignments: StorefrontEditorSectionLayoutAssignment[],
+    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
+  ): void {
+    if (!assignments.length) {
+      return;
+    }
+
+    const dimensions = this.getSectionContentDimensions(sectionId);
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          const nextAssignments = [
+            ...this.readSectionLayoutAssignments(section).filter(
+              (existingAssignment) => !assignments.some((assignment) => assignment.componentId === existingAssignment.componentId)
+            ),
+            ...assignments,
+          ];
+          let nextSection = this.writeSectionLayoutAssignments(section, nextAssignments);
+          if (dimensions) {
+            nextSection = this.applyLayoutAssignmentsToSectionGeometry(nextSection, dimensions.width, dimensions.height);
+          }
+          return nextSection;
+        }),
+      },
+    }), { selectedSectionId: sectionId, ...options });
+  }
+
+  private refreshSectionLayoutAssignments(sectionIds?: string[]): void {
+    const ids = new Set(sectionIds?.length ? sectionIds : this.sections().map((section) => section.id));
+    const dimensionsBySectionId = new Map<string, { width: number; height: number }>();
+
+    ids.forEach((sectionId) => {
+      const dimensions = this.getSectionContentDimensions(sectionId);
+      if (dimensions) {
+        dimensionsBySectionId.set(sectionId, dimensions);
+      }
+    });
+
+    if (!dimensionsBySectionId.size) {
+      return;
+    }
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          const dimensions = dimensionsBySectionId.get(section.id);
+          if (!dimensions || !this.readSectionLayoutAssignments(section).length || !this.sectionShowsLayoutControls(section)) {
+            return section;
+          }
+
+          return this.applyLayoutAssignmentsToSectionGeometry(section, dimensions.width, dimensions.height);
+        }),
+      },
+    }), { syncRail: false });
+  }
+
   private updateSectionComponents(
     sectionId: string,
     updater: (components: StorefrontEditorComponentNode[]) => StorefrontEditorComponentNode[],
@@ -5673,9 +7183,34 @@ private updateSelectedProductFeedProps(
   private insertComponentIntoSection(
     sectionId: string,
     component: StorefrontEditorComponentNode,
-    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
+    options: {
+      selectedSectionId?: string | null;
+      syncRail?: boolean;
+      layoutAssignment?: StorefrontEditorSectionLayoutAssignment | null;
+    } = {}
   ): void {
-    this.updateSectionComponents(sectionId, (components) => [...components, component], options);
+    const { layoutAssignment, ...mutationOptions } = options;
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          let nextSection = this.writeSectionComponents(section, [...this.readSectionComponents(section), component]);
+          if (layoutAssignment) {
+            nextSection = this.writeSectionLayoutAssignments(nextSection, [
+              ...this.readSectionLayoutAssignments(nextSection),
+              layoutAssignment,
+            ]);
+          }
+
+          return nextSection;
+        }),
+      },
+    }), mutationOptions);
     this.selectedComponentId.set(component.id);
     this.selectedComponentIds.set([component.id]);
     this.isolatedGroupComponentId.set(null);
@@ -5731,6 +7266,76 @@ private updateSelectedProductFeedProps(
       };
   }
 
+  private resolveSectionLayoutPlacementForComponent(
+    sectionId: string,
+    component: StorefrontEditorComponentNode,
+    clientX?: number,
+    clientY?: number
+  ): { frame: StorefrontEditorComponentNode['frame']; assignment: StorefrontEditorSectionLayoutAssignment } | null {
+    const section = this.sections().find((candidate) => candidate.id === sectionId) ?? null;
+    const container = document.querySelector(
+      `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
+    );
+    if (!section || !this.sectionShowsLayoutControls(section) || !(container instanceof HTMLElement)) {
+      return null;
+    }
+
+    const rect = container.getBoundingClientRect();
+    const cellBounds = this.getSectionLayoutCellBounds(section, rect.width, rect.height);
+    if (!cellBounds.length) {
+      return null;
+    }
+
+    const targetCell =
+      typeof clientX === 'number' && typeof clientY === 'number'
+        ? this.getSectionLayoutCellAtLocalPoint(cellBounds, clientX - rect.left, clientY - rect.top)
+        : this.getNextSectionLayoutInsertionCell(section, cellBounds);
+    if (!targetCell) {
+      return null;
+    }
+
+    return {
+      frame: this.getSnappedComponentFrameForLayoutCell(component, targetCell),
+      assignment: {
+        componentId: component.id,
+        column: targetCell.column,
+        row: targetCell.row,
+      },
+    };
+  }
+
+  private resolveSectionLayoutAssignmentForFrame(
+    sectionId: string,
+    componentId: string,
+    frame: StorefrontEditorComponentNode['frame']
+  ): StorefrontEditorSectionLayoutAssignment | null {
+    const section = this.sections().find((candidate) => candidate.id === sectionId) ?? null;
+    const dimensions = this.getSectionContentDimensions(sectionId);
+    if (!section || !this.sectionShowsLayoutControls(section) || !dimensions) {
+      return null;
+    }
+
+    const cellBounds = this.getSectionLayoutCellBounds(section, dimensions.width, dimensions.height);
+    if (!cellBounds.length) {
+      return null;
+    }
+
+    const cell = this.getSectionLayoutCellAtLocalPoint(
+      cellBounds,
+      frame.x + frame.width / 2,
+      frame.y + frame.height / 2
+    );
+    if (!cell) {
+      return null;
+    }
+
+    return {
+      componentId,
+      column: cell.column,
+      row: cell.row,
+    };
+  }
+
   private getPreviewVisibleHeightForSection(container: HTMLElement): number {
     const previewCanvas = container.closest('.storefront-editor__preview-canvas');
     if (!(previewCanvas instanceof HTMLElement)) {
@@ -5774,12 +7379,20 @@ private updateSelectedProductFeedProps(
     const item = this.addElementsLibraryItems.find((candidate) => candidate.id === activeDrag.itemId) ?? null;
 
     if (targetSection && item) {
-      const nextComponent = this.buildLibraryComponentForSection(
-        item,
+      const nextComponent = this.buildLibraryComponentForSection(item, targetSection);
+      nextComponent.frame =
+        this.getDropFrameFromClientPoint(targetSection, item.componentType, event.clientX, event.clientY) ??
+        nextComponent.frame;
+      const layoutAssignment = this.resolveSectionLayoutAssignmentForFrame(
         targetSection,
-        this.getDropFrameFromClientPoint(targetSection, item.componentType, event.clientX, event.clientY)
+        nextComponent.id,
+        nextComponent.frame
       );
-      this.insertComponentIntoSection(targetSection, nextComponent, { selectedSectionId: targetSection, syncRail: true });
+      this.insertComponentIntoSection(targetSection, nextComponent, {
+        selectedSectionId: targetSection,
+        syncRail: true,
+        layoutAssignment,
+      });
     }
 
     this.endAddElementsComponentDrag();
@@ -5872,14 +7485,20 @@ private updateSelectedProductFeedProps(
 
           return storefront.draftHomepage.sections.map((section) => {
           if (section.id === sourceSectionId) {
-            return this.writeSectionComponents(
-              section,
-              sourceComponents.filter((component) => !draggedIds.has(component.id))
+            return this.writeSectionLayoutAssignments(
+              this.writeSectionComponents(
+                section,
+                sourceComponents.filter((component) => !draggedIds.has(component.id))
+              ),
+              this.readSectionLayoutAssignments(section).filter((assignment) => !draggedIds.has(assignment.componentId))
             );
           }
 
           if (section.id === targetSectionId) {
-            return this.writeSectionComponents(section, [...targetComponents, ...movedWithZ]);
+            return this.writeSectionLayoutAssignments(
+              this.writeSectionComponents(section, [...targetComponents, ...movedWithZ]),
+              this.readSectionLayoutAssignments(section).filter((assignment) => !draggedIds.has(assignment.componentId))
+            );
           }
 
           return section;
@@ -5903,23 +7522,133 @@ private updateSelectedProductFeedProps(
     }
 
     const nextHeight = Math.max(24, Math.round(this.activeSectionResize.startHeight + (event.clientY - this.activeSectionResize.startY)));
+    const dimensions = this.getSectionContentDimensions(this.activeSectionResize.sectionId);
     this.applyStorefrontMutation((storefront) => ({
       ...storefront,
       draftHomepage: {
         ...storefront.draftHomepage,
         sections: storefront.draftHomepage.sections.map((section) =>
           section.id === this.activeSectionResize!.sectionId
-            ? {
-                ...section,
-                props: {
-                  ...section.props,
-                  [ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY]: nextHeight,
-                },
-              }
+            ? (() => {
+                let nextSection: StorefrontHomepageSection = {
+                  ...section,
+                  props: {
+                    ...section.props,
+                    [ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY]: nextHeight,
+                  },
+                };
+                if (dimensions) {
+                  nextSection = this.applyLayoutAssignmentsToSectionGeometry(nextSection, dimensions.width, nextHeight);
+                }
+                return nextSection;
+              })()
             : section
         ),
       },
     }), { selectedSectionId: this.activeSectionResize.sectionId, syncRail: true });
+  }
+
+  private updateSectionLayoutResize(event: MouseEvent): void {
+    if (!this.activeSectionLayoutResize) {
+      return;
+    }
+
+    const state = this.activeSectionLayoutResize;
+    const deltaPx = state.axis === 'column'
+      ? event.clientX - state.startClientX
+      : event.clientY - state.startClientY;
+    const deltaPercent = (deltaPx / Math.max(1, state.availableSize)) * 100;
+    const nextSizes = [...state.startSizes];
+    const minimumTrackPercent = (72 / Math.max(1, state.availableSize)) * 100;
+    const leftIndex = state.separatorIndex;
+    const rightIndex = state.separatorIndex + 1;
+    const minimumLeftDelta = minimumTrackPercent - state.startSizes[leftIndex];
+    const maximumLeftDelta = state.startSizes[rightIndex] - minimumTrackPercent;
+    const clampedDelta = this.clamp(deltaPercent, minimumLeftDelta, maximumLeftDelta);
+
+    nextSizes[leftIndex] = state.startSizes[leftIndex] + clampedDelta;
+    nextSizes[rightIndex] = state.startSizes[rightIndex] - clampedDelta;
+
+    this.updateSectionLayoutStructure(state.sectionId, (section) => ({
+      ...section,
+      props: {
+        ...section.props,
+        [state.axis === 'column'
+          ? ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY
+          : ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: nextSizes,
+      },
+    }), { syncRail: false });
+  }
+
+  private finalizeDraggedComponentsLayoutSnap(): void {
+    if (!this.activeComponentDrag) {
+      return;
+    }
+
+    const section = this.sections().find((item) => item.id === this.activeComponentDrag?.sectionId) ?? null;
+    if (!section || !this.sectionShowsLayoutControls(section)) {
+      return;
+    }
+
+    const dimensions = this.getSectionContentDimensions(section.id);
+    if (!dimensions) {
+      return;
+    }
+
+    const draggedIds = new Set(this.activeComponentDrag.components.map((component) => component.componentId));
+    const components = this.readSectionComponents(section);
+    const cellBounds = this.getSectionLayoutCellBounds(section, dimensions.width, dimensions.height);
+    if (!cellBounds.length) {
+      return;
+    }
+
+    const nextAssignments: StorefrontEditorSectionLayoutAssignment[] = [];
+    const nextComponents = components.map((component) => {
+      if (!draggedIds.has(component.id)) {
+        return component;
+      }
+
+      const cell = this.getSectionLayoutCellAtLocalPoint(
+        cellBounds,
+        component.frame.x + component.frame.width / 2,
+        component.frame.y + component.frame.height / 2
+      );
+      if (!cell) {
+        return component;
+      }
+
+      nextAssignments.push({
+        componentId: component.id,
+        column: cell.column,
+        row: cell.row,
+      });
+
+      return component;
+    });
+
+    if (!nextAssignments.length) {
+      return;
+    }
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((currentSection) => {
+          if (currentSection.id !== section.id) {
+            return currentSection;
+          }
+
+          const existingAssignments = this.readSectionLayoutAssignments(currentSection).filter(
+            (assignment) => !draggedIds.has(assignment.componentId)
+          );
+          return this.writeSectionLayoutAssignments(
+            this.writeSectionComponents(currentSection, nextComponents),
+            [...existingAssignments, ...nextAssignments]
+          );
+        }),
+      },
+    }), { selectedSectionId: section.id, syncRail: false });
   }
 
   private createDefaultEditorSession(): StorefrontEditorSession {
