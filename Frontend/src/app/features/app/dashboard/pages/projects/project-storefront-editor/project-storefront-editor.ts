@@ -47,6 +47,7 @@ import {
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
   StorefrontEditorContainerNode,
+  StorefrontEditorImageNode,
   StorefrontEditorParagraphNode,
   StorefrontEditorProductFeedNode,
   StorefrontEditorTextNode,
@@ -111,6 +112,7 @@ type ButtonToolbarMenu =
   | 'shadow'
   | 'spacing'
   | null;
+type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
 type SectionToolbarMenu = 'layout' | 'background' | 'borders' | 'corners' | 'opacity' | null;
 type ProductFeedToolbarMenu = 'designs' | 'settings' | 'color' | null;
 type ProductFeedSettingsSection =
@@ -177,7 +179,7 @@ type StorefrontPageDesignTemplate = {
   category: StorefrontPageDesignCategory;
   accent: 'linen' | 'cobalt' | 'ink' | 'sand';
 };
-type MediaManagerPurpose = 'general' | 'button-icon';
+type MediaManagerPurpose = 'general' | 'button-icon' | 'image-component';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type AddElementsBrowserGroup = {
   id: string;
@@ -310,6 +312,21 @@ export class ProjectStorefrontEditor {
         startY: number;
         startFrame: StorefrontEditorComponentNode['frame'];
         startRotation: number;
+        preserveAspectRatio: boolean;
+        startAspectRatio: number;
+      }
+    | null = null;
+  private activeImageCrop:
+    | {
+        sectionId: string;
+        componentId: string;
+        mode: 'move' | 'resize';
+        handle: string | null;
+        startX: number;
+        startY: number;
+        startRotation: number;
+        viewport: { x: number; y: number; width: number; height: number };
+        startCrop: { x: number; y: number; width: number; height: number };
       }
     | null = null;
   private activeRotation:
@@ -359,6 +376,8 @@ export class ProjectStorefrontEditor {
   private activeSectionBackgroundColorHueDrag = false;
   private activeSectionBorderColorCanvasDrag = false;
   private activeSectionBorderColorHueDrag = false;
+  private activeImageBorderColorCanvasDrag = false;
+  private activeImageBorderColorHueDrag = false;
   private readonly rotationHandleCursorCache = new Map<string, string>();
 
   readonly project = signal<Project | null>(null);
@@ -514,15 +533,19 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'text' ? component : null;
   });
-readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
-  const component = this.selectedComponent();
-  return component?.type === 'button' ? component : null;
-});
-readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
-  const component = this.selectedComponent();
-  return component?.type === 'container' ? component : null;
-});
-readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
+  readonly selectedImageComponent = computed<StorefrontEditorImageNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'image' ? component : null;
+  });
+  readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'button' ? component : null;
+  });
+  readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'container' ? component : null;
+  });
+  readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
     const component = this.selectedComponent();
     return component?.type === 'product-feed' ? component : null;
   });
@@ -531,6 +554,9 @@ readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode
   );
 readonly isParagraphToolbarVisible = computed(
     () => this.selectedComponentIds().length === 1 && this.selectedTextComponent() !== null
+  );
+  readonly isImageToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedImageComponent() !== null
   );
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
@@ -549,6 +575,16 @@ readonly activeTextToolbarMenu = signal<
   readonly textFontSearch = signal('');
   readonly textLinkPageId = signal<string>('home');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
+  readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
+  readonly imageLinkPageId = signal<string>('home');
+  readonly imageLinkOpenMode = signal<'current' | 'new'>('current');
+  readonly isImageSettingsLinkPopupOpen = signal(false);
+  readonly imageSettingsLinkPopupPlacement = signal<'below' | 'viewport-bottom'>('below');
+  readonly imageSettingsLinkPopupViewportLeft = signal(12);
+  readonly croppingImageComponentId = signal<string | null>(null);
+  readonly isImageBorderColorPickerOpen = signal(false);
+  readonly activeImageBorderColorTab = signal<'brand' | 'custom'>('brand');
+  readonly isImageBorderStylePickerOpen = signal(false);
   readonly activeSectionToolbarMenu = signal<SectionToolbarMenu>(null);
   readonly activeSectionBackgroundTab = signal<'brand' | 'custom'>('brand');
   readonly isSectionBorderColorPickerOpen = signal(false);
@@ -671,6 +707,27 @@ readonly activeTextToolbarMenu = signal<
     { id: 'dotted', label: 'Dotted' },
     { id: 'double', label: 'Double' },
   ];
+  readonly imageDisplayModeOptions: ReadonlyArray<{ id: 'fill' | 'fit' | 'aspect'; label: string }> = [
+    { id: 'fill', label: 'fill' },
+    { id: 'fit', label: 'fit' },
+    { id: 'aspect', label: 'by aspect ratio' },
+  ];
+  readonly imageBorderCustomPickerHue = signal(224);
+  readonly imageBorderCustomPickerSaturation = signal(71);
+  readonly imageBorderCustomPickerBrightness = signal(11);
+  readonly imageBorderCustomColorCanvasBackground = computed(
+    () => `hsl(${this.imageBorderCustomPickerHue()} 100% 50%)`
+  );
+  readonly imageBorderCustomColorCanvasHandleLeft = computed(
+    () => `${this.imageBorderCustomPickerSaturation()}%`
+  );
+  readonly imageBorderCustomColorCanvasHandleTop = computed(
+    () => `${100 - this.imageBorderCustomPickerBrightness()}%`
+  );
+  readonly imageBorderCustomColorSpectrumHandleLeft = computed(
+    () => `${(this.imageBorderCustomPickerHue() / 360) * 100}%`
+  );
+  readonly imageBorderHexValue = computed(() => this.imageBorderColor(this.selectedImageComponent()).replace('#', '').toUpperCase());
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
   readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
   readonly textLineHeightOptions = [0.95, 1, 1.1, 1.2, 1.35, 1.5, 1.7, 2];
@@ -1263,6 +1320,26 @@ effect(() => {
 });
 
 effect(() => {
+  const image = this.selectedImageComponent();
+  if (!image) {
+    this.activeImageToolbarMenu.set(null);
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.isImageBorderColorPickerOpen.set(false);
+    this.isImageBorderStylePickerOpen.set(false);
+    this.exitImageCropMode();
+    return;
+  }
+
+  if (this.croppingImageComponentId() && this.croppingImageComponentId() !== image.id) {
+    this.exitImageCropMode();
+  }
+
+  const linkedPage = this.findManagedPageIdForHref(image.props.href ?? '');
+  this.imageLinkPageId.set(linkedPage);
+  this.imageLinkOpenMode.set(image.props.openInNewTab ? 'new' : 'current');
+});
+
+effect(() => {
   if (!this.selectedButtonComponent()) {
     this.activeButtonToolbarMenu.set(null);
     return;
@@ -1318,10 +1395,12 @@ effect(() => {
     this.updateAddElementsSubmenuScrollState();
     this.updateSectionLibraryTabScrollState();
     this.syncSectionAddMenuPlacement();
+    this.syncImageSettingsLinkPopupPlacement();
     setTimeout(() => {
       this.updatePreviewStageScrollbarState();
       this.syncSelectedSectionRailPosition();
       this.refreshSectionLayoutAssignments();
+      this.syncImageSettingsLinkPopupPlacement();
     }, 0);
   }
 
@@ -1351,17 +1430,32 @@ effect(() => {
       return;
     }
 
-    if (event.key === 'Escape' && this.activeButtonToolbarMenu()) {
-      event.preventDefault();
-      this.activeButtonToolbarMenu.set(null);
-      return;
-    }
+  if (event.key === 'Escape' && this.activeButtonToolbarMenu()) {
+    event.preventDefault();
+    this.activeButtonToolbarMenu.set(null);
+    return;
+  }
 
-    if (event.key === 'Escape' && this.activeProductFeedToolbarMenu()) {
-      event.preventDefault();
-      this.activeProductFeedToolbarMenu.set(null);
-      return;
-    }
+  if (event.key === 'Escape' && this.activeImageToolbarMenu()) {
+    event.preventDefault();
+    this.activeImageToolbarMenu.set(null);
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.isImageBorderColorPickerOpen.set(false);
+    this.isImageBorderStylePickerOpen.set(false);
+    return;
+  }
+
+  if (event.key === 'Escape' && this.activeProductFeedToolbarMenu()) {
+    event.preventDefault();
+    this.activeProductFeedToolbarMenu.set(null);
+    return;
+  }
+
+if (event.key === 'Escape' && this.croppingImageComponentId()) {
+  event.preventDefault();
+  this.exitImageCropMode();
+  return;
+}
 
     if (event.key === 'Escape' && this.isMediaManagerOpen()) {
       event.preventDefault();
@@ -1506,10 +1600,15 @@ effect(() => {
    this.sectionOptionsMenuId.set(null);
    this.pageCardMenuId.set(null);
    this.activeTextToolbarMenu.set(null);
+   this.activeImageToolbarMenu.set(null);
+   this.isImageSettingsLinkPopupOpen.set(false);
+   this.isImageBorderColorPickerOpen.set(false);
+   this.isImageBorderStylePickerOpen.set(false);
    this.activeSectionToolbarMenu.set(null);
    this.isSectionBorderColorPickerOpen.set(false);
    this.isSectionBorderStylePickerOpen.set(false);
    this.activeButtonToolbarMenu.set(null);
+   this.activeProductFeedToolbarMenu.set(null);
    this.closeComponentContextMenu();
    return;
  }
@@ -1561,11 +1660,42 @@ effect(() => {
       }
     }
 
- if (this.activeTextToolbarMenu()) {
-   if (!target.closest('.storefront-editor__context-toolbar-shell')) {
+if (this.activeTextToolbarMenu()) {
+  if (!target.closest('.storefront-editor__context-toolbar-shell')) {
      this.activeTextToolbarMenu.set(null);
-   }
- }
+  }
+}
+
+if (this.activeImageToolbarMenu()) {
+  if (
+    !target.closest(
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__image-toolbar-side-panel, .storefront-editor__image-settings-link-shell'
+    )
+  ) {
+    this.activeImageToolbarMenu.set(null);
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.isImageBorderColorPickerOpen.set(false);
+    this.isImageBorderStylePickerOpen.set(false);
+  }
+}
+
+if (this.isImageSettingsLinkPopupOpen()) {
+  if (!target.closest('.storefront-editor__image-settings-link-shell')) {
+    this.isImageSettingsLinkPopupOpen.set(false);
+  }
+}
+
+if (this.isImageBorderColorPickerOpen()) {
+  if (!target.closest('.storefront-editor__image-borders-color-panel, .storefront-editor__image-border-color-trigger')) {
+    this.isImageBorderColorPickerOpen.set(false);
+  }
+}
+
+if (this.isImageBorderStylePickerOpen()) {
+  if (!target.closest('.storefront-editor__image-border-style-menu, .storefront-editor__image-border-style-trigger')) {
+    this.isImageBorderStylePickerOpen.set(false);
+  }
+}
 
 if (this.activeSectionToolbarMenu()) {
   if (!target.closest('.storefront-editor__context-toolbar-shell')) {
@@ -1664,6 +1794,18 @@ if (this.activeProductFeedToolbarMenu()) {
     return;
   }
 
+  if (this.activeImageBorderColorCanvasDrag) {
+    event.preventDefault();
+    this.updateImageBorderColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeImageBorderColorHueDrag) {
+    event.preventDefault();
+    this.updateImageBorderColorFromHueEvent(event);
+    return;
+  }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -1685,6 +1827,12 @@ if (this.activeProductFeedToolbarMenu()) {
     if (this.activeSelectionDrag) {
       event.preventDefault();
       this.updateComponentSelectionBox(event);
+      return;
+    }
+
+    if (this.activeImageCrop) {
+      event.preventDefault();
+      this.updateImageCropInteraction(event);
       return;
     }
 
@@ -1792,9 +1940,20 @@ handleComponentPointerUp(event: MouseEvent): void {
     return;
   }
 
-  if (this.activeSectionBorderColorCanvasDrag || this.activeSectionBorderColorHueDrag) {
-    this.activeSectionBorderColorCanvasDrag = false;
-    this.activeSectionBorderColorHueDrag = false;
+if (this.activeSectionBorderColorCanvasDrag || this.activeSectionBorderColorHueDrag) {
+  this.activeSectionBorderColorCanvasDrag = false;
+  this.activeSectionBorderColorHueDrag = false;
+  return;
+}
+
+if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag) {
+  this.activeImageBorderColorCanvasDrag = false;
+  this.activeImageBorderColorHueDrag = false;
+  return;
+}
+
+  if (this.activeImageCrop) {
+    this.activeImageCrop = null;
     return;
   }
 
@@ -2564,6 +2723,10 @@ this.finalizeDraggedComponentsLayoutSnap();
     event.preventDefault();
     event.stopPropagation();
 
+    if (this.isImageCropModeForComponent(componentId)) {
+      return;
+    }
+
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
     if (!component) {
@@ -3073,6 +3236,8 @@ this.finalizeDraggedComponentsLayoutSnap();
       startY: event.clientY,
       startFrame: { ...this.getComponentFrame(component) },
       startRotation: component.rotation ?? 0,
+      preserveAspectRatio: component.type === 'image' && /[ns]/.test(handle) && /[ew]/.test(handle),
+      startAspectRatio: component.frame.width > 0 && component.frame.height > 0 ? component.frame.width / component.frame.height : 1,
     };
     this.isResizingComponent.set(true);
     this.closeComponentContextMenu();
@@ -3217,9 +3382,9 @@ this.finalizeDraggedComponentsLayoutSnap();
     }
   }
 
-  startEditingComponentText(sectionId: string, componentId: string, event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
+startEditingComponentText(sectionId: string, componentId: string, event: MouseEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
 
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
@@ -3234,7 +3399,32 @@ this.finalizeDraggedComponentsLayoutSnap();
     setTimeout(() => this.focusActiveTextEditor(), 0);
   }
 
-  finishEditingComponentText(): void {
+handleComponentDoubleClick(sectionId: string, componentId: string, event: MouseEvent): void {
+  const section = this.sections().find((item) => item.id === sectionId);
+  const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
+  if (!component) {
+    return;
+  }
+
+  if (component.groupId) {
+    this.isolateGroupedComponent(sectionId, componentId, event);
+    return;
+  }
+
+  if (component.type === 'image') {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectComponent(sectionId, componentId, event);
+    this.enterImageCropMode(componentId);
+    return;
+  }
+
+  if (this.canEditComponentText(component)) {
+    this.startEditingComponentText(sectionId, componentId, event);
+  }
+}
+
+finishEditingComponentText(): void {
     const sectionId = this.selectedSectionId();
     const componentId = this.editingComponentTextId();
     if (!sectionId || !componentId) {
@@ -3477,6 +3667,10 @@ this.finalizeDraggedComponentsLayoutSnap();
   this.isAddPageMenuOpen.set(false);
   this.sectionAddMenuSectionId.set(null);
   this.activeTextToolbarMenu.set(null);
+  this.activeImageToolbarMenu.set(null);
+  this.isImageSettingsLinkPopupOpen.set(false);
+  this.isImageBorderColorPickerOpen.set(false);
+  this.isImageBorderStylePickerOpen.set(false);
   this.activeSectionToolbarMenu.set(null);
   this.isSectionBorderColorPickerOpen.set(false);
   this.isSectionBorderStylePickerOpen.set(false);
@@ -3564,6 +3758,51 @@ this.finalizeDraggedComponentsLayoutSnap();
     const anchorRect = anchor.getBoundingClientRect();
 
     this.sectionAddMenuPlacement.set(this.getSectionAddMenuPlacement(anchorRect, menuHeight));
+  }
+
+  private syncImageSettingsLinkPopupPlacement(anchorElement?: HTMLElement | null): void {
+    if (!this.isImageSettingsLinkPopupOpen() && !anchorElement) {
+      return;
+    }
+
+    const anchor =
+      anchorElement ??
+      (document.querySelector(
+        '.storefront-editor__image-settings-link-shell .storefront-editor__image-settings-link-button'
+      ) as HTMLElement | null);
+
+    if (!anchor) {
+      this.imageSettingsLinkPopupPlacement.set('below');
+      this.imageSettingsLinkPopupViewportLeft.set(12);
+      return;
+    }
+
+    const popup = document.querySelector(
+      '.storefront-editor__image-settings-link-shell .storefront-editor__image-link-popup'
+    ) as HTMLElement | null;
+    const popupRect = popup?.getBoundingClientRect();
+    const popupWidth = popupRect?.width ?? 292;
+    const popupHeight = popupRect?.height ?? 420;
+    const anchorRect = anchor.getBoundingClientRect();
+    const gap = 8;
+    const viewportMargin = 12;
+    const availableBelow = window.innerHeight - anchorRect.bottom - gap - viewportMargin;
+    const fitsBelow = availableBelow >= popupHeight;
+
+    if (fitsBelow) {
+      this.imageSettingsLinkPopupPlacement.set('below');
+      this.imageSettingsLinkPopupViewportLeft.set(12);
+      return;
+    }
+
+    const clampedPosition = this.getClampedFloatingPanelPosition(
+      anchorRect.left,
+      window.innerHeight - popupHeight - viewportMargin,
+      popupWidth,
+      popupHeight
+    );
+    this.imageSettingsLinkPopupPlacement.set('viewport-bottom');
+    this.imageSettingsLinkPopupViewportLeft.set(clampedPosition.x);
   }
 
   private getClampedFloatingPanelPosition(x: number, y: number, width: number, height: number): { x: number; y: number } {
@@ -3960,6 +4199,505 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.activeTextToolbarMenu.set(null);
   }
 
+  toggleImageToolbarMenu(menu: Exclude<ImageToolbarMenu, null>): void {
+    const next = this.activeImageToolbarMenu() === menu ? null : menu;
+    this.activeImageToolbarMenu.set(next);
+
+    if (next !== 'settings') {
+      this.isImageSettingsLinkPopupOpen.set(false);
+    }
+
+    if (next !== 'borders') {
+      this.isImageBorderColorPickerOpen.set(false);
+      this.isImageBorderStylePickerOpen.set(false);
+    }
+
+    if (next === 'link' || next === 'settings') {
+      const component = this.selectedImageComponent();
+      const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
+      this.imageLinkPageId.set(linkedPage);
+      this.imageLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
+    }
+  }
+
+  setImageLinkPage(pageId: string): void {
+    this.imageLinkPageId.set(pageId);
+  }
+
+  setImageLinkOpenMode(mode: 'current' | 'new'): void {
+    this.imageLinkOpenMode.set(mode);
+  }
+
+  saveSelectedImageLink(): void {
+    const href = this.buildManagedPageHref(this.imageLinkPageId());
+    this.updateSelectedImageProps({
+      href,
+      openInNewTab: this.imageLinkOpenMode() === 'new',
+    });
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.activeImageToolbarMenu.set(null);
+  }
+
+  removeSelectedImageLink(): void {
+    this.updateSelectedImageProps({
+      href: '',
+      openInNewTab: false,
+    });
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.activeImageToolbarMenu.set(null);
+  }
+
+  closeImageLinkPopups(): void {
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.imageSettingsLinkPopupPlacement.set('below');
+    if (this.activeImageToolbarMenu() === 'link') {
+      this.activeImageToolbarMenu.set(null);
+    }
+  }
+
+  toggleImageSettingsLinkPopup(event?: MouseEvent): void {
+    const next = !this.isImageSettingsLinkPopupOpen();
+    if (!next) {
+      this.isImageSettingsLinkPopupOpen.set(false);
+      this.imageSettingsLinkPopupPlacement.set('below');
+      return;
+    }
+
+    const anchor =
+      event?.currentTarget instanceof HTMLElement
+        ? event.currentTarget
+        : (document.querySelector(
+            '.storefront-editor__image-settings-link-shell .storefront-editor__image-settings-link-button'
+          ) as HTMLElement | null);
+
+    this.syncImageSettingsLinkPopupPlacement(anchor);
+    this.isImageSettingsLinkPopupOpen.set(next);
+
+    const component = this.selectedImageComponent();
+    const linkedPage = this.findManagedPageIdForHref(component?.props.href ?? '');
+    this.imageLinkPageId.set(linkedPage);
+    this.imageLinkOpenMode.set(component?.props.openInNewTab ? 'new' : 'current');
+    setTimeout(() => this.syncImageSettingsLinkPopupPlacement(anchor), 0);
+  }
+
+  openMediaManagerForSelectedImage(): void {
+    this.closeFloatingUi();
+    this.mediaManagerPurpose.set('image-component');
+    this.isMediaManagerOpen.set(true);
+  }
+
+  toggleSelectedImageCropMode(): void {
+    const component = this.selectedImageComponent();
+    if (!component) {
+      return;
+    }
+
+    const next = this.croppingImageComponentId() === component.id ? null : component.id;
+    if (next) {
+      this.activeImageCrop = null;
+      this.activeImageToolbarMenu.set(null);
+      this.isImageSettingsLinkPopupOpen.set(false);
+      this.isImageBorderColorPickerOpen.set(false);
+      this.isImageBorderStylePickerOpen.set(false);
+      this.croppingImageComponentId.set(next);
+      return;
+    }
+
+    this.exitImageCropMode();
+  }
+
+  enterImageCropMode(componentId: string): void {
+    this.activeImageToolbarMenu.set(null);
+    this.isImageSettingsLinkPopupOpen.set(false);
+    this.isImageBorderColorPickerOpen.set(false);
+    this.isImageBorderStylePickerOpen.set(false);
+    this.activeImageCrop = null;
+    this.croppingImageComponentId.set(componentId);
+  }
+
+  isImageCropModeForComponent(componentId: string): boolean {
+    return this.croppingImageComponentId() === componentId;
+  }
+
+  componentVisualFrame(component: StorefrontEditorComponentNode): StorefrontEditorComponentNode['frame'] {
+    if (component.type === 'image' && this.isImageCropModeForComponent(component.id)) {
+      return this.resolveImageCropEditingFrame(component);
+    }
+
+    return component.frame;
+  }
+
+  beginImageCropMove(sectionId: string, componentId: string, event: MouseEvent): void {
+    this.startImageCropInteraction(sectionId, componentId, 'move', null, event);
+  }
+
+  beginImageCropResize(sectionId: string, componentId: string, handle: string, event: MouseEvent): void {
+    this.startImageCropInteraction(sectionId, componentId, 'resize', handle, event);
+  }
+
+  imageCropFrameStyle(component: StorefrontEditorComponentNode): Record<string, string> | null {
+    if (component.type !== 'image') {
+      return null;
+    }
+
+    const rect = this.resolveImageCropFrameRect(component);
+    return {
+      left: `${rect.x}px`,
+      top: `${rect.y}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+    };
+  }
+
+  updateSelectedImageDisplayMode(value: 'fill' | 'fit' | 'aspect'): void {
+    const objectFit = value === 'fill' ? 'cover' : 'contain';
+    this.updateSelectedImageProps({
+      displayMode: value,
+      objectFit,
+    });
+  }
+
+  updateSelectedImageOpacity(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedImageProps({ opacity: Math.max(0, Math.min(100, Math.round(parsed))) });
+  }
+
+  updateSelectedImageBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.syncImageBorderColorPickerFromHex(normalized);
+    this.rememberSectionBorderColor(normalized);
+    this.updateSelectedImageProps({ borderColor: normalized });
+  }
+
+  updateSelectedImageBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedImageProps({
+      borderWidth: Math.max(0, Math.min(12, Math.round(parsed))),
+    });
+  }
+
+  updateSelectedImageBorderStyle(value: 'solid' | 'dashed' | 'dotted' | 'double'): void {
+    const width = Math.max(this.imageBorderWidth(this.selectedImageComponent()), 1);
+    this.updateSelectedImageProps({
+      borderStyle: value,
+      borderWidth: width,
+    });
+    this.isImageBorderStylePickerOpen.set(false);
+  }
+
+  updateSelectedImageRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedImageProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
+  }
+
+  updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
+    this.updateSelectedImageProps({ shadow: value });
+  }
+
+  private startImageCropInteraction(
+    sectionId: string,
+    componentId: string,
+    mode: 'move' | 'resize',
+    handle: string | null,
+    event: MouseEvent
+  ): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const component = this.findImageComponent(sectionId, componentId);
+    if (!component) {
+      return;
+    }
+
+    this.selectComponent(sectionId, componentId);
+    const viewport = this.resolveImageCropViewportRect(component, this.resolveImageCropEditingFrame(component));
+    const crop = this.resolveImageCropPixelRect(component, viewport);
+    this.activeImageCrop = {
+      sectionId,
+      componentId,
+      mode,
+      handle,
+      startX: event.clientX,
+      startY: event.clientY,
+      startRotation: component.rotation ?? 0,
+      viewport,
+      startCrop: crop,
+    };
+  }
+
+  private updateImageCropInteraction(event: MouseEvent): void {
+    if (!this.activeImageCrop) {
+      return;
+    }
+
+    const interaction = this.activeImageCrop;
+    const deltaX = event.clientX - interaction.startX;
+    const deltaY = event.clientY - interaction.startY;
+    const localDelta = this.rotateVectorToLocal(deltaX, deltaY, interaction.startRotation);
+    const minWidth = Math.min(interaction.viewport.width, Math.max(36, interaction.viewport.width * 0.12));
+    const minHeight = Math.min(interaction.viewport.height, Math.max(36, interaction.viewport.height * 0.12));
+    let left = interaction.startCrop.x;
+    let top = interaction.startCrop.y;
+    let right = interaction.startCrop.x + interaction.startCrop.width;
+    let bottom = interaction.startCrop.y + interaction.startCrop.height;
+
+    if (interaction.mode === 'move') {
+      const nextLeft = Math.max(0, Math.min(interaction.startCrop.x + localDelta.x, interaction.viewport.width - interaction.startCrop.width));
+      const nextTop = Math.max(0, Math.min(interaction.startCrop.y + localDelta.y, interaction.viewport.height - interaction.startCrop.height));
+      left = nextLeft;
+      top = nextTop;
+      right = nextLeft + interaction.startCrop.width;
+      bottom = nextTop + interaction.startCrop.height;
+    } else {
+      if (interaction.handle?.includes('e')) {
+        right = Math.max(left + minWidth, Math.min(interaction.viewport.width, right + localDelta.x));
+      }
+      if (interaction.handle?.includes('w')) {
+        left = Math.min(right - minWidth, Math.max(0, left + localDelta.x));
+      }
+      if (interaction.handle?.includes('s')) {
+        bottom = Math.max(top + minHeight, Math.min(interaction.viewport.height, bottom + localDelta.y));
+      }
+      if (interaction.handle?.includes('n')) {
+        top = Math.min(bottom - minHeight, Math.max(0, top + localDelta.y));
+      }
+    }
+
+    this.updateImageComponentProps(interaction.sectionId, interaction.componentId, {
+      cropX: left / interaction.viewport.width,
+      cropY: top / interaction.viewport.height,
+      cropWidth: (right - left) / interaction.viewport.width,
+      cropHeight: (bottom - top) / interaction.viewport.height,
+    });
+  }
+
+  private findImageComponent(sectionId: string, componentId: string): StorefrontEditorImageNode | null {
+    const section = this.sections().find((item) => item.id === sectionId);
+    const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
+    return component?.type === 'image' ? component : null;
+  }
+
+  private resolveImageCropFrameRect(component: StorefrontEditorImageNode): { x: number; y: number; width: number; height: number } {
+    const viewport = this.resolveImageCropViewportRect(component, this.resolveImageCropEditingFrame(component));
+    const crop = this.resolveNormalizedImageCropRect(component);
+    return {
+      x: viewport.x + crop.x * viewport.width,
+      y: viewport.y + crop.y * viewport.height,
+      width: crop.width * viewport.width,
+      height: crop.height * viewport.height,
+    };
+  }
+
+  private resolveImageCropPixelRect(
+    component: StorefrontEditorImageNode,
+    viewport: { x: number; y: number; width: number; height: number }
+  ): { x: number; y: number; width: number; height: number } {
+    const crop = this.resolveNormalizedImageCropRect(component);
+    return {
+      x: crop.x * viewport.width,
+      y: crop.y * viewport.height,
+      width: crop.width * viewport.width,
+      height: crop.height * viewport.height,
+    };
+  }
+
+  private resolveNormalizedImageCropRect(component: StorefrontEditorImageNode): { x: number; y: number; width: number; height: number } {
+    const width = Math.max(0.01, this.clampUnit(component.props.cropWidth ?? 1));
+    const height = Math.max(0.01, this.clampUnit(component.props.cropHeight ?? 1));
+    const x = Math.min(this.clampUnit(component.props.cropX ?? 0), 1 - width);
+    const y = Math.min(this.clampUnit(component.props.cropY ?? 0), 1 - height);
+    return { x, y, width, height };
+  }
+
+  private resolveImageCropViewportRect(
+    component: StorefrontEditorImageNode,
+    frame: StorefrontEditorComponentNode['frame'] = component.frame
+  ): { x: number; y: number; width: number; height: number } {
+    const frameWidth = frame.width;
+    const frameHeight = frame.height;
+    if (component.props.displayMode === 'fill') {
+      return { x: 0, y: 0, width: frameWidth, height: frameHeight };
+    }
+
+    const frameAspectRatio = frameWidth > 0 && frameHeight > 0 ? frameWidth / frameHeight : 1;
+    const imageAspectRatio = this.parseImageAspectRatio(component.props.aspectRatio, frameAspectRatio);
+    if (imageAspectRatio >= frameAspectRatio) {
+      const width = frameWidth;
+      const height = width / imageAspectRatio;
+      return {
+        x: 0,
+        y: (frameHeight - height) / 2,
+        width,
+        height,
+      };
+    }
+
+    const height = frameHeight;
+    const width = height * imageAspectRatio;
+    return {
+      x: (frameWidth - width) / 2,
+      y: 0,
+      width,
+      height,
+    };
+  }
+
+  private resolveImageCropEditingFrame(component: StorefrontEditorImageNode): StorefrontEditorComponentNode['frame'] {
+    const outerWidth = Math.max(component.props.cropOuterWidth ?? component.frame.width, component.frame.width);
+    const outerHeight = Math.max(component.props.cropOuterHeight ?? component.frame.height, component.frame.height);
+    const offsetX = Number.isFinite(component.props.cropOuterOffsetX) ? component.props.cropOuterOffsetX : 0;
+    const offsetY = Number.isFinite(component.props.cropOuterOffsetY) ? component.props.cropOuterOffsetY : 0;
+    return {
+      x: component.frame.x + offsetX,
+      y: component.frame.y + offsetY,
+      width: outerWidth,
+      height: outerHeight,
+    };
+  }
+
+  private exitImageCropMode(): void {
+    const componentId = this.croppingImageComponentId();
+    this.activeImageCrop = null;
+    if (!componentId) {
+      return;
+    }
+
+    const located = this.findImageComponentLocation(componentId);
+    if (located) {
+      this.commitImageCrop(located.sectionId, located.component);
+    }
+    this.croppingImageComponentId.set(null);
+  }
+
+  private commitImageCrop(sectionId: string, component: StorefrontEditorImageNode): void {
+    const outerFrame = this.resolveImageCropEditingFrame(component);
+    const cropRect = this.resolveImageCropFrameRect(component);
+    const nextFrame = {
+      x: outerFrame.x + cropRect.x,
+      y: outerFrame.y + cropRect.y,
+      width: cropRect.width,
+      height: cropRect.height,
+    };
+
+    this.updateComponentNode(sectionId, component.id, (current) =>
+      current.type === 'image'
+        ? {
+            ...current,
+            frame: nextFrame,
+            props: {
+              ...current.props,
+              cropOuterOffsetX: outerFrame.x - nextFrame.x,
+              cropOuterOffsetY: outerFrame.y - nextFrame.y,
+              cropOuterWidth: outerFrame.width,
+              cropOuterHeight: outerFrame.height,
+            },
+          }
+        : current
+    );
+  }
+
+  private parseImageAspectRatio(value: string | null | undefined, fallback: number): number {
+    if (!value) {
+      return fallback;
+    }
+
+    const normalized = value.replace(':', '/');
+    const [widthRaw, heightRaw] = normalized.split('/').map((part) => Number(part.trim()));
+    if (Number.isFinite(widthRaw) && Number.isFinite(heightRaw) && heightRaw > 0) {
+      return widthRaw / heightRaw;
+    }
+
+    const numeric = Number(value);
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+  }
+
+  private clampUnit(value: number): number {
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(1, value));
+  }
+
+  private findImageComponentLocation(componentId: string): { sectionId: string; component: StorefrontEditorImageNode } | null {
+    for (const section of this.sections()) {
+      const component = this.readSectionComponents(section).find((item) => item.id === componentId);
+      if (component?.type === 'image') {
+        return {
+          sectionId: section.id,
+          component,
+        };
+      }
+    }
+
+    return null;
+  }
+
+  toggleImageBorderColorPicker(): void {
+    const next = !this.isImageBorderColorPickerOpen();
+    this.isImageBorderColorPickerOpen.set(next);
+    if (next) {
+      this.isImageBorderStylePickerOpen.set(false);
+      this.activeImageBorderColorTab.set('brand');
+      this.syncImageBorderColorPickerFromHex(this.imageBorderColor(this.selectedImageComponent()));
+    }
+  }
+
+  setActiveImageBorderColorTab(tab: 'brand' | 'custom'): void {
+    this.activeImageBorderColorTab.set(tab);
+  }
+
+  toggleImageBorderStylePicker(): void {
+    const next = !this.isImageBorderStylePickerOpen();
+    this.isImageBorderStylePickerOpen.set(next);
+    if (next) {
+      this.isImageBorderColorPickerOpen.set(false);
+    }
+  }
+
+  startImageBorderColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeImageBorderColorCanvasDrag = true;
+    this.updateImageBorderColorFromCanvasEvent(event);
+  }
+
+  startImageBorderHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeImageBorderColorHueDrag = true;
+    this.updateImageBorderColorFromHueEvent(event);
+  }
+
+  updateImageBorderHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedImageBorderColor(normalized);
+  }
+
+  applySavedImageBorderColor(color: string): void {
+    this.updateSelectedImageBorderColor(color);
+  }
+
   textStylePreviewFontSize(style: StorefrontEditorTextStylePreset): number {
     return Math.min(buildStorefrontEditorTextProps(style).fontSize, 22);
   }
@@ -4345,13 +5083,71 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedSectionBorderColor(normalized);
   }
 
-  applySavedSectionBorderColor(color: string): void {
-    this.updateSelectedSectionBorderColor(color);
+applySavedSectionBorderColor(color: string): void {
+  this.updateSelectedSectionBorderColor(color);
+}
+
+private updateImageBorderColorFromCanvasEvent(event: MouseEvent): void {
+  const target = event.currentTarget instanceof HTMLElement
+    ? event.currentTarget
+    : document.querySelector('.storefront-editor__image-borders-color-canvas');
+  if (!(target instanceof HTMLElement)) {
+    return;
   }
 
-  toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
-    const next = this.activeButtonToolbarMenu() === menu ? null : menu;
-    this.activeButtonToolbarMenu.set(next);
+  const rect = target.getBoundingClientRect();
+  const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+  const y = Math.min(Math.max(event.clientY - rect.top, 0), rect.height);
+  const saturation = rect.width === 0 ? 0 : (x / rect.width) * 100;
+  const brightness = rect.height === 0 ? 0 : 100 - (y / rect.height) * 100;
+
+  this.imageBorderCustomPickerSaturation.set(Math.round(saturation));
+  this.imageBorderCustomPickerBrightness.set(Math.round(brightness));
+
+  const hex = this.hsvToHex(
+    this.imageBorderCustomPickerHue(),
+    this.imageBorderCustomPickerSaturation(),
+    this.imageBorderCustomPickerBrightness()
+  );
+  this.updateSelectedImageBorderColor(hex);
+}
+
+private updateImageBorderColorFromHueEvent(event: MouseEvent): void {
+  const target = event.currentTarget instanceof HTMLElement
+    ? event.currentTarget
+    : document.querySelector('.storefront-editor__image-borders-color-spectrum');
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  const rect = target.getBoundingClientRect();
+  const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+  const hue = rect.width === 0 ? 0 : (x / rect.width) * 360;
+  this.imageBorderCustomPickerHue.set(Math.round(hue));
+
+  const hex = this.hsvToHex(
+    this.imageBorderCustomPickerHue(),
+    this.imageBorderCustomPickerSaturation(),
+    this.imageBorderCustomPickerBrightness()
+  );
+  this.updateSelectedImageBorderColor(hex);
+}
+
+private syncImageBorderColorPickerFromHex(color: string): void {
+  const normalized = this.normalizeHexColor(color);
+  if (!normalized || normalized === 'transparent') {
+    return;
+  }
+
+  const { h, s, v } = this.hexToHsv(normalized);
+  this.imageBorderCustomPickerHue.set(h);
+  this.imageBorderCustomPickerSaturation.set(s);
+  this.imageBorderCustomPickerBrightness.set(v);
+}
+
+toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
+  const next = this.activeButtonToolbarMenu() === menu ? null : menu;
+  this.activeButtonToolbarMenu.set(next);
 
     if (next === 'edit-text') {
       this.buttonEditTextValue.set(this.selectedButtonComponent()?.props.label ?? '');
@@ -4856,16 +5652,35 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return;
     }
 
-    if (this.mediaManagerPurpose() === 'button-icon') {
-      this.updateSelectedButtonCustomIcon(asset.url);
-      this.toastService.success(`${asset.name} selected as button icon.`);
-      this.closeMediaManager();
-      return;
-    }
-
-    this.toastService.success(`${asset.name} selected.`);
+  if (this.mediaManagerPurpose() === 'button-icon') {
+    this.updateSelectedButtonCustomIcon(asset.url);
+    this.toastService.success(`${asset.name} selected as button icon.`);
     this.closeMediaManager();
+    return;
   }
+
+if (this.mediaManagerPurpose() === 'image-component') {
+  const image = this.selectedImageComponent();
+  this.updateSelectedImageProps({
+    src: asset.url,
+    alt: asset.name,
+    cropX: 0,
+    cropY: 0,
+    cropWidth: 1,
+    cropHeight: 1,
+    cropOuterOffsetX: 0,
+    cropOuterOffsetY: 0,
+    cropOuterWidth: image?.frame.width ?? 260,
+    cropOuterHeight: image?.frame.height ?? 180,
+  });
+  this.toastService.success(`${asset.name} selected as image.`);
+  this.closeMediaManager();
+  return;
+}
+
+  this.toastService.success(`${asset.name} selected.`);
+  this.closeMediaManager();
+}
 
   deleteMediaFromManager(asset: StorefrontMediaManagerAsset): void {
     const projectId = this.projectId();
@@ -6037,22 +6852,57 @@ updatePageDesignTabScrollState(): void {
     return Math.max(0, Math.min(100, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_OPACITY_PROP_KEY, 100)));
   }
 
-  sectionSurfaceStyle(section: StorefrontHomepageSection | null): Record<string, string | null> {
-    const borderStyle = this.sectionBorderStyle(section);
-    const borderWidth = this.sectionBorderWidth(section);
+sectionSurfaceStyle(section: StorefrontHomepageSection | null): Record<string, string | null> {
+  const borderStyle = this.sectionBorderStyle(section);
+  const borderWidth = this.sectionBorderWidth(section);
 
-    return {
+  return {
       background: this.sectionBackgroundColor(section),
       borderColor: borderWidth === 0 ? 'transparent' : this.sectionBorderColor(section),
       borderStyle,
       borderWidth: `${borderWidth}px`,
       borderRadius: `${this.sectionRadius(section)}px`,
-      opacity: `${this.sectionOpacity(section) / 100}`,
-    };
+    opacity: `${this.sectionOpacity(section) / 100}`,
+  };
+}
+
+imageDisplayMode(component: StorefrontEditorImageNode | null): 'fill' | 'fit' | 'aspect' {
+  const value = component?.props.displayMode;
+  if (value === 'fit' || value === 'aspect' || value === 'fill') {
+    return value;
   }
 
+  return component?.props.objectFit === 'contain' ? 'fit' : 'fill';
+}
+
+imageBorderStyle(component: StorefrontEditorImageNode | null): 'solid' | 'dashed' | 'dotted' | 'double' {
+  const value = component?.props.borderStyle;
+  return value === 'dashed' || value === 'dotted' || value === 'double' ? value : 'solid';
+}
+
+imageBorderWidth(component: StorefrontEditorImageNode | null): number {
+  return Math.max(0, Math.min(12, Math.round(Number(component?.props.borderWidth ?? 0))));
+}
+
+imageBorderColor(component: StorefrontEditorImageNode | null): string {
+  return this.normalizeHexColor(component?.props.borderColor ?? '') ?? '#111827';
+}
+
+imageRadius(component: StorefrontEditorImageNode | null): number {
+  return Math.max(0, Math.min(999, Math.round(Number(component?.props.radius ?? 0))));
+}
+
+imageOpacity(component: StorefrontEditorImageNode | null): number {
+  return Math.max(0, Math.min(100, Math.round(Number(component?.props.opacity ?? 100))));
+}
+
+imageShadow(component: StorefrontEditorImageNode | null): StorefrontEditorButtonNode['props']['shadow'] {
+  const value = component?.props.shadow;
+  return value === 'soft' || value === 'medium' || value === 'strong' ? value : 'none';
+}
+
 componentTypeLabel(component: StorefrontEditorComponentNode): string {
-  switch (component.type) {
+switch (component.type) {
     case 'text':
       return 'Text';
     case 'heading':
@@ -6174,9 +7024,9 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     }
   }
 
-  private updateSelectedSection(
-    updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection
-  ): void {
+private updateSelectedSection(
+  updater: (section: StorefrontHomepageSection) => StorefrontHomepageSection
+): void {
     const selectedSectionId = this.selectedSectionId();
     if (!selectedSectionId) {
       return;
@@ -6744,6 +7594,37 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     }
 
     const minSize = 50;
+    if (this.activeResize.preserveAspectRatio) {
+      const aspectRatio = Math.max(this.activeResize.startAspectRatio || 1, 0.01);
+      const widthScale = Math.abs((right - left) - startFrame.width) / Math.max(startFrame.width, 1);
+      const heightScale = Math.abs((bottom - top) - startFrame.height) / Math.max(startFrame.height, 1);
+      const minWidth = Math.max(minSize, minSize * aspectRatio);
+      const minHeight = Math.max(minSize, minSize / aspectRatio);
+      const widthDriven = widthScale >= heightScale;
+      let nextWidth = right - left;
+      let nextHeight = bottom - top;
+
+      if (widthDriven) {
+        nextWidth = Math.max(nextWidth, minWidth);
+        nextHeight = nextWidth / aspectRatio;
+      } else {
+        nextHeight = Math.max(nextHeight, minHeight);
+        nextWidth = nextHeight * aspectRatio;
+      }
+
+      if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
+        left = right - nextWidth;
+      } else {
+        right = left + nextWidth;
+      }
+
+      if (this.activeResize.handle.includes('n') && !this.activeResize.handle.includes('s')) {
+        top = bottom - nextHeight;
+      } else {
+        bottom = top + nextHeight;
+      }
+    }
+
     if (right - left < minSize) {
       if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
         left = right - minSize;
@@ -7050,8 +7931,38 @@ private updateComponentTree(
             },
           }
         : current
-    );
+  );
+}
+
+private updateSelectedImageProps(
+  patch: Partial<StorefrontEditorImageNode['props']>
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedImageComponent();
+  if (!sectionId || !component) {
+    return;
   }
+
+  this.updateImageComponentProps(sectionId, component.id, patch);
+}
+
+private updateImageComponentProps(
+  sectionId: string,
+  componentId: string,
+  patch: Partial<StorefrontEditorImageNode['props']>
+): void {
+  this.updateComponentNode(sectionId, componentId, (current) =>
+    current.type === 'image'
+      ? {
+          ...current,
+          props: {
+            ...current.props,
+            ...patch,
+          },
+        }
+      : current
+  );
+}
 
   private isEditingSelectedTextComponent(): boolean {
     return this.isEditingComponentText() && this.selectedTextComponent() !== null;
