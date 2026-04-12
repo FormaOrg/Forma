@@ -178,6 +178,18 @@ type StorefrontEditorFontOption = {
   description: string;
   preview: string;
 };
+type StorefrontEditorBrandKitPreset = {
+  id: string;
+  name: string;
+  description: string;
+  headingFont: string;
+  bodyFont: string;
+  palette: string[];
+  buttonPresetId: string;
+  boxFill: string;
+  boxBorder: string;
+  lines: string[];
+};
 type StorefrontPageDesignTemplate = {
   id: string;
   name: string;
@@ -199,12 +211,25 @@ const STOREFRONT_EDITOR_TEXT_FONT_OPTIONS: ReadonlyArray<StorefrontEditorFontOpt
   { family: 'Work Sans', category: 'Sans', description: 'Versatile grotesk family', preview: 'Clear messaging at any size' },
   { family: 'Libre Franklin', category: 'Sans', description: 'Newsroom-inspired sans', preview: 'Editorial tone with precision' },
   { family: 'IBM Plex Sans', category: 'Sans', description: 'Technical but approachable', preview: 'Systematic brand storytelling' },
+  { family: 'Figtree', category: 'Sans', description: 'Modern rounded interface sans', preview: 'Soft structure with clarity' },
+  { family: 'Nunito Sans', category: 'Sans', description: 'Friendly balanced sans', preview: 'Warm UI and readable body copy' },
+  { family: 'Mulish', category: 'Sans', description: 'Clean minimal sans', preview: 'Quiet typography with range' },
+  { family: 'Archivo', category: 'Sans', description: 'Sharp grotesk with presence', preview: 'Strong navigation and labels' },
+  { family: 'Montserrat', category: 'Sans', description: 'Popular geometric sans', preview: 'Bold brand-led headings' },
+  { family: 'Raleway', category: 'Sans', description: 'Elegant modern sans', preview: 'Light, spacious headlines' },
+  { family: 'Karla', category: 'Sans', description: 'Humanist grotesk hybrid', preview: 'Practical copy with personality' },
+  { family: 'Rubik', category: 'Sans', description: 'Rounded geometric sans', preview: 'Contemporary product storytelling' },
   { family: 'Hedvig Letters Serif', category: 'Serif', description: 'Friendly editorial serif', preview: 'Warm brand storytelling' },
   { family: 'Merriweather', category: 'Serif', description: 'Readable classic serif', preview: 'Long-form text with texture' },
   { family: 'Lora', category: 'Serif', description: 'Balanced contemporary serif', preview: 'Elegant paragraphs and intros' },
   { family: 'Cormorant Garamond', category: 'Serif', description: 'High-contrast editorial serif', preview: 'Luxurious section titles' },
   { family: 'Playfair Display', category: 'Serif', description: 'Fashion-forward serif', preview: 'Dramatic, polished headlines' },
   { family: 'DM Serif Display', category: 'Serif', description: 'Compact display serif', preview: 'Classic contrast with punch' },
+  { family: 'Libre Baskerville', category: 'Serif', description: 'Bookish traditional serif', preview: 'Refined reading and heritage tone' },
+  { family: 'Crimson Text', category: 'Serif', description: 'Literary old-style serif', preview: 'Text-first elegance and warmth' },
+  { family: 'Cormorant Infant', category: 'Serif', description: 'Decorative editorial serif', preview: 'Stylized titles with softness' },
+  { family: 'Bitter', category: 'Serif', description: 'Sturdy slab-influenced serif', preview: 'Authority in headings and body' },
+  { family: 'Spectral', category: 'Serif', description: 'Versatile contemporary serif', preview: 'Smart editorial hierarchy' },
   { family: 'Bricolage Grotesque', category: 'Display', description: 'Playful variable grotesk', preview: 'Creative direction with edge' },
   { family: 'Syne', category: 'Display', description: 'Artful experimental display', preview: 'Unexpected but still usable' },
   { family: 'Fraunces', category: 'Display', description: 'Expressive soft-serif display', preview: 'Strong hero typography' },
@@ -212,12 +237,21 @@ const STOREFRONT_EDITOR_TEXT_FONT_OPTIONS: ReadonlyArray<StorefrontEditorFontOpt
   { family: 'Bebas Neue', category: 'Display', description: 'Tall condensed display', preview: 'Launch headlines and labels' },
   { family: 'Oswald', category: 'Display', description: 'Condensed utility display', preview: 'Structured, emphatic headings' },
   { family: 'Abril Fatface', category: 'Display', description: 'High-drama Didone', preview: 'Editorial glamour in one line' },
+  { family: 'Anton', category: 'Display', description: 'Massive condensed display', preview: 'Impactful hero statements' },
+  { family: 'League Spartan', category: 'Display', description: 'Bold geometric display', preview: 'Direct modern campaign type' },
+  { family: 'Alfa Slab One', category: 'Display', description: 'Chunky slab display', preview: 'Vintage punch and energy' },
+  { family: 'Righteous', category: 'Display', description: 'Rounded retro display', preview: 'Distinctive headlines with flair' },
+  { family: 'Unbounded', category: 'Display', description: 'Square contemporary display', preview: 'Experimental but controlled emphasis' },
   { family: 'Fira Mono', category: 'Mono', description: 'Readable monospaced text', preview: 'Code-like notes and labels' },
   { family: 'IBM Plex Mono', category: 'Mono', description: 'Technical mono with warmth', preview: 'Utility captions and specs' },
   { family: 'JetBrains Mono', category: 'Mono', description: 'Sharp modern mono', preview: 'Precise callouts and metadata' },
   { family: 'Space Mono', category: 'Mono', description: 'Retro-futurist mono', preview: 'Distinct utility styling' },
+  { family: 'Source Code Pro', category: 'Mono', description: 'Classic coding mono', preview: 'Structured utility text' },
+  { family: 'Inconsolata', category: 'Mono', description: 'Compact readable mono', preview: 'Technical labels with charm' },
   { family: 'Caveat', category: 'Handwritten', description: 'Loose handwritten accent', preview: 'Personal notes and signatures' },
   { family: 'Patrick Hand', category: 'Handwritten', description: 'Clean marker handwriting', preview: 'Friendly annotations' },
+  { family: 'Shadows Into Light', category: 'Handwritten', description: 'Airy handwritten accent', preview: 'Casual highlights and notes' },
+  { family: 'Permanent Marker', category: 'Handwritten', description: 'Bold marker script', preview: 'Expressive callouts and badges' },
 ];
 
 const STOREFRONT_EDITOR_TEXT_FONT_STYLESHEET_HREF = [
@@ -226,6 +260,56 @@ const STOREFRONT_EDITOR_TEXT_FONT_STYLESHEET_HREF = [
     (font) => `family=${font.family.replace(/ /g, '+')}:wght@400;500;600;700`
   ),
 ].join('&');
+const STOREFRONT_EDITOR_BRAND_KIT_PRESETS: ReadonlyArray<StorefrontEditorBrandKitPreset> = [
+  {
+    id: 'editorial-moss',
+    name: 'Editorial Moss',
+    description: 'Refined serif headings with grounded green neutrals.',
+    headingFont: 'Hedvig Letters Serif',
+    bodyFont: 'Fira Mono',
+    palette: ['#0b2239', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8'],
+    buttonPresetId: 'valuation',
+    boxFill: '#dbeafe',
+    boxBorder: '#082237',
+    lines: ['#b8d0ea', '#071a2e', '#b2d083'],
+  },
+  {
+    id: 'modern-cobalt',
+    name: 'Modern Cobalt',
+    description: 'Bright interface tones and sharp sans typography.',
+    headingFont: 'Sora',
+    bodyFont: 'Inter',
+    palette: ['#111827', '#355cff', '#e5ecff', '#dbeafe', '#f8fafc'],
+    buttonPresetId: 'book-now',
+    boxFill: '#e5ecff',
+    boxBorder: '#355cff',
+    lines: ['#355cff', '#111827', '#b8d0ea'],
+  },
+  {
+    id: 'soft-linen',
+    name: 'Soft Linen',
+    description: 'Warm editorial neutrals with softer contrast.',
+    headingFont: 'Cormorant Garamond',
+    bodyFont: 'DM Sans',
+    palette: ['#1f2937', '#ffe066', '#ffefe5', '#f4f1ef', '#d8e0e8'],
+    buttonPresetId: 'start-now',
+    boxFill: '#ffefe5',
+    boxBorder: '#1f2937',
+    lines: ['#d8e0e8', '#1f2937', '#ffe066'],
+  },
+  {
+    id: 'mono-utility',
+    name: 'Mono Utility',
+    description: 'Technical mono body with bold utility styling.',
+    headingFont: 'League Spartan',
+    bodyFont: 'IBM Plex Mono',
+    palette: ['#020817', '#1f4d30', '#d9fb7c', '#e8f1fb', '#ffffff'],
+    buttonPresetId: 'best-sellers',
+    boxFill: '#e8f1fb',
+    boxBorder: '#1f4d30',
+    lines: ['#1f4d30', '#020817', '#d9fb7c'],
+  },
+];
 type MediaManagerPurpose = 'general' | 'button-icon' | 'image-component';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type AddElementsBrowserGroup = {
@@ -445,6 +529,8 @@ readonly isFormaMenuOpen = signal(false);
 readonly isAccountMenuOpen = signal(false);
 readonly isZoomMenuOpen = signal(false);
 readonly isBrandKitPopupOpen = signal(false);
+readonly isBrandKitCustomizerOpen = signal(false);
+readonly activeBrandKitPresetId = signal<string | null>(null);
   readonly isAddElementsPanelOpen = signal(false);
   readonly isAddElementsPanelClosing = signal(false);
   readonly isAddElementsLibraryModalOpen = signal(false);
@@ -750,6 +836,10 @@ readonly brandSectionBorderColors = [
     '#d62828',
   ];
   readonly brandKitPreviewPalette = computed(() => {
+    const preset = this.activeBrandKitPreset();
+    if (preset) {
+      return preset.palette;
+    }
     const palette = [
       ...this.brandButtonColors().slice(0, 2),
       ...this.brandParagraphColors().filter((color) => color !== 'transparent').slice(5, 8),
@@ -764,6 +854,10 @@ readonly brandSectionBorderColors = [
     return unique.slice(0, 5);
   });
   readonly brandKitAccentPalette = computed(() => {
+    const preset = this.activeBrandKitPreset();
+    if (preset) {
+      return preset.palette;
+    }
     const palette = [
       ...this.brandParagraphColors().filter((color) => color !== 'transparent').slice(3, 8),
       ...this.brandSectionBackgroundColors.filter((color) => color !== 'transparent').slice(0, 4),
@@ -805,16 +899,55 @@ readonly brandSectionBorderColors = [
   readonly imageBorderHexValue = computed(() => this.imageBorderColor(this.selectedImageComponent()).replace('#', '').toUpperCase());
   readonly paragraphFontOptions = STOREFRONT_EDITOR_TEXT_FONT_OPTIONS;
   readonly paragraphFontFamilies = this.paragraphFontOptions.map((font) => font.family);
+  readonly brandKitPresets = STOREFRONT_EDITOR_BRAND_KIT_PRESETS;
+  readonly activeBrandKitPreset = computed(
+    () => this.brandKitPresets.find((preset) => preset.id === this.activeBrandKitPresetId()) ?? null
+  );
   readonly brandKitHeadingFont = computed(
-    () => this.paragraphFontOptions.find((font) => font.family === 'Hedvig Letters Serif')?.family
+    () => this.activeBrandKitPreset()?.headingFont
+      ?? this.paragraphFontOptions.find((font) => font.family === 'Hedvig Letters Serif')?.family
       ?? this.paragraphFontOptions.find((font) => font.category === 'Serif')?.family
       ?? this.paragraphFontFamilies[0]
   );
   readonly brandKitBodyFont = computed(
-    () => this.paragraphFontOptions.find((font) => font.family === 'Fira Mono')?.family
+    () => this.activeBrandKitPreset()?.bodyFont
+      ?? this.paragraphFontOptions.find((font) => font.family === 'Fira Mono')?.family
       ?? this.paragraphFontOptions.find((font) => font.category === 'Mono')?.family
       ?? this.paragraphFontFamilies[1]
       ?? this.paragraphFontFamilies[0]
+  );
+  readonly brandKitButtonPreset = computed(() => {
+    const presetId = this.activeBrandKitPreset()?.buttonPresetId;
+    if (!presetId) {
+      return this.buttonDesignPresets[0] ?? null;
+    }
+
+    return this.buttonDesignPresets.find((preset) => preset.id === presetId) ?? this.buttonDesignPresets[0] ?? null;
+  });
+  readonly brandKitPrimaryButtonBackground = computed(
+    () => this.brandKitButtonPreset()?.patch.backgroundColor ?? this.brandButtonColors()[0] ?? '#0f172a'
+  );
+  readonly brandKitPrimaryButtonText = computed(
+    () => this.brandKitButtonPreset()?.patch.textColor ?? this.brandButtonColors()[4] ?? '#ffffff'
+  );
+  readonly brandKitSecondaryButtonBorder = computed(
+    () => this.brandKitButtonPreset()?.patch.borderColor ?? this.brandButtonColors()[0] ?? '#0f172a'
+  );
+  readonly brandKitSecondaryButtonText = computed(
+    () => this.brandKitButtonPreset()?.patch.textColor ?? this.brandButtonColors()[0] ?? '#0f172a'
+  );
+  readonly brandKitBoxFill = computed(
+    () => this.activeBrandKitPreset()?.boxFill ?? this.brandSectionBackgroundColors[6]
+  );
+  readonly brandKitBoxBorder = computed(
+    () => this.activeBrandKitPreset()?.boxBorder ?? this.brandSectionBorderColors[3]
+  );
+  readonly brandKitLineColors = computed(
+    () => this.activeBrandKitPreset()?.lines ?? [
+      this.brandSectionBorderColors[2],
+      this.brandSectionBorderColors[3],
+      this.brandSectionBorderColors[6],
+    ]
   );
   readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
   readonly textLineHeightOptions = [0.95, 1, 1.1, 1.2, 1.35, 1.5, 1.7, 2];
@@ -2402,6 +2535,21 @@ this.finalizeDraggedComponentsLayoutSnap();
     const next = !this.isBrandKitPopupOpen();
     this.closeFloatingUi();
     this.isBrandKitPopupOpen.set(next);
+    this.isBrandKitCustomizerOpen.set(false);
+  }
+
+  openBrandKitCustomizer(): void {
+    this.isBrandKitCustomizerOpen.set(true);
+  }
+
+  closeBrandKitCustomizer(): void {
+    this.isBrandKitCustomizerOpen.set(false);
+  }
+
+  applyBrandKitPreset(presetId: string): void {
+    this.activeBrandKitPresetId.set(presetId);
+    this.isBrandKitCustomizerOpen.set(false);
+    this.toastService.success('Brand kit preset applied.');
   }
 
   toggleAddElementsPanel(): void {
@@ -3774,6 +3922,7 @@ finishEditingComponentText(): void {
     this.isFormaMenuOpen.set(false);
   this.isAccountMenuOpen.set(false);
   this.isBrandKitPopupOpen.set(false);
+  this.isBrandKitCustomizerOpen.set(false);
   this.isZoomMenuOpen.set(false);
   this.isAddPageMenuOpen.set(false);
   this.sectionAddMenuSectionId.set(null);
