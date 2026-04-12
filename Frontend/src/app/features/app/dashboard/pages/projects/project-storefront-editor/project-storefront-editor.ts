@@ -169,6 +169,7 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
   private static readonly SECTION_LABEL_PROP_KEY = 'editorLabel';
+  private static readonly SECTION_BLANK_PROP_KEY = 'editorBlankSection';
   private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
   private static readonly SAVED_BUTTON_COLORS_STORAGE_KEY = 'forma_saved_button_colors';
   private static readonly ROTATION_CURSOR_HOTSPOT = 12;
@@ -309,6 +310,8 @@ export class ProjectStorefrontEditor {
 readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
 readonly pagesManagerSearch = signal('');
 readonly isAddPageMenuOpen = signal(false);
+readonly sectionAddMenuSectionId = signal<string | null>(null);
+readonly sectionAddMenuPlacement = signal<'above' | 'below'>('below');
 readonly isPageDesignPickerOpen = signal(false);
 readonly isPageDesignPickerClosing = signal(false);
 readonly activePageDesignCategory = signal<StorefrontPageDesignCategory>('Business');
@@ -434,7 +437,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly isProductFeedToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
   );
-  readonly activeTextToolbarMenu = signal<'style' | 'font-family' | 'link' | 'alignment' | 'color' | null>(null);
+readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color' | null>(null);
   readonly activeColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedParagraphColors = signal<string[]>([]);
   readonly customPickerHue = signal(206);
@@ -495,7 +498,7 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     return color.replace('#', '').toUpperCase();
   });
   readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
-  readonly paragraphFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
+  readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
   readonly textStylePresets: ReadonlyArray<{ id: StorefrontEditorTextStylePreset; sampleSize: string }> = [
     { id: 'Heading 1', sampleSize: '180px' },
     { id: 'Heading 2', sampleSize: '64px' },
@@ -789,6 +792,8 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
       this.isFormaMenuOpen() ||
       this.isAccountMenuOpen() ||
       this.isZoomMenuOpen() ||
+      this.isAddPageMenuOpen() ||
+      this.sectionAddMenuSectionId() !== null ||
       this.isAddElementsPanelVisible() ||
       this.isPagesPanelVisible() ||
       this.isManagePagesVisible() ||
@@ -942,6 +947,7 @@ effect(() => {
     this.updateAddElementsTabScrollState();
     this.updateAddElementsSubmenuScrollState();
     this.updateSectionLibraryTabScrollState();
+    this.syncSectionAddMenuPlacement();
     setTimeout(() => {
       this.updatePreviewStageScrollbarState();
       this.syncSelectedSectionRailPosition();
@@ -987,6 +993,12 @@ effect(() => {
     if (event.key === 'Escape' && this.isPagesPanelOpen()) {
       event.preventDefault();
       this.isPagesPanelOpen.set(false);
+      return;
+    }
+
+    if (event.key === 'Escape' && this.sectionAddMenuSectionId()) {
+      event.preventDefault();
+      this.sectionAddMenuSectionId.set(null);
       return;
     }
 
@@ -1105,6 +1117,7 @@ effect(() => {
       this.isAccountMenuOpen.set(false);
       this.isZoomMenuOpen.set(false);
       this.isAddPageMenuOpen.set(false);
+   this.sectionAddMenuSectionId.set(null);
    this.sectionOptionsMenuId.set(null);
    this.pageCardMenuId.set(null);
    this.activeTextToolbarMenu.set(null);
@@ -1127,6 +1140,12 @@ effect(() => {
     if (this.isAddPageMenuOpen()) {
       if (!target.closest('.storefront-editor__add-page-menu, .storefront-editor__pages-primary')) {
         this.isAddPageMenuOpen.set(false);
+      }
+    }
+
+    if (this.sectionAddMenuSectionId()) {
+      if (!target.closest('.storefront-editor__add-page-menu--section, .storefront-editor__preview-section-add')) {
+        this.sectionAddMenuSectionId.set(null);
       }
     }
 
@@ -2507,6 +2526,7 @@ handleComponentPointerUp(event: MouseEvent): void {
       clearTimeout(this.sectionLibraryCloseTimer);
       this.sectionLibraryCloseTimer = null;
     }
+    this.sectionAddMenuSectionId.set(null);
     this.isPagesPanelOpen.set(false);
     this.sectionOptionsMenuId.set(null);
     this.activeSectionLibraryCategory.set('Welcome');
@@ -2571,6 +2591,8 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.isFormaMenuOpen.set(false);
     this.isAccountMenuOpen.set(false);
   this.isZoomMenuOpen.set(false);
+  this.isAddPageMenuOpen.set(false);
+  this.sectionAddMenuSectionId.set(null);
   this.activeTextToolbarMenu.set(null);
   this.activeButtonToolbarMenu.set(null);
   this.activeProductFeedToolbarMenu.set(null);
@@ -2619,6 +2641,42 @@ handleComponentPointerUp(event: MouseEvent): void {
   private openSectionOptionsAt(sectionId: string, x: number, y: number): void {
     this.sectionContextMenuPosition.set(this.getClampedFloatingPanelPosition(x, y, 232, 340));
     this.sectionOptionsMenuId.set(sectionId);
+  }
+
+  private getSectionAddMenuPlacement(anchorRect: DOMRect | null, menuHeight: number): 'above' | 'below' {
+    if (!anchorRect) {
+      return 'below';
+    }
+
+    const gap = 12;
+    const viewportMargin = 12;
+    const fitsBelow = anchorRect.bottom + gap + menuHeight <= window.innerHeight - viewportMargin;
+    return fitsBelow ? 'below' : 'above';
+  }
+
+  private syncSectionAddMenuPlacement(sectionId?: string | null, anchorElement?: HTMLElement | null): void {
+    const activeSectionId = sectionId ?? this.sectionAddMenuSectionId();
+    if (!activeSectionId || this.sectionAddMenuSectionId() !== activeSectionId) {
+      return;
+    }
+
+    const anchor =
+      anchorElement ??
+      (document.querySelector(
+        `.storefront-editor__preview-section-add-wrap[data-section-id="${activeSectionId}"] .storefront-editor__preview-section-add`
+      ) as HTMLElement | null);
+    if (!anchor) {
+      this.sectionAddMenuPlacement.set('below');
+      return;
+    }
+
+    const menu = document.querySelector(
+      `.storefront-editor__add-page-menu--section[data-section-id="${activeSectionId}"]`
+    ) as HTMLElement | null;
+    const menuHeight = menu?.getBoundingClientRect().height ?? 112;
+    const anchorRect = anchor.getBoundingClientRect();
+
+    this.sectionAddMenuPlacement.set(this.getSectionAddMenuPlacement(anchorRect, menuHeight));
   }
 
   private getClampedFloatingPanelPosition(x: number, y: number, width: number, height: number): { x: number; y: number } {
@@ -2794,7 +2852,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return;
     }
 
-    this.updateSelectedParagraphProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+    this.updateSelectedParagraphProps({ fontSize: Math.max(10, Math.min(288, Math.round(parsed))) });
     this.activeTextToolbarMenu.set(null);
   }
 
@@ -2847,7 +2905,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedParagraphProps({ color: normalized });
   }
 
-  toggleTextToolbarMenu(menu: 'style' | 'font-family' | 'link' | 'alignment' | 'color'): void {
+  toggleTextToolbarMenu(menu: 'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color'): void {
     const next = this.activeTextToolbarMenu() === menu ? null : menu;
     this.activeTextToolbarMenu.set(next);
     if (next === 'font-family') {
@@ -3548,9 +3606,19 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
 toggleAddPageMenu(event?: MouseEvent): void {
   event?.stopPropagation();
+  this.sectionAddMenuSectionId.set(null);
   this.isPageDesignPickerOpen.set(false);
   this.isPageDesignPickerClosing.set(false);
   this.isAddPageMenuOpen.update((open) => !open);
+}
+
+toggleSectionAddMenu(sectionId: string, event?: MouseEvent): void {
+  event?.stopPropagation();
+  const next = this.sectionAddMenuSectionId() === sectionId ? null : sectionId;
+  const anchor = event?.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+  this.closeFloatingUi();
+  this.sectionAddMenuPlacement.set(next ? this.getSectionAddMenuPlacement(anchor?.getBoundingClientRect() ?? null, 112) : 'below');
+  this.sectionAddMenuSectionId.set(next);
 }
 
   openPageDesignPicker(): void {
@@ -3870,6 +3938,43 @@ updatePageDesignTabScrollState(): void {
       const insertAt =
         mode === 'after-selected' && selectedIndex >= 0 ? selectedIndex + 1 : sections.length;
 
+      sections.splice(insertAt, 0, section);
+
+      return {
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
+          sections,
+        },
+      };
+    }, { selectedSectionId: insertedId, syncRail: true });
+  }
+
+  createBlankSection(sectionId: string): void {
+    this.sectionAddMenuSectionId.set(null);
+    this.selectedSectionId.set(sectionId);
+
+    let insertedId: string | null = null;
+    this.applyStorefrontMutation((storefront) => {
+      const section = this.createSection('hero');
+      section.props = {
+        ...section.props,
+        eyebrow: '',
+        title: '',
+        description: '',
+        primaryCtaLabel: '',
+        primaryCtaHref: '',
+        secondaryCtaLabel: '',
+        secondaryCtaHref: '',
+        [ProjectStorefrontEditor.SECTION_LABEL_PROP_KEY]: 'Blank section',
+        [ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY]: 280,
+        [ProjectStorefrontEditor.SECTION_BLANK_PROP_KEY]: true,
+      };
+      insertedId = section.id;
+
+      const sections = [...storefront.draftHomepage.sections];
+      const selectedIndex = sections.findIndex((item) => item.id === sectionId);
+      const insertAt = selectedIndex >= 0 ? selectedIndex + 1 : sections.length;
       sections.splice(insertAt, 0, section);
 
       return {
@@ -4237,6 +4342,11 @@ updatePageDesignTabScrollState(): void {
     return typeof value === 'string' ? value : '';
   }
 
+  readBooleanProp(section: StorefrontHomepageSection | null, key: string): boolean {
+    const value = (section?.props as Record<string, unknown> | undefined)?.[key];
+    return value === true;
+  }
+
   readNumberProp(section: StorefrontHomepageSection | null, key: string, fallback = 0): number {
     const value = (section?.props as Record<string, unknown> | undefined)?.[key];
     return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
@@ -4264,6 +4374,10 @@ updatePageDesignTabScrollState(): void {
   sectionPreviewHeight(section: StorefrontHomepageSection): number | null {
     const height = this.readNumberProp(section, ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY, 0);
     return height > 0 ? height : null;
+  }
+
+  isBlankSection(section: StorefrontHomepageSection | null): boolean {
+    return this.readBooleanProp(section, ProjectStorefrontEditor.SECTION_BLANK_PROP_KEY);
   }
 
 componentTypeLabel(component: StorefrontEditorComponentNode): string {
