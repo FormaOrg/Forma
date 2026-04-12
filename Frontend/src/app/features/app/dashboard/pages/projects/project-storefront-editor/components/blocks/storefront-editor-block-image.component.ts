@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { StorefrontEditorImageNode } from './storefront-editor-component.model';
+import { StorefrontEditorImageNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-image',

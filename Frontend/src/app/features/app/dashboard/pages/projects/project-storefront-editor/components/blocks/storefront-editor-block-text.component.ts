@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 
-import { StorefrontEditorTextNode } from './storefront-editor-component.model';
+import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-text',

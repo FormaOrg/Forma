@@ -36,10 +36,12 @@ import {
   STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES,
   STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS,
   STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS,
+  STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES,
   StorefrontEditorAddElementsCategory,
   StorefrontEditorAddElementsLibraryItem,
+  StorefrontEditorAddElementsSubcategoryOption,
   filterStorefrontEditorAddElementsLibraryItems,
-} from './storefront-editor-component-library';
+} from './components/storefront-editor-component-library';
 import {
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
@@ -51,12 +53,12 @@ import {
   buildStorefrontEditorProductFeedProps,
   buildStorefrontEditorTextProps,
   createStorefrontEditorComponentNode,
-} from './storefront-editor-component.model';
+} from './components/storefront-editor-component.model';
 import {
   ProjectStorefrontMediaManager,
   StorefrontMediaManagerAsset,
-} from './project-storefront-media-manager';
-import { StorefrontEditorComponentHostComponent } from './storefront-editor-component-host.component';
+} from './components/media-manager/project-storefront-media-manager';
+import { StorefrontEditorComponentHostComponent } from './components/storefront-editor-component-host.component';
 import {
   buildStorefrontMediaManagerAssets,
   describeStorefrontMediaAsset,
@@ -292,6 +294,7 @@ export class ProjectStorefrontEditor {
   readonly isAddElementsPanelOpen = signal(false);
   readonly isAddElementsPanelClosing = signal(false);
   readonly activeAddElementsCategory = signal<StorefrontEditorAddElementsCategory>('All');
+  readonly activeAddElementsSubcategory = signal('all');
   readonly addElementsSearch = signal('');
   readonly draggedAddElementsItemId = signal<string | null>(null);
   readonly draggedAddElementsPreviewPosition = signal<{ left: number; top: number; width: number; height: number } | null>(
@@ -317,6 +320,8 @@ readonly pageCardMenuId = signal<string | null>(null);
   readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Welcome');
   readonly canScrollAddElementsTabsLeft = signal(false);
   readonly canScrollAddElementsTabsRight = signal(false);
+  readonly canScrollAddElementsSubmenuLeft = signal(false);
+  readonly canScrollAddElementsSubmenuRight = signal(false);
 readonly canScrollSectionLibraryTabsLeft = signal(false);
 readonly canScrollSectionLibraryTabsRight = signal(false);
 readonly canScrollPageDesignTabsLeft = signal(false);
@@ -861,12 +866,17 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     this.pageDesignTemplates.filter((template) => template.category === this.activePageDesignCategory())
   );
   readonly addElementsCategories = STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES;
+  readonly addElementsSubcategories = STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES;
   readonly addElementsFeaturedShortcuts = STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS;
   readonly addElementsLibraryItems = STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS;
+  readonly activeAddElementsSubcategories = computed(() =>
+    this.getAddElementsSubcategories(this.activeAddElementsCategory())
+  );
   readonly visibleAddElementsLibraryItems = computed(() => {
     return filterStorefrontEditorAddElementsLibraryItems(
       this.addElementsLibraryItems,
       this.activeAddElementsCategory(),
+      this.activeAddElementsSubcategory(),
       this.addElementsSearch()
     );
   });
@@ -930,6 +940,7 @@ effect(() => {
   @HostListener('window:resize')
   handleWindowResize(): void {
     this.updateAddElementsTabScrollState();
+    this.updateAddElementsSubmenuScrollState();
     this.updateSectionLibraryTabScrollState();
     setTimeout(() => {
       this.updatePreviewStageScrollbarState();
@@ -1469,7 +1480,10 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.closeFloatingUi();
     this.isAddElementsPanelClosing.set(false);
     this.isAddElementsPanelOpen.set(true);
-    setTimeout(() => this.updateAddElementsTabScrollState(), 0);
+    setTimeout(() => {
+      this.updateAddElementsTabScrollState();
+      this.updateAddElementsSubmenuScrollState();
+    }, 0);
   }
 
   closeAddElementsPanel(): void {
@@ -1487,6 +1501,8 @@ handleComponentPointerUp(event: MouseEvent): void {
       this.isAddElementsPanelClosing.set(false);
       this.canScrollAddElementsTabsLeft.set(false);
       this.canScrollAddElementsTabsRight.set(false);
+      this.canScrollAddElementsSubmenuLeft.set(false);
+      this.canScrollAddElementsSubmenuRight.set(false);
       this.addElementsPanelCloseTimer = null;
     }, ProjectStorefrontEditor.ADD_ELEMENTS_PANEL_CLOSE_MS);
   }
@@ -1501,6 +1517,22 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.isAddElementsPanelClosing.set(false);
     this.canScrollAddElementsTabsLeft.set(false);
     this.canScrollAddElementsTabsRight.set(false);
+    this.canScrollAddElementsSubmenuLeft.set(false);
+    this.canScrollAddElementsSubmenuRight.set(false);
+  }
+
+  setActiveAddElementsCategory(category: StorefrontEditorAddElementsCategory): void {
+    this.activeAddElementsCategory.set(category);
+    this.activeAddElementsSubcategory.set(this.getDefaultAddElementsSubcategory(category));
+    setTimeout(() => {
+      this.updateAddElementsTabScrollState();
+      this.updateAddElementsSubmenuScrollState();
+    }, 0);
+  }
+
+  setActiveAddElementsSubcategory(subcategoryId: string): void {
+    this.activeAddElementsSubcategory.set(subcategoryId);
+    setTimeout(() => this.updateAddElementsSubmenuScrollState(), 0);
   }
 
   scrollAddElementsTabs(direction: 'left' | 'right'): void {
@@ -1529,6 +1561,34 @@ handleComponentPointerUp(event: MouseEvent): void {
     const maxScrollLeft = Math.max(0, tabs.scrollWidth - tabs.clientWidth);
     this.canScrollAddElementsTabsLeft.set(tabs.scrollLeft > 4);
     this.canScrollAddElementsTabsRight.set(tabs.scrollLeft < maxScrollLeft - 4);
+  }
+
+  scrollAddElementsSubmenu(direction: 'left' | 'right'): void {
+    const submenu = this.getAddElementsSubmenuElement();
+    if (!submenu) {
+      return;
+    }
+
+    const delta = Math.max(180, Math.round(submenu.clientWidth * 0.55));
+    submenu.scrollBy({
+      left: direction === 'right' ? delta : -delta,
+      behavior: 'smooth',
+    });
+
+    setTimeout(() => this.updateAddElementsSubmenuScrollState(), 220);
+  }
+
+  updateAddElementsSubmenuScrollState(): void {
+    const submenu = this.getAddElementsSubmenuElement();
+    if (!submenu) {
+      this.canScrollAddElementsSubmenuLeft.set(false);
+      this.canScrollAddElementsSubmenuRight.set(false);
+      return;
+    }
+
+    const maxScrollLeft = Math.max(0, submenu.scrollWidth - submenu.clientWidth);
+    this.canScrollAddElementsSubmenuLeft.set(submenu.scrollLeft > 4);
+    this.canScrollAddElementsSubmenuRight.set(submenu.scrollLeft < maxScrollLeft - 4);
   }
 
   insertComponentFromLibrary(item: StorefrontEditorAddElementsLibraryItem): void {
@@ -6023,5 +6083,23 @@ private getPageDesignTabsElement(): HTMLElement | null {
 
 private getAddElementsTabsElement(): HTMLElement | null {
   return document.querySelector('.storefront-editor__add-elements-tabs-scroll');
+}
+
+private getAddElementsSubmenuElement(): HTMLElement | null {
+  return document.querySelector('.storefront-editor__add-elements-submenu-scroll');
+}
+
+private getAddElementsSubcategories(
+  category: StorefrontEditorAddElementsCategory
+): readonly StorefrontEditorAddElementsSubcategoryOption[] {
+  if (category === 'All') {
+    return [];
+  }
+
+  return this.addElementsSubcategories[category] ?? [];
+}
+
+private getDefaultAddElementsSubcategory(category: StorefrontEditorAddElementsCategory): string {
+  return this.getAddElementsSubcategories(category)[0]?.id ?? 'all';
 }
 }

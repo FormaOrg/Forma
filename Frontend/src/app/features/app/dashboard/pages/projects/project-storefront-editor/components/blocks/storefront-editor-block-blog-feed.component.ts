@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { StorefrontEditorBlogFeedNode } from './storefront-editor-component.model';
+import { StorefrontEditorBlogFeedNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-blog-feed',

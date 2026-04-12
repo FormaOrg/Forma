@@ -34,6 +34,11 @@ export interface StorefrontEditorAddElementsCategoryOption {
   icon: StorefrontEditorAddElementsCategoryIcon;
 }
 
+export interface StorefrontEditorAddElementsSubcategoryOption {
+  id: string;
+  label: string;
+}
+
 export interface StorefrontEditorAddElementsFeaturedShortcut {
   id: string;
   title: string;
@@ -46,6 +51,7 @@ export interface StorefrontEditorAddElementsLibraryItem {
   id: string;
   title: string;
   category: Exclude<StorefrontEditorAddElementsCategory, 'All'>;
+  subcategoryIds?: readonly string[];
   componentType: StorefrontEditorComponentType;
   description: string;
   preview: StorefrontEditorAddElementsCardPreview;
@@ -62,6 +68,49 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_CATEGORIES: readonly StorefrontEdito
   { id: 'Forma Store', label: 'Forma Store', icon: 'store' },
   { id: 'Forma Blog', label: 'Forma Blog', icon: 'blog' },
 ];
+
+export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
+  Record<
+    Exclude<StorefrontEditorAddElementsCategory, 'All'>,
+    readonly StorefrontEditorAddElementsSubcategoryOption[]
+  >
+> = {
+  Text: [
+    { id: 'all', label: 'All' },
+    { id: 'titles', label: 'Titles' },
+    { id: 'paragraphs', label: 'Paragraphs' },
+    { id: 'text-combos', label: 'Text combos' },
+    { id: 'running-text', label: 'Running text' },
+  ],
+  Image: [
+    { id: 'all', label: 'All' },
+    { id: 'single-images', label: 'Single images' },
+    { id: 'galleries', label: 'Galleries' },
+    { id: 'banners', label: 'Banners' },
+  ],
+  Button: [
+    { id: 'all', label: 'All' },
+    { id: 'primary-buttons', label: 'Primary buttons' },
+    { id: 'secondary-buttons', label: 'Secondary buttons' },
+    { id: 'icon-buttons', label: 'Icon buttons' },
+  ],
+  Graphics: [
+    { id: 'all', label: 'All' },
+    { id: 'containers', label: 'Containers' },
+    { id: 'shapes', label: 'Shapes' },
+    { id: 'decorative', label: 'Decorative' },
+  ],
+  'Forma Store': [
+    { id: 'all', label: 'All' },
+    { id: 'grid-gallery', label: 'Grid gallery' },
+    { id: 'featured-products', label: 'Featured products' },
+  ],
+  'Forma Blog': [
+    { id: 'all', label: 'All' },
+    { id: 'recent-posts', label: 'Recent posts' },
+    { id: 'featured-articles', label: 'Featured articles' },
+  ],
+};
 
 export const STOREFRONT_EDITOR_ADD_ELEMENTS_FEATURED_SHORTCUTS: readonly StorefrontEditorAddElementsFeaturedShortcut[] = [
   {
@@ -85,6 +134,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'text',
     title: 'Text',
     category: 'Text',
+    subcategoryIds: ['all', 'titles', 'paragraphs', 'text-combos', 'running-text'],
     componentType: 'text',
     description: 'Flexible text block with heading and paragraph styles.',
     preview: 'headline',
@@ -94,6 +144,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'image',
     title: 'Image',
     category: 'Image',
+    subcategoryIds: ['all', 'single-images', 'galleries', 'banners'],
     componentType: 'image',
     description: 'Responsive media block for photos, banners, and galleries.',
     preview: 'photo',
@@ -103,6 +154,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'button',
     title: 'Button',
     category: 'Button',
+    subcategoryIds: ['all', 'primary-buttons', 'secondary-buttons', 'icon-buttons'],
     componentType: 'button',
     description: 'Clickable call-to-action with primary or secondary styling.',
     preview: 'button',
@@ -112,6 +164,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'container',
     title: 'Container',
     category: 'Graphics',
+    subcategoryIds: ['all', 'containers', 'decorative'],
     componentType: 'container',
     description: 'Flexible wrapper that groups and aligns nested components.',
     preview: 'container',
@@ -121,6 +174,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'graphic',
     title: 'Graphic',
     category: 'Graphics',
+    subcategoryIds: ['all', 'shapes', 'decorative'],
     componentType: 'graphic',
     description: 'Decorative shape or icon area for visual accents.',
     preview: 'graphic',
@@ -130,6 +184,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'product-feed',
     title: 'Product feed',
     category: 'Forma Store',
+    subcategoryIds: ['all', 'grid-gallery', 'featured-products'],
     componentType: 'product-feed',
     description: 'Catalog-driven product strip for storefront sections.',
     preview: 'product-feed',
@@ -140,6 +195,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     id: 'blog-feed',
     title: 'Blog feed',
     category: 'Forma Blog',
+    subcategoryIds: ['all', 'recent-posts', 'featured-articles'],
     componentType: 'blog-feed',
     description: 'Recent articles list for editorial and marketing sections.',
     preview: 'blog-feed',
@@ -150,13 +206,25 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
 export function filterStorefrontEditorAddElementsLibraryItems(
   items: readonly StorefrontEditorAddElementsLibraryItem[],
   category: StorefrontEditorAddElementsCategory,
+  subcategory: string,
   search: string
 ): StorefrontEditorAddElementsLibraryItem[] {
   const normalizedSearch = search.trim().toLowerCase();
+  const normalizedSubcategory = subcategory.trim().toLowerCase();
 
   return items.filter((item) => {
     const matchesCategory = category === 'All' || item.category === category;
     if (!matchesCategory) {
+      return false;
+    }
+
+    const matchesSubcategory =
+      category === 'All' ||
+      !normalizedSubcategory ||
+      normalizedSubcategory === 'all' ||
+      !item.subcategoryIds?.length ||
+      item.subcategoryIds.includes(normalizedSubcategory);
+    if (!matchesSubcategory) {
       return false;
     }
 

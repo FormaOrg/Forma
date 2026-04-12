@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { StorefrontEditorHeadingNode } from './storefront-editor-component.model';
+import { StorefrontEditorHeadingNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-heading',

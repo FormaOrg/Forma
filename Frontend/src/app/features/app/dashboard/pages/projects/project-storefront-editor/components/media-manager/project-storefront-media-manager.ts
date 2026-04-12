@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
-import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
-import { PexelsPhoto, PexelsPhotoService } from '../../../../../../core/services/pexels-photo.service';
+import { AppIcon } from '../../../../../../../../shared/app/icons/app-icon';
+import { PexelsPhoto, PexelsPhotoService } from '../../../../../../../../core/services/pexels-photo.service';
 
 export interface StorefrontMediaManagerAsset {
   id: number;

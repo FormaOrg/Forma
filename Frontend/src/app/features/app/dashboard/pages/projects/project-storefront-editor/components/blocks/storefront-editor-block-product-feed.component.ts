@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 
-import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
-import { StorefrontEditorProductFeedNode } from './storefront-editor-component.model';
+import { ProjectCatalogProduct } from '../../../../../../../../core/models/project-catalog.model';
+import { StorefrontEditorProductFeedNode } from '../storefront-editor-component.model';
 
 type ProductFeedBadgeTone = 'dark' | 'light';
 

@@ -1,8 +1,8 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 
-import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
-import { StorefrontEditorButtonNode } from './storefront-editor-component.model';
+import { AppIcon } from '../../../../../../../../shared/app/icons/app-icon';
+import { StorefrontEditorButtonNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-button',

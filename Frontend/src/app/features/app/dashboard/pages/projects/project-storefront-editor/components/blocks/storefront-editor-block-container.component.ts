@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-import { StorefrontEditorContainerNode } from './storefront-editor-component.model';
+import { StorefrontEditorContainerNode } from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-container',

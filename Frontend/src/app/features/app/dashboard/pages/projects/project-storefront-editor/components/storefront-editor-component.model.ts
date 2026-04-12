@@ -202,7 +202,7 @@ function getDefaultStorefrontEditorComponentFrame(
     case 'graphic':
       return { x: 420, y: 250, width: 96, height: 96 };
     case 'product-feed':
-      return { x: 32, y: 32, width: 420, height: 220 };
+      return { x: 32, y: 32, width: 560, height: 300 };
     case 'blog-feed':
       return { x: 32, y: 32, width: 360, height: 180 };
   }
