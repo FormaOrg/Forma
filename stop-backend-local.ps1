@@ -16,17 +16,18 @@ if (-not $pidFiles) {
 
 foreach ($pidFile in $pidFiles) {
     $serviceName = [System.IO.Path]::GetFileNameWithoutExtension($pidFile.Name)
-    $pid = (Get-Content $pidFile.FullName | Select-Object -First 1).Trim()
+    $pidLine = Get-Content $pidFile.FullName -ErrorAction SilentlyContinue | Select-Object -First 1
+    $servicePid = if ($null -ne $pidLine) { "$pidLine".Trim() } else { "" }
 
-    if (-not $pid) {
+    if (-not $servicePid) {
         Remove-Item $pidFile.FullName -Force -ErrorAction SilentlyContinue
         continue
     }
 
-    $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+    $process = Get-Process -Id $servicePid -ErrorAction SilentlyContinue
     if ($process) {
-        Write-Host "Stopping $serviceName (PID $pid)..." -ForegroundColor Yellow
-        Stop-Process -Id $pid -Force
+        Write-Host "Stopping $serviceName (PID $servicePid)..." -ForegroundColor Yellow
+        Stop-Process -Id $servicePid -Force
     } else {
         Write-Host "$serviceName is not running anymore." -ForegroundColor DarkYellow
     }

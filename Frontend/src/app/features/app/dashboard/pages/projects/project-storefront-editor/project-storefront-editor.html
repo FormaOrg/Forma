@@ -238,10 +238,16 @@
           <app-icon name="chevron-down" [size]="14"></app-icon>
         </button>
 
-        <button type="button" class="storefront-editor__topbar-select">
-          <span>Brand</span>
-          <app-icon name="chevron-down" [size]="14"></app-icon>
-        </button>
+        <div class="storefront-editor__floating-shell">
+          <button
+            type="button"
+            class="storefront-editor__topbar-select storefront-editor__topbar-brand-trigger"
+            (click)="toggleBrandKitPopup()"
+          >
+            <span>Brand</span>
+            <app-icon name="chevron-down" [size]="14"></app-icon>
+          </button>
+        </div>
       </div>
 
       <div class="storefront-editor__topbar-center">
@@ -344,6 +350,142 @@
         </button>
       </div>
     </header>
+
+    <div class="storefront-editor__brand-kit-panel-shell">
+      <aside
+        class="storefront-editor__brand-kit-panel"
+        [class.storefront-editor__brand-kit-panel--open]="isBrandKitPopupOpen()"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="storefront-editor__brand-kit-header">
+          <h3>Site Brand</h3>
+          <div class="storefront-editor__brand-kit-header-actions">
+            <button type="button" class="storefront-editor__brand-kit-icon" aria-label="Brand kit help">?</button>
+            <button type="button" class="storefront-editor__brand-kit-icon" aria-label="Close brand kit" (click)="toggleBrandKitPopup()">
+              <svg
+                class="storefront-editor__pages-close-icon"
+                fill="currentColor"
+                viewBox="0 0 8 8"
+                width="12"
+                height="12"
+                data-hook="close-large"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M6.636.246a.775.775 0 0 1 1.097 0 .778.778 0 0 1 0 1.1L5.101 3.98l2.672 2.692a.778.778 0 0 1 0 1.1.775.775 0 0 1-1.098 0L4.003 5.08 1.325 7.764a.775.775 0 0 1-1.098 0 .778.778 0 0 1 0-1.1l2.679-2.683L.292 1.327a.778.778 0 0 1 0-1.1.775.775 0 0 1 1.098 0l2.613 2.655L6.636.246Z"></path>
+                </g>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="storefront-editor__brand-kit-scroll">
+          <div class="storefront-editor__brand-kit-preview">
+            <div class="storefront-editor__brand-kit-preview-copy">
+              <h4 [style.font-family]="$any(brandKitHeadingFont())">{{ storeName() || 'Bonjour,' }}</h4>
+              <p [style.font-family]="$any(brandKitBodyFont())">
+                This is your site's current brand kit.
+              </p>
+
+              <div
+                class="storefront-editor__brand-kit-font-sample"
+                [style.background]="brandButtonColors()[0]"
+                [style.color]="brandButtonColors()[4] ?? '#ffffff'"
+              >
+                <span [style.font-family]="$any(brandKitHeadingFont())">{{ brandKitHeadingFont() }}</span>
+                <strong [style.font-family]="$any(brandKitHeadingFont())">AaBb</strong>
+              </div>
+            </div>
+
+            <div class="storefront-editor__brand-kit-preview-swatches">
+              @for (color of brandKitAccentPalette(); track color) {
+                <div class="storefront-editor__brand-kit-preview-swatch" [style.background]="color">
+                  <span>{{ color.replace('#', '').toUpperCase() }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="storefront-editor__brand-kit-sections">
+            <button type="button" class="storefront-editor__brand-kit-card">
+              <div class="storefront-editor__brand-kit-card-header">
+                <span>Colors</span>
+                <span class="storefront-editor__brand-kit-chevron">&gt;</span>
+              </div>
+              <div class="storefront-editor__brand-kit-palette-strip">
+                @for (color of brandKitPreviewPalette(); track color) {
+                  <span [style.background]="color"></span>
+                }
+              </div>
+            </button>
+
+            <button type="button" class="storefront-editor__brand-kit-card">
+              <div class="storefront-editor__brand-kit-card-header">
+                <span>Text</span>
+                <span class="storefront-editor__brand-kit-chevron">&gt;</span>
+              </div>
+              <div class="storefront-editor__brand-kit-text-stack">
+                <strong [style.font-family]="$any(brandKitHeadingFont())">{{ brandKitHeadingFont() }}</strong>
+                <span [style.font-family]="$any(brandKitBodyFont())">{{ brandKitBodyFont() }}</span>
+              </div>
+            </button>
+
+            <button type="button" class="storefront-editor__brand-kit-card">
+              <div class="storefront-editor__brand-kit-card-header">
+                <span>Buttons</span>
+                <span class="storefront-editor__brand-kit-chevron">&gt;</span>
+              </div>
+              <div class="storefront-editor__brand-kit-button-row">
+                <span
+                  class="storefront-editor__brand-kit-button storefront-editor__brand-kit-button--primary"
+                  [style.background]="brandButtonColors()[0]"
+                  [style.color]="brandButtonColors()[4] ?? '#ffffff'"
+                  [style.font-family]="$any(brandKitBodyFont())"
+              >
+                Primary
+              </span>
+              <span
+                class="storefront-editor__brand-kit-button storefront-editor__brand-kit-button--secondary"
+                  [style.border-color]="brandButtonColors()[0]"
+                  [style.color]="brandButtonColors()[0]"
+                  [style.font-family]="$any(brandKitBodyFont())"
+              >
+                Secondary
+              </span>
+            </div>
+          </button>
+
+          <button type="button" class="storefront-editor__brand-kit-card">
+            <div class="storefront-editor__brand-kit-card-header">
+              <span>Boxes</span>
+              <span class="storefront-editor__brand-kit-chevron">&gt;</span>
+            </div>
+              <div class="storefront-editor__brand-kit-box-row">
+                <span class="storefront-editor__brand-kit-box storefront-editor__brand-kit-box--filled" [style.background]="brandSectionBackgroundColors[6]"></span>
+                <span class="storefront-editor__brand-kit-box storefront-editor__brand-kit-box--outlined" [style.border-color]="brandSectionBorderColors[3]"></span>
+              </div>
+            </button>
+
+          <button type="button" class="storefront-editor__brand-kit-card">
+            <div class="storefront-editor__brand-kit-card-header">
+              <span>Lines</span>
+              <span class="storefront-editor__brand-kit-chevron">&gt;</span>
+            </div>
+              <div class="storefront-editor__brand-kit-line-stack">
+                <span [style.background]="brandSectionBorderColors[2]"></span>
+                <span [style.background]="brandSectionBorderColors[3]"></span>
+                <span [style.background]="brandSectionBorderColors[6]"></span>
+              </div>
+            </button>
+          </div>
+
+          <button type="button" class="storefront-editor__brand-kit-link">
+            <app-icon name="sparkles" [size]="14"></app-icon>
+            <span>Change Brand Kit</span>
+          </button>
+        </div>
+      </aside>
+    </div>
 
     <div class="storefront-editor__pages-panel-shell">
       <aside
@@ -725,7 +867,7 @@
         <div class="storefront-editor__page-card-menu-divider"></div>
         <button type="button" class="storefront-editor__page-card-menu-button" (click)="openManagedPageSeoSettings()">
           <span>SEO and accessibility</span>
-          <span>›</span>
+          <span>&gt;</span>
         </button>
         <button type="button" class="storefront-editor__page-card-menu-button" (click)="openManagedPageSettings()">
           Settings
@@ -1871,7 +2013,7 @@
                               (click)="toggleSectionBorderColorPicker()"
                               aria-label="Close border color picker"
                             >
-                              ×
+                              x
                             </button>
                           </div>
 
@@ -2185,17 +2327,24 @@
                       placeholder="Search fonts"
                     />
                   </label>
-                  @for (fontFamily of filteredTextFontFamilies(); track fontFamily) {
-                    <button
-                      type="button"
-                      class="storefront-editor__context-toolbar-menu-item"
-                      [class.storefront-editor__context-toolbar-menu-item--active]="textComponent.props.fontFamily === fontFamily"
-                      [style.fontFamily]="fontFamily"
-                      (click)="updateSelectedParagraphFontFamily(fontFamily)"
-                    >
-                      {{ fontFamily }}
-                    </button>
-                  }
+                  <div class="storefront-editor__context-toolbar-font-scroll">
+                    @for (font of filteredTextFontOptions(); track font.family) {
+                      <button
+                        type="button"
+                        class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--font"
+                        [class.storefront-editor__context-toolbar-menu-item--active]="textComponent.props.fontFamily === font.family"
+                        [style.fontFamily]="font.family"
+                        (click)="updateSelectedParagraphFontFamily(font.family)"
+                      >
+                        {{ font.family }}
+                      </button>
+                    }
+                    @if (!filteredTextFontOptions().length) {
+                      <div class="storefront-editor__text-font-empty-state">
+                        No fonts matched "{{ textFontSearch() }}"
+                      </div>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -2222,7 +2371,7 @@
                     <h3>Link to</h3>
                     <div class="storefront-editor__text-link-popup-actions">
                       <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
-                      <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="toggleTextToolbarMenu('link')">×</button>
+                      <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="toggleTextToolbarMenu('link')">x</button>
                     </div>
                   </div>
                   <div class="storefront-editor__text-link-popup-tabs">
@@ -2655,7 +2804,7 @@
             <h3>Link to</h3>
             <div class="storefront-editor__text-link-popup-actions">
               <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
-              <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="closeImageLinkPopups()">×</button>
+              <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="closeImageLinkPopups()">x</button>
             </div>
           </div>
 
@@ -4359,7 +4508,7 @@
                                 [class.storefront-editor__preview-component-size-indicator--flipped]="isComponentRotationFlipped(component.rotation || 0)"
                               >
                                 <span class="storefront-editor__preview-component-size-indicator-text">
-                                  {{ roundedComponentWidth(component) }} × {{ roundedComponentHeight(component) }}
+                                  {{ roundedComponentWidth(component) }} x {{ roundedComponentHeight(component) }}
                                 </span>
                               </span>
                             }
@@ -4960,3 +5109,4 @@
       />
   }
 }
+
