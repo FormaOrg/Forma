@@ -1954,10 +1954,18 @@ handleComponentPointerUp(event: MouseEvent): void {
         return 'Paragraph';
       case 'image':
         return 'Image';
-      case 'button':
-        return 'Button';
-      case 'container':
-        return 'Container';
+    case 'button':
+      return 'Button';
+    case 'icon':
+      return 'Icon';
+    case 'spacer':
+      return 'Spacer';
+    case 'social-links':
+      return 'Social links';
+    case 'faq':
+      return 'FAQ';
+    case 'container':
+      return 'Container';
       case 'graphic':
         return 'Graphic';
       case 'product-feed':
@@ -4288,6 +4296,14 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
         return 'Image';
       case 'button':
         return 'Button';
+      case 'icon':
+        return 'Icon';
+      case 'spacer':
+        return 'Spacer';
+      case 'social-links':
+        return 'Social links';
+      case 'faq':
+        return 'FAQ';
       case 'container':
         return 'Container';
       case 'graphic':

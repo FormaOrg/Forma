@@ -3195,6 +3195,80 @@
   font-weight: 500;
 }
 
+.storefront-editor__add-elements-demo-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: rgba(53, 92, 255, 0.12);
+  color: #355cff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.storefront-editor__add-elements-demo-spacer {
+  display: block;
+  width: calc(100% - 24px);
+  height: 2px;
+  background: rgba(15, 23, 42, 0.16);
+}
+
+.storefront-editor__add-elements-demo-social-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.storefront-editor__add-elements-demo-social-links span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.storefront-editor__add-elements-demo-faq {
+  display: grid;
+  gap: 8px;
+  width: calc(100% - 20px);
+}
+
+.storefront-editor__add-elements-demo-faq span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.storefront-editor__add-elements-demo-faq strong,
+.storefront-editor__add-elements-demo-faq small {
+  margin: 0;
+  color: #111827;
+}
+
+.storefront-editor__add-elements-demo-faq strong {
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.storefront-editor__add-elements-demo-faq small {
+  color: #355cff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
 .storefront-editor__add-elements-demo-container {
   width: calc(100% - 26px);
   height: calc(100% - 26px);

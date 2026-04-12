@@ -8,6 +8,10 @@ import { StorefrontEditorBlockHeadingComponent } from './blocks/storefront-edito
 import { StorefrontEditorBlockParagraphComponent } from './blocks/storefront-editor-block-paragraph.component';
 import { StorefrontEditorBlockImageComponent } from './blocks/storefront-editor-block-image.component';
 import { StorefrontEditorBlockButtonComponent } from './blocks/storefront-editor-block-button.component';
+import { StorefrontEditorBlockIconComponent } from './blocks/storefront-editor-block-icon.component';
+import { StorefrontEditorBlockSpacerComponent } from './blocks/storefront-editor-block-spacer.component';
+import { StorefrontEditorBlockSocialLinksComponent } from './blocks/storefront-editor-block-social-links.component';
+import { StorefrontEditorBlockFaqComponent } from './blocks/storefront-editor-block-faq.component';
 import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-editor-block-container.component';
 import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
 import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-editor-block-product-feed.component';
@@ -22,6 +26,10 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
     StorefrontEditorBlockParagraphComponent,
     StorefrontEditorBlockImageComponent,
     StorefrontEditorBlockButtonComponent,
+    StorefrontEditorBlockIconComponent,
+    StorefrontEditorBlockSpacerComponent,
+    StorefrontEditorBlockSocialLinksComponent,
+    StorefrontEditorBlockFaqComponent,
     StorefrontEditorBlockContainerComponent,
     StorefrontEditorBlockGraphicComponent,
     StorefrontEditorBlockProductFeedComponent,
@@ -52,6 +60,18 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
       }
       @case ('button') {
         <app-storefront-editor-block-button [node]="$any(node())" />
+      }
+      @case ('icon') {
+        <app-storefront-editor-block-icon [node]="$any(node())" />
+      }
+      @case ('spacer') {
+        <app-storefront-editor-block-spacer [node]="$any(node())" />
+      }
+      @case ('social-links') {
+        <app-storefront-editor-block-social-links [node]="$any(node())" />
+      }
+      @case ('faq') {
+        <app-storefront-editor-block-faq [node]="$any(node())" />
       }
       @case ('container') {
         <app-storefront-editor-block-container [node]="$any(node())" />
