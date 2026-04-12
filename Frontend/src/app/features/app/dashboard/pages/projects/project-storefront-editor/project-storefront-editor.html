@@ -84,7 +84,7 @@
   <button
     type="button"
     class="storefront-editor__overlay"
-    [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible()"
+    [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible() || isAddElementsLibraryModalVisible()"
     aria-label="Close open panels"
     (click)="closeFloatingUi()"
   ></button>
@@ -951,7 +951,7 @@
 
           <div class="storefront-editor__add-elements-section-head">
             <h3>Core elements</h3>
-            <button type="button">See all</button>
+            <button type="button" (click)="openAddElementsLibraryModal()">See all</button>
           </div>
 
             <div class="storefront-editor__add-elements-grid">
@@ -1062,6 +1062,504 @@
         </aside>
       }
       </div>
+
+      @if (isAddElementsLibraryModalVisible()) {
+        <div
+          class="storefront-editor__add-elements-browser"
+          [class.storefront-editor__add-elements-browser--closing]="isAddElementsLibraryModalClosing()"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="storefront-editor__add-elements-browser-shell">
+            <aside class="storefront-editor__add-elements-browser-sidebar">
+              <div class="storefront-editor__add-elements-browser-brand">
+                <div>
+                  <strong>Element library</strong>
+                  <small>Browse every building block for this storefront</small>
+                </div>
+              </div>
+
+              <div class="storefront-editor__add-elements-browser-stats">
+                <article>
+                  <strong>{{ addElementsLibraryItems.length }}</strong>
+                  <span>Total elements</span>
+                </article>
+                <article>
+                  <strong>{{ visibleAddElementsLibraryItems().length }}</strong>
+                  <span>Showing now</span>
+                </article>
+              </div>
+
+              <nav class="storefront-editor__add-elements-browser-categories">
+                @for (category of addElementsCategories; track category.id) {
+                  <button
+                    type="button"
+                    class="storefront-editor__add-elements-browser-category"
+                    [class.storefront-editor__add-elements-browser-category--active]="activeAddElementsCategory() === category.id"
+                    (click)="setActiveAddElementsCategory(category.id)"
+                  >
+                    <span class="storefront-editor__add-elements-browser-category-icon" aria-hidden="true">
+                      @switch (category.icon) {
+                        @case ('text') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M4 5h12"></path>
+                            <path d="M7 10h6"></path>
+                            <path d="M5 15h10"></path>
+                          </svg>
+                        }
+                        @case ('image') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <rect x="3" y="4" width="14" height="12" rx="2"></rect>
+                            <circle cx="7" cy="8" r="1.4"></circle>
+                            <path d="m17 13-4-4-5 5"></path>
+                          </svg>
+                        }
+                        @case ('button') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <rect x="3" y="6" width="14" height="8" rx="4"></rect>
+                          </svg>
+                        }
+                        @case ('graphics') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <circle cx="6.5" cy="10" r="2.5"></circle>
+                            <rect x="10.5" y="7.5" width="5" height="5" rx="1.2"></rect>
+                          </svg>
+                        }
+                        @case ('store') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M4 8h12"></path>
+                            <path d="M5 8V6l1-2h8l1 2v2"></path>
+                            <path d="M6 8v7h8V8"></path>
+                          </svg>
+                        }
+                        @case ('blog') {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <rect x="4" y="4" width="12" height="12" rx="2"></rect>
+                            <path d="M7 8h6"></path>
+                            <path d="M7 11h6"></path>
+                            <path d="M7 14h4"></path>
+                          </svg>
+                        }
+                        @default {
+                          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <rect x="4" y="4" width="5" height="5" rx="1"></rect>
+                            <rect x="11" y="4" width="5" height="5" rx="1"></rect>
+                            <rect x="4" y="11" width="5" height="5" rx="1"></rect>
+                            <rect x="11" y="11" width="5" height="5" rx="1"></rect>
+                          </svg>
+                        }
+                      }
+                    </span>
+                    <span>{{ category.label }}</span>
+                    <small>{{ addElementsCountForCategory(category.id) }}</small>
+                  </button>
+                }
+              </nav>
+            </aside>
+
+            <section class="storefront-editor__add-elements-browser-main">
+              <div class="storefront-editor__add-elements-browser-head">
+                <div>
+                  <h2>{{ activeAddElementsCategory() === 'All' ? 'All elements' : activeAddElementsCategory() }}</h2>
+                  <span>Choose a block, then place it inside the selected section.</span>
+                </div>
+                <button
+                  type="button"
+                  class="storefront-editor__add-elements-close"
+                  aria-label="Close full element library"
+                  (click)="closeAddElementsLibraryModal()"
+                >
+                  <svg
+                    class="storefront-editor__pages-close-icon"
+                    fill="currentColor"
+                    viewBox="0 0 8 8"
+                    width="12"
+                    height="12"
+                    aria-hidden="true"
+                  >
+                    <g>
+                      <path d="M6.636.246a.775.775 0 0 1 1.097 0 .778.778 0 0 1 0 1.1L5.101 3.98l2.672 2.692a.778.778 0 0 1 0 1.1.775.775 0 0 1-1.098 0L4.003 5.08 1.325 7.764a.775.775 0 0 1-1.098 0 .778.778 0 0 1 0-1.1l2.679-2.683L.292 1.327a.778.778 0 0 1 0-1.1.775.775 0 0 1 1.098 0l2.613 2.655L6.636.246Z"></path>
+                    </g>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="storefront-editor__add-elements-browser-toolbar">
+                <label class="storefront-editor__add-elements-search storefront-editor__add-elements-search--browser">
+                  <span class="storefront-editor__add-elements-search-icon" aria-hidden="true">⌕</span>
+                  <input
+                    type="search"
+                    [value]="addElementsSearch()"
+                    placeholder="Search all elements"
+                    (input)="addElementsSearch.set(($any($event.target).value ?? '').toString())"
+                  />
+                </label>
+
+                @if (activeAddElementsCategory() !== 'All' && activeAddElementsSubcategories().length) {
+                  <div class="storefront-editor__add-elements-browser-filters">
+                    @for (subcategory of activeAddElementsSubcategories(); track subcategory.id) {
+                      <button
+                        type="button"
+                        class="storefront-editor__add-elements-browser-filter"
+                        [class.storefront-editor__add-elements-browser-filter--active]="activeAddElementsSubcategory() === subcategory.id"
+                        (click)="setActiveAddElementsSubcategory(subcategory.id)"
+                      >
+                        {{ subcategory.label }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="storefront-editor__add-elements-browser-content">
+                <div class="storefront-editor__add-elements-browser-sections">
+                  @for (group of addElementsBrowserGroups(); track group.id) {
+                    <section class="storefront-editor__add-elements-browser-group">
+                      <div class="storefront-editor__add-elements-browser-group-head">
+                        <div>
+                          <strong>{{ group.title }}</strong>
+                          <span>{{ group.description }}</span>
+                        </div>
+                        <small>{{ group.items.length }}</small>
+                      </div>
+
+                      <div class="storefront-editor__add-elements-browser-group-grid">
+                        @for (item of group.items; track item.id) {
+                          <button
+                            type="button"
+                            class="storefront-editor__add-elements-browser-card"
+                            [class.storefront-editor__add-elements-browser-card--active]="activeAddElementsBrowserItem()?.id === item.id"
+                            (mouseenter)="setHoveredAddElementsLibraryItem(item.id)"
+                            (focus)="setHoveredAddElementsLibraryItem(item.id)"
+                            (click)="insertComponentFromLibrary(item)"
+                            (mousedown)="startAddElementsComponentDrag(item, $event)"
+                          >
+                            <span class="storefront-editor__add-elements-browser-card-topline">
+                              <small>{{ item.category }}</small>
+                              <span>{{ addElementsQuickTag(item) }}</span>
+                            </span>
+                            <span class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ item.preview }}">
+                              @switch (item.preview) {
+                                @case ('headline') {
+                                  <span class="storefront-editor__add-elements-demo-heading">Heading</span>
+                                }
+                                @case ('paragraph') {
+                                  <span class="storefront-editor__add-elements-demo-paragraph">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </span>
+                                }
+                                @case ('photo') {
+                                  <span class="storefront-editor__add-elements-demo-photo"></span>
+                                }
+                                @case ('button') {
+                                  <span class="storefront-editor__add-elements-demo-button">Button</span>
+                                }
+                                @case ('icon') {
+                                  <span class="storefront-editor__add-elements-demo-icon">✦</span>
+                                }
+                                @case ('spacer') {
+                                  <span class="storefront-editor__add-elements-demo-spacer"></span>
+                                }
+                                @case ('social-links') {
+                                  <span class="storefront-editor__add-elements-demo-social-links">
+                                    <span>IG</span>
+                                    <span>FB</span>
+                                    <span>TK</span>
+                                  </span>
+                                }
+                                @case ('faq') {
+                                  <span class="storefront-editor__add-elements-demo-faq">
+                                    <span>
+                                      <strong>Shipping policy</strong>
+                                      <small>+</small>
+                                    </span>
+                                    <span>
+                                      <strong>Returns</strong>
+                                      <small>+</small>
+                                    </span>
+                                  </span>
+                                }
+                                @case ('contact-form') {
+                                  <span class="storefront-editor__add-elements-demo-contact-form">
+                                    <small>Contact</small>
+                                    <strong>Request a callback</strong>
+                                    <span class="storefront-editor__add-elements-demo-contact-form-field"></span>
+                                    <span class="storefront-editor__add-elements-demo-contact-form-row">
+                                      <span></span>
+                                      <span></span>
+                                    </span>
+                                    <span class="storefront-editor__add-elements-demo-contact-form-area"></span>
+                                    <em>Send message</em>
+                                  </span>
+                                }
+                                @case ('container') {
+                                  <span class="storefront-editor__add-elements-demo-container">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </span>
+                                }
+                                @case ('graphic') {
+                                  <span class="storefront-editor__add-elements-demo-graphic"></span>
+                                }
+                                @case ('product-feed') {
+                                  <img
+                                    [src]="item.previewImageSrc!"
+                                    alt=""
+                                    class="storefront-editor__add-elements-demo-preview-image"
+                                  />
+                                }
+                                @case ('blog-feed') {
+                                  <span class="storefront-editor__add-elements-demo-blog-feed">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </span>
+                                }
+                              }
+                            </span>
+                            <span class="storefront-editor__add-elements-card-copy">
+                              <strong>{{ item.title }}</strong>
+                              <small>{{ item.description }}</small>
+                            </span>
+                          </button>
+                        }
+                      </div>
+                    </section>
+                  }
+
+                  @if (!visibleAddElementsLibraryItems().length) {
+                    <div class="storefront-editor__add-elements-empty storefront-editor__add-elements-empty--browser">
+                      <strong>No elements match these filters</strong>
+                      <span>Try another category or clear the search to see the full library again.</span>
+                    </div>
+                  }
+                </div>
+
+                <aside class="storefront-editor__add-elements-browser-preview">
+                  @if (activeAddElementsBrowserItem(); as activeItem) {
+                    <span class="storefront-editor__add-elements-browser-preview-tag">{{ addElementsQuickTag(activeItem) }}</span>
+                    <span class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ activeItem.preview }}">
+                      @switch (activeItem.preview) {
+                        @case ('headline') {
+                          <span class="storefront-editor__add-elements-demo-heading">Heading</span>
+                        }
+                        @case ('paragraph') {
+                          <span class="storefront-editor__add-elements-demo-paragraph">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                        @case ('photo') {
+                          <span class="storefront-editor__add-elements-demo-photo"></span>
+                        }
+                        @case ('button') {
+                          <span class="storefront-editor__add-elements-demo-button">Button</span>
+                        }
+                        @case ('icon') {
+                          <span class="storefront-editor__add-elements-demo-icon">✦</span>
+                        }
+                        @case ('spacer') {
+                          <span class="storefront-editor__add-elements-demo-spacer"></span>
+                        }
+                        @case ('social-links') {
+                          <span class="storefront-editor__add-elements-demo-social-links">
+                            <span>IG</span>
+                            <span>FB</span>
+                            <span>TK</span>
+                          </span>
+                        }
+                        @case ('faq') {
+                          <span class="storefront-editor__add-elements-demo-faq">
+                            <span>
+                              <strong>Shipping policy</strong>
+                              <small>+</small>
+                            </span>
+                            <span>
+                              <strong>Returns</strong>
+                              <small>+</small>
+                            </span>
+                          </span>
+                        }
+                        @case ('contact-form') {
+                          <span class="storefront-editor__add-elements-demo-contact-form">
+                            <small>Contact</small>
+                            <strong>Request a callback</strong>
+                            <span class="storefront-editor__add-elements-demo-contact-form-field"></span>
+                            <span class="storefront-editor__add-elements-demo-contact-form-row">
+                              <span></span>
+                              <span></span>
+                            </span>
+                            <span class="storefront-editor__add-elements-demo-contact-form-area"></span>
+                            <em>Send message</em>
+                          </span>
+                        }
+                        @case ('container') {
+                          <span class="storefront-editor__add-elements-demo-container">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                        @case ('graphic') {
+                          <span class="storefront-editor__add-elements-demo-graphic"></span>
+                        }
+                        @case ('product-feed') {
+                          <img
+                            [src]="activeItem.previewImageSrc!"
+                            alt=""
+                            class="storefront-editor__add-elements-demo-preview-image"
+                          />
+                        }
+                        @case ('blog-feed') {
+                          <span class="storefront-editor__add-elements-demo-blog-feed">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                      }
+                    </span>
+
+                    <div class="storefront-editor__add-elements-browser-preview-copy">
+                      <strong>{{ activeItem.title }}</strong>
+                      <p>{{ activeItem.description }}</p>
+                    </div>
+
+                    <div class="storefront-editor__add-elements-browser-preview-section">
+                      <h3>Best for</h3>
+                      <p>{{ addElementsPlacementHint(activeItem) }}</p>
+                    </div>
+
+                    <div class="storefront-editor__add-elements-browser-preview-section">
+                      <h3>Quick notes</h3>
+                      <div class="storefront-editor__add-elements-browser-preview-pills">
+                        <span>{{ activeItem.category }}</span>
+                        <span>{{ addElementsQuickTag(activeItem) }}</span>
+                        <span>Drag or click</span>
+                      </div>
+                    </div>
+                  }
+                </aside>
+              </div>
+
+              <div class="storefront-editor__add-elements-browser-grid">
+                @for (item of visibleAddElementsLibraryItems(); track item.id) {
+                  <button
+                    type="button"
+                    class="storefront-editor__add-elements-browser-card"
+                    (click)="insertComponentFromLibrary(item)"
+                    (mousedown)="startAddElementsComponentDrag(item, $event)"
+                  >
+                    <span class="storefront-editor__add-elements-browser-card-topline">
+                      <small>{{ item.category }}</small>
+                      <span>Drag or click</span>
+                    </span>
+                    <span class="storefront-editor__add-elements-card-preview storefront-editor__add-elements-card-preview--{{ item.preview }}">
+                      @switch (item.preview) {
+                        @case ('headline') {
+                          <span class="storefront-editor__add-elements-demo-heading">Heading</span>
+                        }
+                        @case ('paragraph') {
+                          <span class="storefront-editor__add-elements-demo-paragraph">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                        @case ('photo') {
+                          <span class="storefront-editor__add-elements-demo-photo"></span>
+                        }
+                        @case ('button') {
+                          <span class="storefront-editor__add-elements-demo-button">Button</span>
+                        }
+                        @case ('icon') {
+                          <span class="storefront-editor__add-elements-demo-icon">✦</span>
+                        }
+                        @case ('spacer') {
+                          <span class="storefront-editor__add-elements-demo-spacer"></span>
+                        }
+                        @case ('social-links') {
+                          <span class="storefront-editor__add-elements-demo-social-links">
+                            <span>IG</span>
+                            <span>FB</span>
+                            <span>TK</span>
+                          </span>
+                        }
+                        @case ('faq') {
+                          <span class="storefront-editor__add-elements-demo-faq">
+                            <span>
+                              <strong>Shipping policy</strong>
+                              <small>+</small>
+                            </span>
+                            <span>
+                              <strong>Returns</strong>
+                              <small>+</small>
+                            </span>
+                          </span>
+                        }
+                        @case ('contact-form') {
+                          <span class="storefront-editor__add-elements-demo-contact-form">
+                            <small>Contact</small>
+                            <strong>Request a callback</strong>
+                            <span class="storefront-editor__add-elements-demo-contact-form-field"></span>
+                            <span class="storefront-editor__add-elements-demo-contact-form-row">
+                              <span></span>
+                              <span></span>
+                            </span>
+                            <span class="storefront-editor__add-elements-demo-contact-form-area"></span>
+                            <em>Send message</em>
+                          </span>
+                        }
+                        @case ('container') {
+                          <span class="storefront-editor__add-elements-demo-container">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                        @case ('graphic') {
+                          <span class="storefront-editor__add-elements-demo-graphic"></span>
+                        }
+                        @case ('product-feed') {
+                          <img
+                            [src]="item.previewImageSrc!"
+                            alt=""
+                            class="storefront-editor__add-elements-demo-preview-image"
+                          />
+                        }
+                        @case ('blog-feed') {
+                          <span class="storefront-editor__add-elements-demo-blog-feed">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                          </span>
+                        }
+                      }
+                    </span>
+                    <span class="storefront-editor__add-elements-card-copy">
+                      <strong>{{ item.title }}</strong>
+                      <small>{{ item.description }}</small>
+                    </span>
+                  </button>
+                }
+
+                @if (!visibleAddElementsLibraryItems().length) {
+                  <div class="storefront-editor__add-elements-empty storefront-editor__add-elements-empty--browser">
+                    <strong>No elements match these filters</strong>
+                    <span>Try another category or clear the search to see the full library again.</span>
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+        </div>
+      }
 
       @if (isLibraryComponentDragging() && draggedAddElementsPreviewPosition(); as draggedPreview) {
         <div
