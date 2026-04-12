@@ -106,6 +106,49 @@
             </section>
           }
 
+          @case ('contact') {
+            <section class="storefront-home__contact">
+              <div class="storefront-home__contact-copy">
+                @if (readStringProp(section, 'eyebrow')) {
+                  <span class="storefront-home__eyebrow">{{ readStringProp(section, 'eyebrow') }}</span>
+                }
+
+                <h2>{{ readStringProp(section, 'title') || 'Contact our store' }}</h2>
+                <p>{{ readStringProp(section, 'description') }}</p>
+
+                @if (readStringProp(section, 'ctaLabel')) {
+                  <a
+                    class="storefront-home__button storefront-home__button--primary"
+                    [attr.href]="resolveLinkHref(readStringProp(section, 'ctaHref'))"
+                  >
+                    {{ readStringProp(section, 'ctaLabel') }}
+                  </a>
+                }
+              </div>
+
+              <div class="storefront-home__contact-cards">
+                @if (readStringProp(section, 'email')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Email</span>
+                    <strong>{{ readStringProp(section, 'email') }}</strong>
+                  </article>
+                }
+                @if (readStringProp(section, 'phone')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Phone</span>
+                    <strong>{{ readStringProp(section, 'phone') }}</strong>
+                  </article>
+                }
+                @if (readStringProp(section, 'address')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Location</span>
+                    <strong>{{ readStringProp(section, 'address') }}</strong>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+
           @case ('footer') {
             <footer class="storefront-home__footer">
               <div>

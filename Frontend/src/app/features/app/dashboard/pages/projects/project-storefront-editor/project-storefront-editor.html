@@ -433,6 +433,12 @@
                               <small>{{ featuredProductsPreview().length }} selected</small>
                             </span>
                           }
+                          @case ('contact') {
+                            <span class="storefront-editor__page-card-mini-section">
+                              <strong>{{ readStringProp(section, 'title') || 'Contact section' }}</strong>
+                              <small>{{ readStringProp(section, 'email') || 'Contact details' }}</small>
+                            </span>
+                          }
                           @case ('footer') {
                             <span class="storefront-editor__page-card-mini-footer">
                               <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
@@ -2458,6 +2464,30 @@
                             }
                           </section>
                         }
+                        @case ('contact') {
+                          <section class="preview-contact">
+                            <div class="preview-contact__copy">
+                              <p class="preview-contact__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Contact' }}</p>
+                              <h3 class="preview-contact__title">{{ readStringProp(section, 'title') || 'Talk to our team' }}</h3>
+                              <p class="preview-contact__description">{{ readStringProp(section, 'description') || 'Add ways customers can reach your store.' }}</p>
+                              <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'ctaLabel') || 'Email us' }}</a>
+                            </div>
+                            <div class="preview-contact__details">
+                              <div>
+                                <span>Email</span>
+                                <strong>{{ readStringProp(section, 'email') || 'hello@store.com' }}</strong>
+                              </div>
+                              <div>
+                                <span>Phone</span>
+                                <strong>{{ readStringProp(section, 'phone') || '+216 00 000 000' }}</strong>
+                              </div>
+                              <div>
+                                <span>Location</span>
+                                <strong>{{ readStringProp(section, 'address') || 'Tunis, Tunisia' }}</strong>
+                              </div>
+                            </div>
+                          </section>
+                        }
                         @case ('footer') {
                           <footer class="preview-footer">
                             <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
@@ -2756,12 +2786,13 @@
             <button
               type="button"
               class="storefront-editor__section-card storefront-editor__section-card--{{ template.layout }}"
-              (click)="addSectionFromLibrary(template.type)"
+              (click)="addSectionFromLibrary(template)"
           >
             <span class="storefront-editor__section-card-thumb storefront-editor__section-card-thumb--{{ template.accent }}">
+              <span class="storefront-editor__section-card-kind">{{ sectionLibraryTypeLabel(template.type) }}</span>
               <span class="storefront-editor__section-card-title-preview">{{ template.title }}</span>
               <span class="storefront-editor__section-card-copy-preview">
-                {{ sectionLibraryDescription(template.type) }}
+                {{ template.description }}
               </span>
               <span class="storefront-editor__section-card-add-overlay">
                 <span class="storefront-editor__section-card-add-pill">Add Section</span>
