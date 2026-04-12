@@ -62,6 +62,7 @@
 .storefront-home__announcement,
 .storefront-home__hero,
 .storefront-home__featured,
+.storefront-home__contact,
 .storefront-home__footer {
   max-width: 1180px;
   width: 100%;
@@ -225,6 +226,59 @@
   color: #665441;
 }
 
+.storefront-home__contact {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+  background:
+    radial-gradient(circle at top right, rgba(53, 92, 255, 0.14), transparent 28%),
+    rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(53, 92, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(76, 57, 34, 0.08);
+}
+
+.storefront-home__contact-copy {
+  max-width: 54ch;
+}
+
+.storefront-home__contact-copy h2 {
+  margin: 0.8rem 0 1rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1;
+}
+
+.storefront-home__contact-copy p {
+  color: #665441;
+}
+
+.storefront-home__contact-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  min-width: min(480px, 100%);
+}
+
+.storefront-home__contact-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid rgba(53, 92, 255, 0.08);
+}
+
+.storefront-home__contact-card span {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.76rem;
+  color: #355cff;
+}
+
+.storefront-home__contact-card strong {
+  line-height: 1.45;
+}
+
 .storefront-home__footer {
   display: flex;
   justify-content: space-between;
@@ -244,8 +298,15 @@
   .storefront-home__header,
   .storefront-home__announcement,
   .storefront-home__section-heading,
+  .storefront-home__contact,
   .storefront-home__footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .storefront-home__contact-cards {
+    grid-template-columns: 1fr;
+    min-width: 0;
+    width: 100%;
   }
 }

@@ -4,12 +4,17 @@ export type StorefrontEditorComponentType =
   | 'paragraph'
   | 'image'
   | 'button'
+  | 'icon'
+  | 'spacer'
+  | 'social-links'
+  | 'faq'
+  | 'contact-form'
   | 'container'
   | 'graphic'
   | 'product-feed'
   | 'blog-feed';
 
-export type StorefrontEditorTextAlign = 'left' | 'center' | 'right';
+export type StorefrontEditorTextAlign = 'left' | 'center' | 'right' | 'justify';
 export type StorefrontEditorSlotName = 'default' | 'content' | 'media' | 'actions';
 export type StorefrontEditorTextStylePreset =
   | 'Heading 1'
@@ -91,6 +96,44 @@ export interface StorefrontEditorButtonProps {
   iconPosition: 'left' | 'right';
 }
 
+export interface StorefrontEditorIconProps {
+  iconName: 'sparkles' | 'package' | 'wand' | 'eye' | 'external-link';
+  color: string;
+  backgroundColor: string;
+  radius: number;
+}
+
+export interface StorefrontEditorSpacerProps {
+  style: 'empty' | 'line';
+  lineColor: string;
+}
+
+export interface StorefrontEditorSocialLinksProps {
+  style: 'ghost' | 'filled';
+  color: string;
+  backgroundColor: string;
+  labels: string[];
+}
+
+export interface StorefrontEditorFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface StorefrontEditorFaqProps {
+  title: string;
+  items: StorefrontEditorFaqItem[];
+}
+
+export interface StorefrontEditorContactFormProps {
+  eyebrow: string;
+  title: string;
+  description: string;
+  submitLabel: string;
+  consentLabel: string;
+  successMessage: string;
+}
+
 export interface StorefrontEditorContainerProps {
   layout: 'stack' | 'row' | 'grid';
   gap: number;
@@ -147,6 +190,11 @@ export type StorefrontEditorHeadingNode = StorefrontEditorComponentBase<'heading
 export type StorefrontEditorParagraphNode = StorefrontEditorComponentBase<'paragraph', StorefrontEditorParagraphProps>;
 export type StorefrontEditorImageNode = StorefrontEditorComponentBase<'image', StorefrontEditorImageProps>;
 export type StorefrontEditorButtonNode = StorefrontEditorComponentBase<'button', StorefrontEditorButtonProps>;
+export type StorefrontEditorIconNode = StorefrontEditorComponentBase<'icon', StorefrontEditorIconProps>;
+export type StorefrontEditorSpacerNode = StorefrontEditorComponentBase<'spacer', StorefrontEditorSpacerProps>;
+export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'social-links', StorefrontEditorSocialLinksProps>;
+export type StorefrontEditorFaqNode = StorefrontEditorComponentBase<'faq', StorefrontEditorFaqProps>;
+export type StorefrontEditorContactFormNode = StorefrontEditorComponentBase<'contact-form', StorefrontEditorContactFormProps>;
 export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'container', StorefrontEditorContainerProps>;
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
 export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'product-feed', StorefrontEditorProductFeedProps>;
@@ -158,6 +206,11 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorParagraphNode
   | StorefrontEditorImageNode
   | StorefrontEditorButtonNode
+  | StorefrontEditorIconNode
+  | StorefrontEditorSpacerNode
+  | StorefrontEditorSocialLinksNode
+  | StorefrontEditorFaqNode
+  | StorefrontEditorContactFormNode
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
   | StorefrontEditorProductFeedNode
@@ -197,6 +250,16 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 380, y: 36, width: 260, height: 180 };
     case 'button':
       return { x: 32, y: 236, width: 170, height: 48 };
+    case 'icon':
+      return { x: 32, y: 300, width: 72, height: 72 };
+    case 'spacer':
+      return { x: 32, y: 320, width: 320, height: 36 };
+    case 'social-links':
+      return { x: 32, y: 360, width: 180, height: 48 };
+    case 'faq':
+      return { x: 32, y: 430, width: 420, height: 220 };
+    case 'contact-form':
+      return { x: 32, y: 430, width: 440, height: 360 };
     case 'container':
       return { x: 32, y: 32, width: 340, height: 220 };
     case 'graphic':
@@ -485,6 +548,72 @@ export function createStorefrontEditorComponentNode(
           customIconSrc: null,
           iconMotion: 'static',
           iconPosition: 'right',
+        },
+      };
+    case 'icon':
+      return {
+        ...createStorefrontEditorComponentBase('icon'),
+        name: 'Icon',
+        props: {
+          iconName: 'sparkles',
+          color: '#355cff',
+          backgroundColor: 'rgba(53, 92, 255, 0.08)',
+          radius: 20,
+        },
+      };
+    case 'spacer':
+      return {
+        ...createStorefrontEditorComponentBase('spacer'),
+        name: 'Spacer',
+        props: {
+          style: 'line',
+          lineColor: 'rgba(15, 23, 42, 0.14)',
+        },
+      };
+    case 'social-links':
+      return {
+        ...createStorefrontEditorComponentBase('social-links'),
+        name: 'Social links',
+        props: {
+          style: 'ghost',
+          color: '#111827',
+          backgroundColor: '#111827',
+          labels: ['instagram', 'facebook', 'tiktok'],
+        },
+      };
+    case 'faq':
+      return {
+        ...createStorefrontEditorComponentBase('faq'),
+        name: 'FAQ',
+        props: {
+          title: 'Frequently asked questions',
+          items: [
+            {
+              question: 'How long does delivery take?',
+              answer: 'Orders are usually prepared within 1 to 2 business days.',
+            },
+            {
+              question: 'Can I return an item?',
+              answer: 'Yes. Returns are accepted according to your store policy and product condition.',
+            },
+            {
+              question: 'Do you offer support before purchase?',
+              answer: 'Yes. Use the contact details on the page and we will help you choose the right product.',
+            },
+          ],
+        },
+      };
+    case 'contact-form':
+      return {
+        ...createStorefrontEditorComponentBase('contact-form'),
+        name: 'Contact form',
+        props: {
+          eyebrow: 'Start a conversation',
+          title: 'Let customers reach you fast',
+          description: 'Use this form for product questions, wholesale inquiries, custom orders, or support requests.',
+          submitLabel: 'Send message',
+          consentLabel: 'I agree to be contacted about my request.',
+          successMessage: 'Thanks, your message is ready to send.',
         },
       };
     case 'container':

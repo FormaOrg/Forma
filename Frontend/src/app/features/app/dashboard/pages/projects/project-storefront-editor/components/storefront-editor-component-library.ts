@@ -21,6 +21,11 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'paragraph'
   | 'photo'
   | 'button'
+  | 'icon'
+  | 'spacer'
+  | 'social-links'
+  | 'faq'
+  | 'contact-form'
   | 'container'
   | 'graphic'
   | 'product-feed';
@@ -77,6 +82,8 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
     { id: 'paragraphs', label: 'Paragraphs' },
     { id: 'text-combos', label: 'Text combos' },
     { id: 'running-text', label: 'Running text' },
+    { id: 'faq', label: 'FAQ' },
+    { id: 'forms', label: 'Forms' },
   ],
   Image: [
     { id: 'all', label: 'All' },
@@ -92,6 +99,9 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
   ],
   Graphics: [
     { id: 'all', label: 'All' },
+    { id: 'icons', label: 'Icons' },
+    { id: 'social', label: 'Social' },
+    { id: 'spacing', label: 'Spacing' },
     { id: 'containers', label: 'Containers' },
     { id: 'shapes', label: 'Shapes' },
     { id: 'decorative', label: 'Decorative' },
@@ -132,6 +142,26 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['text', 'copy', 'body', 'description', 'paragraph', 'title', 'headline', 'hero', 'heading'],
   },
   {
+    id: 'faq',
+    title: 'FAQ',
+    category: 'Text',
+    subcategoryIds: ['all', 'faq', 'text-combos'],
+    componentType: 'faq',
+    description: 'Question-and-answer block for shipping, returns, support, and policies.',
+    preview: 'faq',
+    keywords: ['faq', 'accordion', 'questions', 'answers', 'help', 'support'],
+  },
+  {
+    id: 'contact-form',
+    title: 'Contact form',
+    category: 'Text',
+    subcategoryIds: ['all', 'forms', 'text-combos'],
+    componentType: 'contact-form',
+    description: 'Polished inquiry form with message fields, consent, and a built-in success state.',
+    preview: 'contact-form',
+    keywords: ['form', 'contact', 'message', 'email', 'support', 'lead'],
+  },
+  {
     id: 'image',
     title: 'Image',
     category: 'Image',
@@ -162,10 +192,40 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['stack', 'group', 'wrapper', 'layout', 'container'],
   },
   {
+    id: 'icon',
+    title: 'Icon',
+    category: 'Graphics',
+    subcategoryIds: ['all', 'icons', 'decorative'],
+    componentType: 'icon',
+    description: 'Standalone icon chip for highlights, benefits, and contact details.',
+    preview: 'icon',
+    keywords: ['icon', 'symbol', 'feature', 'badge', 'contact'],
+  },
+  {
+    id: 'spacer',
+    title: 'Spacer',
+    category: 'Graphics',
+    subcategoryIds: ['all', 'spacing', 'decorative'],
+    componentType: 'spacer',
+    description: 'Add breathing room or a subtle divider between elements.',
+    preview: 'spacer',
+    keywords: ['space', 'spacer', 'divider', 'gap', 'separator'],
+  },
+  {
+    id: 'social-links',
+    title: 'Social links',
+    category: 'Graphics',
+    subcategoryIds: ['all', 'social', 'decorative'],
+    componentType: 'social-links',
+    description: 'Quick social pills for headers, footers, and contact areas.',
+    preview: 'social-links',
+    keywords: ['social', 'instagram', 'facebook', 'tiktok', 'links'],
+  },
+  {
     id: 'graphic',
     title: 'Graphic',
     category: 'Graphics',
-    subcategoryIds: ['all', 'shapes', 'decorative'],
+    subcategoryIds: ['all', 'icons', 'shapes', 'decorative'],
     componentType: 'graphic',
     description: 'Decorative shape or icon area for visual accents.',
     preview: 'graphic',

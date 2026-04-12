@@ -6,6 +6,7 @@ export type StorefrontSectionType =
   | 'announcement-bar'
   | 'hero'
   | 'featured-products'
+  | 'contact'
   | 'footer';
 
 export interface StorefrontSeo {
@@ -35,6 +36,17 @@ export interface StorefrontFeaturedProductsProps {
   maxItems: number;
 }
 
+export interface StorefrontContactProps {
+  eyebrow: string;
+  title: string;
+  description: string;
+  email: string;
+  phone: string;
+  address: string;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
 export interface StorefrontFooterProps {
   brandText: string;
   contactEmail: string;
@@ -52,6 +64,7 @@ export type StorefrontHomepageSectionProps =
   | StorefrontAnnouncementBarProps
   | StorefrontHeroProps
   | StorefrontFeaturedProductsProps
+  | StorefrontContactProps
   | StorefrontFooterProps
   | Record<string, unknown>;
 
