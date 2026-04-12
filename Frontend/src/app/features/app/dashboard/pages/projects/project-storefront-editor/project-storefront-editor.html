@@ -3650,6 +3650,17 @@
                           ></div>
                         }
 
+                        @for (guide of snapGuidesForSection(section.id); track trackSnapGuide($index, guide)) {
+                          <div
+                            class="storefront-editor__preview-snap-guide"
+                            [class.storefront-editor__preview-snap-guide--vertical]="guide.orientation === 'vertical'"
+                            [class.storefront-editor__preview-snap-guide--horizontal]="guide.orientation === 'horizontal'"
+                            [class.storefront-editor__preview-snap-guide--grid]="guide.kind === 'grid'"
+                            [style.left.px]="guide.orientation === 'vertical' ? guide.offset : null"
+                            [style.top.px]="guide.orientation === 'horizontal' ? guide.offset : null"
+                          ></div>
+                        }
+
                         @for (component of readSectionComponents(section); track component.id) {
                           <button
                             type="button"
@@ -4096,6 +4107,19 @@
             <small>Ctrl + V</small>
           </button>
           <div class="storefront-editor__component-context-divider"></div>
+          <button type="button" class="storefront-editor__component-context-item" (click)="toggleSnapToGrid()">
+            <span>Snap to grid</span>
+            <small>{{ snapToGridEnabled() ? 'On' : 'Off' }}</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="cycleSnapSpacingToken()">
+            <span>Spacing step</span>
+            <small>{{ snapSpacingToken() }}px</small>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" (click)="toggleAspectRatioLock()">
+            <span>Lock aspect ratio</span>
+            <small>{{ lockAspectRatioEnabled() ? 'On' : 'Off' }}</small>
+          </button>
+          <div class="storefront-editor__component-context-divider"></div>
           <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
             <span>Duplicate</span>
             <small>Ctrl + D</small>
@@ -4134,6 +4158,31 @@
           >
             <span>Ungroup</span>
             <small>Ctrl + Shift + G</small>
+          </button>
+          <div class="storefront-editor__component-context-divider"></div>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('left')">
+            <span>Align left</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('center')">
+            <span>Align center</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('right')">
+            <span>Align right</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('top')">
+            <span>Align top</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('middle')">
+            <span>Align middle</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('bottom')">
+            <span>Align bottom</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 3" (click)="distributeSelectedComponents('horizontal')">
+            <span>Distribute horizontal</span>
+          </button>
+          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 3" (click)="distributeSelectedComponents('vertical')">
+            <span>Distribute vertical</span>
           </button>
           <div class="storefront-editor__component-context-divider"></div>
           <button

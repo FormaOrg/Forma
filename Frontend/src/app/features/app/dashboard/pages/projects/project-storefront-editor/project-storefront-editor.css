@@ -6824,6 +6824,29 @@
   z-index: 9996;
 }
 
+.storefront-editor__preview-snap-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9997;
+  background: rgba(53, 92, 255, 0.72);
+}
+
+.storefront-editor__preview-snap-guide--vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.storefront-editor__preview-snap-guide--horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.storefront-editor__preview-snap-guide--grid {
+  background: rgba(53, 92, 255, 0.34);
+}
+
 .storefront-editor__preview-component-resize-handles,
 .storefront-editor__preview-component-rotation-handles {
   position: absolute;

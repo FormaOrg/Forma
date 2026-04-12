@@ -90,6 +90,11 @@ type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 type PagesPanelLayoutMode = 'grid' | 'rows';
 type ComponentSelectionBox = { x: number; y: number; width: number; height: number };
+type EditorSnapGuide = {
+  orientation: 'vertical' | 'horizontal';
+  offset: number;
+  kind: 'grid' | 'alignment';
+};
 type RotationHandleCorner = 'nw' | 'ne' | 'se' | 'sw';
 type ButtonToolbarMenu =
   | 'designs'
@@ -210,6 +215,8 @@ export class ProjectStorefrontEditor {
   private static readonly ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS = 180;
   private static readonly PAGES_MANAGER_CLOSE_MS = 180;
   private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
+  private static readonly SNAP_SPACING_STEPS = [4, 8, 16] as const;
+  private static readonly SNAP_ALIGNMENT_THRESHOLD = 6;
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
   private static readonly SECTION_HEIGHT_PROP_KEY = 'editorHeight';
   private static readonly SECTION_TABLET_HEIGHT_PROP_KEY = 'editorTabletHeight';
@@ -420,6 +427,11 @@ readonly canScrollPageDesignTabsRight = signal(false);
   readonly isResizingSection = signal(false);
   readonly selectionBoxSectionId = signal<string | null>(null);
   readonly selectionBox = signal<ComponentSelectionBox>({ x: 0, y: 0, width: 0, height: 0 });
+  readonly snapToGridEnabled = signal(true);
+  readonly snapSpacingToken = signal<4 | 8 | 16>(8);
+  readonly lockAspectRatioEnabled = signal(false);
+  readonly activeSnapGuideSectionId = signal<string | null>(null);
+  readonly activeSnapGuides = signal<EditorSnapGuide[]>([]);
   readonly isComponentContextMenuOpen = signal(false);
   readonly componentContextMenuPosition = signal({ x: 0, y: 0 });
   readonly componentContextMenuSectionId = signal<string | null>(null);
@@ -1389,7 +1401,7 @@ effect(() => {
 
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key) && this.selectedComponentIds().length) {
       event.preventDefault();
-      const distance = event.shiftKey ? 10 : 1;
+      const distance = event.shiftKey ? this.getSnapStep() : 1;
       switch (event.key) {
         case 'ArrowUp':
           this.nudgeSelectedComponents(0, -distance);
@@ -1721,8 +1733,21 @@ if (this.activeProductFeedToolbarMenu()) {
     const maxAnchorX = rect.width - 20;
     const minAnchorY = -bounds.height + 20;
     const maxAnchorY = previewVisibleHeight - bounds.height - 20;
-    const clampedAnchorX = Math.max(minAnchorX, Math.min(anchorX, maxAnchorX));
-    const clampedAnchorY = Math.max(minAnchorY, Math.min(anchorY, maxAnchorY));
+    const snappedBounds = this.snapDraggedBoundsToConstraints(
+      this.activeComponentDrag.sectionId,
+      this.activeComponentDrag.components.map((component) => component.componentId),
+      {
+        x: Math.max(minAnchorX, Math.min(anchorX, maxAnchorX)),
+        y: Math.max(minAnchorY, Math.min(anchorY, maxAnchorY)),
+        width: bounds.width,
+        height: bounds.height,
+      },
+      rect.width,
+      previewVisibleHeight
+    );
+    const clampedAnchorX = Math.max(minAnchorX, Math.min(snappedBounds.x, maxAnchorX));
+    const clampedAnchorY = Math.max(minAnchorY, Math.min(snappedBounds.y, maxAnchorY));
+    this.setSnapGuides(this.activeComponentDrag.sectionId, snappedBounds.guides);
 
     this.updateSectionComponentFrames(
       this.activeComponentDrag.sectionId,
@@ -1773,9 +1798,10 @@ handleComponentPointerUp(event: MouseEvent): void {
     return;
   }
 
-  this.finalizeDraggedComponentsLayoutSnap();
+this.finalizeDraggedComponentsLayoutSnap();
+  this.clearSnapGuides();
 
-    this.activeComponentDrag = null;
+  this.activeComponentDrag = null;
     this.activeResize = null;
     this.activeRotation = null;
     this.activeSectionResize = null;
@@ -1915,6 +1941,107 @@ handleComponentPointerUp(event: MouseEvent): void {
       this.updatePreviewStageScrollbarState();
       this.refreshSectionLayoutAssignments();
     }, 0);
+  }
+
+  toggleSnapToGrid(): void {
+    this.snapToGridEnabled.update((value) => !value);
+    this.clearSnapGuides();
+  }
+
+  cycleSnapSpacingToken(): void {
+    const steps = [...ProjectStorefrontEditor.SNAP_SPACING_STEPS];
+    const currentIndex = steps.indexOf(this.snapSpacingToken());
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % steps.length : 1;
+    this.snapSpacingToken.set(steps[nextIndex] ?? 8);
+    this.clearSnapGuides();
+  }
+
+  toggleAspectRatioLock(): void {
+    this.lockAspectRatioEnabled.update((value) => !value);
+  }
+
+  alignSelectedComponents(mode: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'): void {
+    const section = this.selectedSection();
+    if (!section) {
+      return;
+    }
+
+    const selectedComponents = this.getSelectedComponentsForBatchAction(section);
+    if (selectedComponents.length < 2) {
+      return;
+    }
+
+    const bounds = this.getComponentBounds(selectedComponents);
+    const dimensions = this.getSectionContentDimensions(section.id);
+    const containerWidth = dimensions?.width ?? 99999;
+    const containerHeight = dimensions?.height ?? 99999;
+
+    this.updateSectionComponentFrames(
+      section.id,
+      selectedComponents.map((component) => {
+        const frame = this.getComponentFrame(component);
+        switch (mode) {
+          case 'left':
+            return { componentId: component.id, x: bounds.x, y: frame.y };
+          case 'center':
+            return { componentId: component.id, x: bounds.x + ((bounds.width - frame.width) / 2), y: frame.y };
+          case 'right':
+            return { componentId: component.id, x: bounds.x + bounds.width - frame.width, y: frame.y };
+          case 'top':
+            return { componentId: component.id, x: frame.x, y: bounds.y };
+          case 'middle':
+            return { componentId: component.id, x: frame.x, y: bounds.y + ((bounds.height - frame.height) / 2) };
+          case 'bottom':
+            return { componentId: component.id, x: frame.x, y: bounds.y + bounds.height - frame.height };
+        }
+      }),
+      containerWidth,
+      containerHeight
+    );
+    this.closeComponentContextMenu();
+  }
+
+  distributeSelectedComponents(axis: 'horizontal' | 'vertical'): void {
+    const section = this.selectedSection();
+    if (!section) {
+      return;
+    }
+
+    const selectedComponents = this.getSelectedComponentsForBatchAction(section);
+    if (selectedComponents.length < 3) {
+      return;
+    }
+
+    const sortedComponents = [...selectedComponents].sort((left, right) => {
+      const leftFrame = this.getComponentFrame(left);
+      const rightFrame = this.getComponentFrame(right);
+      return axis === 'horizontal' ? leftFrame.x - rightFrame.x : leftFrame.y - rightFrame.y;
+    });
+    const bounds = this.getComponentBounds(sortedComponents);
+    const dimensions = this.getSectionContentDimensions(section.id);
+    const containerWidth = dimensions?.width ?? 99999;
+    const containerHeight = dimensions?.height ?? 99999;
+
+    const totalSize = sortedComponents.reduce((sum, component) => {
+      const frame = this.getComponentFrame(component);
+      return sum + (axis === 'horizontal' ? frame.width : frame.height);
+    }, 0);
+    const availableGap = Math.max(0, (axis === 'horizontal' ? bounds.width : bounds.height) - totalSize);
+    const gap = sortedComponents.length > 1 ? availableGap / (sortedComponents.length - 1) : 0;
+
+    let cursor = axis === 'horizontal' ? bounds.x : bounds.y;
+    const positions = sortedComponents.map((component) => {
+      const frame = this.getComponentFrame(component);
+      const position =
+        axis === 'horizontal'
+          ? { componentId: component.id, x: cursor, y: frame.y }
+          : { componentId: component.id, x: frame.x, y: cursor };
+      cursor += (axis === 'horizontal' ? frame.width : frame.height) + gap;
+      return position;
+    });
+
+    this.updateSectionComponentFrames(section.id, positions, containerWidth, containerHeight);
+    this.closeComponentContextMenu();
   }
 
   toggleFormaMenu(): void {
@@ -6033,6 +6160,44 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     };
   }
 
+  private getComponentBounds(
+    components: StorefrontEditorComponentNode[]
+  ): { x: number; y: number; width: number; height: number } {
+    const frames = components.map((component) => this.getComponentFrame(component));
+    const left = Math.min(...frames.map((frame) => frame.x));
+    const top = Math.min(...frames.map((frame) => frame.y));
+    const right = Math.max(...frames.map((frame) => frame.x + frame.width));
+    const bottom = Math.max(...frames.map((frame) => frame.y + frame.height));
+
+    return {
+      x: left,
+      y: top,
+      width: right - left,
+      height: bottom - top,
+    };
+  }
+
+  private clearSnapGuides(): void {
+    this.activeSnapGuideSectionId.set(null);
+    this.activeSnapGuides.set([]);
+  }
+
+  private setSnapGuides(sectionId: string, guides: EditorSnapGuide[]): void {
+    const uniqueGuides = guides.filter((guide, index, collection) =>
+      collection.findIndex((candidate) => candidate.orientation === guide.orientation && Math.abs(candidate.offset - guide.offset) < 0.5) === index
+    );
+
+    this.activeSnapGuideSectionId.set(uniqueGuides.length ? sectionId : null);
+    this.activeSnapGuides.set(uniqueGuides);
+  }
+
+  snapGuidesForSection(sectionId: string): EditorSnapGuide[] {
+    return this.activeSnapGuideSectionId() === sectionId ? this.activeSnapGuides() : [];
+  }
+
+  trackSnapGuide = (_: number, guide: EditorSnapGuide): string =>
+    `${guide.orientation}-${guide.kind}-${Math.round(guide.offset)}`;
+
   private getSelectedComponentsForBatchAction(
     section: StorefrontHomepageSection
   ): StorefrontEditorComponentNode[] {
@@ -6048,6 +6213,153 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     }
 
     return components.filter((component) => selectedIds.has(component.id));
+  }
+
+  private getSnapStep(): number {
+    return this.snapSpacingToken();
+  }
+
+  private roundToSnapStep(value: number): number {
+    const step = this.getSnapStep();
+    return Math.round(value / step) * step;
+  }
+
+  private getAlignmentTargets(
+    sectionId: string,
+    excludedComponentIds: readonly string[],
+    containerWidth: number,
+    containerHeight: number
+  ): { vertical: number[]; horizontal: number[] } {
+    const excludedIds = new Set(excludedComponentIds);
+    const section = this.sections().find((item) => item.id === sectionId) ?? null;
+    const vertical = [0, containerWidth / 2, containerWidth];
+    const horizontal = [0, containerHeight / 2, containerHeight];
+
+    if (!section) {
+      return { vertical, horizontal };
+    }
+
+    this.readSectionComponents(section)
+      .filter((component) => !excludedIds.has(component.id))
+      .forEach((component) => {
+        const frame = this.getComponentFrame(component);
+        vertical.push(frame.x, frame.x + (frame.width / 2), frame.x + frame.width);
+        horizontal.push(frame.y, frame.y + (frame.height / 2), frame.y + frame.height);
+      });
+
+    return { vertical, horizontal };
+  }
+
+  private findBestSnapOffset(
+    candidates: Array<{ position: number; orientation: EditorSnapGuide['orientation'] }>,
+    targets: readonly number[]
+  ): { delta: number; guide: EditorSnapGuide } | null {
+    let bestMatch: { delta: number; guide: EditorSnapGuide } | null = null;
+
+    candidates.forEach((candidate) => {
+      targets.forEach((target) => {
+        const delta = target - candidate.position;
+        if (Math.abs(delta) > ProjectStorefrontEditor.SNAP_ALIGNMENT_THRESHOLD) {
+          return;
+        }
+
+        if (!bestMatch || Math.abs(delta) < Math.abs(bestMatch.delta)) {
+          bestMatch = {
+            delta,
+            guide: {
+              orientation: candidate.orientation,
+              offset: target,
+              kind: 'alignment',
+            },
+          };
+        }
+      });
+    });
+
+    return bestMatch;
+  }
+
+  private snapDraggedBoundsToConstraints(
+    sectionId: string,
+    movingComponentIds: readonly string[],
+    bounds: { x: number; y: number; width: number; height: number },
+    containerWidth: number,
+    containerHeight: number
+  ): { x: number; y: number; guides: EditorSnapGuide[] } {
+    let nextX = bounds.x;
+    let nextY = bounds.y;
+    const guides: EditorSnapGuide[] = [];
+
+    if (this.snapToGridEnabled()) {
+      nextX = this.roundToSnapStep(nextX);
+      nextY = this.roundToSnapStep(nextY);
+      guides.push(
+        { orientation: 'vertical', offset: nextX, kind: 'grid' },
+        { orientation: 'horizontal', offset: nextY, kind: 'grid' }
+      );
+    }
+
+    const targets = this.getAlignmentTargets(sectionId, movingComponentIds, containerWidth, containerHeight);
+    const verticalSnap = this.findBestSnapOffset(
+      [
+        { position: nextX, orientation: 'vertical' },
+        { position: nextX + (bounds.width / 2), orientation: 'vertical' },
+        { position: nextX + bounds.width, orientation: 'vertical' },
+      ],
+      targets.vertical
+    );
+    if (verticalSnap) {
+      nextX += verticalSnap.delta;
+      guides.push(verticalSnap.guide);
+    }
+
+    const horizontalSnap = this.findBestSnapOffset(
+      [
+        { position: nextY, orientation: 'horizontal' },
+        { position: nextY + (bounds.height / 2), orientation: 'horizontal' },
+        { position: nextY + bounds.height, orientation: 'horizontal' },
+      ],
+      targets.horizontal
+    );
+    if (horizontalSnap) {
+      nextY += horizontalSnap.delta;
+      guides.push(horizontalSnap.guide);
+    }
+
+    return { x: nextX, y: nextY, guides };
+  }
+
+  private snapResizeFrameToGrid(
+    frame: StorefrontEditorComponentNode['frame'],
+    handle: string
+  ): StorefrontEditorComponentNode['frame'] {
+    if (!this.snapToGridEnabled()) {
+      return frame;
+    }
+
+    const snappedWidth = Math.max(50, this.roundToSnapStep(frame.width));
+    const snappedHeight = Math.max(50, this.roundToSnapStep(frame.height));
+    let nextX = frame.x;
+    let nextY = frame.y;
+
+    if (handle.includes('w') && !handle.includes('e')) {
+      nextX = frame.x + (frame.width - snappedWidth);
+    } else {
+      nextX = this.roundToSnapStep(frame.x);
+    }
+
+    if (handle.includes('n') && !handle.includes('s')) {
+      nextY = frame.y + (frame.height - snappedHeight);
+    } else {
+      nextY = this.roundToSnapStep(frame.y);
+    }
+
+    return {
+      x: nextX,
+      y: nextY,
+      width: snappedWidth,
+      height: snappedHeight,
+    };
   }
 
   private cloneComponentsForBatchInsert(
@@ -6198,6 +6510,25 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
       top += localDelta.y;
     }
 
+    const aspectRatioLocked = this.lockAspectRatioEnabled() || event.shiftKey;
+    if (aspectRatioLocked && startFrame.height > 0) {
+      const aspectRatio = startFrame.width / startFrame.height;
+      const currentWidth = right - left;
+      const currentHeight = bottom - top;
+
+      if (this.activeResize.handle.length === 1 ? this.activeResize.handle === 'n' || this.activeResize.handle === 's' : Math.abs(localDelta.x) < Math.abs(localDelta.y)) {
+        const adjustedWidth = currentHeight * aspectRatio;
+        const widthDelta = adjustedWidth - currentWidth;
+        left -= widthDelta / 2;
+        right += widthDelta / 2;
+      } else {
+        const adjustedHeight = currentWidth / aspectRatio;
+        const heightDelta = adjustedHeight - currentHeight;
+        top -= heightDelta / 2;
+        bottom += heightDelta / 2;
+      }
+    }
+
     const minSize = 50;
     if (right - left < minSize) {
       if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
@@ -6235,9 +6566,16 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
       width: nextWidth,
       height: nextHeight,
     };
+    const snappedFrame = this.snapResizeFrameToGrid(nextFrame, this.activeResize.handle);
+    this.setSnapGuides(this.activeResize.sectionId, this.snapToGridEnabled()
+      ? [
+          { orientation: 'vertical', offset: snappedFrame.x, kind: 'grid' },
+          { orientation: 'horizontal', offset: snappedFrame.y, kind: 'grid' },
+        ]
+      : []);
 
     this.updateSectionComponentTransform(this.activeResize.sectionId, this.activeResize.componentId, {
-      frame: nextFrame,
+      frame: snappedFrame,
     });
   }
 
