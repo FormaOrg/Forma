@@ -27,6 +27,7 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'spacer'
   | 'social-links'
   | 'faq'
+  | 'contact-form'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -86,6 +87,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
     { id: 'text-combos', label: 'Text combos' },
     { id: 'running-text', label: 'Running text' },
     { id: 'faq', label: 'FAQ' },
+    { id: 'forms', label: 'Forms' },
   ],
   Image: [
     { id: 'all', label: 'All' },
@@ -157,6 +159,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     description: 'Question-and-answer block for shipping, returns, support, and policies.',
     preview: 'faq',
     keywords: ['faq', 'accordion', 'questions', 'answers', 'help', 'support'],
+  },
+  {
+    id: 'contact-form',
+    title: 'Contact form',
+    category: 'Text',
+    subcategoryIds: ['all', 'forms', 'text-combos'],
+    componentType: 'contact-form',
+    description: 'Polished inquiry form with message fields, consent, and a built-in success state.',
+    preview: 'contact-form',
+    keywords: ['form', 'contact', 'message', 'email', 'support', 'lead'],
   },
   {
     id: 'image',
