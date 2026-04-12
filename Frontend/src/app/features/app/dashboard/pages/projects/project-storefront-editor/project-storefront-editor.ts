@@ -1964,6 +1964,8 @@ handleComponentPointerUp(event: MouseEvent): void {
       return 'Social links';
     case 'faq':
       return 'FAQ';
+    case 'contact-form':
+      return 'Contact form';
     case 'container':
       return 'Container';
       case 'graphic':
@@ -4304,6 +4306,8 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
         return 'Social links';
       case 'faq':
         return 'FAQ';
+      case 'contact-form':
+        return 'Contact form';
       case 'container':
         return 'Container';
       case 'graphic':

@@ -8,6 +8,7 @@ export type StorefrontEditorComponentType =
   | 'spacer'
   | 'social-links'
   | 'faq'
+  | 'contact-form'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -124,6 +125,15 @@ export interface StorefrontEditorFaqProps {
   items: StorefrontEditorFaqItem[];
 }
 
+export interface StorefrontEditorContactFormProps {
+  eyebrow: string;
+  title: string;
+  description: string;
+  submitLabel: string;
+  consentLabel: string;
+  successMessage: string;
+}
+
 export interface StorefrontEditorContainerProps {
   layout: 'stack' | 'row' | 'grid';
   gap: number;
@@ -184,6 +194,7 @@ export type StorefrontEditorIconNode = StorefrontEditorComponentBase<'icon', Sto
 export type StorefrontEditorSpacerNode = StorefrontEditorComponentBase<'spacer', StorefrontEditorSpacerProps>;
 export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'social-links', StorefrontEditorSocialLinksProps>;
 export type StorefrontEditorFaqNode = StorefrontEditorComponentBase<'faq', StorefrontEditorFaqProps>;
+export type StorefrontEditorContactFormNode = StorefrontEditorComponentBase<'contact-form', StorefrontEditorContactFormProps>;
 export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'container', StorefrontEditorContainerProps>;
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
 export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'product-feed', StorefrontEditorProductFeedProps>;
@@ -199,6 +210,7 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorSpacerNode
   | StorefrontEditorSocialLinksNode
   | StorefrontEditorFaqNode
+  | StorefrontEditorContactFormNode
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
   | StorefrontEditorProductFeedNode
@@ -246,6 +258,8 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 360, width: 180, height: 48 };
     case 'faq':
       return { x: 32, y: 430, width: 420, height: 220 };
+    case 'contact-form':
+      return { x: 32, y: 430, width: 440, height: 360 };
     case 'container':
       return { x: 32, y: 32, width: 340, height: 220 };
     case 'graphic':
@@ -587,6 +601,19 @@ export function createStorefrontEditorComponentNode(
               answer: 'Yes. Use the contact details on the page and we will help you choose the right product.',
             },
           ],
+        },
+      };
+    case 'contact-form':
+      return {
+        ...createStorefrontEditorComponentBase('contact-form'),
+        name: 'Contact form',
+        props: {
+          eyebrow: 'Start a conversation',
+          title: 'Let customers reach you fast',
+          description: 'Use this form for product questions, wholesale inquiries, custom orders, or support requests.',
+          submitLabel: 'Send message',
+          consentLabel: 'I agree to be contacted about my request.',
+          successMessage: 'Thanks, your message is ready to send.',
         },
       };
     case 'container':
