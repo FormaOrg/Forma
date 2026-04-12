@@ -172,6 +172,12 @@ type StorefrontEditorProductFeedDesignPreset = {
   previewImageSrc: string;
   patch?: Partial<StorefrontEditorProductFeedNode['props']>;
 };
+type StorefrontEditorFontOption = {
+  family: string;
+  category: 'Sans' | 'Serif' | 'Display' | 'Mono' | 'Handwritten';
+  description: string;
+  preview: string;
+};
 type StorefrontPageDesignTemplate = {
   id: string;
   name: string;
@@ -179,6 +185,47 @@ type StorefrontPageDesignTemplate = {
   category: StorefrontPageDesignCategory;
   accent: 'linen' | 'cobalt' | 'ink' | 'sand';
 };
+
+const STOREFRONT_EDITOR_TEXT_FONT_OPTIONS: ReadonlyArray<StorefrontEditorFontOption> = [
+  { family: 'Inter', category: 'Sans', description: 'Neutral UI workhorse', preview: 'Shape clarity and rhythm' },
+  { family: 'Poppins', category: 'Sans', description: 'Rounded geometric sans', preview: 'Bold headlines with warmth' },
+  { family: 'Manrope', category: 'Sans', description: 'Modern high-legibility sans', preview: 'Confident product copy' },
+  { family: 'DM Sans', category: 'Sans', description: 'Friendly editorial sans', preview: 'Readable, polished body text' },
+  { family: 'Plus Jakarta Sans', category: 'Sans', description: 'Contemporary brand sans', preview: 'Sharp interfaces and hero lines' },
+  { family: 'Space Grotesk', category: 'Sans', description: 'Expressive geometric sans', preview: 'Personality without chaos' },
+  { family: 'Sora', category: 'Sans', description: 'Crisp digital-first sans', preview: 'Future-facing callouts' },
+  { family: 'Outfit', category: 'Sans', description: 'Clean wide sans', preview: 'Balanced headlines and CTAs' },
+  { family: 'Urbanist', category: 'Sans', description: 'Soft geometric sans', preview: 'Smooth contemporary layouts' },
+  { family: 'Work Sans', category: 'Sans', description: 'Versatile grotesk family', preview: 'Clear messaging at any size' },
+  { family: 'Libre Franklin', category: 'Sans', description: 'Newsroom-inspired sans', preview: 'Editorial tone with precision' },
+  { family: 'IBM Plex Sans', category: 'Sans', description: 'Technical but approachable', preview: 'Systematic brand storytelling' },
+  { family: 'Hedvig Letters Serif', category: 'Serif', description: 'Friendly editorial serif', preview: 'Warm brand storytelling' },
+  { family: 'Merriweather', category: 'Serif', description: 'Readable classic serif', preview: 'Long-form text with texture' },
+  { family: 'Lora', category: 'Serif', description: 'Balanced contemporary serif', preview: 'Elegant paragraphs and intros' },
+  { family: 'Cormorant Garamond', category: 'Serif', description: 'High-contrast editorial serif', preview: 'Luxurious section titles' },
+  { family: 'Playfair Display', category: 'Serif', description: 'Fashion-forward serif', preview: 'Dramatic, polished headlines' },
+  { family: 'DM Serif Display', category: 'Serif', description: 'Compact display serif', preview: 'Classic contrast with punch' },
+  { family: 'Bricolage Grotesque', category: 'Display', description: 'Playful variable grotesk', preview: 'Creative direction with edge' },
+  { family: 'Syne', category: 'Display', description: 'Artful experimental display', preview: 'Unexpected but still usable' },
+  { family: 'Fraunces', category: 'Display', description: 'Expressive soft-serif display', preview: 'Strong hero typography' },
+  { family: 'Archivo Black', category: 'Display', description: 'Heavy compressed impact', preview: 'Posters, banners, statements' },
+  { family: 'Bebas Neue', category: 'Display', description: 'Tall condensed display', preview: 'Launch headlines and labels' },
+  { family: 'Oswald', category: 'Display', description: 'Condensed utility display', preview: 'Structured, emphatic headings' },
+  { family: 'Abril Fatface', category: 'Display', description: 'High-drama Didone', preview: 'Editorial glamour in one line' },
+  { family: 'Fira Mono', category: 'Mono', description: 'Readable monospaced text', preview: 'Code-like notes and labels' },
+  { family: 'IBM Plex Mono', category: 'Mono', description: 'Technical mono with warmth', preview: 'Utility captions and specs' },
+  { family: 'JetBrains Mono', category: 'Mono', description: 'Sharp modern mono', preview: 'Precise callouts and metadata' },
+  { family: 'Space Mono', category: 'Mono', description: 'Retro-futurist mono', preview: 'Distinct utility styling' },
+  { family: 'Caveat', category: 'Handwritten', description: 'Loose handwritten accent', preview: 'Personal notes and signatures' },
+  { family: 'Patrick Hand', category: 'Handwritten', description: 'Clean marker handwriting', preview: 'Friendly annotations' },
+];
+
+const STOREFRONT_EDITOR_TEXT_FONT_STYLESHEET_HREF = [
+  'https://fonts.googleapis.com/css2?display=swap',
+  ...STOREFRONT_EDITOR_TEXT_FONT_OPTIONS.map(
+    (font) => `family=${font.family.replace(/ /g, '+')}:wght@400;500;600;700`
+  ),
+].join('&');
 type MediaManagerPurpose = 'general' | 'button-icon' | 'image-component';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
 type AddElementsBrowserGroup = {
@@ -394,9 +441,10 @@ export class ProjectStorefrontEditor {
   readonly viewport = signal<StorefrontEditorViewport>('desktop');
   readonly sidebarCollapsed = signal(false);
   readonly sidebarMode = signal<EditorSidebarMode>('structure');
-  readonly isFormaMenuOpen = signal(false);
-  readonly isAccountMenuOpen = signal(false);
-  readonly isZoomMenuOpen = signal(false);
+readonly isFormaMenuOpen = signal(false);
+readonly isAccountMenuOpen = signal(false);
+readonly isZoomMenuOpen = signal(false);
+readonly isBrandKitPopupOpen = signal(false);
   readonly isAddElementsPanelOpen = signal(false);
   readonly isAddElementsPanelClosing = signal(false);
   readonly isAddElementsLibraryModalOpen = signal(false);
@@ -689,7 +737,7 @@ readonly activeTextToolbarMenu = signal<
     () => `${(this.sectionBorderCustomPickerHue() / 360) * 100}%`
   );
   readonly sectionBorderHexValue = computed(() => this.sectionBorderColor(this.selectedSection()).replace('#', '').toUpperCase());
-  readonly brandSectionBorderColors = [
+readonly brandSectionBorderColors = [
     '#ffffff',
     '#e8f1fb',
     '#b8d0ea',
@@ -701,6 +749,33 @@ readonly activeTextToolbarMenu = signal<
     '#c0cad6',
     '#d62828',
   ];
+  readonly brandKitPreviewPalette = computed(() => {
+    const palette = [
+      ...this.brandButtonColors().slice(0, 2),
+      ...this.brandParagraphColors().filter((color) => color !== 'transparent').slice(5, 8),
+      ...this.brandSectionBorderColors.filter((color) => color !== 'transparent').slice(1, 3),
+    ];
+    const unique: string[] = [];
+    for (const color of palette) {
+      if (!unique.includes(color)) {
+        unique.push(color);
+      }
+    }
+    return unique.slice(0, 5);
+  });
+  readonly brandKitAccentPalette = computed(() => {
+    const palette = [
+      ...this.brandParagraphColors().filter((color) => color !== 'transparent').slice(3, 8),
+      ...this.brandSectionBackgroundColors.filter((color) => color !== 'transparent').slice(0, 4),
+    ];
+    const unique: string[] = [];
+    for (const color of palette) {
+      if (!unique.includes(color)) {
+        unique.push(color);
+      }
+    }
+    return unique.slice(0, 5);
+  });
   readonly sectionBorderStyleOptions: ReadonlyArray<{ id: 'solid' | 'dashed' | 'dotted' | 'double'; label: string }> = [
     { id: 'solid', label: 'Solid' },
     { id: 'dashed', label: 'Dashed' },
@@ -728,7 +803,19 @@ readonly activeTextToolbarMenu = signal<
     () => `${(this.imageBorderCustomPickerHue() / 360) * 100}%`
   );
   readonly imageBorderHexValue = computed(() => this.imageBorderColor(this.selectedImageComponent()).replace('#', '').toUpperCase());
-  readonly paragraphFontFamilies = ['Fira Sans', 'Fira Mono', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
+  readonly paragraphFontOptions = STOREFRONT_EDITOR_TEXT_FONT_OPTIONS;
+  readonly paragraphFontFamilies = this.paragraphFontOptions.map((font) => font.family);
+  readonly brandKitHeadingFont = computed(
+    () => this.paragraphFontOptions.find((font) => font.family === 'Hedvig Letters Serif')?.family
+      ?? this.paragraphFontOptions.find((font) => font.category === 'Serif')?.family
+      ?? this.paragraphFontFamilies[0]
+  );
+  readonly brandKitBodyFont = computed(
+    () => this.paragraphFontOptions.find((font) => font.family === 'Fira Mono')?.family
+      ?? this.paragraphFontOptions.find((font) => font.category === 'Mono')?.family
+      ?? this.paragraphFontFamilies[1]
+      ?? this.paragraphFontFamilies[0]
+  );
   readonly paragraphFontSizes = [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 124, 144, 288];
   readonly textLineHeightOptions = [0.95, 1, 1.1, 1.2, 1.35, 1.5, 1.7, 2];
   readonly textLetterSpacingOptions = [-0.08, -0.04, -0.02, 0, 0.02, 0.04, 0.08, 0.12];
@@ -832,13 +919,18 @@ readonly activeTextToolbarMenu = signal<
       ],
     },
   ];
-  readonly filteredTextFontFamilies = computed(() => {
+  readonly filteredTextFontOptions = computed(() => {
     const query = this.textFontSearch().trim().toLowerCase();
     if (!query) {
-      return this.paragraphFontFamilies;
+      return this.paragraphFontOptions;
     }
 
-    return this.paragraphFontFamilies.filter((fontFamily) => fontFamily.toLowerCase().includes(query));
+    return this.paragraphFontOptions.filter((font) =>
+      font.family.toLowerCase().includes(query)
+      || font.category.toLowerCase().includes(query)
+      || font.description.toLowerCase().includes(query)
+      || font.preview.toLowerCase().includes(query)
+    );
   });
   readonly buttonTextPresets = ['Paragraph 1', 'Paragraph 2', 'Heading 4'] as const;
   readonly buttonFontFamilies = ['Fira Mono', 'Fira Sans', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
@@ -1119,11 +1211,12 @@ readonly activeTextToolbarMenu = signal<
   });
   readonly previewTitle = computed(() => this.workingStorefront()?.draftHomepage.seo.title || this.storeName());
   readonly selectedPageLabel = computed(() => this.selectedManagedPage()?.name || 'Home');
-  readonly hasFloatingUi = computed(
-    () =>
-      this.isFormaMenuOpen() ||
-      this.isAccountMenuOpen() ||
-      this.isZoomMenuOpen() ||
+readonly hasFloatingUi = computed(
+  () =>
+    this.isFormaMenuOpen() ||
+    this.isAccountMenuOpen() ||
+    this.isBrandKitPopupOpen() ||
+    this.isZoomMenuOpen() ||
       this.isAddPageMenuOpen() ||
       this.sectionAddMenuSectionId() !== null ||
       this.isAddElementsPanelVisible() ||
@@ -1307,6 +1400,10 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
   });
 
 constructor() {
+effect(() => {
+  this.ensureParagraphFontStylesheetLoaded();
+});
+
 effect(() => {
   this.savedParagraphColors.set(this.readSavedParagraphColors());
 });
@@ -1594,6 +1691,7 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
     if (!(target instanceof Element)) {
       this.isFormaMenuOpen.set(false);
       this.isAccountMenuOpen.set(false);
+      this.isBrandKitPopupOpen.set(false);
       this.isZoomMenuOpen.set(false);
       this.isAddPageMenuOpen.set(false);
    this.sectionAddMenuSectionId.set(null);
@@ -1622,6 +1720,12 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
       this.isFormaMenuOpen.set(false);
       this.isAccountMenuOpen.set(false);
       this.isZoomMenuOpen.set(false);
+    }
+
+    if (this.isBrandKitPopupOpen()) {
+      if (!target.closest('.storefront-editor__brand-kit-panel, .storefront-editor__topbar-brand-trigger')) {
+        this.isBrandKitPopupOpen.set(false);
+      }
     }
 
     if (this.isAddPageMenuOpen()) {
@@ -2292,6 +2396,12 @@ this.finalizeDraggedComponentsLayoutSnap();
     const next = !this.isZoomMenuOpen();
     this.closeFloatingUi();
     this.isZoomMenuOpen.set(next);
+  }
+
+  toggleBrandKitPopup(): void {
+    const next = !this.isBrandKitPopupOpen();
+    this.closeFloatingUi();
+    this.isBrandKitPopupOpen.set(next);
   }
 
   toggleAddElementsPanel(): void {
@@ -3663,6 +3773,7 @@ finishEditingComponentText(): void {
   closeFloatingUi(): void {
     this.isFormaMenuOpen.set(false);
   this.isAccountMenuOpen.set(false);
+  this.isBrandKitPopupOpen.set(false);
   this.isZoomMenuOpen.set(false);
   this.isAddPageMenuOpen.set(false);
   this.sectionAddMenuSectionId.set(null);
@@ -4146,6 +4257,9 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   toggleSelectedTextList(style: 'bullet' | 'number'): void {
     if (!this.isEditingSelectedTextComponent()) {
       this.startEditingSelectedTextComponent();
+      setTimeout(() => {
+        this.applyRichTextCommand(style === 'bullet' ? 'insertUnorderedList' : 'insertOrderedList');
+      }, 0);
       return;
     }
 
@@ -8133,11 +8247,11 @@ private updateImageComponentProps(
     return this.isEditingComponentText() && this.selectedTextComponent() !== null;
   }
 
-  private focusActiveTextEditor(): HTMLElement | null {
-    const componentId = this.editingComponentTextId();
-    if (!componentId) {
-      return null;
-    }
+private focusActiveTextEditor(): HTMLElement | null {
+  const componentId = this.editingComponentTextId();
+  if (!componentId) {
+    return null;
+  }
 
     const editor = document.querySelector(
       `.storefront-editor__preview-component-text-editor[data-component-id="${componentId}"]`
@@ -8146,14 +8260,27 @@ private updateImageComponentProps(
       return null;
     }
 
-    editor.focus();
-    return editor;
+  editor.focus();
+  return editor;
+}
+
+private ensureParagraphFontStylesheetLoaded(): void {
+  const existingLink = document.getElementById('forma-storefront-editor-google-fonts');
+  if (existingLink instanceof HTMLLinkElement) {
+    return;
   }
 
-  private readActiveTextEditorHtml(): string {
-    const editor = this.focusActiveTextEditor();
-    return editor?.innerHTML ?? this.editingComponentTextValue();
-  }
+  const link = document.createElement('link');
+  link.id = 'forma-storefront-editor-google-fonts';
+  link.rel = 'stylesheet';
+  link.href = STOREFRONT_EDITOR_TEXT_FONT_STYLESHEET_HREF;
+  document.head.appendChild(link);
+}
+
+private readActiveTextEditorHtml(): string {
+  const editor = this.focusActiveTextEditor();
+  return editor?.innerHTML ?? this.editingComponentTextValue();
+}
 
   private syncEditingTextValueFromDom(): void {
     const editor = this.focusActiveTextEditor();
