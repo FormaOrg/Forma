@@ -25,6 +25,7 @@ export function normalizeStorefrontSectionType(type: unknown): StorefrontSection
     case 'announcement-bar':
     case 'hero':
     case 'featured-products':
+    case 'contact':
     case 'footer':
       return type;
     default:
@@ -58,6 +59,23 @@ export function buildStorefrontSection(
           title: 'Featured products',
           productIds: [],
           maxItems: 4,
+        },
+      };
+    case 'contact':
+      return {
+        id: createSectionId(type),
+        type,
+        enabled: true,
+        props: {
+          eyebrow: 'Contact',
+          title: `Talk to ${storeName}`,
+          description:
+            'Invite visitors to ask about custom orders, shipping questions, or product recommendations.',
+          email: 'hello@store.com',
+          phone: '+216 00 000 000',
+          address: 'Tunis, Tunisia',
+          ctaLabel: 'Email us',
+          ctaHref: 'mailto:hello@store.com',
         },
       };
     case 'footer':

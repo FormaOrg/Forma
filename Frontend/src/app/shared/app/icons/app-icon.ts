@@ -49,7 +49,10 @@ export type AppIconName =
   | 'list'
   | 'copy'
   | 'external-link'
-  | 'upload';
+  | 'upload'
+  | 'instagram'
+  | 'facebook'
+  | 'tiktok';
 
 @Component({
   selector: 'app-icon',
@@ -365,6 +368,17 @@ export type AppIconName =
           <path d="M12 16V4" />
           <path d="m7 9 5-5 5 5" />
           <path d="M5 20h14" />
+        }
+        @case ('instagram') {
+          <rect x="4.5" y="4.5" width="15" height="15" rx="4.2" />
+          <circle cx="12" cy="12" r="3.6" />
+          <circle cx="17.1" cy="6.9" r="0.9" fill="currentColor" stroke="none" />
+        }
+        @case ('facebook') {
+          <path d="M13.2 21v-7.1h2.4l.36-2.8H13.2V9.32c0-.8.22-1.34 1.36-1.34H16V5.48c-.24-.03-1.05-.1-2-.1-1.98 0-3.34 1.2-3.34 3.42v2.31H8.4v2.8h2.26V21h2.54Z" fill="currentColor" stroke="none" />
+        }
+        @case ('tiktok') {
+          <path d="M14.75 4.5c.52 1.48 1.55 2.6 3.05 3.14v2.27a5.77 5.77 0 0 1-3.05-1.04v5.08a4.43 4.43 0 1 1-4.43-4.43c.24 0 .48.02.71.06v2.36a2.12 2.12 0 1 0 1.41 2v-9.44h2.31Z" fill="currentColor" stroke="none" />
         }
     }
     </svg>

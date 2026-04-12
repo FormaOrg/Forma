@@ -137,20 +137,27 @@ type StorefrontPageDesignTemplate = {
 };
 type MediaManagerPurpose = 'general' | 'button-icon';
 type StorefrontPageDesignCategory = 'Business' | 'Store' | 'Info' | 'Policy';
+type AddElementsBrowserGroup = {
+  id: string;
+  title: string;
+  description: string;
+  items: StorefrontEditorAddElementsLibraryItem[];
+};
 type SectionLibraryCategory =
-  | 'Welcome'
-  | 'About'
-  | 'Portfolio'
-  | 'Services'
-  | 'Products'
-  | 'Promote & Engage';
+  | 'Essentials'
+  | 'Promotions'
+  | 'Catalog'
+  | 'Contact'
+  | 'Footer';
 type SectionLibraryTemplate = {
   id: string;
   title: string;
+  description: string;
   category: SectionLibraryCategory;
   type: StorefrontSectionType;
   layout: 'wide' | 'standard' | 'tall';
   accent: 'cobalt' | 'linen' | 'ink' | 'sand' | 'sky' | 'charcoal';
+  props?: Record<string, unknown>;
 };
 
 @Component({
@@ -164,6 +171,7 @@ export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
   private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
+  private static readonly ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS = 180;
   private static readonly PAGES_MANAGER_CLOSE_MS = 180;
   private static readonly SECTION_LIBRARY_CLOSE_MS = 200;
   private static readonly SECTION_COMPONENTS_PROP_KEY = 'editorComponents';
@@ -203,6 +211,7 @@ export class ProjectStorefrontEditor {
 
   private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private managePagesCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private sectionLibraryCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -294,6 +303,9 @@ export class ProjectStorefrontEditor {
   readonly isZoomMenuOpen = signal(false);
   readonly isAddElementsPanelOpen = signal(false);
   readonly isAddElementsPanelClosing = signal(false);
+  readonly isAddElementsLibraryModalOpen = signal(false);
+  readonly isAddElementsLibraryModalClosing = signal(false);
+  readonly hoveredAddElementsLibraryItemId = signal<string | null>(null);
   readonly activeAddElementsCategory = signal<StorefrontEditorAddElementsCategory>('All');
   readonly activeAddElementsSubcategory = signal('all');
   readonly addElementsSearch = signal('');
@@ -320,7 +332,7 @@ readonly pageCardMenuId = signal<string | null>(null);
   readonly pageCardMenuLeft = signal(0);
   readonly sectionLibraryTargetId = signal<string | null>(null);
   readonly isSectionLibraryClosing = signal(false);
-  readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Welcome');
+readonly activeSectionLibraryCategory = signal<SectionLibraryCategory>('Essentials');
   readonly canScrollAddElementsTabsLeft = signal(false);
   readonly canScrollAddElementsTabsRight = signal(false);
   readonly canScrollAddElementsSubmenuLeft = signal(false);
@@ -795,8 +807,10 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
       this.isAddPageMenuOpen() ||
       this.sectionAddMenuSectionId() !== null ||
       this.isAddElementsPanelVisible() ||
+      this.isAddElementsLibraryModalVisible() ||
       this.isPagesPanelVisible() ||
       this.isManagePagesVisible() ||
+      this.isAddElementsLibraryModalVisible() ||
       this.isPageDesignPickerVisible() ||
       this.isSectionLibraryVisible() ||
       this.isMediaManagerOpen() ||
@@ -813,6 +827,9 @@ readonly activeTextToolbarMenu = signal<'style' | 'font-size' | 'font-family' | 
   );
   readonly isAddElementsPanelVisible = computed(
     () => this.isAddElementsPanelOpen() || this.isAddElementsPanelClosing()
+  );
+  readonly isAddElementsLibraryModalVisible = computed(
+    () => this.isAddElementsLibraryModalOpen() || this.isAddElementsLibraryModalClosing()
   );
 readonly isPagesPanelVisible = computed(() => this.isPagesPanelOpen() || this.isPagesPanelClosing());
 readonly isManagePagesVisible = computed(() => this.isManagePagesOpen() || this.isManagePagesClosing());
@@ -858,6 +875,7 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     'announcement-bar',
     'hero',
     'featured-products',
+    'contact',
     'footer',
   ];
   readonly sectionLibraryCategories: SectionLibraryCategory[] = STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES;
@@ -884,6 +902,88 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
       this.activeAddElementsSubcategory(),
       this.addElementsSearch()
     );
+  });
+  readonly addElementsBrowserGroups = computed<AddElementsBrowserGroup[]>(() => {
+    const items = this.visibleAddElementsLibraryItems();
+    const category = this.activeAddElementsCategory();
+    const hasSearch = this.addElementsSearch().trim().length > 0;
+
+    if (!items.length) {
+      return [];
+    }
+
+    if (category === 'All' && !hasSearch) {
+      return [
+        this.buildAddElementsBrowserGroup(
+          'popular',
+          'Popular',
+          'Best building blocks for most storefront pages.',
+          ['text', 'button', 'image', 'faq', 'contact-form', 'product-feed']
+        ),
+        this.buildAddElementsBrowserGroup(
+          'text',
+          'Text',
+          'Copy, support content, and messaging blocks.',
+          items.filter((item) => item.category === 'Text').map((item) => item.id)
+        ),
+        this.buildAddElementsBrowserGroup(
+          'store',
+          'Store',
+          'Commerce-focused elements for products and selling.',
+          items.filter((item) => item.category === 'Forma Store').map((item) => item.id)
+        ),
+        this.buildAddElementsBrowserGroup(
+          'graphics',
+          'Graphics',
+          'Layout, decorative, and utility pieces.',
+          items.filter((item) => item.category === 'Graphics').map((item) => item.id)
+        ),
+        this.buildAddElementsBrowserGroup(
+          'editorial',
+          'Editorial',
+          'Content and story-driven elements.',
+          items.filter((item) => item.category === 'Image' || item.category === 'Button').map((item) => item.id)
+        ),
+      ].filter((group) => group.items.length > 0);
+    }
+
+    if (category !== 'All') {
+      const popularInCategory = items.filter((item) => this.isPopularAddElementsItem(item.id));
+      const groups: AddElementsBrowserGroup[] = [];
+      if (popularInCategory.length) {
+        groups.push({
+          id: `${category}-popular`,
+          title: 'Top picks',
+          description: 'The most useful choices in this category.',
+          items: popularInCategory,
+        });
+      }
+      groups.push({
+        id: `${category}-results`,
+        title: hasSearch ? 'Results' : category,
+        description: hasSearch ? 'Matching elements for this search and filter.' : 'All available elements in this category.',
+        items,
+      });
+      return groups;
+    }
+
+    return [
+      {
+        id: 'results',
+        title: 'Results',
+        description: 'Matching elements for the current search.',
+        items,
+      },
+    ];
+  });
+  readonly activeAddElementsBrowserItem = computed<StorefrontEditorAddElementsLibraryItem | null>(() => {
+    const items = this.visibleAddElementsLibraryItems();
+    if (!items.length) {
+      return null;
+    }
+
+    const hoveredId = this.hoveredAddElementsLibraryItemId();
+    return items.find((item) => item.id === hoveredId) ?? items[0] ?? null;
   });
 
 constructor() {
@@ -931,6 +1031,9 @@ effect(() => {
       }
       if (this.addElementsPanelCloseTimer) {
         clearTimeout(this.addElementsPanelCloseTimer);
+      }
+      if (this.addElementsLibraryModalCloseTimer) {
+        clearTimeout(this.addElementsLibraryModalCloseTimer);
       }
    if (this.sectionLibraryCloseTimer) {
      clearTimeout(this.sectionLibraryCloseTimer);
@@ -1002,15 +1105,9 @@ effect(() => {
       return;
     }
 
-    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedComponentIds().length) {
+    if (event.key === 'Escape' && this.isAddElementsLibraryModalVisible()) {
       event.preventDefault();
-      this.deleteSelectedComponents();
-      return;
-    }
-
-    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedSectionId() && !this.hasComponentSelection()) {
-      event.preventDefault();
-      this.removeSection(this.selectedSectionId()!);
+      this.closeAddElementsLibraryModal();
       return;
     }
 
@@ -1021,6 +1118,18 @@ effect(() => {
       target instanceof HTMLSelectElement ||
       (target instanceof HTMLElement && target.isContentEditable)
     ) {
+      return;
+    }
+
+    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedComponentIds().length) {
+      event.preventDefault();
+      this.deleteSelectedComponents();
+      return;
+    }
+
+    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedSectionId() && !this.hasComponentSelection()) {
+      event.preventDefault();
+      this.removeSection(this.selectedSectionId()!);
       return;
     }
 
@@ -1540,6 +1649,50 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.canScrollAddElementsSubmenuRight.set(false);
   }
 
+  openAddElementsLibraryModal(): void {
+    if (this.addElementsLibraryModalCloseTimer) {
+      clearTimeout(this.addElementsLibraryModalCloseTimer);
+      this.addElementsLibraryModalCloseTimer = null;
+    }
+
+    this.closeAddElementsPanelImmediately();
+    this.isFormaMenuOpen.set(false);
+    this.isAccountMenuOpen.set(false);
+    this.isZoomMenuOpen.set(false);
+    this.closePagesPanel();
+    this.closeManagePages();
+    this.closePageDesignPicker();
+    this.closeSectionLibrary();
+    this.closeSectionOptionsMenu();
+    this.isMediaManagerOpen.set(false);
+    this.pageCardMenuId.set(null);
+    this.isAddElementsLibraryModalClosing.set(false);
+    this.isAddElementsLibraryModalOpen.set(true);
+    this.hoveredAddElementsLibraryItemId.set(this.visibleAddElementsLibraryItems()[0]?.id ?? null);
+    setTimeout(() => {
+      this.updateAddElementsTabScrollState();
+      this.updateAddElementsSubmenuScrollState();
+    }, 0);
+  }
+
+  closeAddElementsLibraryModal(): void {
+    if (!this.isAddElementsLibraryModalOpen() && !this.isAddElementsLibraryModalClosing()) {
+      return;
+    }
+
+    if (this.addElementsLibraryModalCloseTimer) {
+      clearTimeout(this.addElementsLibraryModalCloseTimer);
+    }
+
+    this.isAddElementsLibraryModalOpen.set(false);
+    this.isAddElementsLibraryModalClosing.set(true);
+    this.hoveredAddElementsLibraryItemId.set(null);
+    this.addElementsLibraryModalCloseTimer = setTimeout(() => {
+      this.isAddElementsLibraryModalClosing.set(false);
+      this.addElementsLibraryModalCloseTimer = null;
+    }, ProjectStorefrontEditor.ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS);
+  }
+
   setActiveAddElementsCategory(category: StorefrontEditorAddElementsCategory): void {
     this.activeAddElementsCategory.set(category);
     this.activeAddElementsSubcategory.set(this.getDefaultAddElementsSubcategory(category));
@@ -1552,6 +1705,98 @@ handleComponentPointerUp(event: MouseEvent): void {
   setActiveAddElementsSubcategory(subcategoryId: string): void {
     this.activeAddElementsSubcategory.set(subcategoryId);
     setTimeout(() => this.updateAddElementsSubmenuScrollState(), 0);
+  }
+
+  addElementsCountForCategory(category: StorefrontEditorAddElementsCategory): number {
+    return filterStorefrontEditorAddElementsLibraryItems(
+      this.addElementsLibraryItems,
+      category,
+      'all',
+      ''
+    ).length;
+  }
+
+  setHoveredAddElementsLibraryItem(itemId: string | null): void {
+    this.hoveredAddElementsLibraryItemId.set(itemId);
+  }
+
+  addElementsQuickTag(item: StorefrontEditorAddElementsLibraryItem): string {
+    switch (item.id) {
+      case 'text':
+        return 'Best for hero';
+      case 'button':
+        return 'Drive clicks';
+      case 'image':
+        return 'Visual anchor';
+      case 'faq':
+        return 'Support';
+      case 'contact-form':
+        return 'Lead capture';
+      case 'product-feed':
+        return 'Store';
+      case 'social-links':
+        return 'Footer';
+      case 'spacer':
+        return 'Layout';
+      case 'icon':
+        return 'Highlights';
+      case 'container':
+        return 'Structure';
+      case 'graphic':
+        return 'Decorative';
+      case 'blog-feed':
+        return 'Editorial';
+      default:
+        return item.category;
+    }
+  }
+
+  addElementsPlacementHint(item: StorefrontEditorAddElementsLibraryItem): string {
+    switch (item.id) {
+      case 'text':
+        return 'Great for hero intros, section headings, and landing page messaging.';
+      case 'button':
+        return 'Use in hero areas, promo sections, and product call-to-actions.';
+      case 'image':
+        return 'Best for banners, product storytelling, and visual breaks.';
+      case 'faq':
+        return 'Useful for shipping, returns, sizing, and support pages.';
+      case 'contact-form':
+        return 'Ideal for contact sections, wholesale requests, and support pages.';
+      case 'product-feed':
+        return 'Use in homepage highlights, collection previews, and featured rows.';
+      case 'social-links':
+        return 'Fits headers, contact areas, and footer link groups.';
+      case 'spacer':
+        return 'Helpful when sections feel cramped or need clearer separation.';
+      case 'icon':
+        return 'Works well in feature rows, contact details, and trust badges.';
+      case 'container':
+        return 'Useful for grouping custom layouts inside a section.';
+      case 'graphic':
+        return 'Adds visual rhythm without adding more copy.';
+      case 'blog-feed':
+        return 'Best for content hubs, editorial pages, and resource areas.';
+      default:
+        return item.description;
+    }
+  }
+
+  private buildAddElementsBrowserGroup(
+    id: string,
+    title: string,
+    description: string,
+    itemIds: string[]
+  ): AddElementsBrowserGroup {
+    const items = itemIds
+      .map((itemId) => this.visibleAddElementsLibraryItems().find((item) => item.id === itemId))
+      .filter((item): item is StorefrontEditorAddElementsLibraryItem => Boolean(item));
+
+    return { id, title, description, items };
+  }
+
+  private isPopularAddElementsItem(itemId: string): boolean {
+    return ['text', 'button', 'image', 'faq', 'contact-form', 'product-feed'].includes(itemId);
   }
 
   scrollAddElementsTabs(direction: 'left' | 'right'): void {
@@ -1620,6 +1865,7 @@ handleComponentPointerUp(event: MouseEvent): void {
     const nextComponent = this.buildLibraryComponentForSection(item, selectedSection.id);
     this.insertComponentIntoSection(selectedSection.id, nextComponent, { syncRail: true });
     this.closeAddElementsPanel();
+    this.closeAddElementsLibraryModal();
   }
 
   startAddElementsComponentDrag(item: StorefrontEditorAddElementsLibraryItem, event: MouseEvent): void {
@@ -1634,6 +1880,7 @@ handleComponentPointerUp(event: MouseEvent): void {
 
     const rect = target.getBoundingClientRect();
     this.closeAddElementsPanelImmediately();
+    this.closeAddElementsLibraryModal();
     this.activeAddElementsComponentDrag = {
       itemId: item.id,
       pointerOffsetX: event.clientX - rect.left,
@@ -1971,10 +2218,20 @@ handleComponentPointerUp(event: MouseEvent): void {
         return 'Paragraph';
       case 'image':
         return 'Image';
-      case 'button':
-        return 'Button';
-      case 'container':
-        return 'Container';
+    case 'button':
+      return 'Button';
+    case 'icon':
+      return 'Icon';
+    case 'spacer':
+      return 'Spacer';
+    case 'social-links':
+      return 'Social links';
+    case 'faq':
+      return 'FAQ';
+    case 'contact-form':
+      return 'Contact form';
+    case 'container':
+      return 'Container';
       case 'graphic':
         return 'Graphic';
       case 'product-feed':
@@ -2529,7 +2786,7 @@ handleComponentPointerUp(event: MouseEvent): void {
     this.sectionAddMenuSectionId.set(null);
     this.isPagesPanelOpen.set(false);
     this.sectionOptionsMenuId.set(null);
-    this.activeSectionLibraryCategory.set('Welcome');
+  this.activeSectionLibraryCategory.set('Essentials');
     this.isSectionLibraryClosing.set(false);
     this.sectionLibraryTargetId.set(sectionId);
     setTimeout(() => this.updateSectionLibraryTabScrollState(), 0);
@@ -2597,6 +2854,7 @@ handleComponentPointerUp(event: MouseEvent): void {
   this.activeButtonToolbarMenu.set(null);
   this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
+    this.closeAddElementsLibraryModal();
     this.closePagesPanel();
     this.closeManagePages();
     this.closePageDesignPicker();
@@ -2994,7 +3252,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   textStylePreviewFontSize(style: StorefrontEditorTextStylePreset): number {
-    return buildStorefrontEditorTextProps(style).fontSize;
+    return Math.min(buildStorefrontEditorTextProps(style).fontSize, 22);
   }
 
   private buildManagedPageHref(pageId: string): string {
@@ -3925,10 +4183,14 @@ updatePageDesignTabScrollState(): void {
     }
   }
 
-  addSection(type: StorefrontSectionType, mode: SectionInsertMode = 'after-selected'): void {
+  addSection(
+    type: StorefrontSectionType,
+    mode: SectionInsertMode = 'after-selected',
+    props?: Record<string, unknown>
+  ): void {
     let insertedId: string | null = null;
     this.applyStorefrontMutation((storefront) => {
-      const section = this.createSection(type);
+      const section = this.createSection(type, props);
       insertedId = section.id;
       const sections = [...storefront.draftHomepage.sections];
       const selectedSectionId = this.selectedSectionId();
@@ -3987,13 +4249,13 @@ updatePageDesignTabScrollState(): void {
     }, { selectedSectionId: insertedId, syncRail: true });
   }
 
-  addSectionFromLibrary(type: StorefrontSectionType): void {
+  addSectionFromLibrary(template: SectionLibraryTemplate): void {
     const targetSectionId = this.sectionLibraryTargetId();
     if (targetSectionId) {
       this.selectedSectionId.set(targetSectionId);
     }
 
-    this.addSection(type, 'after-selected');
+    this.addSection(template.type, 'after-selected', template.props);
     this.closeSectionLibrary();
   }
 
@@ -4303,6 +4565,8 @@ updatePageDesignTabScrollState(): void {
         return 'Announcement Bar';
       case 'featured-products':
         return 'Featured Products';
+      case 'contact':
+        return 'Contact';
       case 'footer':
         return 'Footer';
       default:
@@ -4320,6 +4584,8 @@ updatePageDesignTabScrollState(): void {
       }
       case 'footer':
         return this.readStringProp(section, 'brandText');
+      case 'contact':
+        return this.readStringProp(section, 'title') || this.readStringProp(section, 'email');
       default:
         return this.readStringProp(section, 'title');
     }
@@ -4392,6 +4658,16 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
         return 'Image';
       case 'button':
         return 'Button';
+      case 'icon':
+        return 'Icon';
+      case 'spacer':
+        return 'Spacer';
+      case 'social-links':
+        return 'Social links';
+      case 'faq':
+        return 'FAQ';
+      case 'contact-form':
+        return 'Contact form';
       case 'container':
         return 'Container';
       case 'graphic':
@@ -4451,11 +4727,13 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
   }
 
   sectionTypeIcon(type: StorefrontSectionType): 'layout-grid' | 'package' | 'settings' {
-    switch (type) {
-      case 'featured-products':
-        return 'package';
-      case 'footer':
-        return 'settings';
+  switch (type) {
+    case 'featured-products':
+      return 'package';
+    case 'contact':
+      return 'layout-grid';
+    case 'footer':
+      return 'settings';
       default:
         return 'layout-grid';
     }
@@ -4467,10 +4745,12 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
         return 'Highlight a quick message, notice, or promo banner.';
       case 'hero':
         return 'Lead with a headline, supporting copy, and primary actions.';
-      case 'featured-products':
-        return 'Feature selected catalog products in a curated section.';
-      case 'footer':
-        return 'Add brand details and contact information at the bottom.';
+    case 'featured-products':
+      return 'Feature selected catalog products in a curated section.';
+    case 'contact':
+      return 'Show customers how to reach you with email, phone, and location details.';
+    case 'footer':
+      return 'Add brand details and contact information at the bottom.';
     }
   }
 
@@ -4478,10 +4758,12 @@ componentTypeLabel(component: StorefrontEditorComponentNode): string {
     switch (type) {
       case 'announcement-bar':
         return 'Announcement';
-      case 'featured-products':
-        return 'Products';
-      case 'footer':
-        return 'Footer';
+    case 'featured-products':
+      return 'Products';
+    case 'contact':
+      return 'Contact';
+    case 'footer':
+      return 'Footer';
       default:
         return 'Welcome';
     }
@@ -6175,9 +6457,20 @@ private updateSelectedProductFeedProps(
     return buildStorefrontSection(type, storeName, (sectionType) => this.createSectionId(sectionType));
   }
 
-  private createSection(type: StorefrontSectionType): StorefrontHomepageSection {
-    return this.buildSection(type, this.storeName());
+private createSection(type: StorefrontSectionType, props?: Record<string, unknown>): StorefrontHomepageSection {
+  const section = this.buildSection(type, this.storeName());
+  if (!props) {
+    return section;
   }
+
+  return {
+    ...section,
+    props: {
+      ...section.props,
+      ...props,
+    },
+  };
+}
 
   private createSectionId(type: StorefrontSectionType): string {
     return createStorefrontSectionId(type);
