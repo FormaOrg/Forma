@@ -32,7 +32,8 @@ foreach ($service in $services) {
 
     $pidFile = Join-Path $pidRoot "$($service.Name).pid"
     if (Test-Path $pidFile) {
-        $existingPid = (Get-Content $pidFile -ErrorAction SilentlyContinue | Select-Object -First 1).Trim()
+        $existingPidLine = Get-Content $pidFile -ErrorAction SilentlyContinue | Select-Object -First 1
+        $existingPid = if ($null -ne $existingPidLine) { "$existingPidLine".Trim() } else { "" }
         if ($existingPid) {
             $existingProcess = Get-Process -Id $existingPid -ErrorAction SilentlyContinue
             if ($existingProcess) {

@@ -63,6 +63,18 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
       padding-left: 1.2em;
     }
 
+    .storefront-editor-block-text--rich :where(ul) {
+      list-style: disc;
+    }
+
+    .storefront-editor-block-text--rich :where(ol) {
+      list-style: decimal;
+    }
+
+    .storefront-editor-block-text--rich :where(li) {
+      display: list-item;
+    }
+
     .storefront-editor-block-text--rich :where(a) {
       color: inherit;
     }
