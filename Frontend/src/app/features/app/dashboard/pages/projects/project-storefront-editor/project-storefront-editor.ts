@@ -4312,6 +4312,10 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.isImageBorderColorPickerOpen.set(false);
     this.isImageBorderStylePickerOpen.set(false);
     this.activeImageCrop = null;
+    const located = this.findImageComponentLocation(componentId);
+    if (located) {
+      this.prepareImageCropEditingState(located.sectionId, located.component);
+    }
     this.croppingImageComponentId.set(componentId);
   }
 
@@ -4427,7 +4431,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
     this.selectComponent(sectionId, componentId);
     const viewport = this.resolveImageCropViewportRect(component, this.resolveImageCropEditingFrame(component));
-    const crop = this.resolveImageCropPixelRect(component, viewport);
+    const crop = this.resolveNormalizedImageCropRect(component);
     this.activeImageCrop = {
       sectionId,
       componentId,
@@ -4437,7 +4441,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       startY: event.clientY,
       startRotation: component.rotation ?? 0,
       viewport,
-      startCrop: crop,
+      startCrop: {
+        x: crop.x * viewport.width,
+        y: crop.y * viewport.height,
+        width: crop.width * viewport.width,
+        height: crop.height * viewport.height,
+      },
     };
   }
 
@@ -4504,19 +4513,6 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     };
   }
 
-  private resolveImageCropPixelRect(
-    component: StorefrontEditorImageNode,
-    viewport: { x: number; y: number; width: number; height: number }
-  ): { x: number; y: number; width: number; height: number } {
-    const crop = this.resolveNormalizedImageCropRect(component);
-    return {
-      x: crop.x * viewport.width,
-      y: crop.y * viewport.height,
-      width: crop.width * viewport.width,
-      height: crop.height * viewport.height,
-    };
-  }
-
   private resolveNormalizedImageCropRect(component: StorefrontEditorImageNode): { x: number; y: number; width: number; height: number } {
     const width = Math.max(0.01, this.clampUnit(component.props.cropWidth ?? 1));
     const height = Math.max(0.01, this.clampUnit(component.props.cropHeight ?? 1));
@@ -4569,6 +4565,69 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       width: outerWidth,
       height: outerHeight,
     };
+  }
+
+  private prepareImageCropEditingState(sectionId: string, component: StorefrontEditorImageNode): void {
+    const crop = this.resolveNormalizedImageCropRect(component);
+    const outerWidth = Math.max(component.props.cropOuterWidth ?? component.frame.width, component.frame.width);
+    const outerHeight = Math.max(component.props.cropOuterHeight ?? component.frame.height, component.frame.height);
+    const offsetX = Number(component.props.cropOuterOffsetX ?? 0);
+    const offsetY = Number(component.props.cropOuterOffsetY ?? 0);
+    const epsilon = 0.001;
+    const isDefaultCrop =
+      crop.x <= epsilon
+      && crop.y <= epsilon
+      && crop.width >= 1 - epsilon
+      && crop.height >= 1 - epsilon;
+    const hasStoredOuter =
+      Math.abs(offsetX) > epsilon
+      || Math.abs(offsetY) > epsilon
+      || Math.abs(outerWidth - component.frame.width) > epsilon
+      || Math.abs(outerHeight - component.frame.height) > epsilon;
+
+    if (!isDefaultCrop || hasStoredOuter || component.props.displayMode !== 'fill') {
+      return;
+    }
+
+    const frame = component.frame;
+    const frameAspectRatio = frame.width > 0 && frame.height > 0 ? frame.width / frame.height : 1;
+    const imageAspectRatio = this.parseImageAspectRatio(component.props.aspectRatio, frameAspectRatio);
+
+    if (Math.abs(imageAspectRatio - frameAspectRatio) <= epsilon) {
+      return;
+    }
+
+    let nextOuterOffsetX = 0;
+    let nextOuterOffsetY = 0;
+    let nextOuterWidth = frame.width;
+    let nextOuterHeight = frame.height;
+    let nextCropX = 0;
+    let nextCropY = 0;
+    let nextCropWidth = 1;
+    let nextCropHeight = 1;
+
+    if (imageAspectRatio > frameAspectRatio) {
+      nextOuterWidth = frame.height * imageAspectRatio;
+      nextOuterOffsetX = (frame.width - nextOuterWidth) / 2;
+      nextCropX = -nextOuterOffsetX / nextOuterWidth;
+      nextCropWidth = frame.width / nextOuterWidth;
+    } else {
+      nextOuterHeight = frame.width / imageAspectRatio;
+      nextOuterOffsetY = (frame.height - nextOuterHeight) / 2;
+      nextCropY = -nextOuterOffsetY / nextOuterHeight;
+      nextCropHeight = frame.height / nextOuterHeight;
+    }
+
+    this.updateImageComponentProps(sectionId, component.id, {
+      cropX: nextCropX,
+      cropY: nextCropY,
+      cropWidth: nextCropWidth,
+      cropHeight: nextCropHeight,
+      cropOuterOffsetX: nextOuterOffsetX,
+      cropOuterOffsetY: nextOuterOffsetY,
+      cropOuterWidth: nextOuterWidth,
+      cropOuterHeight: nextOuterHeight,
+    });
   }
 
   private exitImageCropMode(): void {
@@ -5660,21 +5719,7 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
   }
 
 if (this.mediaManagerPurpose() === 'image-component') {
-  const image = this.selectedImageComponent();
-  this.updateSelectedImageProps({
-    src: asset.url,
-    alt: asset.name,
-    cropX: 0,
-    cropY: 0,
-    cropWidth: 1,
-    cropHeight: 1,
-    cropOuterOffsetX: 0,
-    cropOuterOffsetY: 0,
-    cropOuterWidth: image?.frame.width ?? 260,
-    cropOuterHeight: image?.frame.height ?? 180,
-  });
-  this.toastService.success(`${asset.name} selected as image.`);
-  this.closeMediaManager();
+  void this.applySelectedImageAsset(asset);
   return;
 }
 
@@ -7574,7 +7619,7 @@ private updateSelectedSection(
       top += localDelta.y;
     }
 
-    const aspectRatioLocked = this.lockAspectRatioEnabled() || event.shiftKey;
+    const aspectRatioLocked = !this.activeResize.preserveAspectRatio && (this.lockAspectRatioEnabled() || event.shiftKey);
     if (aspectRatioLocked && startFrame.height > 0) {
       const aspectRatio = startFrame.width / startFrame.height;
       const currentWidth = right - left;
@@ -7596,47 +7641,50 @@ private updateSelectedSection(
     const minSize = 50;
     if (this.activeResize.preserveAspectRatio) {
       const aspectRatio = Math.max(this.activeResize.startAspectRatio || 1, 0.01);
-      const widthScale = Math.abs((right - left) - startFrame.width) / Math.max(startFrame.width, 1);
-      const heightScale = Math.abs((bottom - top) - startFrame.height) / Math.max(startFrame.height, 1);
-      const minWidth = Math.max(minSize, minSize * aspectRatio);
-      const minHeight = Math.max(minSize, minSize / aspectRatio);
-      const widthDriven = widthScale >= heightScale;
-      let nextWidth = right - left;
-      let nextHeight = bottom - top;
+      const startWidth = Math.max(startFrame.width, 1);
+      const startHeight = Math.max(startFrame.height, 1);
+      const widthSign = this.activeResize.handle.includes('e') ? 1 : -1;
+      const heightSign = this.activeResize.handle.includes('s') ? 1 : -1;
+      const rawWidth = startWidth + widthSign * localDelta.x;
+      const rawHeight = startHeight + heightSign * localDelta.y;
+      const minScale = Math.max(minSize / startWidth, minSize / startHeight);
+      const sizeDot = rawWidth * startWidth + rawHeight * startHeight;
+      const sizeLength = startWidth * startWidth + startHeight * startHeight;
+      const nextScale = Math.max(sizeDot / Math.max(sizeLength, 1), minScale);
+      const nextWidth = Math.max(startWidth * nextScale, minSize);
+      const nextHeight = Math.max(nextWidth / aspectRatio, minSize);
 
-      if (widthDriven) {
-        nextWidth = Math.max(nextWidth, minWidth);
-        nextHeight = nextWidth / aspectRatio;
-      } else {
-        nextHeight = Math.max(nextHeight, minHeight);
-        nextWidth = nextHeight * aspectRatio;
-      }
-
-      if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
-        left = right - nextWidth;
-      } else {
+      if (this.activeResize.handle.includes('e')) {
+        left = -halfWidth;
         right = left + nextWidth;
+      } else {
+        right = halfWidth;
+        left = right - nextWidth;
       }
 
-      if (this.activeResize.handle.includes('n') && !this.activeResize.handle.includes('s')) {
-        top = bottom - nextHeight;
-      } else {
+      if (this.activeResize.handle.includes('s')) {
+        top = -halfHeight;
         bottom = top + nextHeight;
+      } else {
+        bottom = halfHeight;
+        top = bottom - nextHeight;
       }
     }
 
-    if (right - left < minSize) {
-      if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
-        left = right - minSize;
-      } else {
-        right = left + minSize;
+    if (!this.activeResize.preserveAspectRatio) {
+      if (right - left < minSize) {
+        if (this.activeResize.handle.includes('w') && !this.activeResize.handle.includes('e')) {
+          left = right - minSize;
+        } else {
+          right = left + minSize;
+        }
       }
-    }
-    if (bottom - top < minSize) {
-      if (this.activeResize.handle.includes('n') && !this.activeResize.handle.includes('s')) {
-        top = bottom - minSize;
-      } else {
-        bottom = top + minSize;
+      if (bottom - top < minSize) {
+        if (this.activeResize.handle.includes('n') && !this.activeResize.handle.includes('s')) {
+          top = bottom - minSize;
+        } else {
+          bottom = top + minSize;
+        }
       }
     }
 
@@ -7722,6 +7770,29 @@ private updateSelectedSection(
             this.readSectionComponents(section).map((component) =>
               component.id === componentId
                 ? (() => {
+                    if (patch.frame !== undefined && component.type === 'image') {
+                      const scaleX = component.frame.width > 0 ? patch.frame.width / component.frame.width : 1;
+                      const scaleY = component.frame.height > 0 ? patch.frame.height / component.frame.height : 1;
+                      const currentOuterWidth = Number(component.props.cropOuterWidth ?? component.frame.width);
+                      const currentOuterHeight = Number(component.props.cropOuterHeight ?? component.frame.height);
+                      const currentOffsetX = Number(component.props.cropOuterOffsetX ?? 0);
+                      const currentOffsetY = Number(component.props.cropOuterOffsetY ?? 0);
+
+                      const nextImageComponent: StorefrontEditorImageNode = {
+                        ...component,
+                        frame: patch.frame,
+                        props: {
+                          ...component.props,
+                          cropOuterWidth: Math.max(patch.frame.width, currentOuterWidth * scaleX),
+                          cropOuterHeight: Math.max(patch.frame.height, currentOuterHeight * scaleY),
+                          cropOuterOffsetX: currentOffsetX * scaleX,
+                          cropOuterOffsetY: currentOffsetY * scaleY,
+                        },
+                        ...(patch.rotation !== undefined ? { rotation: patch.rotation } : {}),
+                      };
+                      return nextImageComponent;
+                    }
+
                     const nextComponent =
                       patch.frame !== undefined ? this.writeComponentFrame(component, patch.frame) : component;
                     return {
@@ -7935,7 +8006,7 @@ private updateComponentTree(
 }
 
 private updateSelectedImageProps(
-  patch: Partial<StorefrontEditorImageNode['props']>
+patch: Partial<StorefrontEditorImageNode['props']>
 ): void {
   const sectionId = this.selectedSectionId();
   const component = this.selectedImageComponent();
@@ -7943,7 +8014,101 @@ private updateSelectedImageProps(
     return;
   }
 
-  this.updateImageComponentProps(sectionId, component.id, patch);
+this.updateImageComponentProps(sectionId, component.id, patch);
+}
+
+private async applySelectedImageAsset(asset: StorefrontMediaManagerAsset): Promise<void> {
+  const sectionId = this.selectedSectionId();
+  const image = this.selectedImageComponent();
+  if (!sectionId || !image) {
+    return;
+  }
+
+  const dimensions = await this.resolveImageAssetDimensions(asset.url);
+  const nextFrame = dimensions
+    ? this.computeImageFrameForAspectRatio(image.frame, dimensions.width / Math.max(dimensions.height, 1))
+    : image.frame;
+  const nextAspectRatio = dimensions
+    ? this.formatImageAspectRatio(dimensions.width, dimensions.height)
+    : image.props.aspectRatio;
+
+  this.updateComponentNode(sectionId, image.id, (current) =>
+    current.type === 'image'
+      ? {
+          ...current,
+          frame: nextFrame,
+          props: {
+            ...current.props,
+            src: asset.url,
+            alt: asset.name,
+            aspectRatio: nextAspectRatio,
+            cropX: 0,
+            cropY: 0,
+            cropWidth: 1,
+            cropHeight: 1,
+            cropOuterOffsetX: 0,
+            cropOuterOffsetY: 0,
+            cropOuterWidth: nextFrame.width,
+            cropOuterHeight: nextFrame.height,
+          },
+        }
+      : current
+  );
+  this.toastService.success(`${asset.name} selected as image.`);
+  this.closeMediaManager();
+}
+
+private async resolveImageAssetDimensions(url: string): Promise<{ width: number; height: number } | null> {
+  return await new Promise((resolve) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => {
+      const width = image.naturalWidth || image.width;
+      const height = image.naturalHeight || image.height;
+      if (width > 0 && height > 0) {
+        resolve({ width, height });
+        return;
+      }
+      resolve(null);
+    };
+    image.onerror = () => resolve(null);
+    image.src = url;
+  });
+}
+
+private computeImageFrameForAspectRatio(
+  frame: StorefrontEditorComponentNode['frame'],
+  aspectRatio: number
+): StorefrontEditorComponentNode['frame'] {
+  const safeAspectRatio = Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 1;
+  const area = Math.max(frame.width * frame.height, 50 * 50);
+  const width = Math.max(50, Math.sqrt(area * safeAspectRatio));
+  const height = Math.max(50, width / safeAspectRatio);
+
+  return {
+    x: frame.x + (frame.width - width) / 2,
+    y: frame.y + (frame.height - height) / 2,
+    width,
+    height,
+  };
+}
+
+private formatImageAspectRatio(width: number, height: number): string {
+  const safeWidth = Math.max(1, Math.round(width));
+  const safeHeight = Math.max(1, Math.round(height));
+  const divisor = this.greatestCommonDivisor(safeWidth, safeHeight);
+  return `${safeWidth / divisor} / ${safeHeight / divisor}`;
+}
+
+private greatestCommonDivisor(left: number, right: number): number {
+  let a = Math.abs(left);
+  let b = Math.abs(right);
+  while (b !== 0) {
+    const remainder = a % b;
+    a = b;
+    b = remainder;
+  }
+  return Math.max(a, 1);
 }
 
 private updateImageComponentProps(

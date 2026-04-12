@@ -3668,11 +3668,6 @@
                 }
               </div>
             </div>
-
-            <button type="button" class="storefront-editor__image-settings-accessibility">
-              <span>Accessibility</span>
-              <app-icon name="chevron-down" [size]="14"></app-icon>
-            </button>
           </aside>
         }
       }
@@ -4236,6 +4231,7 @@
                         }
 
                         @for (component of readSectionComponents(section); track component.id) {
+                          @let visualFrame = componentVisualFrame(component);
                           <button
                             type="button"
                             class="storefront-editor__preview-component"
@@ -4247,10 +4243,10 @@
                             [class.storefront-editor__preview-component--text]="component.type === 'text'"
                             [class.storefront-editor__preview-component--image]="component.type === 'image'"
                             [class.storefront-editor__preview-component--image-cropping]="isImageCropModeForComponent(component.id)"
-                            [style.left.px]="componentVisualFrame(component).x"
-                            [style.top.px]="componentVisualFrame(component).y"
-                            [style.width.px]="componentVisualFrame(component).width"
-                            [style.height.px]="componentVisualFrame(component).height"
+                            [style.left.px]="visualFrame.x"
+                            [style.top.px]="visualFrame.y"
+                            [style.width.px]="visualFrame.width"
+                            [style.height.px]="visualFrame.height"
                             [style.zIndex]="component.zIndex || 1"
                             [style.transform]="'rotate(' + (component.rotation || 0) + 'deg)'"
                             (click)="selectComponent(section.id, component.id, $event)"
@@ -4266,8 +4262,8 @@
                             [node]="component"
                             [products]="products()"
                             [disableImageCrop]="component.type === 'image' && isImageCropModeForComponent(component.id)"
-                            [renderWidth]="componentVisualFrame(component).width"
-                            [renderHeight]="componentVisualFrame(component).height"
+                            [renderWidth]="visualFrame.width"
+                            [renderHeight]="visualFrame.height"
                             [style.opacity]="isEditingComponentText() && editingComponentTextId() === component.id ? '0' : null"
                           />
                           </div>
