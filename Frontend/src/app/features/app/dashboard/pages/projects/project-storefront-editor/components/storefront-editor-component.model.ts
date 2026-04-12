@@ -79,6 +79,23 @@ export interface StorefrontEditorImageProps {
   alt: string;
   aspectRatio: string;
   objectFit: 'cover' | 'contain';
+  displayMode: 'fill' | 'fit' | 'aspect';
+  cropX: number;
+  cropY: number;
+  cropWidth: number;
+  cropHeight: number;
+  cropOuterOffsetX: number;
+  cropOuterOffsetY: number;
+  cropOuterWidth: number;
+  cropOuterHeight: number;
+  href: string;
+  openInNewTab: boolean;
+  opacity: number;
+  borderColor: string;
+  borderWidth: number;
+  borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
+  radius: number;
+  shadow: 'none' | 'soft' | 'medium' | 'strong';
 }
 
 export interface StorefrontEditorButtonProps {
@@ -577,6 +594,23 @@ export function createStorefrontEditorComponentNode(
           alt: '',
           aspectRatio: '4 / 3',
           objectFit: 'cover',
+          displayMode: 'fill',
+          cropX: 0,
+          cropY: 0,
+          cropWidth: 1,
+          cropHeight: 1,
+          cropOuterOffsetX: 0,
+          cropOuterOffsetY: 0,
+          cropOuterWidth: getDefaultStorefrontEditorComponentFrame('image').width,
+          cropOuterHeight: getDefaultStorefrontEditorComponentFrame('image').height,
+          href: '',
+          openInNewTab: false,
+          opacity: 100,
+          borderColor: '#111827',
+          borderWidth: 0,
+          borderStyle: 'solid',
+          radius: 0,
+          shadow: 'none',
         },
       };
     case 'button':

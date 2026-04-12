@@ -1630,12 +1630,12 @@
       }
   
     <div class="storefront-editor__body">
-  <div
-    class="storefront-editor__context-toolbar-shell"
-    [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
-    [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
-    (mousedown)="preserveRichTextEditing($event)"
-  >
+    <div
+      class="storefront-editor__context-toolbar-shell"
+      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
+      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
+      (mousedown)="preserveRichTextEditing($event)"
+    >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
           <div
             class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__section-toolbar"
@@ -2641,6 +2641,427 @@
           </div>
       }
 
+      <ng-template #imageLinkPopupTemplate>
+        <div
+          class="storefront-editor__text-link-popup storefront-editor__image-link-popup"
+          [class.storefront-editor__image-link-popup--viewport-bottom]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom'"
+          [style.position]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? 'fixed' : null"
+          [style.top]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? 'auto' : null"
+          [style.bottom.px]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? 12 : null"
+          [style.left.px]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? imageSettingsLinkPopupViewportLeft() : null"
+          [style.transform]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? 'none' : null"
+        >
+          <div class="storefront-editor__text-link-popup-header">
+            <h3>Link to</h3>
+            <div class="storefront-editor__text-link-popup-actions">
+              <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
+              <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="closeImageLinkPopups()">×</button>
+            </div>
+          </div>
+
+          <div class="storefront-editor__text-link-popup-tabs">
+            <button type="button" class="storefront-editor__text-link-popup-tab storefront-editor__text-link-popup-tab--active">
+              <app-icon name="layout-grid" [size]="15"></app-icon>
+            </button>
+            <button type="button" class="storefront-editor__text-link-popup-tab">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+                <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
+                <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
+                <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+              </svg>
+            </button>
+            <button type="button" class="storefront-editor__text-link-popup-tab">
+              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
+                <path d="M10 2.5a7.5 7.5 0 1 0 0 15a7.5 7.5 0 0 0 0-15Zm5.74 6.75h-2.58a12.79 12.79 0 0 0-1.17-4.06a6.03 6.03 0 0 1 3.75 4.06ZM10 4.18c.65.87 1.28 2.6 1.56 5.07H8.44C8.72 6.78 9.35 5.05 10 4.18Zm-2.99 1a12.79 12.79 0 0 0-1.17 4.07H3.26a6.03 6.03 0 0 1 3.75-4.06ZM3.26 10.75h2.58c.1 1.44.5 2.82 1.17 4.06a6.03 6.03 0 0 1-3.75-4.06ZM10 15.82c-.65-.87-1.28-2.6-1.56-5.07h3.12c-.28 2.47-.91 4.2-1.56 5.07Zm1.99-1.01c.67-1.24 1.07-2.62 1.17-4.06h2.58a6.03 6.03 0 0 1-3.75 4.06Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button type="button" class="storefront-editor__text-link-popup-tab">
+              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
+                <rect x="6" y="2.75" width="8" height="14.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M8.5 5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="10" cy="14.75" r="0.8" fill="currentColor"/>
+              </svg>
+            </button>
+            <button type="button" class="storefront-editor__text-link-popup-tab">
+              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
+                <circle cx="5" cy="10" r="1.35" fill="currentColor"/>
+                <circle cx="10" cy="10" r="1.35" fill="currentColor"/>
+                <circle cx="15" cy="10" r="1.35" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <label class="storefront-editor__text-link-popup-field">
+            <span>Page</span>
+            <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
+              @for (page of managedPages(); track page.id) {
+                <option [value]="page.id">{{ page.name }}</option>
+              }
+            </select>
+          </label>
+
+          <div class="storefront-editor__text-link-popup-field">
+            <span>Choose how it opens</span>
+            <div class="storefront-editor__text-link-popup-toggle">
+              <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
+              <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+            </div>
+          </div>
+
+          <button type="button" class="storefront-editor__text-link-popup-advanced">
+            <span>Advanced SEO Settings</span>
+            <svg viewBox="0 0 18 18" width="14" height="14" aria-hidden="true">
+              <path d="M6.75 4.5L11.25 9l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="storefront-editor__text-link-popup-footer">
+            <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedImageLink()">Remove Link</button>
+            <div class="storefront-editor__text-link-popup-footer-actions">
+              <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeImageLinkPopups()">Cancel</button>
+              <button type="button" class="storefront-editor__text-link-popup-primary" (click)="saveSelectedImageLink()">Done</button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      @if (selectedImageComponent(); as image) {
+        <div
+          class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__image-toolbar"
+          animate.enter="storefront-editor__context-toolbar-fade-enter"
+        >
+          <button
+            type="button"
+            class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+            (click)="openMediaManagerForSelectedImage()"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path d="M6.75 11.427c.41 0 .75.34.75.75 0 2.07 1.68 3.75 3.75 3.75h4.33l-1.23-1.23a.755.755 0 0 1 0-1.06c.29-.29.77-.29 1.06 0v.01l2.29 2.29a.997.997 0 0 1 0 1.411l-2.29 2.29c-.29.29-.77.29-1.06 0a.755.755 0 0 1 0-1.06l1.15-1.15h-4.25A5.25 5.25 0 0 1 6 12.177c0-.41.34-.75.75-.75Zm1.84-6.21c.29-.29.77-.29 1.06 0 .29.29.29.77 0 1.06L8.5 7.428h4.25c2.9 0 5.25 2.35 5.25 5.25 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-2.07-1.68-3.75-3.75-3.75H8.42l1.23 1.23c.29.29.29.77 0 1.06-.29.29-.77.29-1.06 0v-.01L6.3 8.917a.996.996 0 0 1 0-1.41l2.29-2.29Z"></path>
+            </svg>
+            <span>Replace Image</span>
+          </button>
+
+          <button
+            type="button"
+            class="storefront-editor__button-toolbar-icon-trigger"
+            [class.storefront-editor__button-toolbar-icon-trigger--active]="isImageCropModeForComponent(image.id)"
+            (click)="toggleSelectedImageCropMode()"
+            aria-label="Crop image"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path d="M7.75 5a.75.75 0 0 1 .75.75V7h7c.824 0 1.5.676 1.5 1.5v7h1.25a.75.75 0 0 1 0 1.5H17v1.25a.75.75 0 0 1-1.5 0V17h-7c-.824 0-1.5-.676-1.5-1.5v-7H5.75a.75.75 0 0 1 0-1.5H7V5.75A.75.75 0 0 1 7.75 5Zm.75 10.5h7v-7h-7v7Z"></path>
+            </svg>
+          </button>
+
+          <div class="storefront-editor__context-toolbar-floating-shell">
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeImageToolbarMenu() === 'link'"
+              (click)="toggleImageToolbarMenu('link')"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
+                <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
+                <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+              </svg>
+              <span>Link</span>
+            </button>
+
+            @if (activeImageToolbarMenu() === 'link') {
+              <ng-container *ngTemplateOutlet="imageLinkPopupTemplate"></ng-container>
+            }
+          </div>
+
+          <span class="storefront-editor__context-toolbar-divider"></span>
+
+          <button
+            type="button"
+            class="storefront-editor__button-toolbar-icon-trigger"
+            [class.storefront-editor__button-toolbar-icon-trigger--active]="activeImageToolbarMenu() === 'settings'"
+            (click)="toggleImageToolbarMenu('settings')"
+            aria-label="Settings"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path d="M11.99 9.51a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0-5Zm0 1.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1Z"></path><path d="M12.48 4.51c.944 0 1.71.766 1.71 1.71v.151c.08.031.16.064.239.099l.101-.1a1.705 1.705 0 0 1 2.421 0l.672.672c.686.668.676 1.759.008 2.428l-.102.1c.035.079.068.159.099.24h.152c.944 0 1.711.766 1.711 1.71v.96c0 .943-.767 1.709-1.71 1.71h-.152c-.031.08-.065.16-.1.238l.102.101a1.705 1.705 0 0 1 0 2.421l-.68.68v-.001a1.703 1.703 0 0 1-2.42 0l-.102-.1a6.084 6.084 0 0 1-.239.098v.152c0 .944-.766 1.71-1.71 1.711h-.96c-.944 0-1.71-.767-1.71-1.71v-.153a5.957 5.957 0 0 1-.239-.099l-.093.094a1.703 1.703 0 0 1-2.427.008l-.68-.68a1.705 1.705 0 0 1 0-2.42l.1-.102a5.943 5.943 0 0 1-.099-.239h-.151a1.712 1.712 0 0 1-1.712-1.71v-.96c0-.944.768-1.71 1.712-1.71h.152c.031-.08.063-.16.098-.239l-.1-.1a1.704 1.704 0 0 1 0-2.42l.68-.68a1.704 1.704 0 0 1 2.42 0l.1.1c.079-.035.16-.068.24-.099V6.22c0-.944.765-1.71 1.71-1.71h.96Zm-.96 1.5a.21.21 0 0 0-.21.21v.69a.75.75 0 0 1-.55.723 4.426 4.426 0 0 0-.975.402.751.751 0 0 1-.894-.125l-.48-.48a.205.205 0 0 0-.293-.007l-.687.687a.204.204 0 0 0-.007.292l.487.488a.752.752 0 0 1 .125.894 4.42 4.42 0 0 0-.402.975.75.75 0 0 1-.723.55h-.69a.21.21 0 0 0-.21.21v.96c0 .116.094.21.21.21h.69l.124.011c.284.048.52.257.599.541.093.338.229.662.402.975a.752.752 0 0 1-.125.894l-.48.48a.206.206 0 0 0-.032.262l.025.03.687.687c.091.09.22.08.292.007l.007-.007.48-.48.094-.08a.751.751 0 0 1 .801-.045c.312.173.638.31.975.402.325.09.55.387.55.724v.69c0 .115.095.21.21.21h.96a.21.21 0 0 0 .21-.21v-.69c0-.338.227-.634.552-.724a4.43 4.43 0 0 0 .975-.402l.112-.05a.752.752 0 0 1 .782.176l.48.48c.09.09.221.08.293.006l.686-.686a.206.206 0 0 0 .007-.293l-.486-.487a.75.75 0 0 1-.126-.894c.173-.312.31-.638.402-.975l.043-.117a.751.751 0 0 1 .68-.434h.69a.212.212 0 0 0 .211-.21v-.96a.212.212 0 0 0-.21-.21h-.69a.75.75 0 0 1-.724-.551 4.421 4.421 0 0 0-.402-.975.75.75 0 0 1 .126-.894l.48-.48a.205.205 0 0 0 .006-.293l-.686-.687a.205.205 0 0 0-.293-.007l-.007.007-.48.48a.751.751 0 0 1-.894.125 4.428 4.428 0 0 0-.975-.402.75.75 0 0 1-.552-.723v-.69a.211.211 0 0 0-.21-.21h-.96Z"></path>
+            </svg>
+          </button>
+
+          <div class="storefront-editor__context-toolbar-floating-shell">
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeImageToolbarMenu() === 'opacity'"
+              (click)="toggleImageToolbarMenu('opacity')"
+              aria-label="Opacity"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M6.5 16c.83 0 1.5.67 1.5 1.5S7.33 19 6.5 19 5 18.33 5 17.5 5.67 16 6.5 16Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Zm-9.67-3.37c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 10.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S5 12.83 5 12s.67-1.5 1.5-1.5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75ZM8.58 7.88c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 5C7.33 5 8 5.67 8 6.5S7.33 8 6.5 8 5 7.33 5 6.5 5.67 5 6.5 5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Z"></path>
+              </svg>
+            </button>
+
+            @if (activeImageToolbarMenu() === 'opacity') {
+              <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__image-toolbar-popup">
+                <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                  <h3>Image opacity</h3>
+                </div>
+
+                <label class="storefront-editor__button-toolbar-slider-block storefront-editor__section-opacity-block">
+                  <div class="storefront-editor__button-toolbar-slider-row storefront-editor__section-opacity-row">
+                    <input type="range" min="0" max="100" [value]="imageOpacity(image)" (input)="updateSelectedImageOpacity($any($event.target).value)" />
+                    <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                      <input type="text" inputmode="numeric" [value]="imageOpacity(image)" (input)="updateSelectedImageOpacity($any($event.target).value)" />
+                      <span class="storefront-editor__section-value-input-suffix">%</span>
+                    </label>
+                  </div>
+                </label>
+              </div>
+            }
+          </div>
+
+          <div class="storefront-editor__context-toolbar-floating-shell">
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeImageToolbarMenu() === 'borders'"
+              (click)="toggleImageToolbarMenu('borders')"
+              aria-label="Borders"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M17.75 16a1.25 1.25 0 0 1 0 2.5H6.25a1.25 1.25 0 0 1 0-2.5h11.5Zm.25-5.5c.55 0 1 .45 1 1s-.45 1-1 1H6c-.55 0-1-.45-1-1s.45-1 1-1h12Zm.25-5c.41 0 .75.34.75.75s-.34.75-.75.75H5.75C5.34 7 5 6.66 5 6.25s.34-.75.75-.75h12.5Z"></path>
+              </svg>
+            </button>
+
+            @if (activeImageToolbarMenu() === 'borders') {
+              <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__section-toolbar-popup--borders storefront-editor__image-toolbar-popup storefront-editor__image-toolbar-popup--borders">
+                <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                  <h3>Borders</h3>
+                </div>
+
+                <div class="storefront-editor__button-toolbar-inline-fields storefront-editor__button-toolbar-inline-fields--borders">
+                  <div class="storefront-editor__section-borders-color-shell">
+                    <button
+                      type="button"
+                      class="storefront-editor__section-border-color-trigger storefront-editor__image-border-color-trigger"
+                      [style.background]="imageBorderColor(image)"
+                      (click)="toggleImageBorderColorPicker()"
+                      aria-label="Image border color"
+                    ></button>
+
+                    @if (isImageBorderColorPickerOpen()) {
+                      <div class="storefront-editor__context-toolbar-color-panel storefront-editor__section-borders-color-panel storefront-editor__image-borders-color-panel">
+                        <div class="storefront-editor__context-toolbar-color-panel-header">
+                          <h3>Color Picker</h3>
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-color-panel-close"
+                            (click)="toggleImageBorderColorPicker()"
+                            aria-label="Close image border colors"
+                          >
+                            <app-icon name="x" [size]="14"></app-icon>
+                          </button>
+                        </div>
+
+                        <div class="storefront-editor__context-toolbar-color-panel-tabs">
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-color-panel-tab"
+                            [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeImageBorderColorTab() === 'brand'"
+                            (click)="setActiveImageBorderColorTab('brand')"
+                          >
+                            Brand
+                          </button>
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-color-panel-tab"
+                            [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeImageBorderColorTab() === 'custom'"
+                            (click)="setActiveImageBorderColorTab('custom')"
+                          >
+                            Custom
+                          </button>
+                        </div>
+
+                        @if (activeImageBorderColorTab() === 'custom') {
+                          <div class="storefront-editor__context-toolbar-color-panel-body">
+                            <div
+                              class="storefront-editor__context-toolbar-color-canvas storefront-editor__section-borders-color-canvas"
+                              [style.--color-picker-hue]="imageBorderCustomColorCanvasBackground()"
+                              (mousedown)="startImageBorderColorCanvasDrag($event)"
+                            >
+                              <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                              <span class="storefront-editor__context-toolbar-color-canvas-knob" [style.left]="imageBorderCustomColorCanvasHandleLeft()" [style.top]="imageBorderCustomColorCanvasHandleTop()"></span>
+                            </div>
+
+                            <div class="storefront-editor__context-toolbar-color-spectrum storefront-editor__section-borders-color-spectrum" (mousedown)="startImageBorderHueDrag($event)">
+                              <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                              <span class="storefront-editor__context-toolbar-color-spectrum-thumb" [style.left]="imageBorderCustomColorSpectrumHandleLeft()"></span>
+                            </div>
+
+                            <div class="storefront-editor__context-toolbar-color-meta">
+                              <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                              <label class="storefront-editor__context-toolbar-color-hex">
+                                <span>#</span>
+                                <input type="text" [value]="imageBorderHexValue()" (change)="updateImageBorderHex($any($event.target).value)" aria-label="Image border color" />
+                              </label>
+                              <span class="storefront-editor__context-toolbar-color-current" [style.background]="imageBorderColor(image)"></span>
+                            </div>
+                          </div>
+                        } @else {
+                          <div class="storefront-editor__context-toolbar-color-panel-body">
+                            <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                            <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                              @for (brandColor of brandSectionBorderColors; track brandColor) {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__context-toolbar-saved-color"
+                                  [class.storefront-editor__context-toolbar-saved-color--active]="imageBorderColor(image) === brandColor"
+                                  [style.--saved-color]="brandColor"
+                                  (click)="updateSelectedImageBorderColor(brandColor)"
+                                >
+                                  <span></span>
+                                </button>
+                              }
+                            </div>
+
+                            <div class="storefront-editor__context-toolbar-brand-label">Saved colors</div>
+                            <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                              @for (savedColor of savedSectionBorderColors().length ? savedSectionBorderColors() : [imageBorderColor(image)]; track savedColor) {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__context-toolbar-saved-color"
+                                  [class.storefront-editor__context-toolbar-saved-color--active]="imageBorderColor(image) === savedColor"
+                                  [style.--saved-color]="savedColor"
+                                  (click)="applySavedImageBorderColor(savedColor)"
+                                >
+                                  <span></span>
+                                </button>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <label class="storefront-editor__button-toolbar-field storefront-editor__button-toolbar-field--numeric">
+                    <div class="storefront-editor__button-toolbar-field-input-wrap storefront-editor__section-value-input-wrap">
+                      <input type="text" inputmode="numeric" [value]="imageBorderWidth(image)" (input)="updateSelectedImageBorderWidth($any($event.target).value)" />
+                      <span class="storefront-editor__section-value-input-suffix">px</span>
+                    </div>
+                  </label>
+
+                  <div class="storefront-editor__section-border-style-shell">
+                    <button
+                      type="button"
+                      class="storefront-editor__section-border-style-trigger storefront-editor__image-border-style-trigger"
+                      (click)="toggleImageBorderStylePicker()"
+                      aria-label="Image border style"
+                    >
+                      <span class="storefront-editor__section-border-style-preview storefront-editor__image-border-style-preview">
+                        <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + imageBorderStyle(image)"></span>
+                      </span>
+                      <span class="storefront-editor__section-border-style-chevron" aria-hidden="true">
+                        <svg fill="currentColor" viewBox="0 0 8 5" width="8" height="5">
+                          <g>
+                            <path d="M7.852.852 4 4.712.146.85a.496.496 0 0 1 .7-.701L4 3.298 7.153.148a.494.494 0 0 1 .699 0l.001.001a.499.499 0 0 1-.001.703Z"></path>
+                          </g>
+                        </svg>
+                      </span>
+                    </button>
+
+                    @if (isImageBorderStylePickerOpen()) {
+                      <div class="storefront-editor__section-border-style-menu storefront-editor__section-toolbar-popup storefront-editor__image-border-style-menu">
+                        @for (borderStyle of sectionBorderStyleOptions; track borderStyle.id) {
+                          <button
+                            type="button"
+                            class="storefront-editor__section-border-style-option"
+                            [class.storefront-editor__section-border-style-option--active]="imageBorderStyle(image) === borderStyle.id"
+                            (click)="updateSelectedImageBorderStyle(borderStyle.id)"
+                          >
+                            <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + borderStyle.id"></span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="storefront-editor__context-toolbar-floating-shell">
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeImageToolbarMenu() === 'corners'"
+              (click)="toggleImageToolbarMenu('corners')"
+              aria-label="Corners"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M17 5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c.27 0 .5.23.5.5v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-1.1-.9-2-2-2ZM7 5c-1.1 0-2 .9-2 2v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-.27.23-.5.5-.5h3.25c.41 0 .75-.34.75-.75S10.66 5 10.25 5H7Zm10.5 12c0 .27-.23.5-.5.5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c1.1 0 2-.9 2-2v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17ZM7 17.5c-.27 0-.5-.23-.5-.5v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17c0 1.1.9 2 2 2h3.25c.41 0 .75-.34.75-.75s-.34-.75-.75-.75H7Z"></path>
+              </svg>
+            </button>
+
+            @if (activeImageToolbarMenu() === 'corners') {
+              <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__image-toolbar-popup">
+                <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                  <h3>Corners</h3>
+                </div>
+
+                <div class="storefront-editor__button-toolbar-option-row">
+                  @for (radiusOption of [0, 8, 14, 20, 999]; track radiusOption) {
+                    <button type="button" class="storefront-editor__button-toolbar-choice" [class.storefront-editor__button-toolbar-choice--active]="imageRadius(image) === radiusOption" (click)="updateSelectedImageRadius(radiusOption)">
+                      <span class="storefront-editor__button-toolbar-choice-box storefront-editor__button-toolbar-choice-box--radius storefront-editor__section-corner-preview" [style.--button-radius-preview.px]="radiusOption === 999 ? 999 : radiusOption === 20 ? 12 : radiusOption === 14 ? 8 : radiusOption === 8 ? 4 : 0"></span>
+                    </button>
+                  }
+                </div>
+
+                <label class="storefront-editor__button-toolbar-slider-block">
+                  <span>Radius</span>
+                  <div class="storefront-editor__button-toolbar-slider-row">
+                    <input type="range" min="0" max="64" [value]="imageRadius(image)" (input)="updateSelectedImageRadius($any($event.target).value)" />
+                    <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                      <input type="text" inputmode="numeric" [value]="imageRadius(image)" (input)="updateSelectedImageRadius($any($event.target).value)" />
+                      <span class="storefront-editor__section-value-input-suffix">px</span>
+                    </label>
+                  </div>
+                </label>
+              </div>
+            }
+          </div>
+
+          <div class="storefront-editor__context-toolbar-floating-shell">
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeImageToolbarMenu() === 'shadow'"
+              (click)="toggleImageToolbarMenu('shadow')"
+              aria-label="Shadow"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M15 5c1.1 0 2 .9 2 2 1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8ZM7 6.5c-.28 0-.5.22-.5.5v8c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V7c0-.28-.22-.5-.5-.5H7Z"></path>
+              </svg>
+            </button>
+
+            @if (activeImageToolbarMenu() === 'shadow') {
+              <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__image-toolbar-popup">
+                <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                  <h3>Shadow</h3>
+                </div>
+
+                <div class="storefront-editor__button-toolbar-option-row storefront-editor__button-toolbar-option-row--shadow">
+                  @for (shadowOption of buttonShadowOptions; track shadowOption.id) {
+                    <button type="button" class="storefront-editor__button-toolbar-choice storefront-editor__button-toolbar-choice--shadow" [class.storefront-editor__button-toolbar-choice--active]="imageShadow(image) === shadowOption.id" (click)="updateSelectedImageShadow(shadowOption.id)">
+                      <span class="storefront-editor__button-toolbar-shadow-preview" [ngStyle]="buttonShadowPreviewStyle(shadowOption.id)"></span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
         <div
           class="storefront-editor__context-toolbar storefront-editor__button-toolbar"
           *ngIf="selectedButtonComponent() as button; else productFeedToolbar"
@@ -3190,6 +3611,71 @@
           </div>
         }
       </ng-template>
+
+      @if (selectedImageComponent(); as image) {
+        @if (activeImageToolbarMenu() === 'settings') {
+          <aside class="storefront-editor__image-toolbar-side-panel storefront-editor__button-toolbar-side-panel">
+            <div class="storefront-editor__button-toolbar-panel-header">
+              <h3>Settings</h3>
+              <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleImageToolbarMenu('settings')">
+                <app-icon name="x" [size]="14"></app-icon>
+              </button>
+            </div>
+
+            <div class="storefront-editor__image-settings-section">
+              <span class="storefront-editor__image-settings-label">Image</span>
+              <button type="button" class="storefront-editor__image-settings-preview" (click)="openMediaManagerForSelectedImage()">
+                @if (image.props.src) {
+                  <img [src]="image.props.src" [alt]="image.props.alt || 'Image preview'" />
+                } @else {
+                  <span class="storefront-editor__image-settings-preview-empty">No image selected</span>
+                }
+                <span class="storefront-editor__image-settings-preview-overlay">
+                  <span class="storefront-editor__image-settings-preview-replace">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                      <path d="M6.75 11.427c.41 0 .75.34.75.75 0 2.07 1.68 3.75 3.75 3.75h4.33l-1.23-1.23a.755.755 0 0 1 0-1.06c.29-.29.77-.29 1.06 0v.01l2.29 2.29a.997.997 0 0 1 0 1.411l-2.29 2.29c-.29.29-.77.29-1.06 0a.755.755 0 0 1 0-1.06l1.15-1.15h-4.25A5.25 5.25 0 0 1 6 12.177c0-.41.34-.75.75-.75Zm1.84-6.21c.29-.29.77-.29 1.06 0 .29.29.29.77 0 1.06L8.5 7.428h4.25c2.9 0 5.25 2.35 5.25 5.25 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-2.07-1.68-3.75-3.75-3.75H8.42l1.23 1.23c.29.29.29.77 0 1.06-.29.29-.77.29-1.06 0v-.01L6.3 8.917a.996.996 0 0 1 0-1.41l2.29-2.29Z"></path>
+                    </svg>
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <div class="storefront-editor__image-settings-section">
+              <label class="storefront-editor__button-toolbar-field">
+                <span>Display Mode</span>
+                <select [value]="imageDisplayMode(image)" (change)="updateSelectedImageDisplayMode($any($event.target).value)">
+                  @for (option of imageDisplayModeOptions; track option.id) {
+                    <option [value]="option.id">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+
+            <div class="storefront-editor__image-settings-section">
+              <span class="storefront-editor__image-settings-label">Links to</span>
+              <div class="storefront-editor__image-settings-link-shell">
+                <button type="button" class="storefront-editor__image-settings-link-button" (click)="toggleImageSettingsLinkPopup($event)">
+                  <span>{{ image.props.href ? 'Edit link...' : 'Choose a link...' }}</span>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                    <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
+                    <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
+                    <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+                  </svg>
+                </button>
+
+                @if (isImageSettingsLinkPopupOpen()) {
+                  <ng-container *ngTemplateOutlet="imageLinkPopupTemplate"></ng-container>
+                }
+              </div>
+            </div>
+
+            <button type="button" class="storefront-editor__image-settings-accessibility">
+              <span>Accessibility</span>
+              <app-icon name="chevron-down" [size]="14"></app-icon>
+            </button>
+          </aside>
+        }
+      }
 
       @if (selectedButtonComponent(); as button) {
         @if (activeButtonToolbarMenu() === 'designs') {
@@ -3759,14 +4245,16 @@
                             [class.storefront-editor__preview-component--dragging]="draggedComponentId() === component.id"
                             [class.storefront-editor__preview-component--button]="component.type === 'button'"
                             [class.storefront-editor__preview-component--text]="component.type === 'text'"
-                            [style.left.px]="component.frame.x"
-                            [style.top.px]="component.frame.y"
-                            [style.width.px]="component.frame.width"
-                            [style.height.px]="component.frame.height"
+                            [class.storefront-editor__preview-component--image]="component.type === 'image'"
+                            [class.storefront-editor__preview-component--image-cropping]="isImageCropModeForComponent(component.id)"
+                            [style.left.px]="componentVisualFrame(component).x"
+                            [style.top.px]="componentVisualFrame(component).y"
+                            [style.width.px]="componentVisualFrame(component).width"
+                            [style.height.px]="componentVisualFrame(component).height"
                             [style.zIndex]="component.zIndex || 1"
                             [style.transform]="'rotate(' + (component.rotation || 0) + 'deg)'"
                             (click)="selectComponent(section.id, component.id, $event)"
-                          (dblclick)="component.groupId ? isolateGroupedComponent(section.id, component.id, $event) : (component.type !== 'button' ? startEditingComponentText(section.id, component.id, $event) : null)"
+                            (dblclick)="handleComponentDoubleClick(section.id, component.id, $event)"
                             (mousedown)="beginComponentMove(section.id, component.id, $event)"
                             (contextmenu)="openComponentContextMenu(section.id, component.id, $event)"
                             [style.--storefront-editor-text-align]="component.type === 'heading' || component.type === 'paragraph' || component.type === 'text' ? component.props.align : null"
@@ -3774,13 +4262,62 @@
                             [style.--storefront-editor-container-bg]="component.type === 'container' ? component.props.backgroundColor : null"
                           >
                           <div class="storefront-editor__preview-component-content">
-                            <app-storefront-editor-component-host
-                              [node]="component"
-                              [products]="products()"
-                              [style.opacity]="isEditingComponentText() && editingComponentTextId() === component.id ? '0' : null"
-                            />
+                          <app-storefront-editor-component-host
+                            [node]="component"
+                            [products]="products()"
+                            [disableImageCrop]="component.type === 'image' && isImageCropModeForComponent(component.id)"
+                            [renderWidth]="componentVisualFrame(component).width"
+                            [renderHeight]="componentVisualFrame(component).height"
+                            [style.opacity]="isEditingComponentText() && editingComponentTextId() === component.id ? '0' : null"
+                          />
                           </div>
-                            @if (selectedComponentId() === component.id && selectedComponentIds().length === 1 && !isResizingComponent() && !isRotatingComponent()) {
+                          @if (isImageCropModeForComponent(component.id)) {
+                            <div class="storefront-editor__preview-image-crop-overlay">
+                              <div
+                                class="storefront-editor__preview-image-crop-frame"
+                                [ngStyle]="imageCropFrameStyle(component)"
+                                (mousedown)="beginImageCropMove(section.id, component.id, $event)"
+                              >
+                                <span class="storefront-editor__preview-image-crop-grid-line storefront-editor__preview-image-crop-grid-line--v storefront-editor__preview-image-crop-grid-line--v1"></span>
+                                <span class="storefront-editor__preview-image-crop-grid-line storefront-editor__preview-image-crop-grid-line--v storefront-editor__preview-image-crop-grid-line--v2"></span>
+                                <span class="storefront-editor__preview-image-crop-grid-line storefront-editor__preview-image-crop-grid-line--h storefront-editor__preview-image-crop-grid-line--h1"></span>
+                                <span class="storefront-editor__preview-image-crop-grid-line storefront-editor__preview-image-crop-grid-line--h storefront-editor__preview-image-crop-grid-line--h2"></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-corner storefront-editor__preview-image-crop-corner--nw"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'nw', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-corner storefront-editor__preview-image-crop-corner--ne"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'ne', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-corner storefront-editor__preview-image-crop-corner--se"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'se', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-corner storefront-editor__preview-image-crop-corner--sw"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'sw', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-edge storefront-editor__preview-image-crop-edge--n"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'n', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-edge storefront-editor__preview-image-crop-edge--e"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'e', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-edge storefront-editor__preview-image-crop-edge--s"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 's', $event)"
+                                ></span>
+                                <span
+                                  class="storefront-editor__preview-image-crop-edge storefront-editor__preview-image-crop-edge--w"
+                                  (mousedown)="beginImageCropResize(section.id, component.id, 'w', $event)"
+                                ></span>
+                              </div>
+                            </div>
+                          }
+                            @if (selectedComponentId() === component.id && selectedComponentIds().length === 1 && !isResizingComponent() && !isRotatingComponent() && !isImageCropModeForComponent(component.id)) {
                               <span
                                 class="storefront-editor__preview-component-name-label"
                                 [class.storefront-editor__preview-component-name-label--flipped]="isComponentRotationFlipped(component.rotation || 0)"

@@ -58,7 +58,12 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
         <app-storefront-editor-block-paragraph [node]="$any(node())" />
       }
       @case ('image') {
-        <app-storefront-editor-block-image [node]="$any(node())" />
+        <app-storefront-editor-block-image
+          [node]="$any(node())"
+          [disableCrop]="disableImageCrop()"
+          [renderWidth]="renderWidth()"
+          [renderHeight]="renderHeight()"
+        />
       }
       @case ('button') {
         <app-storefront-editor-block-button [node]="$any(node())" />
@@ -96,4 +101,7 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
 export class StorefrontEditorComponentHostComponent {
   readonly node = input.required<StorefrontEditorComponentNode>();
   readonly products = input<ProjectCatalogProduct[]>([]);
+  readonly disableImageCrop = input(false);
+  readonly renderWidth = input<number | null>(null);
+  readonly renderHeight = input<number | null>(null);
 }
