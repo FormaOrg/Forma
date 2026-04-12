@@ -5675,7 +5675,33 @@ private updateSelectedProductFeedProps(
     component: StorefrontEditorComponentNode,
     options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
   ): void {
-    this.updateSectionComponents(sectionId, (components) => [...components, component], options);
+    const minSectionHeight = this.getRequiredSectionHeightForComponent(sectionId, component);
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          const nextSection = this.writeSectionComponents(section, [...this.readSectionComponents(section), component]);
+          const currentHeight = this.readNumberProp(section, ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY, 0);
+          if (minSectionHeight <= currentHeight) {
+            return nextSection;
+          }
+
+          return {
+            ...nextSection,
+            props: {
+              ...nextSection.props,
+              [ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY]: minSectionHeight,
+            },
+          };
+        }),
+      },
+    }), options);
     this.selectedComponentId.set(component.id);
     this.selectedComponentIds.set([component.id]);
     this.isolatedGroupComponentId.set(null);
@@ -5719,16 +5745,57 @@ private updateSelectedProductFeedProps(
       return undefined;
     }
 
-      const next = createStorefrontEditorComponentNode(componentType);
-      const rect = container.getBoundingClientRect();
-      const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
-      const x = clientX - rect.left - next.frame.width / 2;
-      const y = clientY - rect.top - next.frame.height / 2;
-      return {
-        ...next.frame,
-        x: Math.max(-next.frame.width + 20, Math.min(x, rect.width - 20)),
-        y: Math.max(-next.frame.height + 20, Math.min(y, previewVisibleHeight - 20)),
-      };
+    const next = createStorefrontEditorComponentNode(componentType);
+    const rect = container.getBoundingClientRect();
+    const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
+    const fittedFrame = this.fitDroppedComponentFrameToSection(container, next.frame);
+    const x = clientX - rect.left - fittedFrame.width / 2;
+    const y = clientY - rect.top - fittedFrame.height / 2;
+
+    return {
+      ...fittedFrame,
+      x: Math.max(0, Math.min(x, Math.max(0, rect.width - fittedFrame.width))),
+      y: Math.max(0, Math.min(y, Math.max(0, previewVisibleHeight - fittedFrame.height))),
+    };
+  }
+
+  private fitDroppedComponentFrameToSection(
+    container: HTMLElement,
+    frame: StorefrontEditorComponentNode['frame']
+  ): StorefrontEditorComponentNode['frame'] {
+    const rect = container.getBoundingClientRect();
+    const inset = 20;
+    const maxWidth = Math.max(48, rect.width - inset * 2);
+    const scale = Math.min(1, maxWidth / frame.width);
+
+    return {
+      ...frame,
+      width: Math.max(48, Math.round(frame.width * scale)),
+      height: Math.max(
+        48,
+        Math.round(this.shouldPreserveDroppedHeight(frame) ? frame.height : frame.height * scale)
+      ),
+    };
+  }
+
+  private shouldPreserveDroppedHeight(frame: StorefrontEditorComponentNode['frame']): boolean {
+    return frame.height >= 360;
+  }
+
+  private getRequiredSectionHeightForComponent(
+    sectionId: string,
+    component: StorefrontEditorComponentNode
+  ): number {
+    const container = document.querySelector(
+      `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
+    );
+    const currentHeight =
+      container instanceof HTMLElement
+        ? Math.max(container.getBoundingClientRect().height, container.scrollHeight)
+        : 0;
+    const componentBottom = component.frame.y + component.frame.height + 24;
+
+    return Math.max(currentHeight, Math.ceil(componentBottom));
   }
 
   private getPreviewVisibleHeightForSection(container: HTMLElement): number {
