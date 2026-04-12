@@ -259,7 +259,7 @@ function getDefaultStorefrontEditorComponentFrame(
     case 'faq':
       return { x: 32, y: 430, width: 420, height: 220 };
     case 'contact-form':
-      return { x: 32, y: 430, width: 440, height: 360 };
+      return { x: 32, y: 430, width: 440, height: 520 };
     case 'container':
       return { x: 32, y: 32, width: 340, height: 220 };
     case 'graphic':

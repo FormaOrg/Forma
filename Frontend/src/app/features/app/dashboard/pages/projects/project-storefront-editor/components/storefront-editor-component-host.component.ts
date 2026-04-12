@@ -39,11 +39,9 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
   ],
   styles: [`
     :host {
-      display: flex;
+      display: block;
       width: 100%;
       height: 100%;
-      align-items: center;
-      justify-content: center;
     }
   `],
   template: `

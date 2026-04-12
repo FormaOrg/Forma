@@ -6149,13 +6149,13 @@
 
 .storefront-editor__preview-component {
   position: absolute;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 0;
   cursor: move;
   text-align: left;
   overflow: visible;
@@ -6169,8 +6169,8 @@
   min-height: 0;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 .storefront-editor__preview-component--button {
@@ -6190,7 +6190,7 @@
 }
 
 .storefront-editor__preview-component--selected {
-  border-color: #355cff;
+  border-color: transparent;
   outline: 2px solid rgba(53, 92, 255, 0.22);
   outline-offset: 0;
 }
@@ -6200,7 +6200,7 @@
   position: absolute;
   inset: -2px;
   border: 2px solid #2563eb;
-  border-radius: 0;
+  border-radius: 24px;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   pointer-events: none;
 }
@@ -6215,7 +6215,7 @@
   position: absolute;
   inset: -2px;
   border: 2px solid #7c3aed;
-  border-radius: 0;
+  border-radius: 24px;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
   pointer-events: none;
 }
