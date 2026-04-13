@@ -7850,6 +7850,8 @@
   resize: none;
   outline: none;
   box-shadow: none;
+  direction: ltr;
+  unicode-bidi: plaintext;
 }
 
 .storefront-editor__preview-component-text-editor--rich {
