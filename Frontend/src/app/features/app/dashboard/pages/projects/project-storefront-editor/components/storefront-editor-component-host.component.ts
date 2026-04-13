@@ -9,6 +9,8 @@ import { StorefrontEditorBlockHeadingComponent } from './blocks/storefront-edito
 import { StorefrontEditorBlockParagraphComponent } from './blocks/storefront-editor-block-paragraph.component';
 import { StorefrontEditorBlockImageComponent } from './blocks/storefront-editor-block-image.component';
 import { StorefrontEditorBlockButtonComponent } from './blocks/storefront-editor-block-button.component';
+import { StorefrontEditorBlockMenuComponent } from './blocks/storefront-editor-block-menu.component';
+import { StorefrontEditorBlockCartComponent } from './blocks/storefront-editor-block-cart.component';
 import { StorefrontEditorBlockIconComponent } from './blocks/storefront-editor-block-icon.component';
 import { StorefrontEditorBlockSpacerComponent } from './blocks/storefront-editor-block-spacer.component';
 import { StorefrontEditorBlockSocialLinksComponent } from './blocks/storefront-editor-block-social-links.component';
@@ -29,6 +31,8 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
     StorefrontEditorBlockParagraphComponent,
     StorefrontEditorBlockImageComponent,
     StorefrontEditorBlockButtonComponent,
+    StorefrontEditorBlockMenuComponent,
+    StorefrontEditorBlockCartComponent,
     StorefrontEditorBlockIconComponent,
     StorefrontEditorBlockSpacerComponent,
     StorefrontEditorBlockSocialLinksComponent,
@@ -49,7 +53,11 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
   template: `
     @switch (node().type) {
       @case ('text') {
-        <app-storefront-editor-block-text [node]="$any(node())" />
+        <app-storefront-editor-block-text
+          [node]="$any(node())"
+          [interactiveLinks]="interactiveLinks()"
+          [linkHrefResolver]="linkHrefResolver()"
+        />
       }
       @case ('heading') {
         <app-storefront-editor-block-heading [node]="$any(node())" />
@@ -67,6 +75,16 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
       }
       @case ('button') {
         <app-storefront-editor-block-button [node]="$any(node())" />
+      }
+      @case ('menu') {
+        <app-storefront-editor-block-menu
+          [node]="$any(node())"
+          [interactiveLinks]="interactiveLinks()"
+          [linkHrefResolver]="linkHrefResolver()"
+        />
+      }
+      @case ('cart') {
+        <app-storefront-editor-block-cart [node]="$any(node())" [count]="cartCount()" />
       }
       @case ('icon') {
         <app-storefront-editor-block-icon [node]="$any(node())" />
@@ -104,4 +122,7 @@ export class StorefrontEditorComponentHostComponent {
   readonly disableImageCrop = input(false);
   readonly renderWidth = input<number | null>(null);
   readonly renderHeight = input<number | null>(null);
+  readonly cartCount = input<number | null>(null);
+  readonly interactiveLinks = input(false);
+  readonly linkHrefResolver = input<((value: string) => string) | null>(null);
 }
