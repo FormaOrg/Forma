@@ -132,6 +132,7 @@ type ButtonToolbarMenu =
   | 'shadow'
   | 'spacing'
   | null;
+type ButtonTextDropdownMenu = 'preset' | 'font-family' | 'font-weight' | 'font-size' | 'line-height' | 'letter-spacing' | null;
 type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
 type ContainerToolbarMenu = 'designs' | 'background' | 'borders' | 'corners' | 'shadow' | 'opacity' | null;
 type SectionToolbarMenu = 'layout' | 'background' | 'borders' | 'corners' | 'opacity' | null;
@@ -784,6 +785,7 @@ readonly activeTextToolbarMenu = signal<
   readonly customPickerSaturation = signal(74);
   readonly customPickerBrightness = signal(22);
   readonly textFontSearch = signal('');
+  readonly buttonTextFontSearch = signal('');
   readonly textLinkPageId = signal<string>('home');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
   readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
@@ -837,6 +839,7 @@ readonly activeTextToolbarMenu = signal<
   readonly activeSectionBorderColorTab = signal<'brand' | 'custom'>('brand');
   readonly isSectionBorderStylePickerOpen = signal(false);
   readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
+  readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
   readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
@@ -1182,9 +1185,22 @@ readonly brandSectionBorderColors = [
       || font.preview.toLowerCase().includes(query)
     );
   });
+  readonly filteredButtonFontOptions = computed(() => {
+    const query = this.buttonTextFontSearch().trim().toLowerCase();
+    if (!query) {
+      return this.paragraphFontOptions;
+    }
+
+    return this.paragraphFontOptions.filter((font) =>
+      font.family.toLowerCase().includes(query)
+      || font.category.toLowerCase().includes(query)
+      || font.description.toLowerCase().includes(query)
+      || font.preview.toLowerCase().includes(query)
+    );
+  });
   readonly buttonTextPresets = ['Paragraph 1', 'Paragraph 2', 'Heading 4'] as const;
-  readonly buttonFontFamilies = ['Fira Mono', 'Fira Sans', 'Poppins', 'Merriweather', 'Playfair Display', 'Space Grotesk'];
-  readonly buttonFontSizes = [12, 13, 14, 15, 16, 18, 20, 24, 28, 32];
+  readonly buttonFontFamilies = this.paragraphFontFamilies;
+  readonly buttonFontSizes = this.paragraphFontSizes;
   readonly buttonFontWeights: ReadonlyArray<StorefrontEditorButtonNode['props']['fontWeight']> = [400, 500, 600, 700];
   readonly buttonIconChoices: ReadonlyArray<StorefrontEditorButtonNode['props']['iconName']> = [
     'external-link',
@@ -1772,6 +1788,7 @@ effect(() => {
 effect(() => {
   if (!this.selectedButtonComponent()) {
     this.activeButtonToolbarMenu.set(null);
+    this.closeButtonTextDropdownMenu();
     return;
   }
 
@@ -2202,6 +2219,7 @@ if (this.activeButtonToolbarMenu()) {
     )
   ) {
     this.activeButtonToolbarMenu.set(null);
+    this.closeButtonTextDropdownMenu();
   }
 }
 
@@ -4474,6 +4492,7 @@ finishEditingComponentText(): void {
   this.isSectionBorderColorPickerOpen.set(false);
   this.isSectionBorderStylePickerOpen.set(false);
   this.activeButtonToolbarMenu.set(null);
+  this.closeButtonTextDropdownMenu();
   this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
     this.closeAddElementsLibraryModal();
@@ -6192,6 +6211,10 @@ private syncImageBorderColorPickerFromHex(color: string): void {
 toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
   const next = this.activeButtonToolbarMenu() === menu ? null : menu;
   this.activeButtonToolbarMenu.set(next);
+  if (next !== 'text') {
+    this.activeButtonTextDropdownMenu.set(null);
+    this.buttonTextFontSearch.set('');
+  }
 
     if (next === 'edit-text') {
       this.buttonEditTextValue.set(this.selectedButtonComponent()?.props.label ?? '');
@@ -6205,6 +6228,31 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
       this.activeButtonColorPickerTab.set('brand');
       this.syncButtonCustomColorPickerFromHex(this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff');
     }
+  }
+
+  toggleButtonTextDropdownMenu(menu: Exclude<ButtonTextDropdownMenu, null>): void {
+    const next = this.activeButtonTextDropdownMenu() === menu ? null : menu;
+    this.activeButtonTextDropdownMenu.set(next);
+    if (next !== 'font-family') {
+      this.buttonTextFontSearch.set('');
+    }
+  }
+
+  closeButtonTextDropdownMenu(): void {
+    this.activeButtonTextDropdownMenu.set(null);
+    this.buttonTextFontSearch.set('');
+  }
+
+  updateButtonTextFontSearch(value: string): void {
+    this.buttonTextFontSearch.set(value);
+  }
+
+  buttonFontWeightLabel(value: StorefrontEditorButtonNode['props']['fontWeight']): string {
+    return value === 400 ? 'Regular' : value === 500 ? 'Medium' : value === 600 ? 'Semibold' : 'Bold';
+  }
+
+  buttonLetterSpacingLabel(value: number): string {
+    return value === 0 ? 'Normal' : `${value}em`;
   }
 
   toggleProductFeedToolbarMenu(menu: Exclude<ProductFeedToolbarMenu, null>): void {
@@ -6341,32 +6389,23 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
   }
 
   updateSelectedButtonTextPreset(value: StorefrontEditorButtonNode['props']['textPreset']): void {
-    const nextPatch: Partial<StorefrontEditorButtonNode['props']> = { textPreset: value };
-
-    switch (value) {
-      case 'Paragraph 1':
-        nextPatch.fontFamily = 'Fira Sans';
-        nextPatch.fontSize = 16;
-        nextPatch.fontWeight = 500;
-        break;
-      case 'Heading 4':
-        nextPatch.fontFamily = 'Poppins';
-        nextPatch.fontSize = 18;
-        nextPatch.fontWeight = 600;
-        break;
-      case 'Paragraph 2':
-      default:
-        nextPatch.fontFamily = 'Fira Mono';
-        nextPatch.fontSize = 15;
-        nextPatch.fontWeight = 500;
-        break;
-    }
-
-    this.updateSelectedButtonProps(nextPatch);
+    const textDefaults = buildStorefrontEditorTextProps(value);
+    this.updateSelectedButtonProps({
+      textPreset: value,
+      fontFamily: textDefaults.fontFamily,
+      fontSize: textDefaults.fontSize,
+      fontWeight: textDefaults.fontWeight,
+      fontStyle: textDefaults.fontStyle,
+      textDecoration: textDefaults.textDecoration,
+      lineHeight: textDefaults.lineHeight,
+      letterSpacing: textDefaults.letterSpacing,
+    });
+    this.closeButtonTextDropdownMenu();
   }
 
   updateSelectedButtonFontFamily(value: string): void {
     this.updateSelectedButtonProps({ fontFamily: value });
+    this.closeButtonTextDropdownMenu();
   }
 
   updateSelectedButtonFontSize(value: string | number): void {
@@ -6375,7 +6414,8 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
       return;
     }
 
-    this.updateSelectedButtonProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+    this.updateSelectedButtonProps({ fontSize: Math.max(10, Math.min(288, Math.round(parsed))) });
+    this.closeButtonTextDropdownMenu();
   }
 
   updateSelectedButtonFontWeight(value: string | number): void {
@@ -6386,6 +6426,56 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
 
     const nextWeight = [400, 500, 600, 700].includes(parsed) ? (parsed as 400 | 500 | 600 | 700) : 500;
     this.updateSelectedButtonProps({ fontWeight: nextWeight });
+    this.closeButtonTextDropdownMenu();
+  }
+
+  toggleSelectedButtonBold(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ fontWeight: component.props.fontWeight >= 600 ? 400 : 700 });
+  }
+
+  toggleSelectedButtonItalic(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ fontStyle: component.props.fontStyle === 'italic' ? 'normal' : 'italic' });
+  }
+
+  toggleSelectedButtonUnderline(): void {
+    const component = this.selectedButtonComponent();
+    if (!component) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({
+      textDecoration: component.props.textDecoration === 'underline' ? 'none' : 'underline',
+    });
+  }
+
+  updateSelectedButtonLineHeight(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ lineHeight: this.clamp(parsed, 0.8, 3) });
+    this.closeButtonTextDropdownMenu();
+  }
+
+  updateSelectedButtonLetterSpacing(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedButtonProps({ letterSpacing: this.clamp(parsed, -0.12, 0.24) });
+    this.closeButtonTextDropdownMenu();
   }
 
   updateSelectedButtonTextColor(value: string): void {
@@ -9292,6 +9382,20 @@ private expandPositionUpdatesForAttachedDescendants(
           ...defaults,
           ...component.props,
           richTextHtml: component.props.richTextHtml ?? '',
+          lineHeight: component.props.lineHeight ?? defaults.lineHeight,
+          letterSpacing: component.props.letterSpacing ?? defaults.letterSpacing,
+        },
+      };
+    }
+
+    if (component.type === 'button') {
+      const defaults = buildStorefrontEditorTextProps(component.props.textPreset ?? 'Paragraph 2');
+      return {
+        ...component,
+        props: {
+          ...component.props,
+          fontStyle: component.props.fontStyle ?? defaults.fontStyle,
+          textDecoration: component.props.textDecoration ?? defaults.textDecoration,
           lineHeight: component.props.lineHeight ?? defaults.lineHeight,
           letterSpacing: component.props.letterSpacing ?? defaults.letterSpacing,
         },
