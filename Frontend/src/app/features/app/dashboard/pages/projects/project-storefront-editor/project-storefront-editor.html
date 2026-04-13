@@ -5325,32 +5325,36 @@
       </section>
 
       @if (isLayersPopupOpen()) {
-        <section class="storefront-editor__layers-popup" (click)="$event.stopPropagation()">
-          <div class="storefront-editor__layers-popup-head">
-            <div class="storefront-editor__layers-popup-title">
-              <span class="storefront-editor__layers-popup-eyebrow">Layers</span>
-              <strong>{{ selectedSection() ? sectionLabel(selectedSection()!) : 'Select a section' }}</strong>
-              <small>
-                @if (selectedSection()) {
-                  Drag to reorder the stack
-                } @else {
-                  Choose a section to inspect its component stack.
-                }
-              </small>
+        <section
+          class="storefront-editor__layers-popup"
+          animate.enter="storefront-editor__layers-popup-enter"
+          animate.leave="storefront-editor__layers-popup-leave"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="storefront-editor__components-structure storefront-editor__layers-popup-body">
+            <div class="storefront-editor__layers-popup-title-row">
+              <div class="storefront-editor__layers-popup-title">
+                <strong>Manage Layers</strong>
+                <small>
+                  @if (selectedSection()) {
+                    {{ sectionLabel(selectedSection()!) }}
+                  } @else {
+                    Choose a section to inspect its component stack.
+                  }
+                </small>
+              </div>
+
+              <button
+                type="button"
+                class="storefront-editor__layers-popup-close"
+                aria-label="Close layers"
+                (click)="closeLayersPopup()"
+              >
+                <app-icon name="x" [size]="16"></app-icon>
+              </button>
             </div>
 
-            <button
-              type="button"
-              class="storefront-editor__layers-popup-close"
-              aria-label="Close layers"
-              (click)="closeLayersPopup()"
-            >
-              <app-icon name="x" [size]="16"></app-icon>
-            </button>
-          </div>
-
-          @if (selectedSection()) {
-            <div class="storefront-editor__components-structure storefront-editor__layers-popup-body">
+            @if (selectedSection()) {
               <div class="storefront-editor__layers-popup-summary">
                 <div class="storefront-editor__layers-popup-stats">
                   <article>
@@ -5432,7 +5436,7 @@
                           [attr.aria-label]="item.isVisible ? 'Hide layer' : 'Show layer'"
                           (click)="toggleLayerVisibility(item.componentId, $event)"
                         >
-                          <app-icon name="eye" [size]="14"></app-icon>
+                          <app-icon name="eye" [size]="17"></app-icon>
                         </button>
                         <button
                           type="button"
@@ -5442,7 +5446,15 @@
                           [attr.aria-label]="item.isLocked ? 'Unlock layer' : 'Lock layer'"
                           (click)="toggleLayerLock(item.componentId, $event)"
                         >
-                          <span aria-hidden="true">{{ item.isLocked ? 'L' : 'U' }}</span>
+                          @if (item.isLocked) {
+                            <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
+                              <path d="M6.75 8V6.5a3.25 3.25 0 1 1 6.5 0V8h.25A1.75 1.75 0 0 1 15.25 9.75v5.5A1.75 1.75 0 0 1 13.5 17h-7A1.75 1.75 0 0 1 4.75 15.25v-5.5A1.75 1.75 0 0 1 6.5 8h.25Zm1.5 0h3.5V6.5a1.75 1.75 0 1 0-3.5 0V8Z"></path>
+                            </svg>
+                          } @else {
+                            <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
+                              <path d="M6.75 8V6.5a3.25 3.25 0 1 1 6.5 0 .75.75 0 0 1-1.5 0 1.75 1.75 0 1 0-3.5 0V8h5.25A1.75 1.75 0 0 1 15.25 9.75v5.5A1.75 1.75 0 0 1 13.5 17h-7A1.75 1.75 0 0 1 4.75 15.25v-5.5A1.75 1.75 0 0 1 6.5 8h.25Zm-1 1.75v5.5c0 .138.112.25.25.25h7a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25h-7a.25.25 0 0 0-.25.25Z"></path>
+                            </svg>
+                          }
                         </button>
                       </span>
                     </div>
@@ -5453,12 +5465,12 @@
                   This section does not have any elements yet.
                 </div>
               }
-            </div>
-          } @else {
-            <div class="storefront-editor__layers-empty">
-              Pick a section on the canvas, then open Layers to inspect its elements.
-            </div>
-          }
+            } @else {
+              <div class="storefront-editor__layers-empty">
+                Pick a section on the canvas, then open Layers to inspect its elements.
+              </div>
+            }
+          </div>
         </section>
       }
     </div>
