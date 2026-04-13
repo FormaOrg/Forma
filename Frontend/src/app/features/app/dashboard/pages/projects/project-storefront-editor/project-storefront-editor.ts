@@ -2620,6 +2620,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   }
 
   selectSection(sectionId: string): void {
+    if (this.isEditingComponentText()) {
+      this.finishEditingComponentText();
+    }
     this.sidebarMode.set('structure');
     this.selectedSectionId.set(sectionId);
     this.selectedComponentId.set(null);
@@ -3325,6 +3328,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }
 
     event?.stopPropagation();
+    if (this.isEditingComponentText() && this.editingComponentTextId() !== componentId) {
+      this.finishEditingComponentText();
+    }
     this.selectedSectionId.set(sectionId);
     this.activeSectionToolbarMenu.set(null);
     this.isSectionBorderColorPickerOpen.set(false);
@@ -4139,7 +4145,14 @@ finishEditingComponentText(): void {
     event.stopPropagation();
   }
 
-  onComponentTextEditorBlur(): void {
+  onComponentTextEditorBlur(event: FocusEvent): void {
+    const target = event.target;
+    if (target instanceof HTMLTextAreaElement) {
+      this.editingComponentTextValue.set(target.value);
+    } else if (target instanceof HTMLElement) {
+      this.editingComponentTextValue.set(target.innerHTML);
+    }
+
     setTimeout(() => {
       const activeElement = document.activeElement;
       if (activeElement instanceof HTMLElement && activeElement.closest('.storefront-editor__context-toolbar-shell')) {
@@ -4159,7 +4172,7 @@ finishEditingComponentText(): void {
 
     if (event.key === 'Escape') {
       event.preventDefault();
-      this.cancelComponentTextEditing();
+      this.finishEditingComponentText();
     }
   }
 
@@ -9079,17 +9092,10 @@ private updateImageComponentProps(
   }
 
 private focusActiveTextEditor(): HTMLElement | null {
-  const componentId = this.editingComponentTextId();
-  if (!componentId) {
+  const editor = this.getActiveTextEditorElement();
+  if (!editor) {
     return null;
   }
-
-    const editor = document.querySelector(
-      `.storefront-editor__preview-component-text-editor[data-component-id="${componentId}"]`
-    );
-    if (!(editor instanceof HTMLElement)) {
-      return null;
-    }
 
   const desiredHtml = this.editingComponentTextValue();
   if (editor.innerHTML !== desiredHtml) {
@@ -9099,6 +9105,18 @@ private focusActiveTextEditor(): HTMLElement | null {
 
   editor.focus();
   return editor;
+}
+
+private getActiveTextEditorElement(): HTMLElement | null {
+  const componentId = this.editingComponentTextId();
+  if (!componentId) {
+    return null;
+  }
+
+  const editor = document.querySelector(
+    `.storefront-editor__preview-component-text-editor[data-component-id="${componentId}"]`
+  );
+  return editor instanceof HTMLElement ? editor : null;
 }
 
 private ensureParagraphFontStylesheetLoaded(): void {
@@ -9115,7 +9133,7 @@ private ensureParagraphFontStylesheetLoaded(): void {
 }
 
 private readActiveTextEditorHtml(): string {
-  const editor = this.focusActiveTextEditor();
+  const editor = this.getActiveTextEditorElement();
   return editor?.innerHTML ?? this.editingComponentTextValue();
 }
 
