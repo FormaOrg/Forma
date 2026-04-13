@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { StorefrontEditorImageNode } from '../storefront-editor-component.model';
+import {
+  StorefrontEditorImageNode,
+  normalizeStorefrontEditorImageCropRect,
+  resolveStorefrontEditorImageDisplayMode,
+  resolveStorefrontEditorImageViewportBounds,
+} from '../storefront-editor-component.model';
 
 @Component({
   selector: 'app-storefront-editor-block-image',
@@ -133,8 +138,7 @@ export class StorefrontEditorBlockImageComponent {
   });
 
   private resolveObjectFit(): string {
-    const props = this.node().props;
-    const displayMode = props.displayMode ?? (props.objectFit === 'contain' ? 'fit' : 'fill');
+    const displayMode = resolveStorefrontEditorImageDisplayMode(this.node().props);
     switch (displayMode) {
       case 'fit':
         return 'contain';
@@ -156,78 +160,23 @@ export class StorefrontEditorBlockImageComponent {
       };
     }
 
-    const props = this.node().props;
-    const x = this.clampUnit(props.cropX ?? 0);
-    const y = this.clampUnit(props.cropY ?? 0);
-    const width = this.clampUnit(props.cropWidth ?? 1);
-    const height = this.clampUnit(props.cropHeight ?? 1);
-    return {
-      x: Math.min(x, 1 - width),
-      y: Math.min(y, 1 - height),
-      width: Math.max(width, 0.01),
-      height: Math.max(height, 0.01),
-    };
+    return normalizeStorefrontEditorImageCropRect(this.node().props);
   }
 
   private resolveImageBounds(frameWidth: number, frameHeight: number): { x: number; y: number; width: number; height: number } {
-    const props = this.node().props;
-    if (props.displayMode === 'fill') {
-      return { x: 0, y: 0, width: frameWidth, height: frameHeight };
-    }
-
-    const frameAspectRatio = frameWidth > 0 && frameHeight > 0 ? frameWidth / frameHeight : 1;
-    const imageAspectRatio = this.parseAspectRatio(props.aspectRatio, frameAspectRatio);
-    if (imageAspectRatio >= frameAspectRatio) {
-      const width = frameWidth;
-      const height = width / imageAspectRatio;
-      return {
-        x: 0,
-        y: (frameHeight - height) / 2,
-        width,
-        height,
-      };
-    }
-
-    const height = frameHeight;
-    const width = height * imageAspectRatio;
-    return {
-      x: (frameWidth - width) / 2,
-      y: 0,
-      width,
-      height,
-    };
-  }
-
-  private parseAspectRatio(value: string | null | undefined, fallback: number): number {
-    if (!value) {
-      return fallback;
-    }
-
-    const normalized = value.replace(':', '/');
-    const [widthRaw, heightRaw] = normalized.split('/').map((part) => Number(part.trim()));
-    if (Number.isFinite(widthRaw) && Number.isFinite(heightRaw) && heightRaw > 0) {
-      return widthRaw / heightRaw;
-    }
-
-    const numeric = Number(value);
-    return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
-  }
-
-  private clampUnit(value: number): number {
-    if (!Number.isFinite(value)) {
-      return 0;
-    }
-    return Math.max(0, Math.min(1, value));
+    return resolveStorefrontEditorImageViewportBounds(this.node().props, frameWidth, frameHeight);
   }
 
   private getShadowValue(shadow: StorefrontEditorImageNode['props']['shadow']): string {
     switch (shadow) {
       case 'soft':
-        return '0 10px 24px rgba(15, 23, 42, 0.12)';
+        return '2px -2px 14px rgba(15, 23, 42, 0.16)';
       case 'medium':
-        return '0 14px 30px rgba(15, 23, 42, 0.18)';
+        return '-2px -2px 14px rgba(15, 23, 42, 0.16)';
+      case 'bottom':
+        return '0 10px 18px rgba(15, 23, 42, 0.18)';
       case 'strong':
-        return '0 18px 36px rgba(15, 23, 42, 0.26)';
+        return '0 0 18px rgba(15, 23, 42, 0.28)';
       case 'none':
       default:
         return 'none';

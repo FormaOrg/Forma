@@ -11,12 +11,14 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
     @if (node().props.richTextHtml) {
       <span
         class="storefront-editor-block-text storefront-editor-block-text--rich"
+        dir="ltr"
         [ngStyle]="textStyles()"
         [innerHTML]="node().props.richTextHtml"
       ></span>
     } @else if (node().props.href) {
       <a
         class="storefront-editor-block-text"
+        dir="ltr"
         [attr.href]="node().props.href"
         [attr.target]="node().props.openInNewTab ? '_blank' : null"
         [attr.rel]="node().props.openInNewTab ? 'noreferrer noopener' : null"
@@ -26,7 +28,7 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
         {{ node().props.text }}
       </a>
     } @else {
-      <span class="storefront-editor-block-text" [ngStyle]="textStyles()">
+      <span class="storefront-editor-block-text" dir="ltr" [ngStyle]="textStyles()">
         {{ node().props.text }}
       </span>
     }
@@ -45,6 +47,8 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
       white-space: pre-wrap;
       background: transparent;
       text-decoration-skip-ink: auto;
+      direction: ltr;
+      unicode-bidi: plaintext;
     }
 
     .storefront-editor-block-text--rich {
