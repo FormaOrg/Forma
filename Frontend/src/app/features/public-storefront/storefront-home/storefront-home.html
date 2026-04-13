@@ -9,15 +9,7 @@
   </section>
 } @else if (storefront(); as home) {
   <div class="storefront-home">
-    <header class="storefront-home__header">
-      <a class="storefront-home__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">{{ home.storeName }}</a>
-
-      <nav class="storefront-home__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
-      </nav>
-    </header>
+    <app-storefront-public-header [storefront]="home" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
 
     <main class="storefront-home__content">
       @for (section of sections(); track trackSection($index, section)) {

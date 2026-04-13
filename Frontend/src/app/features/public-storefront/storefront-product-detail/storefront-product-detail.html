@@ -9,17 +9,7 @@
   </section>
 } @else if (product(); as product) {
   <div class="storefront-product">
-    <header class="storefront-product__header">
-      <a class="storefront-product__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">
-        {{ storefront()?.storeName || 'Storefront' }}
-      </a>
-
-      <nav class="storefront-product__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
-      </nav>
-    </header>
+    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
 
     <main class="storefront-product__content">
       <a class="storefront-product__back" [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">

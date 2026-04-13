@@ -9,20 +9,7 @@
   </section>
 } @else {
   <div class="storefront-products">
-    <header class="storefront-products__header">
-      <div>
-        <a class="storefront-products__brand" [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">
-          {{ storefront()?.storeName || 'Storefront' }}
-        </a>
-        <p>{{ isEditorPreview() ? 'Previewing the draft catalog from the editor.' : \"Published products from this store's live catalog.\" }}</p>
-      </div>
-
-      <nav class="storefront-products__nav" aria-label="Store navigation">
-        <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Home</a>
-        <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Products</a>
-        <a [routerLink]="['/store', projectId(), 'cart']" [queryParams]="previewQueryParams()">Cart ({{ cartCount() }})</a>
-      </nav>
-    </header>
+    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
 
     <main class="storefront-products__content">
       <section class="storefront-products__hero">

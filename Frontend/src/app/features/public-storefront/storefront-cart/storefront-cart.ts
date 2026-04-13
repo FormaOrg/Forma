@@ -6,11 +6,12 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
+import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent],
   templateUrl: './storefront-cart.html',
   styleUrl: './storefront-cart.css',
 })

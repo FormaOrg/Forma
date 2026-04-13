@@ -8,11 +8,12 @@ import { PublicStorefrontHome } from '../../../core/models/public-storefront.mod
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-checkout',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, StorefrontPublicHeaderComponent],
   templateUrl: './storefront-checkout.html',
   styleUrl: './storefront-checkout.css',
 })
