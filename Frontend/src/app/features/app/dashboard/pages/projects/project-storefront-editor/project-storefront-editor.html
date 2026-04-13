@@ -5178,7 +5178,7 @@
                                   spellcheck="true"
                                   (input)="onRichTextEditorInput($event)"
                                   (keydown)="onComponentTextInputKeydown($event)"
-                                  (blur)="onComponentTextEditorBlur()"
+                                (blur)="onComponentTextEditorBlur($event)"
                                   (mousedown)="$event.stopPropagation()"
                                   (click)="$event.stopPropagation()"
                                 ></div>
@@ -5189,7 +5189,7 @@
                                   [value]="editingComponentTextValue()"
                                   (input)="editingComponentTextValue.set($any($event.target).value)"
                                   (keydown)="onComponentTextInputKeydown($event)"
-                                  (blur)="onComponentTextEditorBlur()"
+                                (blur)="onComponentTextEditorBlur($event)"
                                   (mousedown)="$event.stopPropagation()"
                                   (click)="$event.stopPropagation()"
                                 ></textarea>
