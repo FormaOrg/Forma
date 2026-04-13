@@ -78,6 +78,8 @@ export interface StorefrontEditorImageProps {
   src: string | null;
   alt: string;
   aspectRatio: string;
+  sourceWidth: number | null;
+  sourceHeight: number | null;
   objectFit: 'cover' | 'contain';
   displayMode: 'fill' | 'fit' | 'aspect';
   cropX: number;
@@ -95,7 +97,7 @@ export interface StorefrontEditorImageProps {
   borderWidth: number;
   borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
   radius: number;
-  shadow: 'none' | 'soft' | 'medium' | 'strong';
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
 }
 
 export interface StorefrontEditorButtonProps {
@@ -112,7 +114,7 @@ export interface StorefrontEditorButtonProps {
   borderWidth: number;
   borderStyle: 'none' | 'solid';
   radius: number;
-  shadow: 'none' | 'soft' | 'medium' | 'strong';
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
   padding: number;
   showText: boolean;
   showIcon: boolean;
@@ -168,6 +170,12 @@ export interface StorefrontEditorContainerProps {
   align: 'start' | 'center' | 'end' | 'stretch';
   wrap: boolean;
   backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
+  radius: number;
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
+  opacity: number;
 }
 
 export interface StorefrontEditorGraphicProps {
@@ -299,6 +307,121 @@ function getDefaultStorefrontEditorComponentFrame(
     case 'blog-feed':
       return { x: 32, y: 32, width: 360, height: 180 };
   }
+}
+
+export function resolveStorefrontEditorImageDisplayMode(
+  props: Pick<StorefrontEditorImageProps, 'displayMode' | 'objectFit'>
+): StorefrontEditorImageProps['displayMode'] {
+  const displayMode = props.displayMode;
+  if (displayMode === 'fit' || displayMode === 'aspect' || displayMode === 'fill') {
+    return displayMode;
+  }
+
+  return props.objectFit === 'contain' ? 'fit' : 'fill';
+}
+
+export function resolveStorefrontEditorImageAspectRatio(
+  props: Pick<StorefrontEditorImageProps, 'sourceWidth' | 'sourceHeight' | 'aspectRatio'>,
+  fallback: number
+): number {
+  const sourceWidth = Number(props.sourceWidth ?? 0);
+  const sourceHeight = Number(props.sourceHeight ?? 0);
+  if (Number.isFinite(sourceWidth) && Number.isFinite(sourceHeight) && sourceWidth > 0 && sourceHeight > 0) {
+    return sourceWidth / sourceHeight;
+  }
+
+  return parseStorefrontEditorAspectRatio(props.aspectRatio, fallback);
+}
+
+export function normalizeStorefrontEditorImageCropRect(
+  props: Pick<StorefrontEditorImageProps, 'cropX' | 'cropY' | 'cropWidth' | 'cropHeight'>
+): { x: number; y: number; width: number; height: number } {
+  const width = Math.max(0.01, clampImageUnit(props.cropWidth ?? 1));
+  const height = Math.max(0.01, clampImageUnit(props.cropHeight ?? 1));
+  const x = Math.min(clampImageUnit(props.cropX ?? 0), 1 - width);
+  const y = Math.min(clampImageUnit(props.cropY ?? 0), 1 - height);
+  return { x, y, width, height };
+}
+
+export function resolveStorefrontEditorImageViewportBounds(
+  props: Pick<StorefrontEditorImageProps, 'displayMode' | 'objectFit' | 'sourceWidth' | 'sourceHeight' | 'aspectRatio'>,
+  frameWidth: number,
+  frameHeight: number
+): { x: number; y: number; width: number; height: number } {
+  if (resolveStorefrontEditorImageDisplayMode(props) === 'fill') {
+    return { x: 0, y: 0, width: frameWidth, height: frameHeight };
+  }
+
+  const frameAspectRatio = frameWidth > 0 && frameHeight > 0 ? frameWidth / frameHeight : 1;
+  const imageAspectRatio = resolveStorefrontEditorImageAspectRatio(props, frameAspectRatio);
+  if (imageAspectRatio >= frameAspectRatio) {
+    const width = frameWidth;
+    const height = width / imageAspectRatio;
+    return {
+      x: 0,
+      y: (frameHeight - height) / 2,
+      width,
+      height,
+    };
+  }
+
+  const height = frameHeight;
+  const width = height * imageAspectRatio;
+  return {
+    x: (frameWidth - width) / 2,
+    y: 0,
+    width,
+    height,
+  };
+}
+
+export function buildStorefrontEditorImageSourceMetadata(
+  width: number,
+  height: number
+): Pick<StorefrontEditorImageProps, 'sourceWidth' | 'sourceHeight' | 'aspectRatio'> {
+  const safeWidth = Math.max(1, Math.round(width));
+  const safeHeight = Math.max(1, Math.round(height));
+  const divisor = greatestCommonDivisor(safeWidth, safeHeight);
+
+  return {
+    sourceWidth: safeWidth,
+    sourceHeight: safeHeight,
+    aspectRatio: `${safeWidth / divisor} / ${safeHeight / divisor}`,
+  };
+}
+
+function parseStorefrontEditorAspectRatio(value: string | null | undefined, fallback: number): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const normalized = value.replace(':', '/');
+  const [widthRaw, heightRaw] = normalized.split('/').map((part) => Number(part.trim()));
+  if (Number.isFinite(widthRaw) && Number.isFinite(heightRaw) && heightRaw > 0) {
+    return widthRaw / heightRaw;
+  }
+
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+}
+
+function clampImageUnit(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(1, value));
+}
+
+function greatestCommonDivisor(left: number, right: number): number {
+  let a = Math.abs(left);
+  let b = Math.abs(right);
+  while (b !== 0) {
+    const remainder = a % b;
+    a = b;
+    b = remainder;
+  }
+  return Math.max(a, 1);
 }
 
 export function buildStorefrontEditorTextProps(
@@ -593,6 +716,8 @@ export function createStorefrontEditorComponentNode(
           src: null,
           alt: '',
           aspectRatio: '4 / 3',
+          sourceWidth: null,
+          sourceHeight: null,
           objectFit: 'cover',
           displayMode: 'fill',
           cropX: 0,
@@ -713,12 +838,18 @@ export function createStorefrontEditorComponentNode(
         name: 'Container',
         props: {
           layout: 'stack',
-          gap: 16,
-          padding: 24,
+          gap: 0,
+          padding: 0,
           justify: 'start',
           align: 'stretch',
           wrap: false,
-          backgroundColor: 'transparent',
+          backgroundColor: '#ffffff',
+          borderColor: '#111827',
+          borderWidth: 0,
+          borderStyle: 'none',
+          radius: 0,
+          shadow: 'none',
+          opacity: 100,
         },
       };
     case 'graphic':

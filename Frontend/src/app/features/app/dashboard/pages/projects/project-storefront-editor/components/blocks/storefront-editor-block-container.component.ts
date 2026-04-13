@@ -13,29 +13,38 @@ import { StorefrontEditorComponentHostComponent } from '../storefront-editor-com
   template: `
     <span
       class="storefront-editor-block-container"
-      [class.storefront-editor-block-container--empty]="!node().children.length"
       [class.storefront-editor-block-container--row]="node().props.layout === 'row'"
       [class.storefront-editor-block-container--grid]="node().props.layout === 'grid'"
-      [style.gap.px]="node().props.gap"
-      [style.padding.px]="node().props.padding"
-      [style.background]="node().props.backgroundColor"
+      [style.border-radius.px]="node().props.radius"
+    >
+      <span
+        class="storefront-editor-block-container__surface"
+        [style.background]="node().props.backgroundColor"
+        [style.opacity]="surfaceOpacity()"
+        [style.border-radius.px]="node().props.radius"
+        [style.border-width.px]="node().props.borderStyle === 'none' ? 0 : node().props.borderWidth"
+        [style.border-style]="node().props.borderWidth === 0 ? 'solid' : node().props.borderStyle"
+        [style.border-color]="node().props.borderWidth === 0 || node().props.borderStyle === 'none' ? 'transparent' : node().props.borderColor"
+        [style.box-shadow]="surfaceShadow()"
+        aria-hidden="true"
+      ></span>
+
+      <span
+        class="storefront-editor-block-container__content"
+        [style.gap.px]="node().props.gap"
+        [style.padding.px]="node().props.padding"
       [style.justify-content]="justifyContent()"
       [style.align-items]="alignItems()"
       [style.flex-wrap]="node().props.wrap ? 'wrap' : 'nowrap'"
-      [attr.data-editor-container-id]="node().id"
-    >
-      @if (node().children.length) {
+        [style.border-radius.px]="node().props.radius"
+        [attr.data-editor-container-id]="node().id"
+      >
         @for (child of node().children; track child.id) {
           <span class="storefront-editor-block-container__item" [ngStyle]="childStyle(child)">
             <app-storefront-editor-component-host [node]="child" [products]="products()" />
           </span>
         }
-      } @else {
-        <span class="storefront-editor-block-container__placeholder">
-          <strong>{{ node().props.layout === 'row' ? 'Row container' : 'Stack container' }}</strong>
-          <small>Drop elements here</small>
-        </span>
-      }
+      </span>
     </span>
   `,
   styles: [`
@@ -46,25 +55,38 @@ import { StorefrontEditorComponentHostComponent } from '../storefront-editor-com
     }
 
     .storefront-editor-block-container {
+      position: relative;
       width: 100%;
       height: 100%;
-      border: 1px dashed rgba(53, 92, 255, 0.3);
-      border-radius: 12px;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
+    .storefront-editor-block-container__surface {
+      position: absolute;
+      inset: 0;
+      border: 0 solid transparent;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+
+    .storefront-editor-block-container__content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       align-items: stretch;
-      padding: 12px;
-      background: transparent;
       box-sizing: border-box;
-      overflow: hidden;
     }
 
-    .storefront-editor-block-container--row {
+    .storefront-editor-block-container--row .storefront-editor-block-container__content {
       flex-direction: row;
     }
 
-    .storefront-editor-block-container--grid {
+    .storefront-editor-block-container--grid .storefront-editor-block-container__content {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
@@ -75,31 +97,6 @@ import { StorefrontEditorComponentHostComponent } from '../storefront-editor-com
       min-width: 0;
       min-height: 48px;
       box-sizing: border-box;
-    }
-
-    .storefront-editor-block-container__placeholder {
-      width: 100%;
-      height: 100%;
-      min-height: 84px;
-      border-radius: 10px;
-      background:
-        linear-gradient(180deg, rgba(53, 92, 255, 0.08), rgba(53, 92, 255, 0.02));
-      color: rgba(17, 24, 39, 0.68);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      gap: 4px;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    .storefront-editor-block-container__placeholder strong {
-      font-size: 0.88rem;
-      font-weight: 600;
-    }
-
-    .storefront-editor-block-container__placeholder small {
-      font-size: 0.74rem;
     }
   `],
 })
@@ -130,6 +127,24 @@ export class StorefrontEditorBlockContainerComponent {
         return 'stretch';
       default:
         return 'flex-start';
+    }
+  });
+
+  readonly surfaceOpacity = computed(() => `${Math.max(0, Math.min(100, Number(this.node().props.opacity ?? 100))) / 100}`);
+
+  readonly surfaceShadow = computed(() => {
+    switch (this.node().props.shadow) {
+      case 'soft':
+        return '2px -2px 14px rgba(15, 23, 42, 0.16)';
+      case 'medium':
+        return '-2px -2px 14px rgba(15, 23, 42, 0.16)';
+      case 'bottom':
+        return '0 10px 18px rgba(15, 23, 42, 0.18)';
+      case 'strong':
+        return '0 0 18px rgba(15, 23, 42, 0.28)';
+      case 'none':
+      default:
+        return 'none';
     }
   });
 
