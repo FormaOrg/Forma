@@ -6,6 +6,8 @@ import {
   StorefrontSectionType,
 } from '../../../../../../../core/models/project-storefront.model';
 
+const STOREFRONT_STABLE_SECTION_TYPES = ['header', 'footer'] as const;
+
 type NormalizeEditorSession = (
   session: StorefrontEditorSession | null | undefined,
   homeDraftDocument?: StorefrontHomepageDocument | null
@@ -22,6 +24,7 @@ export function createStorefrontSectionId(type: StorefrontSectionType): string {
 
 export function normalizeStorefrontSectionType(type: unknown): StorefrontSectionType {
   switch (type) {
+    case 'header':
     case 'announcement-bar':
     case 'hero':
     case 'featured-products':
@@ -39,6 +42,15 @@ export function buildStorefrontSection(
   createSectionId: (sectionType: StorefrontSectionType) => string = createStorefrontSectionId
 ): StorefrontHomepageSection {
   switch (type) {
+    case 'header':
+      return {
+        id: createSectionId(type),
+        type,
+        enabled: true,
+        props: {
+          editorHeight: 96,
+        },
+      };
     case 'announcement-bar':
       return {
         id: createSectionId(type),
@@ -84,6 +96,7 @@ export function buildStorefrontSection(
         type,
         enabled: true,
         props: {
+          editorHeight: 168,
           brandText: storeName,
           contactEmail: 'store@example.com',
           contactPhone: '+216 00 000 000',
@@ -121,6 +134,7 @@ export function buildDefaultStorefrontHomepageDocument(
       description: '',
     },
     sections: [
+      buildSection('header', storeName),
       buildSection('announcement-bar', storeName),
       buildSection('hero', storeName),
       buildSection('featured-products', storeName),
@@ -155,6 +169,45 @@ export function normalizeStorefrontSection(
   };
 }
 
+export function ensureStableStorefrontSections(
+  sections: StorefrontHomepageSection[],
+  storeName: string,
+  buildSection: (type: StorefrontSectionType, name: string) => StorefrontHomepageSection = (type, name) =>
+    buildStorefrontSection(type, name)
+): StorefrontHomepageSection[] {
+  const stableSections = new Map<(typeof STOREFRONT_STABLE_SECTION_TYPES)[number], StorefrontHomepageSection>();
+  const contentSections: StorefrontHomepageSection[] = [];
+
+  for (const section of sections) {
+    if (section.type === 'header' || section.type === 'footer') {
+      if (!stableSections.has(section.type)) {
+        stableSections.set(section.type, {
+          ...section,
+          enabled: true,
+        });
+      }
+      continue;
+    }
+
+    contentSections.push(section);
+  }
+
+  const header = stableSections.get('header') ?? buildSection('header', storeName);
+  const footer = stableSections.get('footer') ?? buildSection('footer', storeName);
+
+  return [
+    {
+      ...header,
+      enabled: true,
+    },
+    ...contentSections,
+    {
+      ...footer,
+      enabled: true,
+    },
+  ];
+}
+
 export function normalizeStorefrontData(
   storefront: ProjectStorefront,
   options: StorefrontNormalizationOptions
@@ -186,8 +239,9 @@ export function normalizeStorefrontData(
             description:
               typeof draftHomepage.seo?.description === 'string' ? draftHomepage.seo.description : '',
           },
-          sections: draftHomepage.sections.map((section) =>
-            normalizeStorefrontSection(section, fallbackStoreName)
+          sections: ensureStableStorefrontSections(
+            draftHomepage.sections.map((section) => normalizeStorefrontSection(section, fallbackStoreName)),
+            fallbackStoreName
           ),
         }
       : buildDefaultStorefrontHomepageDocument(fallbackStoreName);
@@ -210,8 +264,11 @@ export function normalizeStorefrontData(
               : '',
         },
         sections: Array.isArray(snapshot.publishedHomepage.sections)
-          ? snapshot.publishedHomepage.sections.map((section) =>
-              normalizeStorefrontSection(section, fallbackStoreName)
+          ? ensureStableStorefrontSections(
+              snapshot.publishedHomepage.sections.map((section) =>
+                normalizeStorefrontSection(section, fallbackStoreName)
+              ),
+              fallbackStoreName
             )
           : normalizedHomepage.sections,
       }

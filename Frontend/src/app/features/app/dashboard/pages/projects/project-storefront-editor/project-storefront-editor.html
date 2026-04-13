@@ -614,6 +614,12 @@
                     @for (section of sections(); track trackSection($index, section)) {
                       @if (section.enabled) {
                         @switch (section.type) {
+                          @case ('header') {
+                            <span class="storefront-editor__page-card-mini-section">
+                              <strong>Header</strong>
+                              <small>Stable site header</small>
+                            </span>
+                          }
                           @case ('announcement-bar') {
                             <span class="storefront-editor__page-card-mini-announcement">
                               <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
@@ -649,8 +655,9 @@
                             </span>
                           }
                           @case ('footer') {
-                            <span class="storefront-editor__page-card-mini-footer">
-                              <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
+                            <span class="storefront-editor__page-card-mini-section">
+                              <strong>Footer</strong>
+                              <small>Stable site footer</small>
                             </span>
                           }
                         }
@@ -4802,18 +4809,6 @@
               [class.storefront-editor__preview-canvas--mobile]="viewport() === 'mobile'"
               [style.width.px]="previewFrameWidth()"
             >
-                <header class="storefront-editor__preview-header">
-                  <a href="" class="storefront-editor__preview-brand" (click)="$event.preventDefault(); $event.stopPropagation()">
-                    {{ storeName() }}
-                  </a>
-
-                  <nav class="storefront-editor__preview-nav" aria-label="Preview storefront navigation">
-                    <a href="" (click)="$event.preventDefault(); $event.stopPropagation()">Home</a>
-                    <a href="" (click)="$event.preventDefault(); $event.stopPropagation()">Products</a>
-                    <a href="" (click)="$event.preventDefault(); $event.stopPropagation()">Cart</a>
-                  </nav>
-                </header>
-
                 @for (section of sections(); track trackSection($index, section)) {
                     @if (section.enabled) {
                       <div
@@ -4847,6 +4842,9 @@
                           [ngStyle]="sectionSurfaceStyle(section)"
                         >
                           @switch (section.type) {
+                          @case ('header') {
+                            <section class="preview-blank-section"></section>
+                          }
                           @case ('announcement-bar') {
                             <section class="preview-announcement">
                               <div class="preview-announcement__inner">
@@ -4931,13 +4929,7 @@
                             </section>
                           }
                           @case ('footer') {
-                            <footer class="preview-footer">
-                              <strong>{{ readStringProp(section, 'brandText') || storeName() }}</strong>
-                              <div class="preview-footer__meta">
-                                <span>{{ readStringProp(section, 'contactEmail') || 'store@example.com' }}</span>
-                                <span>{{ readStringProp(section, 'contactPhone') || '+216 00 000 000' }}</span>
-                              </div>
-                            </footer>
+                            <section class="preview-blank-section"></section>
                           }
                           }
 
@@ -5228,39 +5220,41 @@
                               aria-label="Resize section height"
                             ></button>
                           }
-                          <div class="storefront-editor__preview-section-add-wrap" [attr.data-section-id]="section.id">
-                            <button
-                              type="button"
-                              class="storefront-editor__preview-section-add"
-                              (click)="toggleSectionAddMenu(section.id, $event)"
-                            >
-                              <app-icon name="invite-plus" [size]="14"></app-icon>
-                              <span>Add Section</span>
-                            </button>
-                            @if (sectionAddMenuSectionId() === section.id) {
-                              <div
-                                class="storefront-editor__add-page-menu storefront-editor__add-page-menu--section"
-                                [class.storefront-editor__add-page-menu--section-above]="sectionAddMenuPlacement() === 'above'"
-                                [class.storefront-editor__add-page-menu--section-below]="sectionAddMenuPlacement() === 'below'"
-                                [attr.data-section-id]="section.id"
-                                (click)="$event.stopPropagation()"
+                          @if (!isFooterSection(section)) {
+                            <div class="storefront-editor__preview-section-add-wrap" [attr.data-section-id]="section.id">
+                              <button
+                                type="button"
+                                class="storefront-editor__preview-section-add"
+                                (click)="toggleSectionAddMenu(section.id, $event)"
                               >
-                                <button type="button" class="storefront-editor__add-page-menu-button" (click)="openSectionLibrary(section.id)">
-                                  <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
-                                    <path d="M7 5.75c.294 0 .562.173.684.44l2.27 5a.75.75 0 0 1-1.366.62l-.425-.934a.753.753 0 0 1-.142.014H5.98a.756.756 0 0 1-.145-.014l-.423.934a.75.75 0 0 1-1.365-.62l2.27-5A.751.751 0 0 1 7 5.75Zm-.488 3.64h.977L7 8.313 6.512 9.39Z"></path>
-                                    <path d="M15 3.5c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1h12ZM3.5 13h7V5h-7v8Zm8.5 0h2.5V9H12v4Zm0-5.5h2.5V5H12v2.5Z"></path>
-                                  </svg>
-                                  <span>Choose a design</span>
-                                </button>
-                                <button type="button" class="storefront-editor__add-page-menu-button" (click)="createBlankSection(section.id)">
-                                  <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
-                                    <path d="M13.5 3c.83 0 1.5.68 1.5 1.5v9c0 .82-.67 1.5-1.5 1.5h-9c-.83 0-1.5-.68-1.5-1.5v-9C3 3.68 3.67 3 4.5 3h9Zm-9 1.5v9h9v-9h-9Z"></path>
-                                  </svg>
-                                  <span>Blank section</span>
-                                </button>
-                              </div>
-                            }
-                          </div>
+                                <app-icon name="invite-plus" [size]="14"></app-icon>
+                                <span>Add Section</span>
+                              </button>
+                              @if (sectionAddMenuSectionId() === section.id) {
+                                <div
+                                  class="storefront-editor__add-page-menu storefront-editor__add-page-menu--section"
+                                  [class.storefront-editor__add-page-menu--section-above]="sectionAddMenuPlacement() === 'above'"
+                                  [class.storefront-editor__add-page-menu--section-below]="sectionAddMenuPlacement() === 'below'"
+                                  [attr.data-section-id]="section.id"
+                                  (click)="$event.stopPropagation()"
+                                >
+                                  <button type="button" class="storefront-editor__add-page-menu-button" (click)="openSectionLibrary(section.id)">
+                                    <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
+                                      <path d="M7 5.75c.294 0 .562.173.684.44l2.27 5a.75.75 0 0 1-1.366.62l-.425-.934a.753.753 0 0 1-.142.014H5.98a.756.756 0 0 1-.145-.014l-.423.934a.75.75 0 0 1-1.365-.62l2.27-5A.751.751 0 0 1 7 5.75Zm-.488 3.64h.977L7 8.313 6.512 9.39Z"></path>
+                                      <path d="M15 3.5c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1h12ZM3.5 13h7V5h-7v8Zm8.5 0h2.5V9H12v4Zm0-5.5h2.5V5H12v2.5Z"></path>
+                                    </svg>
+                                    <span>Choose a design</span>
+                                  </button>
+                                  <button type="button" class="storefront-editor__add-page-menu-button" (click)="createBlankSection(section.id)">
+                                    <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
+                                      <path d="M13.5 3c.83 0 1.5.68 1.5 1.5v9c0 .82-.67 1.5-1.5 1.5h-9c-.83 0-1.5-.68-1.5-1.5v-9C3 3.68 3.67 3 4.5 3h9Zm-9 1.5v9h9v-9h-9Z"></path>
+                                    </svg>
+                                    <span>Blank section</span>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
                         </div>
                     </div>
                   }
@@ -5689,141 +5683,213 @@
     }
 
     @if (isComponentContextMenuOpen()) {
+    <div
+      class="storefront-editor__component-context-menu"
+      [class.storefront-editor__component-context-menu--submenu-left]="componentContextMenuSubmenuDirection() === 'left'"
+      [style.left.px]="componentContextMenuPosition().x"
+      [style.top.px]="componentContextMenuPosition().y"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="storefront-editor__component-context-item"
+        [disabled]="!selectedComponentIds().length"
+        (click)="copySelectedComponents()"
+      >
+        <span>Copy</span>
+        <small>Ctrl + C</small>
+      </button>
+      <button
+        type="button"
+        class="storefront-editor__component-context-item"
+        [disabled]="!componentClipboard()"
+        (click)="pasteComponentFromClipboard()"
+      >
+        <span>Paste</span>
+        <small>Ctrl + V</small>
+      </button>
+      <div class="storefront-editor__component-context-divider"></div>
+      <button type="button" class="storefront-editor__component-context-item" (click)="toggleSnapToGrid()">
+        <span>Snap to grid</span>
+        <small>{{ snapToGridEnabled() ? 'On' : 'Off' }}</small>
+      </button>
+      <button type="button" class="storefront-editor__component-context-item" (click)="cycleSnapSpacingToken()">
+        <span>Spacing step</span>
+        <small>{{ snapSpacingToken() }}px</small>
+      </button>
+      <button type="button" class="storefront-editor__component-context-item" (click)="toggleAspectRatioLock()">
+        <span>Lock aspect ratio</span>
+        <small>{{ lockAspectRatioEnabled() ? 'On' : 'Off' }}</small>
+      </button>
+      <div class="storefront-editor__component-context-divider"></div>
+      <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
+        <span>Duplicate</span>
+        <small>Ctrl + D</small>
+      </button>
       <div
-        class="storefront-editor__component-context-menu"
-        [style.left.px]="componentContextMenuPosition().x"
-        [style.top.px]="componentContextMenuPosition().y"
-        (click)="$event.stopPropagation()"
+        class="storefront-editor__component-context-submenu-group"
+        #arrangeSubmenuGroup
+        (mouseenter)="updateComponentContextSubmenuPosition(arrangeSubmenuGroup, arrangeSubmenuPanel, 'arrange')"
+        (focusin)="updateComponentContextSubmenuPosition(arrangeSubmenuGroup, arrangeSubmenuPanel, 'arrange')"
+      >
+        <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu">
+          <span>Arrange</span>
+          <span class="storefront-editor__component-context-suffix-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M9.205 7.236a.75.75 0 0 1 1.06-.03l4.5 4.25a.75.75 0 0 1 0 1.09l-4.5 4.25a.75.75 0 0 1-1.03-1.09L13.159 12 9.235 8.295a.75.75 0 0 1-.03-1.06Z"></path>
+            </svg>
+          </span>
+        </button>
+        <div
+          class="storefront-editor__component-context-submenu"
+          #arrangeSubmenuPanel
+          [style.left.px]="componentContextArrangeSubmenuPosition().x"
+          [style.top.px]="componentContextArrangeSubmenuPosition().y"
         >
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="!selectedComponentIds().length" (click)="copySelectedComponents()">
-            <span>Copy</span>
-            <small>Ctrl + C</small>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="!componentClipboard()" (click)="pasteComponentFromClipboard()">
-            <span>Paste</span>
-            <small>Ctrl + V</small>
-          </button>
-          <div class="storefront-editor__component-context-divider"></div>
-          <button type="button" class="storefront-editor__component-context-item" (click)="toggleSnapToGrid()">
-            <span>Snap to grid</span>
-            <small>{{ snapToGridEnabled() ? 'On' : 'Off' }}</small>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="cycleSnapSpacingToken()">
-            <span>Spacing step</span>
-            <small>{{ snapSpacingToken() }}px</small>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="toggleAspectRatioLock()">
-            <span>Lock aspect ratio</span>
-            <small>{{ lockAspectRatioEnabled() ? 'On' : 'Off' }}</small>
-          </button>
-          @if (selectedContainerComponent(); as selectedContainer) {
-            <div class="storefront-editor__component-context-divider"></div>
-            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerLayout()">
-              <span>Container layout</span>
-              <small>{{ selectedContainer.props.layout }}</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerJustify()">
-              <span>Justify</span>
-              <small>{{ selectedContainer.props.justify }}</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerAlign()">
-              <span>Align</span>
-              <small>{{ selectedContainer.props.align }}</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="toggleSelectedContainerWrap()">
-              <span>Wrap</span>
-              <small>{{ selectedContainer.props.wrap ? 'On' : 'Off' }}</small>
-            </button>
-          }
-          <div class="storefront-editor__component-context-divider"></div>
-          <button type="button" class="storefront-editor__component-context-item" (click)="duplicateSelectedComponents()">
-            <span>Duplicate</span>
-            <small>Ctrl + D</small>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsToFront()">
+          <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="bringSelectedComponentsToFront()">
+            <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18">
+                <path d="M13 14h-1v-1h1v1Zm1-1h-1v-1h1v1Zm-4-2H9v-1h1v1Zm1-1h-1V9h1v1Z"></path>
+                <path d="M8.5 2c.83 0 1.5.67 1.5 1.5V5h1.5c.83 0 1.5.67 1.5 1.5V8h1.5c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5V13H6.5c-.83 0-1.5-.67-1.5-1.5V10H3.5C2.67 10 2 9.33 2 8.5v-5C2 2.67 2.67 2 3.5 2h5Zm4.5 8h1v1h-1v1h-.087c-.15.427-.486.763-.913.913V13h-1v1h-1v-1h-.5v1.5h5v-5H13v.5Zm-5 1H7v-1h-.5v1.5h5v-5H10V7h1v1h-1v1h-.087c-.15.426-.487.763-.913.913V10H8v1ZM3.5 3.5v5h5v-5h-5Z"></path>
+              </svg>
+            </span>
             <span>Bring to front</span>
-            <small>Shift + ]</small>
           </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="bringSelectedComponentsForward()">
+          <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="bringSelectedComponentsForward()">
+            <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18">
+                <path d="M9 14H8v-1h1v1Zm2 0h-1v-1h1v1Zm2 0h-1v-1h1v1Zm-1-1h-1v-1h1v1Zm2 0h-1v-1h1v1Zm-1-1h-1v-1h1v1Zm1-1h-1v-1h1v1Zm0-3v1h-1V8h1Z"></path>
+                <path d="M10.5 2c.83 0 1.5.67 1.5 1.5V6h2.5c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-7c-.83 0-1.5-.67-1.5-1.5V12H3.5c-.83 0-1.5-.67-1.5-1.5v-7C2 2.67 2.67 2 3.5 2h7ZM12 9h1v1h-1v1h-.087c-.15.427-.486.763-.913.913V12h-1v1H9v-1H7.5v2.5h7v-7H12V9Zm-8.5 1.5h7v-7h-7v7Z"></path>
+              </svg>
+            </span>
             <span>Bring forward</span>
-            <small>]</small>
           </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsBackward()">
+          <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="sendSelectedComponentsBackward()">
+            <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18">
+                <path d="M5 9v1H4V9h1Zm2 1H6V9h1v1Zm2 0H8V9h1v1ZM6 9H5V8h1v1Zm2 0H7V8h1v1Zm2 0H9V8h1v1ZM5 8H4V7h1v1Zm2 0H6V7h1v1Zm2 0H8V7h1v1ZM6 7H5V6h1v1Zm2 0H7V6h1v1Zm2 0H9V6h1v1ZM5 6H4V5h1v1Zm2 0H6V5h1v1Zm2 0H8V5h1v1ZM6 5H5V4h1v1Zm2 0H7V4h1v1Zm2 0H9V4h1v1Z"></path>
+                <path d="M10.5 2c.83 0 1.5.67 1.5 1.5V6h2.5c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-7c-.83 0-1.5-.67-1.5-1.5V12H3.5c-.83 0-1.5-.67-1.5-1.5v-7C2 2.67 2.67 2 3.5 2h7Zm1.5 8.5c0 .83-.67 1.5-1.5 1.5h-3v2.5h7v-7H12v3Zm-8.5 0h7v-7h-7v7Z"></path>
+              </svg>
+            </span>
             <span>Send backward</span>
-            <small>[</small>
           </button>
-          <button type="button" class="storefront-editor__component-context-item" (click)="sendSelectedComponentsToBack()">
+          <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="sendSelectedComponentsToBack()">
+            <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18">
+                <path d="M10 11H9v-1h1v1Zm1-1h-1V9h1v1ZM5 8H4V7h1v1Zm2 0H6V7h1v1ZM6 7H5V6h1v1Zm2 0H7V6h1v1ZM5 5v1H4V5h1Zm2 1H6V5h1v1ZM6 5H5V4h1v1Zm2 0H7V4h1v1Z"></path>
+                <path d="M8.5 2c.83 0 1.5.67 1.5 1.5V5h1.5c.83 0 1.5.67 1.5 1.5V8h1.5c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5V13H6.5c-.83 0-1.5-.67-1.5-1.5V10H3.5C2.67 10 2 9.33 2 8.5v-5C2 2.67 2.67 2 3.5 2h5Zm4.5 9.5c0 .83-.67 1.5-1.5 1.5h-2v1.5h5v-5H13v2ZM10 7h1v1h-1v1h-.087c-.15.426-.487.763-.913.913V10H8v1H7v-1h-.5v1.5h5v-5H10V7ZM3.5 8.5h5v-5h-5v5Z"></path>
+              </svg>
+            </span>
             <span>Send to back</span>
-            <small>Shift + [</small>
-          </button>
-          <div class="storefront-editor__component-context-divider"></div>
-          <button
-            type="button"
-            class="storefront-editor__component-context-item"
-            [disabled]="selectedComponentIds().length < 2"
-            (click)="groupSelectedComponents()"
-          >
-            <span>Group</span>
-            <small>Ctrl + G</small>
-          </button>
-          <button
-            type="button"
-            class="storefront-editor__component-context-item"
-            [disabled]="!selectedComponentGroupId()"
-            (click)="ungroupSelectedComponents()"
-          >
-            <span>Ungroup</span>
-            <small>Ctrl + Shift + G</small>
-          </button>
-          <div class="storefront-editor__component-context-divider"></div>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('left')">
-            <span>Align left</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('center')">
-            <span>Align center</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('right')">
-            <span>Align right</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('top')">
-            <span>Align top</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('middle')">
-            <span>Align middle</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 2" (click)="alignSelectedComponents('bottom')">
-            <span>Align bottom</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 3" (click)="distributeSelectedComponents('horizontal')">
-            <span>Distribute horizontal</span>
-          </button>
-          <button type="button" class="storefront-editor__component-context-item" [disabled]="selectedComponentIds().length < 3" (click)="distributeSelectedComponents('vertical')">
-            <span>Distribute vertical</span>
-          </button>
-          <div class="storefront-editor__component-context-divider"></div>
-          <button
-            type="button"
-            class="storefront-editor__component-context-item storefront-editor__component-context-item--danger"
-            [disabled]="!selectedComponentIds().length"
-            (click)="deleteSelectedComponents()"
-          >
-            <span>Delete</span>
-            <small>Del</small>
           </button>
         </div>
+      </div>
+      @if (canShowGroupAction()) {
+        <button type="button" class="storefront-editor__component-context-item" (click)="groupSelectedComponents()">
+          <span>Group</span>
+          <small>Ctrl + G</small>
+        </button>
+      } @else if (canShowUngroupAction()) {
+        <button type="button" class="storefront-editor__component-context-item" (click)="ungroupSelectedComponents()">
+          <span>Ungroup</span>
+          <small>Ctrl + Shift + G</small>
+        </button>
       }
+      @if (canShowAlignAction()) {
+        <div
+          class="storefront-editor__component-context-submenu-group"
+          #alignSubmenuGroup
+          (mouseenter)="updateComponentContextSubmenuPosition(alignSubmenuGroup, alignSubmenuPanel, 'align')"
+          (focusin)="updateComponentContextSubmenuPosition(alignSubmenuGroup, alignSubmenuPanel, 'align')"
+        >
+          <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu">
+            <span>Align to</span>
+            <span class="storefront-editor__component-context-suffix-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M9.205 7.236a.75.75 0 0 1 1.06-.03l4.5 4.25a.75.75 0 0 1 0 1.09l-4.5 4.25a.75.75 0 0 1-1.03-1.09L13.159 12 9.235 8.295a.75.75 0 0 1-.03-1.06Z"></path>
+              </svg>
+            </span>
+          </button>
+          <div
+            class="storefront-editor__component-context-submenu"
+            #alignSubmenuPanel
+            [style.left.px]="componentContextAlignSubmenuPosition().x"
+            [style.top.px]="componentContextAlignSubmenuPosition().y"
+          >
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('left')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M4.25 3a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-1.5 0V3.75A.75.75 0 0 1 4.25 3Zm7.25 7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1h4Zm2-5c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h6Z"></path></svg>
+              </span>
+              <span>Left</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('right')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M13.75 3a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-1.5 0V3.75a.75.75 0 0 1 .75-.75Zm-3.25 7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1h4Zm0-5c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h6Z"></path></svg>
+              </span>
+              <span>Right</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('center')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M9 3a.75.75 0 0 1 .75.75V5H12c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1H9.75v2H11c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1H9.75v1.25a.75.75 0 0 1-1.5 0V13H7c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1h1.25V8H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h2.25V3.75A.75.75 0 0 1 9 3Z"></path></svg>
+              </span>
+              <span>Center</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('top')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M12 6.5c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1v-6c0-.55.45-1 1-1h1Zm-5 0c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h1Zm7.25-3a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1 0-1.5h10.5Z"></path></svg>
+              </span>
+              <span>Top</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('bottom')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M14.25 13a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1 0-1.5h10.5ZM7 5.5c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h1Zm5-2c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1v-6c0-.55.45-1 1-1h1Z"></path></svg>
+              </span>
+              <span>Bottom</span>
+            </button>
+            <button type="button" class="storefront-editor__component-context-item storefront-editor__component-context-item--submenu-option" (click)="alignSelectedComponents('middle')">
+              <span class="storefront-editor__component-context-prefix-icon" aria-hidden="true">
+                <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18"><path d="M12 5c.55 0 1 .45 1 1v2.25h1.25a.75.75 0 0 1 0 1.5H13V12c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1V9.75H8V11c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1V9.75H3.75a.75.75 0 0 1 0-1.5H5V7c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1.25h2V6c0-.55.45-1 1-1h1Z"></path></svg>
+              </span>
+              <span>Middle</span>
+            </button>
+          </div>
+        </div>
+      }
+      <div class="storefront-editor__component-context-divider"></div>
+      <button
+        type="button"
+        class="storefront-editor__component-context-item storefront-editor__component-context-item--danger"
+        [disabled]="!selectedComponentIds().length"
+        (click)="deleteSelectedComponents()"
+      >
+        <span>Delete</span>
+        <small>⌫</small>
+      </button>
+    </div>
+  }
 
     @if (sectionOptionsMenuId(); as sectionMenuId) {
-      <div
-        class="storefront-editor__preview-section-menu storefront-editor__preview-section-menu--floating"
-        [style.left.px]="sectionContextMenuPosition().x"
-        [style.top.px]="sectionContextMenuPosition().y"
-        (click)="$event.stopPropagation()"
-      >
+    <div
+      class="storefront-editor__preview-section-menu storefront-editor__preview-section-menu--floating"
+      [style.left.px]="sectionContextMenuPosition().x"
+      [style.top.px]="sectionContextMenuPosition().y"
+      (click)="$event.stopPropagation()"
+    >
+      @if (isStableSectionId(sectionMenuId)) {
         <button
           type="button"
           class="storefront-editor__preview-section-menu-item"
-          [disabled]="!canRemoveSection()"
+          [disabled]="!canPasteSection(sectionMenuId)"
+          (click)="pasteSection(sectionMenuId); closeSectionOptionsMenu()"
+        >
+          <span>Paste</span>
+          <small>Ctrl + V</small>
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="storefront-editor__preview-section-menu-item"
+          [disabled]="!canRemoveSection(sectionMenuId)"
           (click)="cutSection(sectionMenuId); closeSectionOptionsMenu()"
         >
           <span>Cut</span>
@@ -5840,7 +5906,7 @@
         <button
           type="button"
           class="storefront-editor__preview-section-menu-item"
-          [disabled]="!canPasteSection()"
+          [disabled]="!canPasteSection(sectionMenuId)"
           (click)="pasteSection(sectionMenuId); closeSectionOptionsMenu()"
         >
           <span>Paste</span>
@@ -5857,7 +5923,7 @@
         <button
           type="button"
           class="storefront-editor__preview-section-menu-item"
-          [disabled]="!canRemoveSection()"
+          [disabled]="!canRemoveSection(sectionMenuId)"
           (click)="removeSection(sectionMenuId); closeSectionOptionsMenu()"
         >
           <span>Delete</span>
@@ -5879,8 +5945,9 @@
         >
           <span>Move section down</span>
         </button>
-      </div>
-    }
+      }
+    </div>
+  }
   </section>
 
   @if (isMediaManagerOpen()) {
