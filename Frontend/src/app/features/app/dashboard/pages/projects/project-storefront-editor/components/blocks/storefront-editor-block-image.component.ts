@@ -170,11 +170,13 @@ export class StorefrontEditorBlockImageComponent {
   private getShadowValue(shadow: StorefrontEditorImageNode['props']['shadow']): string {
     switch (shadow) {
       case 'soft':
-        return '0 10px 24px rgba(15, 23, 42, 0.12)';
+        return '2px -2px 14px rgba(15, 23, 42, 0.16)';
       case 'medium':
-        return '0 14px 30px rgba(15, 23, 42, 0.18)';
+        return '-2px -2px 14px rgba(15, 23, 42, 0.16)';
+      case 'bottom':
+        return '0 10px 18px rgba(15, 23, 42, 0.18)';
       case 'strong':
-        return '0 18px 36px rgba(15, 23, 42, 0.26)';
+        return '0 0 18px rgba(15, 23, 42, 0.28)';
       case 'none':
       default:
         return 'none';

@@ -97,7 +97,7 @@ export interface StorefrontEditorImageProps {
   borderWidth: number;
   borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
   radius: number;
-  shadow: 'none' | 'soft' | 'medium' | 'strong';
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
 }
 
 export interface StorefrontEditorButtonProps {
@@ -114,7 +114,7 @@ export interface StorefrontEditorButtonProps {
   borderWidth: number;
   borderStyle: 'none' | 'solid';
   radius: number;
-  shadow: 'none' | 'soft' | 'medium' | 'strong';
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
   padding: number;
   showText: boolean;
   showIcon: boolean;
@@ -170,6 +170,12 @@ export interface StorefrontEditorContainerProps {
   align: 'start' | 'center' | 'end' | 'stretch';
   wrap: boolean;
   backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
+  radius: number;
+  shadow: 'none' | 'soft' | 'medium' | 'bottom' | 'strong';
+  opacity: number;
 }
 
 export interface StorefrontEditorGraphicProps {
@@ -832,12 +838,18 @@ export function createStorefrontEditorComponentNode(
         name: 'Container',
         props: {
           layout: 'stack',
-          gap: 16,
-          padding: 24,
+          gap: 0,
+          padding: 0,
           justify: 'start',
           align: 'stretch',
           wrap: false,
-          backgroundColor: 'transparent',
+          backgroundColor: '#ffffff',
+          borderColor: '#111827',
+          borderWidth: 0,
+          borderStyle: 'none',
+          radius: 0,
+          shadow: 'none',
+          opacity: 100,
         },
       };
     case 'graphic':

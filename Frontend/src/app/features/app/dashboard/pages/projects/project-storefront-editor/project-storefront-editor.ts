@@ -118,6 +118,7 @@ type ButtonToolbarMenu =
   | 'spacing'
   | null;
 type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
+type ContainerToolbarMenu = 'designs' | 'background' | 'borders' | 'corners' | 'shadow' | 'opacity' | null;
 type SectionToolbarMenu = 'layout' | 'background' | 'borders' | 'corners' | 'opacity' | null;
 type ProductFeedToolbarMenu = 'designs' | 'settings' | 'color' | null;
 type ProductFeedSettingsSection =
@@ -169,6 +170,13 @@ type StorefrontEditorButtonDesignPreset = {
   text: string;
   iconName?: StorefrontEditorButtonNode['props']['iconName'];
   patch: Partial<StorefrontEditorButtonNode['props']>;
+};
+type StorefrontEditorContainerDesignPreset = {
+  id: string;
+  label: string;
+  previewLayout: StorefrontEditorContainerNode['props']['layout'];
+  previewTone: 'airy' | 'outlined' | 'dark' | 'soft';
+  patch: Partial<StorefrontEditorContainerNode['props']>;
 };
 type StorefrontEditorProductFeedDesignPreset = {
   id: StorefrontEditorProductFeedNode['props']['designPreset'];
@@ -293,6 +301,8 @@ export class ProjectStorefrontEditor {
   private static readonly SECTION_OPACITY_PROP_KEY = 'editorOpacity';
   private static readonly SECTION_LAYOUT_PADDING_PX = 10;
   private static readonly SECTION_LAYOUT_GAP_PX = 10;
+  private static readonly ROTATION_SNAP_ANGLES = [0, 90, 180, 270, 360] as const;
+  private static readonly ROTATION_SNAP_THRESHOLD_DEGREES = 5;
   private static readonly SAVED_PARAGRAPH_COLORS_STORAGE_KEY = 'forma_saved_paragraph_colors';
   private static readonly SAVED_BUTTON_COLORS_STORAGE_KEY = 'forma_saved_button_colors';
   private static readonly SAVED_SECTION_BORDER_COLORS_STORAGE_KEY = 'forma_saved_section_border_colors';
@@ -305,10 +315,10 @@ export class ProjectStorefrontEditor {
     sw: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKoSURBVFhH7ZYxaFRBFEXf3Lnz/uyyCYLoqigKmsJCRAioaCMIFqJBsBYVKxFLQRGEGEFBBRWFYCcBrezsgpDOSgQLbTQYQSVYGxRk5X3zw2SiYbPZTZUDy+7/7859d2f+zqzIKovQ+ge5pmfkjVNybddJmxWql6MW7yLjYHo/H9M10iY16jkPtMS5Fsmv/arb03o+dtmk5gHheNXczb5Ivm/WautSXe7RMalpoyj2EfwBj5aHnwLQIvDRe2/vr5rNZj3V514dUZnVQ9hJctqTrUg9T8GIBWjUakcJPLHPSr7YJBJ7EoDkB+9pTR7bNYB71tQ5d0RECOC1RzkTIz0JEKm3FTpaXQO4US6Bc2fKeowbleFZAIZ6EiCH5Fl7FiAYzmsVuVfH5MZGQe4tZ0AwnteM3KNrVA3sYQMwDZGZmsj6njeumPuK5Z6A+7YMwftL6f18TNeZCyAyAMhvm4lGo7FmsQBz6RbRtE1qFMCH9L6lDGPp/f/pc1LdkqgMtvX19RP4ZLthDGHeUhipNoQwVHh/Zb6iwxCpQeH9fgC/bCMqVBc0qFDohGkC+HSPCNNa7t8WqUEAjpUhypnQsRjjhrReakIYAPDWoTzAXqbPjZH7t0VqoOIPVocTgO+F16sN1a2p5oQIvMhzuPLseLOmKLak9dy/LVKDutTXEhi1I9umuzwpyXGC1+ncKXXuUF31MIFJO8qVnKyRu5YVwEhDGJHcHcAHAD5XYWznhHPlq/ovYcuh5FQ1LvddEvMj/GWzSEFykORpiFwTkTsicguCLxbAZkjJm5U+9+yI+REWElUvAPhp+0cM4WJay72WRWpcUTA8KpcCmIkhnExr+fiuUTVQ6N3ZX8i3wvsDK9LcSAIME5gIIjtWrLmRNsvJtT0jb2zkmlVS/gAQwqYDxl3EgAAAAABJRU5ErkJggg==',
   };
 
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly authService = inject(AuthService);
+private readonly route = inject(ActivatedRoute);
+private readonly router = inject(Router);
+private readonly destroyRef = inject(DestroyRef);
+private readonly authService = inject(AuthService);
   private readonly projectService = inject(ProjectService);
   private readonly projectCatalogService = inject(ProjectCatalogService);
   private readonly projectStorefrontService = inject(ProjectStorefrontService);
@@ -337,6 +347,7 @@ export class ProjectStorefrontEditor {
   private activeComponentDrag:
     | {
         sectionId: string;
+        sourceContainerId: string | null;
         pointerOffsetX: number;
         pointerOffsetY: number;
         components: Array<{
@@ -348,27 +359,28 @@ export class ProjectStorefrontEditor {
         }>;
       }
     | null = null;
-  private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
-  private activeSelectionDrag:
+private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
+private activeSelectionDrag:
     | {
         sectionId: string;
         startX: number;
         startY: number;
       }
     | null = null;
-  private activeResize:
-    | {
-        sectionId: string;
-        componentId: string;
-        handle: string;
+private activeResize:
+  | {
+      sectionId: string;
+      componentId: string;
+      handle: string;
         startX: number;
         startY: number;
-        startFrame: StorefrontEditorComponentNode['frame'];
-        startRotation: number;
-        preserveAspectRatio: boolean;
-        startAspectRatio: number;
-      }
-    | null = null;
+      startFrame: StorefrontEditorComponentNode['frame'];
+      startRotation: number;
+      preserveAspectRatio: boolean;
+      startAspectRatio: number;
+      contentBounds: { left: number; right: number; top: number; bottom: number } | null;
+    }
+  | null = null;
   private activeImageCrop:
     | {
         sectionId: string;
@@ -426,6 +438,10 @@ export class ProjectStorefrontEditor {
   private activeColorHueDrag = false;
   private activeButtonColorCanvasDrag = false;
   private activeButtonColorHueDrag = false;
+  private activeContainerBackgroundColorCanvasDrag = false;
+  private activeContainerBackgroundColorHueDrag = false;
+  private activeContainerBorderColorCanvasDrag = false;
+  private activeContainerBorderColorHueDrag = false;
   private activeSectionBackgroundColorCanvasDrag = false;
   private activeSectionBackgroundColorHueDrag = false;
   private activeSectionBorderColorCanvasDrag = false;
@@ -465,6 +481,7 @@ readonly isBrandKitPopupOpen = signal(false);
     null
   );
   readonly componentAttachSectionId = signal<string | null>(null);
+  readonly componentAttachContainerTarget = signal<{ sectionId: string; containerId: string } | null>(null);
   readonly isPagesPanelOpen = signal(false);
   readonly isPagesPanelClosing = signal(false);
   readonly isManagePagesOpen = signal(false);
@@ -613,6 +630,9 @@ readonly isParagraphToolbarVisible = computed(
   readonly isImageToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedImageComponent() !== null
   );
+  readonly isContainerToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedContainerComponent() !== null
+  );
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
   );
@@ -640,6 +660,41 @@ readonly activeTextToolbarMenu = signal<
   readonly isImageBorderColorPickerOpen = signal(false);
   readonly activeImageBorderColorTab = signal<'brand' | 'custom'>('brand');
   readonly isImageBorderStylePickerOpen = signal(false);
+  readonly activeContainerToolbarMenu = signal<ContainerToolbarMenu>(null);
+  readonly activeContainerBackgroundTab = signal<'brand' | 'custom'>('brand');
+  readonly containerBackgroundCustomPickerHue = signal(0);
+  readonly containerBackgroundCustomPickerSaturation = signal(0);
+  readonly containerBackgroundCustomPickerBrightness = signal(100);
+  readonly containerBackgroundCustomColorCanvasBackground = computed(
+    () => `hsl(${this.containerBackgroundCustomPickerHue()} 100% 50%)`
+  );
+  readonly containerBackgroundCustomColorCanvasHandleLeft = computed(
+    () => `${this.containerBackgroundCustomPickerSaturation()}%`
+  );
+  readonly containerBackgroundCustomColorCanvasHandleTop = computed(
+    () => `${100 - this.containerBackgroundCustomPickerBrightness()}%`
+  );
+  readonly containerBackgroundCustomColorSpectrumHandleLeft = computed(
+    () => `${(this.containerBackgroundCustomPickerHue() / 360) * 100}%`
+  );
+  readonly isContainerBorderColorPickerOpen = signal(false);
+  readonly activeContainerBorderColorTab = signal<'brand' | 'custom'>('brand');
+  readonly isContainerBorderStylePickerOpen = signal(false);
+  readonly containerBorderCustomPickerHue = signal(224);
+  readonly containerBorderCustomPickerSaturation = signal(71);
+  readonly containerBorderCustomPickerBrightness = signal(11);
+  readonly containerBorderCustomColorCanvasBackground = computed(
+    () => `hsl(${this.containerBorderCustomPickerHue()} 100% 50%)`
+  );
+  readonly containerBorderCustomColorCanvasHandleLeft = computed(
+    () => `${this.containerBorderCustomPickerSaturation()}%`
+  );
+  readonly containerBorderCustomColorCanvasHandleTop = computed(
+    () => `${100 - this.containerBorderCustomPickerBrightness()}%`
+  );
+  readonly containerBorderCustomColorSpectrumHandleLeft = computed(
+    () => `${(this.containerBorderCustomPickerHue() / 360) * 100}%`
+  );
   readonly activeSectionToolbarMenu = signal<SectionToolbarMenu>(null);
   readonly activeSectionBackgroundTab = signal<'brand' | 'custom'>('brand');
   readonly isSectionBorderColorPickerOpen = signal(false);
@@ -715,6 +770,10 @@ readonly activeTextToolbarMenu = signal<
     const color = this.sectionBackgroundColor(this.selectedSection()) ?? '#ffffff';
     return color.replace('#', '').toUpperCase();
   });
+  readonly containerBackgroundHexValue = computed(() => {
+    const color = this.containerBackgroundColor(this.selectedContainerComponent()) ?? '#ffffff';
+    return color.replace('#', '').toUpperCase();
+  });
   readonly brandSectionBackgroundColors = [
     '#ffffff',
     '#f8fafc',
@@ -744,6 +803,7 @@ readonly activeTextToolbarMenu = signal<
     () => `${(this.sectionBorderCustomPickerHue() / 360) * 100}%`
   );
   readonly sectionBorderHexValue = computed(() => this.sectionBorderColor(this.selectedSection()).replace('#', '').toUpperCase());
+  readonly containerBorderHexValue = computed(() => this.containerBorderColor(this.selectedContainerComponent()).replace('#', '').toUpperCase());
 readonly brandSectionBorderColors = [
     '#ffffff',
     '#e8f1fb',
@@ -1123,6 +1183,80 @@ readonly brandSectionBorderColors = [
       previewImageSrc: 'assets/app/project/editor/grid gallery/minimal.png',
     },
   ];
+  readonly containerDesignPresets: ReadonlyArray<StorefrontEditorContainerDesignPreset> = [
+    {
+      id: 'airy-stack',
+      label: 'Airy stack',
+      previewLayout: 'stack',
+      previewTone: 'airy',
+      patch: {
+        layout: 'stack',
+        gap: 18,
+        padding: 26,
+        backgroundColor: '#ffffff',
+        borderColor: '#e7e3df',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        radius: 20,
+        shadow: 'soft',
+        opacity: 100,
+      },
+    },
+    {
+      id: 'outlined-panel',
+      label: 'Outlined panel',
+      previewLayout: 'stack',
+      previewTone: 'outlined',
+      patch: {
+        layout: 'stack',
+        gap: 16,
+        padding: 22,
+        backgroundColor: 'transparent',
+        borderColor: '#111827',
+        borderWidth: 2,
+        borderStyle: 'solid',
+        radius: 18,
+        shadow: 'none',
+        opacity: 100,
+      },
+    },
+    {
+      id: 'soft-row',
+      label: 'Soft row',
+      previewLayout: 'row',
+      previewTone: 'soft',
+      patch: {
+        layout: 'row',
+        gap: 14,
+        padding: 20,
+        backgroundColor: '#f8fafc',
+        borderColor: '#dbe4f0',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        radius: 18,
+        shadow: 'soft',
+        opacity: 100,
+      },
+    },
+    {
+      id: 'dark-grid',
+      label: 'Dark grid',
+      previewLayout: 'grid',
+      previewTone: 'dark',
+      patch: {
+        layout: 'grid',
+        gap: 12,
+        padding: 18,
+        backgroundColor: '#0f172a',
+        borderColor: '#0f172a',
+        borderWidth: 0,
+        borderStyle: 'none',
+        radius: 20,
+        shadow: 'medium',
+        opacity: 100,
+      },
+    },
+  ];
   readonly productFeedSettingsSections: ReadonlyArray<{ id: ProductFeedSettingsSection; label: string }> = [
     { id: 'category', label: 'Category' },
     { id: 'settings', label: 'Settings' },
@@ -1139,12 +1273,13 @@ readonly brandSectionBorderColors = [
 
     return ['all', ...categories.filter((category, index) => categories.indexOf(category) === index)];
   });
-  readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['props']['shadow']; label: string }> = [
-    { id: 'none', label: 'None' },
-    { id: 'soft', label: 'Soft' },
-    { id: 'medium', label: 'Medium' },
-    { id: 'strong', label: 'Strong' },
-  ];
+readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['props']['shadow']; label: string }> = [
+  { id: 'none', label: 'None' },
+  { id: 'soft', label: 'Soft' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'bottom', label: 'Bottom' },
+  { id: 'strong', label: 'Strong' },
+];
   readonly selectedComponentGroupId = computed(() => {
       const selected = this.selectedComponent();
       return selected?.groupId ?? null;
@@ -1557,6 +1692,14 @@ effect(() => {
     return;
   }
 
+  if (event.key === 'Escape' && this.activeContainerToolbarMenu()) {
+    event.preventDefault();
+    this.activeContainerToolbarMenu.set(null);
+    this.isContainerBorderColorPickerOpen.set(false);
+    this.isContainerBorderStylePickerOpen.set(false);
+    return;
+  }
+
   if (event.key === 'Escape' && this.activeProductFeedToolbarMenu()) {
     event.preventDefault();
     this.activeProductFeedToolbarMenu.set(null);
@@ -1717,6 +1860,9 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
    this.isImageSettingsLinkPopupOpen.set(false);
    this.isImageBorderColorPickerOpen.set(false);
    this.isImageBorderStylePickerOpen.set(false);
+   this.activeContainerToolbarMenu.set(null);
+   this.isContainerBorderColorPickerOpen.set(false);
+   this.isContainerBorderStylePickerOpen.set(false);
    this.activeSectionToolbarMenu.set(null);
    this.isSectionBorderColorPickerOpen.set(false);
    this.isSectionBorderStylePickerOpen.set(false);
@@ -1816,6 +1962,30 @@ if (this.isImageBorderStylePickerOpen()) {
   }
 }
 
+if (this.activeContainerToolbarMenu()) {
+  if (
+    !target.closest(
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__container-toolbar-designs-panel'
+    )
+  ) {
+    this.activeContainerToolbarMenu.set(null);
+    this.isContainerBorderColorPickerOpen.set(false);
+    this.isContainerBorderStylePickerOpen.set(false);
+  }
+}
+
+if (this.isContainerBorderColorPickerOpen()) {
+  if (!target.closest('.storefront-editor__container-borders-color-panel, .storefront-editor__container-border-color-trigger')) {
+    this.isContainerBorderColorPickerOpen.set(false);
+  }
+}
+
+if (this.isContainerBorderStylePickerOpen()) {
+  if (!target.closest('.storefront-editor__container-border-style-menu, .storefront-editor__container-border-style-trigger')) {
+    this.isContainerBorderStylePickerOpen.set(false);
+  }
+}
+
 if (this.activeSectionToolbarMenu()) {
   if (!target.closest('.storefront-editor__context-toolbar-shell')) {
     this.activeSectionToolbarMenu.set(null);
@@ -1886,6 +2056,30 @@ if (this.activeProductFeedToolbarMenu()) {
   if (this.activeButtonColorHueDrag) {
     event.preventDefault();
     this.updateButtonCustomColorFromHueEvent(event);
+    return;
+  }
+
+  if (this.activeContainerBackgroundColorCanvasDrag) {
+    event.preventDefault();
+    this.updateContainerBackgroundColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeContainerBackgroundColorHueDrag) {
+    event.preventDefault();
+    this.updateContainerBackgroundColorFromHueEvent(event);
+    return;
+  }
+
+  if (this.activeContainerBorderColorCanvasDrag) {
+    event.preventDefault();
+    this.updateContainerBorderColorFromCanvasEvent(event);
+    return;
+  }
+
+  if (this.activeContainerBorderColorHueDrag) {
+    event.preventDefault();
+    this.updateContainerBorderColorFromHueEvent(event);
     return;
   }
 
@@ -1992,6 +2186,20 @@ if (this.activeProductFeedToolbarMenu()) {
       }
     }
 
+    const containerAttachTarget = this.getContainerDropTargetForDraggedBounds(
+      draggedRect,
+      this.activeComponentDrag.sectionId,
+      this.activeComponentDrag.components.map((component) => component.componentId)
+    );
+    const hoveredSectionId =
+      targetContainer?.dataset['sectionContentId'] ?? this.activeComponentDrag.sectionId;
+    this.componentAttachContainerTarget.set(containerAttachTarget);
+    this.componentAttachSectionId.set(
+      this.activeComponentDrag.sourceContainerId && !containerAttachTarget
+        ? hoveredSectionId
+        : null
+    );
+
     const container =
       targetContainer ??
       document.querySelector(
@@ -2054,6 +2262,18 @@ handleComponentPointerUp(event: MouseEvent): void {
     return;
   }
 
+  if (this.activeContainerBackgroundColorCanvasDrag || this.activeContainerBackgroundColorHueDrag) {
+    this.activeContainerBackgroundColorCanvasDrag = false;
+    this.activeContainerBackgroundColorHueDrag = false;
+    return;
+  }
+
+  if (this.activeContainerBorderColorCanvasDrag || this.activeContainerBorderColorHueDrag) {
+    this.activeContainerBorderColorCanvasDrag = false;
+    this.activeContainerBorderColorHueDrag = false;
+    return;
+  }
+
   if (this.activeSectionBackgroundColorCanvasDrag || this.activeSectionBackgroundColorHueDrag) {
     this.activeSectionBackgroundColorCanvasDrag = false;
     this.activeSectionBackgroundColorHueDrag = false;
@@ -2088,7 +2308,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   }
 
   const dragUndoSnapshot = this.activeComponentDragUndoSnapshot;
-this.finalizeDraggedComponentsLayoutSnap();
+  if (this.activeComponentDrag) {
+    this.finalizeDraggedComponentsLayoutSnap();
+  }
   this.clearSnapGuides();
 
   if (dragUndoSnapshot) {
@@ -2103,6 +2325,7 @@ this.finalizeDraggedComponentsLayoutSnap();
 
   this.activeComponentDragUndoSnapshot = null;
   this.activeComponentDrag = null;
+    this.componentAttachContainerTarget.set(null);
     this.activeResize = null;
     this.activeRotation = null;
     this.activeSectionResize = null;
@@ -2203,6 +2426,9 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.activeSectionToolbarMenu.set(null);
     this.isSectionBorderColorPickerOpen.set(false);
     this.isSectionBorderStylePickerOpen.set(false);
+    this.activeContainerToolbarMenu.set(null);
+    this.isContainerBorderColorPickerOpen.set(false);
+    this.isContainerBorderStylePickerOpen.set(false);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
@@ -2217,6 +2443,9 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.isSectionBorderColorPickerOpen.set(false);
     this.isSectionBorderStylePickerOpen.set(false);
     this.activeTextToolbarMenu.set(null);
+    this.activeContainerToolbarMenu.set(null);
+    this.isContainerBorderColorPickerOpen.set(false);
+    this.isContainerBorderStylePickerOpen.set(false);
     this.activeButtonToolbarMenu.set(null);
     this.activeProductFeedToolbarMenu.set(null);
     this.syncEditorSessionState({ selectedSectionId: sectionId });
@@ -2232,6 +2461,9 @@ this.finalizeDraggedComponentsLayoutSnap();
     this.activeSectionToolbarMenu.set(null);
     this.isSectionBorderColorPickerOpen.set(false);
     this.isSectionBorderStylePickerOpen.set(false);
+    this.activeContainerToolbarMenu.set(null);
+    this.isContainerBorderColorPickerOpen.set(false);
+    this.isContainerBorderStylePickerOpen.set(false);
     this.syncEditorSessionState({ selectedSectionId: null });
   }
 
@@ -2867,7 +3099,7 @@ this.finalizeDraggedComponentsLayoutSnap();
 
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
-    if (!component) {
+    if (!section || !component) {
       return;
     }
 
@@ -2887,7 +3119,13 @@ this.finalizeDraggedComponentsLayoutSnap();
         ? selectedIds.has(componentId)
         : item.id === componentId;
     });
-    const effectiveComponents = dragComponents.length ? dragComponents : [component];
+    const dragComponentIds = new Set((dragComponents.length ? dragComponents : [component]).map((item) => item.id));
+    if (component.type === 'container') {
+      this.getContainerAssociatedComponents(sectionComponents, component).forEach((item) => {
+        dragComponentIds.add(item.id);
+      });
+    }
+    const effectiveComponents = sectionComponents.filter((item) => dragComponentIds.has(item.id));
     const orderedComponents = [...effectiveComponents].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
     const dragBounds = this.getDraggedComponentsBounds(orderedComponents.map((item) => {
       const frame = this.getComponentFrame(item);
@@ -2900,8 +3138,19 @@ this.finalizeDraggedComponentsLayoutSnap();
     }));
     const container = target.closest('.storefront-editor__preview-section-content');
     const containerRect = container instanceof HTMLElement ? container.getBoundingClientRect() : target.getBoundingClientRect();
+    const sourceContainerTarget = this.getContainerDropTargetForDraggedBounds(
+      {
+        left: containerRect.left + dragBounds.x,
+        top: containerRect.top + dragBounds.y,
+        width: dragBounds.width,
+        height: dragBounds.height,
+      },
+      sectionId,
+      orderedComponents.map((item) => item.id)
+    );
     this.activeComponentDrag = {
       sectionId,
+      sourceContainerId: sourceContainerTarget?.containerId ?? null,
       pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x),
       pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y),
       components: orderedComponents.map((item) => {
@@ -2915,6 +3164,9 @@ this.finalizeDraggedComponentsLayoutSnap();
         };
       }),
       };
+
+    this.componentAttachContainerTarget.set(null);
+    this.componentAttachSectionId.set(null);
 
     const storefront = this.workingStorefront();
     this.activeComponentDragUndoSnapshot = storefront
@@ -3365,7 +3617,7 @@ this.finalizeDraggedComponentsLayoutSnap();
 
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
-    if (!component) {
+    if (!section || !component) {
       return;
     }
 
@@ -3381,6 +3633,7 @@ this.finalizeDraggedComponentsLayoutSnap();
       startRotation: component.rotation ?? 0,
       preserveAspectRatio: component.type === 'image' && /[ns]/.test(handle) && /[ew]/.test(handle),
       startAspectRatio: component.frame.width > 0 && component.frame.height > 0 ? component.frame.width / component.frame.height : 1,
+      contentBounds: component.type === 'container' ? this.getContainerContentLocalBounds(section, component) : null,
     };
     this.isResizingComponent.set(true);
     this.closeComponentContextMenu();
@@ -3819,6 +4072,9 @@ finishEditingComponentText(): void {
   this.isImageSettingsLinkPopupOpen.set(false);
   this.isImageBorderColorPickerOpen.set(false);
   this.isImageBorderStylePickerOpen.set(false);
+  this.activeContainerToolbarMenu.set(null);
+  this.isContainerBorderColorPickerOpen.set(false);
+  this.isContainerBorderStylePickerOpen.set(false);
   this.activeSectionToolbarMenu.set(null);
   this.isSectionBorderColorPickerOpen.set(false);
   this.isSectionBorderStylePickerOpen.set(false);
@@ -4570,9 +4826,9 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.updateSelectedImageProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
   }
 
-  updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
-    this.updateSelectedImageProps({ shadow: value });
-  }
+updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
+  this.updateSelectedImageProps({ shadow: value });
+}
 
   private startImageCropInteraction(
     sectionId: string,
@@ -4920,6 +5176,170 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   ): void {
     pageIdSignal.set(this.findManagedPageIdForHref(href));
     openModeSignal.set(openInNewTab ? 'new' : 'current');
+  }
+
+  toggleContainerToolbarMenu(menu: Exclude<ContainerToolbarMenu, null>): void {
+    const next = this.activeContainerToolbarMenu() === menu ? null : menu;
+    this.activeContainerToolbarMenu.set(next);
+
+    if (next !== 'borders') {
+      this.isContainerBorderColorPickerOpen.set(false);
+      this.isContainerBorderStylePickerOpen.set(false);
+    }
+
+    if (next === 'background') {
+      this.activeContainerBackgroundTab.set('brand');
+      this.syncContainerBackgroundColorPickerFromHex(this.containerBackgroundColor(this.selectedContainerComponent()) ?? '#ffffff');
+    }
+  }
+
+  setActiveContainerBackgroundTab(tab: 'brand' | 'custom'): void {
+    this.activeContainerBackgroundTab.set(tab);
+  }
+
+  applyContainerDesignPreset(preset: StorefrontEditorContainerDesignPreset): void {
+    this.updateSelectedContainerProps(preset.patch);
+    this.activeContainerToolbarMenu.set(null);
+  }
+
+  updateSelectedContainerBackgroundColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    if (normalized !== 'transparent') {
+      this.syncContainerBackgroundColorPickerFromHex(normalized);
+    }
+
+    this.updateSelectedContainerProps({ backgroundColor: normalized });
+  }
+
+  updateSelectedContainerBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.syncContainerBorderColorPickerFromHex(normalized);
+    this.rememberSectionBorderColor(normalized);
+    this.updateSelectedContainerProps({ borderColor: normalized });
+  }
+
+  updateSelectedContainerBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    const component = this.selectedContainerComponent();
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({
+      borderWidth: Math.max(0, Math.min(12, Math.round(parsed))),
+      borderStyle: component?.props.borderStyle === 'none' ? 'solid' : (component?.props.borderStyle ?? 'solid'),
+    });
+  }
+
+  updateSelectedContainerBorderStyle(value: 'solid' | 'dashed' | 'dotted' | 'double'): void {
+    const width = Math.max(this.containerBorderWidth(this.selectedContainerComponent()), 1);
+    this.updateSelectedContainerProps({
+      borderStyle: value,
+      borderWidth: width,
+    });
+    this.isContainerBorderStylePickerOpen.set(false);
+  }
+
+  updateSelectedContainerRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
+  }
+
+updateSelectedContainerShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
+  this.updateSelectedContainerProps({ shadow: value });
+}
+
+  updateSelectedContainerOpacity(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedContainerProps({ opacity: Math.max(0, Math.min(100, Math.round(parsed))) });
+  }
+
+  startContainerBackgroundColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeContainerBackgroundColorCanvasDrag = true;
+    this.updateContainerBackgroundColorFromCanvasEvent(event);
+  }
+
+  startContainerBackgroundHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeContainerBackgroundColorHueDrag = true;
+    this.updateContainerBackgroundColorFromHueEvent(event);
+  }
+
+  updateContainerBackgroundHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedContainerBackgroundColor(normalized);
+  }
+
+  toggleContainerBorderColorPicker(): void {
+    const next = !this.isContainerBorderColorPickerOpen();
+    this.isContainerBorderColorPickerOpen.set(next);
+    if (next) {
+      this.isContainerBorderStylePickerOpen.set(false);
+      this.activeContainerBorderColorTab.set('brand');
+      this.syncContainerBorderColorPickerFromHex(this.containerBorderColor(this.selectedContainerComponent()));
+    }
+  }
+
+  toggleContainerBorderStylePicker(): void {
+    const next = !this.isContainerBorderStylePickerOpen();
+    this.isContainerBorderStylePickerOpen.set(next);
+    if (next) {
+      this.isContainerBorderColorPickerOpen.set(false);
+    }
+  }
+
+  setActiveContainerBorderColorTab(tab: 'brand' | 'custom'): void {
+    this.activeContainerBorderColorTab.set(tab);
+  }
+
+  startContainerBorderColorCanvasDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeContainerBorderColorCanvasDrag = true;
+    this.updateContainerBorderColorFromCanvasEvent(event);
+  }
+
+  startContainerBorderHueDrag(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeContainerBorderColorHueDrag = true;
+    this.updateContainerBorderColorFromHueEvent(event);
+  }
+
+  updateContainerBorderHex(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedContainerBorderColor(normalized);
+  }
+
+  applySavedContainerBorderColor(color: string): void {
+    this.updateSelectedContainerBorderColor(color);
   }
 
   startCustomColorCanvasDrag(event: MouseEvent): void {
@@ -5575,9 +5995,9 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
     this.updateSelectedButtonProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
   }
 
-  updateSelectedButtonShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
-    this.updateSelectedButtonProps({ shadow: value });
-  }
+updateSelectedButtonShadow(value: StorefrontEditorButtonNode['props']['shadow']): void {
+  this.updateSelectedButtonProps({ shadow: value });
+}
 
   updateSelectedButtonPadding(value: string | number): void {
     const parsed = Number(value);
@@ -5718,9 +6138,18 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
     };
   }
 
-  buttonShadowPreviewStyle(shadow: StorefrontEditorButtonNode['props']['shadow']): Record<string, string> {
+  containerDesignPreviewStyle(preset: StorefrontEditorContainerDesignPreset): Record<string, string> {
+    const borderStyle = preset.patch.borderStyle ?? 'none';
+    const borderWidth = borderStyle === 'none' ? 0 : preset.patch.borderWidth ?? 1;
+    const backgroundColor = preset.patch.backgroundColor ?? 'transparent';
+
     return {
-      boxShadow: this.getButtonShadowCssValue(shadow),
+      background: backgroundColor === 'transparent' ? '#ffffff' : backgroundColor,
+      borderStyle,
+      borderWidth: `${borderWidth}px`,
+      borderColor: borderWidth === 0 ? 'rgba(17, 24, 39, 0.08)' : (preset.patch.borderColor ?? '#111827'),
+      borderRadius: `${preset.patch.radius ?? 0}px`,
+      boxShadow: this.getButtonShadowCssValue(preset.patch.shadow ?? 'none'),
     };
   }
 
@@ -7028,6 +7457,36 @@ sectionSurfaceStyle(section: StorefrontHomepageSection | null): Record<string, s
   };
 }
 
+containerBackgroundColor(component: StorefrontEditorContainerNode | null): string | null {
+  return this.normalizeHexColor(component?.props.backgroundColor ?? '');
+}
+
+containerBorderStyle(component: StorefrontEditorContainerNode | null): 'solid' | 'dashed' | 'dotted' | 'double' {
+  const value = component?.props.borderStyle;
+  return value === 'dashed' || value === 'dotted' || value === 'double' ? value : 'solid';
+}
+
+containerBorderWidth(component: StorefrontEditorContainerNode | null): number {
+  return Math.max(0, Math.min(12, Math.round(Number(component?.props.borderWidth ?? 0))));
+}
+
+containerBorderColor(component: StorefrontEditorContainerNode | null): string {
+  return this.normalizeHexColor(component?.props.borderColor ?? '') ?? '#111827';
+}
+
+containerRadius(component: StorefrontEditorContainerNode | null): number {
+  return Math.max(0, Math.min(999, Math.round(Number(component?.props.radius ?? 0))));
+}
+
+containerOpacity(component: StorefrontEditorContainerNode | null): number {
+  return Math.max(0, Math.min(100, Math.round(Number(component?.props.opacity ?? 100))));
+}
+
+containerShadow(component: StorefrontEditorContainerNode | null): StorefrontEditorButtonNode['props']['shadow'] {
+  const value = component?.props.shadow;
+  return value === 'soft' || value === 'medium' || value === 'bottom' || value === 'strong' ? value : 'none';
+}
+
 imageDisplayMode(component: StorefrontEditorImageNode | null): 'fill' | 'fit' | 'aspect' {
   return component ? resolveStorefrontEditorImageDisplayMode(component.props) : 'fill';
 }
@@ -7055,7 +7514,7 @@ imageOpacity(component: StorefrontEditorImageNode | null): number {
 
 imageShadow(component: StorefrontEditorImageNode | null): StorefrontEditorButtonNode['props']['shadow'] {
   const value = component?.props.shadow;
-  return value === 'soft' || value === 'medium' || value === 'strong' ? value : 'none';
+  return value === 'soft' || value === 'medium' || value === 'bottom' || value === 'strong' ? value : 'none';
 }
 
 componentTypeLabel(component: StorefrontEditorComponentNode): string {
@@ -7103,6 +7562,14 @@ switch (component.type) {
 
   roundedComponentHeight(component: StorefrontEditorComponentNode): number {
     return Math.max(0, Math.round(this.getComponentFrame(component).height));
+  }
+
+  isComponentBeingRotated(componentId: string): boolean {
+    return this.isRotatingComponent() && this.activeRotation?.componentId === componentId;
+  }
+
+  displayComponentRotationAngle(rotation: number): number {
+    return Math.round(((rotation % 360) + 360) % 360);
   }
 
   isComponentRotationFlipped(rotation: number): boolean {
@@ -7801,6 +8268,21 @@ private updateSelectedSection(
       }
     }
 
+    if (this.activeResize.contentBounds) {
+      if (this.activeResize.handle.includes('w')) {
+        left = Math.min(left, this.activeResize.contentBounds.left);
+      }
+      if (this.activeResize.handle.includes('e')) {
+        right = Math.max(right, this.activeResize.contentBounds.right);
+      }
+      if (this.activeResize.handle.includes('n')) {
+        top = Math.min(top, this.activeResize.contentBounds.top);
+      }
+      if (this.activeResize.handle.includes('s')) {
+        bottom = Math.max(bottom, this.activeResize.contentBounds.bottom);
+      }
+    }
+
     const localCenterOffset = {
       x: (left + right) / 2,
       y: (top + bottom) / 2,
@@ -7855,7 +8337,7 @@ private updateSelectedSection(
 
     this.activeRotation.accumulatedAngle += frameDelta;
     this.activeRotation.previousAngle = currentAngle;
-    const nextRotation = this.normalizeComponentRotation(
+    const nextRotation = this.getSnappedComponentRotation(
       this.activeRotation.startRotation + this.activeRotation.accumulatedAngle
     );
 
@@ -7927,6 +8409,30 @@ private updateSelectedSection(
       next = 0;
     }
     return next;
+  }
+
+  private getSnappedComponentRotation(angle: number): number {
+    const normalized = this.normalizeComponentRotation(angle);
+    const positiveNormalized = ((normalized % 360) + 360) % 360;
+    const nearestSnap = ProjectStorefrontEditor.ROTATION_SNAP_ANGLES.reduce(
+      (closest, candidate) => {
+        const distance = Math.abs(candidate - positiveNormalized);
+        if (!closest || distance < closest.distance) {
+          return { angle: candidate, distance };
+        }
+        return closest;
+      },
+      null as { angle: number; distance: number } | null
+    );
+
+    if (
+      nearestSnap &&
+      nearestSnap.distance <= ProjectStorefrontEditor.ROTATION_SNAP_THRESHOLD_DEGREES
+    ) {
+      return nearestSnap.angle === 360 ? 0 : nearestSnap.angle;
+    }
+
+    return normalized;
   }
 
   private rotateVectorToLocal(deltaX: number, deltaY: number, rotation: number): { x: number; y: number } {
@@ -8068,10 +8574,12 @@ private updateSelectedSection(
 private updateComponentNode(
   sectionId: string,
   componentId: string,
-  updater: (component: StorefrontEditorComponentNode) => StorefrontEditorComponentNode
+  updater: (component: StorefrontEditorComponentNode) => StorefrontEditorComponentNode,
+  options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean; preview?: boolean } = {}
 ): void {
   this.updateSectionComponents(sectionId, (components) =>
-    this.updateComponentTree(components, componentId, updater)
+    this.updateComponentTree(components, componentId, updater),
+    options
   );
 }
 
@@ -8119,7 +8627,8 @@ private updateComponentTree(
 }
 
 private updateSelectedImageProps(
-patch: Partial<StorefrontEditorImageNode['props']>
+  patch: Partial<StorefrontEditorImageNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
 ): void {
   const sectionId = this.selectedSectionId();
   const component = this.selectedImageComponent();
@@ -8127,7 +8636,7 @@ patch: Partial<StorefrontEditorImageNode['props']>
     return;
   }
 
-this.updateImageComponentProps(sectionId, component.id, patch);
+this.updateImageComponentProps(sectionId, component.id, patch, options);
 }
 
 private ensureImageSourceMetadata(sectionId: string, component: StorefrontEditorImageNode): void {
@@ -8255,7 +8764,8 @@ private computeImageFrameForAspectRatio(
 private updateImageComponentProps(
   sectionId: string,
   componentId: string,
-  patch: Partial<StorefrontEditorImageNode['props']>
+  patch: Partial<StorefrontEditorImageNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
 ): void {
   this.updateComponentNode(sectionId, componentId, (current) =>
     current.type === 'image'
@@ -8266,7 +8776,8 @@ private updateImageComponentProps(
             ...patch,
           },
         }
-      : current
+      : current,
+    options
   );
 }
 
@@ -8368,7 +8879,8 @@ private readActiveTextEditorHtml(): string {
   }
 
 private updateSelectedButtonProps(
-patch: Partial<StorefrontEditorButtonNode['props']>
+  patch: Partial<StorefrontEditorButtonNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
 ): void {
     const sectionId = this.selectedSectionId();
     const component = this.selectedButtonComponent();
@@ -8385,12 +8897,14 @@ patch: Partial<StorefrontEditorButtonNode['props']>
               ...patch,
             },
           }
-        : current
+        : current,
+      options
   );
 }
 
 private updateSelectedContainerProps(
-  patch: Partial<StorefrontEditorContainerNode['props']>
+  patch: Partial<StorefrontEditorContainerNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
 ): void {
   const sectionId = this.selectedSectionId();
   const component = this.selectedContainerComponent();
@@ -8407,7 +8921,8 @@ private updateSelectedContainerProps(
             ...patch,
           },
         }
-      : current
+      : current,
+    options
   );
 }
 
@@ -8579,6 +9094,108 @@ private updateSelectedProductFeedProps(
     this.buttonCustomPickerBrightness.set(v);
   }
 
+  private updateContainerBackgroundColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__container-background-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.containerBackgroundCustomPickerSaturation.set(saturation);
+    this.containerBackgroundCustomPickerBrightness.set(brightness);
+    this.commitContainerBackgroundColorPicker();
+  }
+
+  private updateContainerBackgroundColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__container-background-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.containerBackgroundCustomPickerHue.set(Math.round(ratio * 360));
+    this.commitContainerBackgroundColorPicker();
+  }
+
+  private commitContainerBackgroundColorPicker(): void {
+    const hex = this.hsvToHex(
+      this.containerBackgroundCustomPickerHue(),
+      this.containerBackgroundCustomPickerSaturation(),
+      this.containerBackgroundCustomPickerBrightness()
+    );
+    this.updateSelectedContainerBackgroundColor(hex);
+  }
+
+  private syncContainerBackgroundColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.containerBackgroundCustomPickerHue.set(h);
+    this.containerBackgroundCustomPickerSaturation.set(s);
+    this.containerBackgroundCustomPickerBrightness.set(v);
+  }
+
+  private updateContainerBorderColorFromCanvasEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__container-borders-color-canvas')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const saturation = this.clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+    const brightness = this.clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+    this.containerBorderCustomPickerSaturation.set(saturation);
+    this.containerBorderCustomPickerBrightness.set(brightness);
+    this.commitContainerBorderColorPicker();
+  }
+
+  private updateContainerBorderColorFromHueEvent(event: MouseEvent): void {
+    const element = event.target instanceof HTMLElement
+      ? event.target.closest('.storefront-editor__container-borders-color-spectrum')
+      : null;
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const ratio = this.clamp((event.clientX - rect.left) / rect.width, 0, 1);
+    this.containerBorderCustomPickerHue.set(Math.round(ratio * 360));
+    this.commitContainerBorderColorPicker();
+  }
+
+  private commitContainerBorderColorPicker(): void {
+    const hex = this.hsvToHex(
+      this.containerBorderCustomPickerHue(),
+      this.containerBorderCustomPickerSaturation(),
+      this.containerBorderCustomPickerBrightness()
+    );
+    this.updateSelectedContainerBorderColor(hex);
+  }
+
+  private syncContainerBorderColorPickerFromHex(color: string): void {
+    const normalized = this.normalizeHexColor(color);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    const { h, s, v } = this.hexToHsv(normalized);
+    this.containerBorderCustomPickerHue.set(h);
+    this.containerBorderCustomPickerSaturation.set(s);
+    this.containerBorderCustomPickerBrightness.set(v);
+  }
+
   private updateSectionBackgroundColorFromCanvasEvent(event: MouseEvent): void {
     const element = event.target instanceof HTMLElement
       ? event.target.closest('.storefront-editor__section-background-color-canvas')
@@ -8698,19 +9315,21 @@ private updateSelectedProductFeedProps(
     return this.sectionLayoutPresets.find((preset) => preset.id === presetId) ?? this.sectionLayoutPresets[0];
   }
 
-  private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['shadow']): string {
-    switch (shadow) {
-      case 'soft':
-        return '0 10px 24px rgba(15, 23, 42, 0.12)';
-      case 'medium':
-        return '0 14px 30px rgba(15, 23, 42, 0.18)';
-      case 'strong':
-        return '0 18px 36px rgba(15, 23, 42, 0.26)';
-      case 'none':
-      default:
-        return 'none';
-    }
+private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['shadow']): string {
+  switch (shadow) {
+    case 'soft':
+      return '2px -2px 14px rgba(15, 23, 42, 0.16)';
+    case 'medium':
+      return '-2px -2px 14px rgba(15, 23, 42, 0.16)';
+    case 'bottom':
+      return '0 10px 18px rgba(15, 23, 42, 0.18)';
+    case 'strong':
+      return '0 0 18px rgba(15, 23, 42, 0.28)';
+    case 'none':
+    default:
+      return 'none';
   }
+}
 
   private normalizeHexColor(value: string | null | undefined): string | null {
     const raw = String(value ?? '').trim();
@@ -9213,11 +9832,11 @@ private updateSelectedProductFeedProps(
     }), { syncRail: false });
   }
 
-  private updateSectionComponents(
-    sectionId: string,
-    updater: (components: StorefrontEditorComponentNode[]) => StorefrontEditorComponentNode[],
-    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
-  ): void {
+private updateSectionComponents(
+  sectionId: string,
+  updater: (components: StorefrontEditorComponentNode[]) => StorefrontEditorComponentNode[],
+  options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean; preview?: boolean } = {}
+): void {
     this.applyStorefrontMutation((storefront) => ({
       ...storefront,
       draftHomepage: {
@@ -9320,6 +9939,77 @@ private appendComponentToContainer(
   this.isolatedGroupComponentId.set(null);
 }
 
+private getContainerAssociatedComponents(
+  components: StorefrontEditorComponentNode[],
+  container: StorefrontEditorContainerNode
+): StorefrontEditorComponentNode[] {
+  const containerFrame = this.getComponentFrame(container);
+
+  return components.filter((component) => {
+    if (component.id === container.id) {
+      return false;
+    }
+
+    const frame = this.getComponentFrame(component);
+    return this.isPointInsideFrame(
+      frame.x + frame.width / 2,
+      frame.y + frame.height / 2,
+      containerFrame
+    );
+  });
+}
+
+private getContainerContentLocalBounds(
+  section: StorefrontHomepageSection,
+  container: StorefrontEditorContainerNode
+): { left: number; right: number; top: number; bottom: number } | null {
+  const associatedComponents = this.getContainerAssociatedComponents(this.readSectionComponents(section), container);
+  if (!associatedComponents.length) {
+    return null;
+  }
+
+  const containerFrame = this.getComponentFrame(container);
+  const containerCenterX = containerFrame.x + containerFrame.width / 2;
+  const containerCenterY = containerFrame.y + containerFrame.height / 2;
+  const rotation = container.rotation ?? 0;
+  let left = Number.POSITIVE_INFINITY;
+  let right = Number.NEGATIVE_INFINITY;
+  let top = Number.POSITIVE_INFINITY;
+  let bottom = Number.NEGATIVE_INFINITY;
+
+  associatedComponents.forEach((component) => {
+    const frame = this.getComponentFrame(component);
+    const corners = [
+      { x: frame.x, y: frame.y },
+      { x: frame.x + frame.width, y: frame.y },
+      { x: frame.x, y: frame.y + frame.height },
+      { x: frame.x + frame.width, y: frame.y + frame.height },
+    ];
+
+    corners.forEach((corner) => {
+      const local = this.rotateVectorToLocal(corner.x - containerCenterX, corner.y - containerCenterY, rotation);
+      left = Math.min(left, local.x);
+      right = Math.max(right, local.x);
+      top = Math.min(top, local.y);
+      bottom = Math.max(bottom, local.y);
+    });
+  });
+
+  if (!Number.isFinite(left) || !Number.isFinite(right) || !Number.isFinite(top) || !Number.isFinite(bottom)) {
+    return null;
+  }
+
+  return { left, right, top, bottom };
+}
+
+private isPointInsideFrame(
+  x: number,
+  y: number,
+  frame: StorefrontEditorComponentNode['frame']
+): boolean {
+  return x >= frame.x && x <= frame.x + frame.width && y >= frame.y && y <= frame.y + frame.height;
+}
+
 private getContainerDropTargetAtPoint(
   clientX: number,
   clientY: number
@@ -9341,6 +10031,60 @@ private getContainerDropTargetAtPoint(
   };
 }
 
+private getContainerDropTargetForDraggedBounds(
+  draggedRect: { left: number; top: number; width: number; height: number },
+  _fallbackSectionId: string,
+  excludedComponentIds: string[] = []
+): { sectionId: string; containerId: string } | null {
+  const excludedIds = new Set(excludedComponentIds);
+  const containers = Array.from(
+    document.querySelectorAll('[data-editor-container-id]')
+  ).filter((element): element is HTMLElement => element instanceof HTMLElement);
+
+  if (!containers.length) {
+    return null;
+  }
+
+  const draggedCenterX = draggedRect.left + draggedRect.width / 2;
+  const draggedCenterY = draggedRect.top + draggedRect.height / 2;
+
+  const bestMatch = containers
+    .map((container) => {
+      const containerId = container.dataset['editorContainerId'] ?? '';
+      const sectionId =
+        container.closest('.storefront-editor__preview-section-content[data-section-content-id]')?.getAttribute('data-section-content-id') ??
+        '';
+      if (!containerId || !sectionId || excludedIds.has(containerId)) {
+        return null;
+      }
+
+      const rect = container.getBoundingClientRect();
+      const centerInside =
+        draggedCenterX >= rect.left &&
+        draggedCenterX <= rect.right &&
+        draggedCenterY >= rect.top &&
+        draggedCenterY <= rect.bottom;
+
+      return {
+        sectionId,
+        containerId,
+        centerInside,
+        area: Math.max(1, rect.width * rect.height),
+      };
+    })
+    .filter(
+      (candidate): candidate is { sectionId: string; containerId: string; centerInside: boolean; area: number } =>
+        candidate !== null && candidate.centerInside
+    )
+    .sort((left, right) => left.area - right.area)[0];
+
+  if (bestMatch) {
+    return { sectionId: bestMatch.sectionId, containerId: bestMatch.containerId };
+  }
+
+  return null;
+}
+
 private buildLibraryComponentForSection(
   item: StorefrontEditorAddElementsLibraryItem,
     sectionId: string,
@@ -9356,8 +10100,27 @@ private buildLibraryComponentForSection(
     if (frameOverride || this.viewport() !== 'desktop') {
       Object.assign(nextComponent, this.writeComponentFrame(nextComponent, initialFrame));
     }
-    return nextComponent;
-  }
+  return nextComponent;
+}
+
+isContainerAttachTarget(sectionId: string, containerId: string): boolean {
+  const target = this.componentAttachContainerTarget();
+  return (
+    !!this.activeComponentDrag &&
+    target?.sectionId === sectionId &&
+    target.containerId === containerId &&
+    this.activeComponentDrag.sourceContainerId !== containerId
+  );
+}
+
+isSectionAttachTarget(sectionId: string): boolean {
+  const attachSectionId = this.componentAttachSectionId();
+  return (
+    attachSectionId === sectionId &&
+    (this.isLibraryComponentDragging() ||
+      (!!this.activeComponentDrag && !!this.activeComponentDrag.sourceContainerId))
+  );
+}
 
   private getDropFrameFromEvent(
     sectionId: string,
@@ -9928,10 +10691,24 @@ private buildLibraryComponentForSection(
 
   private applyStorefrontMutation(
     mutator: (storefront: ProjectStorefront) => ProjectStorefront,
-    options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean } = {}
+    options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean; preview?: boolean } = {}
   ): void {
     const current = this.workingStorefront();
     if (!current) {
+      return;
+    }
+
+    if (options.preview) {
+      const next = mutator(this.cloneStorefront(current));
+      this.workingStorefront.set(next);
+      if (options.selectedSectionId !== undefined) {
+        this.selectedSectionId.set(options.selectedSectionId);
+      }
+      this.syncEditorSessionState({ selectedSectionId: this.selectedSectionId() }, false);
+
+      if (options.syncRail) {
+        setTimeout(() => this.syncSelectedSectionRailPosition(), 0);
+      }
       return;
     }
 

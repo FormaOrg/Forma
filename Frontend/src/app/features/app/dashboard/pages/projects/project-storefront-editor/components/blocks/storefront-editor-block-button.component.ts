@@ -123,11 +123,13 @@ export class StorefrontEditorBlockButtonComponent {
   private getShadowValue(shadow: StorefrontEditorButtonNode['props']['shadow']): string {
     switch (shadow) {
       case 'soft':
-        return '0 8px 18px rgba(15, 23, 42, 0.12)';
+        return '2px -2px 12px rgba(15, 23, 42, 0.16)';
       case 'medium':
-        return '0 12px 26px rgba(15, 23, 42, 0.18)';
+        return '-2px -2px 12px rgba(15, 23, 42, 0.16)';
+      case 'bottom':
+        return '0 8px 16px rgba(15, 23, 42, 0.18)';
       case 'strong':
-        return '0 16px 34px rgba(15, 23, 42, 0.24)';
+        return '0 0 14px rgba(15, 23, 42, 0.26)';
       case 'none':
       default:
         return 'none';
