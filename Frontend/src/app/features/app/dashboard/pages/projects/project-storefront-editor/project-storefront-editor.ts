@@ -3519,7 +3519,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
           const [draggedComponent] = components.splice(draggedIndex, 1);
           const nextTargetIndex = components.findIndex((component) => component.id === targetComponentId);
-          components.splice(nextTargetIndex, 0, draggedComponent);
+          const insertionIndex = draggedIndex < targetIndex ? nextTargetIndex + 1 : nextTargetIndex;
+          components.splice(insertionIndex, 0, draggedComponent);
           return this.writeSectionComponents(
             item,
             components.map((component, index, orderedComponents) => ({
