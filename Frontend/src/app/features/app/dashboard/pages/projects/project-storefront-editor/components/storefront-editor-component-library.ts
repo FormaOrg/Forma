@@ -182,6 +182,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['cta', 'link', 'action', 'button'],
   },
   {
+    id: 'menu',
+    title: 'Menu',
+    category: 'Graphics',
+    subcategoryIds: ['all', 'containers', 'decorative'],
+    componentType: 'menu',
+    description: 'Navigation menu for headers, footers, and compact site links.',
+    preview: 'button',
+    keywords: ['menu', 'navigation', 'nav', 'header', 'footer', 'links'],
+  },
+  {
     id: 'container',
     title: 'Container',
     category: 'Graphics',
