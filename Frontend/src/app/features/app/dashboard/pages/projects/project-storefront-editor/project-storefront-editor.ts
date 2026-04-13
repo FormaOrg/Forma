@@ -2310,6 +2310,10 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   const dragUndoSnapshot = this.activeComponentDragUndoSnapshot;
   if (this.activeComponentDrag) {
     this.finalizeDraggedComponentsLayoutSnap();
+    this.elevateDraggedComponentsAboveContainers(
+      this.activeComponentDrag.sectionId,
+      this.activeComponentDrag.components.map((component) => component.componentId)
+    );
   }
   this.clearSnapGuides();
 
@@ -9944,6 +9948,7 @@ private getContainerAssociatedComponents(
   container: StorefrontEditorContainerNode
 ): StorefrontEditorComponentNode[] {
   const containerFrame = this.getComponentFrame(container);
+  const containerArea = containerFrame.width * containerFrame.height;
 
   return components.filter((component) => {
     if (component.id === container.id) {
@@ -9951,12 +9956,89 @@ private getContainerAssociatedComponents(
     }
 
     const frame = this.getComponentFrame(component);
+    const componentArea = frame.width * frame.height;
+    if (componentArea >= containerArea) {
+      return false;
+    }
+
     return this.isPointInsideFrame(
       frame.x + frame.width / 2,
       frame.y + frame.height / 2,
       containerFrame
     );
   });
+}
+
+private elevateDraggedComponentsAboveContainers(sectionId: string, componentIds: string[]): void {
+  const section = this.sections().find((item) => item.id === sectionId);
+  if (!section || !componentIds.length) {
+    return;
+  }
+
+  const draggedIds = new Set(componentIds);
+  const components = this.readSectionComponents(section);
+  const containers = components.filter(
+    (component): component is StorefrontEditorContainerNode => component.type === 'container'
+  );
+  const nextZIndexById = new Map<string, number>();
+
+  componentIds
+    .map((componentId) => components.find((component) => component.id === componentId) ?? null)
+    .filter((component): component is StorefrontEditorComponentNode => component !== null)
+    .sort((left, right) => (left.zIndex ?? 0) - (right.zIndex ?? 0))
+    .forEach((component) => {
+      const frame = this.getComponentFrame(component);
+      const componentArea = Math.max(1, frame.width * frame.height);
+      const containingContainer = containers
+        .filter((container) => {
+          if (container.id === component.id || draggedIds.has(container.id)) {
+            return false;
+          }
+
+          const containerFrame = this.getComponentFrame(container);
+          const containerArea = containerFrame.width * containerFrame.height;
+          return (
+            containerArea > componentArea &&
+            this.isPointInsideFrame(
+              frame.x + frame.width / 2,
+              frame.y + frame.height / 2,
+              containerFrame
+            )
+          );
+        })
+        .sort((left, right) => {
+          const leftFrame = this.getComponentFrame(left);
+          const rightFrame = this.getComponentFrame(right);
+          return leftFrame.width * leftFrame.height - rightFrame.width * rightFrame.height;
+        })[0];
+
+      if (!containingContainer) {
+        return;
+      }
+
+      const containerZIndex = nextZIndexById.get(containingContainer.id) ?? containingContainer.zIndex ?? 1;
+      const currentZIndex = nextZIndexById.get(component.id) ?? component.zIndex ?? 1;
+      if (currentZIndex > containerZIndex) {
+        return;
+      }
+
+      nextZIndexById.set(component.id, containerZIndex + 1);
+    });
+
+  if (!nextZIndexById.size) {
+    return;
+  }
+
+  this.updateSectionComponents(
+    sectionId,
+    (currentComponents) =>
+      currentComponents.map((component) =>
+        nextZIndexById.has(component.id)
+          ? { ...component, zIndex: nextZIndexById.get(component.id) ?? component.zIndex }
+          : component
+      ),
+    { selectedSectionId: sectionId, syncRail: false, transient: true }
+  );
 }
 
 private getContainerContentLocalBounds(
