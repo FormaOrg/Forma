@@ -6,6 +6,7 @@ import {
   StorefrontHomepageDocument,
   StorefrontHomepageSection,
 } from '../../../../../../../core/models/project-storefront.model';
+import { ensureStableStorefrontSections } from './storefront-editor-storefront.domain';
 
 type BuildDefaultHomepageDocument = (storeName: string) => ProjectStorefront['draftHomepage'];
 type NormalizeSection = (
@@ -115,8 +116,9 @@ export function normalizeManagedPageDocument(
       description:
         typeof candidate.seo?.description === 'string' ? candidate.seo.description : fallback.seo.description,
     },
-    sections: candidate.sections!.map((section) =>
-      helpers.normalizeSection(section, helpers.fallbackStoreName)
+    sections: ensureStableStorefrontSections(
+      candidate.sections!.map((section) => helpers.normalizeSection(section, helpers.fallbackStoreName)),
+      helpers.fallbackStoreName
     ),
   };
 }

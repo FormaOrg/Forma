@@ -19,8 +19,7 @@ export type SectionLibraryCategory =
   | 'Essentials'
   | 'Promotions'
   | 'Catalog'
-  | 'Contact'
-  | 'Footer';
+  | 'Contact';
 
 export type SectionLibraryTemplate = {
   id: string;
@@ -38,7 +37,6 @@ export const STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES: SectionLibraryCategor
   'Promotions',
   'Catalog',
   'Contact',
-  'Footer',
 ];
 
 export const STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES: SectionLibraryTemplate[] = [
@@ -108,21 +106,6 @@ export const STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES: SectionLibraryTemplate
       ctaLabel: 'Contact support',
       ctaHref: 'mailto:support@store.com',
       editorLabel: 'Contact Section',
-    },
-  },
-  {
-    id: 'store-footer',
-    title: 'Store Footer',
-    description: 'A practical footer with brand text plus key contact details at the bottom.',
-    category: 'Footer',
-    type: 'footer',
-    layout: 'standard',
-    accent: 'charcoal',
-    props: {
-      brandText: 'Your Store',
-      contactEmail: 'hello@store.com',
-      contactPhone: '+216 00 000 000',
-      editorLabel: 'Store Footer',
     },
   },
 ];

@@ -350,8 +350,7 @@ type SectionLibraryCategory =
   | 'Essentials'
   | 'Promotions'
   | 'Catalog'
-  | 'Contact'
-  | 'Footer';
+  | 'Contact';
 type SectionLibraryTemplate = {
   id: string;
   title: string;
@@ -628,6 +627,9 @@ readonly canScrollPageDesignTabsRight = signal(false);
   readonly activeSnapGuides = signal<EditorSnapGuide[]>([]);
   readonly isComponentContextMenuOpen = signal(false);
   readonly componentContextMenuPosition = signal({ x: 0, y: 0 });
+  readonly componentContextMenuSubmenuDirection = signal<'left' | 'right'>('right');
+  readonly componentContextArrangeSubmenuPosition = signal({ x: 0, y: 0 });
+  readonly componentContextAlignSubmenuPosition = signal({ x: 0, y: 0 });
   readonly componentContextMenuSectionId = signal<string | null>(null);
   readonly componentContextMenuComponentId = signal<string | null>(null);
   readonly sectionContextMenuPosition = signal({ x: 0, y: 0 });
@@ -768,6 +770,11 @@ readonly isParagraphToolbarVisible = computed(
   readonly isProductFeedToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
   );
+  readonly canShowGroupAction = computed(
+    () => this.selectedComponentIds().length >= 2 && !this.selectedComponentGroupId()
+  );
+  readonly canShowUngroupAction = computed(() => !!this.selectedComponentGroupId());
+  readonly canShowAlignAction = computed(() => this.selectedComponentIds().length >= 2);
 readonly activeTextToolbarMenu = signal<
   'style' | 'font-size' | 'font-family' | 'link' | 'alignment' | 'color' | 'typography' | 'highlight' | null
 >(null);
@@ -1608,7 +1615,6 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     'hero',
     'featured-products',
     'contact',
-    'footer',
   ];
   readonly sectionLibraryCategories: SectionLibraryCategory[] = STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES;
   readonly sectionLibraryTemplates: SectionLibraryTemplate[] = STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES;
@@ -2493,9 +2499,33 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   const dragUndoSnapshot = this.activeComponentDragUndoSnapshot;
   if (this.activeComponentDrag) {
     this.finalizeDraggedComponentsLayoutSnap();
+    const draggedComponentIds = this.activeComponentDrag.components.map((component) => component.componentId);
+    const draggedAttachRootIds = this.getContainerAttachRootComponentIds(
+      this.activeComponentDrag.sectionId,
+      draggedComponentIds
+    );
+    const attachTarget = this.componentAttachContainerTarget();
+    if (attachTarget?.sectionId === this.activeComponentDrag.sectionId) {
+      this.updateComponentContainerParentIds(
+        this.activeComponentDrag.sectionId,
+        draggedAttachRootIds,
+        attachTarget.containerId,
+        { selectedSectionId: this.activeComponentDrag.sectionId, syncRail: false, transient: true }
+      );
+    } else if (
+      this.activeComponentDrag.sourceContainerId &&
+      this.componentAttachSectionId() === this.activeComponentDrag.sectionId
+    ) {
+      this.updateComponentContainerParentIds(
+        this.activeComponentDrag.sectionId,
+        draggedAttachRootIds,
+        null,
+        { selectedSectionId: this.activeComponentDrag.sectionId, syncRail: false, transient: true }
+      );
+    }
     this.elevateDraggedComponentsAboveContainers(
       this.activeComponentDrag.sectionId,
-      this.activeComponentDrag.components.map((component) => component.componentId)
+      draggedComponentIds
     );
   }
   this.clearSnapGuides();
@@ -2689,7 +2719,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
-    const selectedComponents = this.getSelectedComponentsForBatchAction(section);
+    const selectedComponents = this.getSelectedRootComponentsForBatchAction(section);
     if (selectedComponents.length < 2) {
       return;
     }
@@ -2699,9 +2729,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     const containerWidth = dimensions?.width ?? 99999;
     const containerHeight = dimensions?.height ?? 99999;
 
-    this.updateSectionComponentFrames(
-      section.id,
-      selectedComponents.map((component) => {
+    const positions = selectedComponents.map((component) => {
         const frame = this.getComponentFrame(component);
         switch (mode) {
           case 'left':
@@ -2717,7 +2745,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           case 'bottom':
             return { componentId: component.id, x: frame.x, y: bounds.y + bounds.height - frame.height };
         }
-      }),
+      });
+
+    this.updateSectionComponentFrames(
+      section.id,
+      this.expandPositionUpdatesForAttachedDescendants(section, positions),
       containerWidth,
       containerHeight
     );
@@ -2730,7 +2762,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
-    const selectedComponents = this.getSelectedComponentsForBatchAction(section);
+    const selectedComponents = this.getSelectedRootComponentsForBatchAction(section);
     if (selectedComponents.length < 3) {
       return;
     }
@@ -2763,7 +2795,12 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return position;
     });
 
-    this.updateSectionComponentFrames(section.id, positions, containerWidth, containerHeight);
+    this.updateSectionComponentFrames(
+      section.id,
+      this.expandPositionUpdatesForAttachedDescendants(section, positions),
+      containerWidth,
+      containerHeight
+    );
     this.closeComponentContextMenu();
   }
 
@@ -3416,19 +3453,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }));
     const container = target.closest('.storefront-editor__preview-section-content');
     const containerRect = container instanceof HTMLElement ? container.getBoundingClientRect() : target.getBoundingClientRect();
-    const sourceContainerTarget = this.getContainerDropTargetForDraggedBounds(
-      {
-        left: containerRect.left + dragBounds.x,
-        top: containerRect.top + dragBounds.y,
-        width: dragBounds.width,
-        height: dragBounds.height,
-      },
-      sectionId,
-      orderedComponents.map((item) => item.id)
-    );
     this.activeComponentDrag = {
       sectionId,
-      sourceContainerId: sourceContainerTarget?.containerId ?? null,
+      sourceContainerId: component.parentContainerId ?? null,
       pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x),
       pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y),
       components: orderedComponents.map((item) => {
@@ -3549,13 +3576,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
-    const selectedGroupId = this.selectedComponentGroupId();
-    const selectedIds = selectedGroupId
-      ? new Set(this.selectedComponentGroupComponents().map((component) => component.id))
-      : new Set(componentIds);
     const removableIds = new Set(
-      this.readSectionComponents(section)
-        .filter((component) => selectedIds.has(component.id) && !component.isLocked)
+      this.getSelectedComponentsForBatchAction(section)
+        .filter((component) => !component.isLocked)
         .map((component) => component.id)
     );
     if (!removableIds.size) {
@@ -3617,7 +3640,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       (max, component) => Math.max(max, component.zIndex || 0),
       0
     );
-    const { clones, nextIds } = this.cloneComponentsForBatchInsert(clipboard, maxZIndex + 1, 20);
+    const rootSourceIds = this.getBatchRootSourceComponentIds(clipboard);
+    const { clones, nextIds, componentIdMap } = this.cloneComponentsForBatchInsert(clipboard, maxZIndex + 1, 20);
     if (!clones.length) {
       return;
     }
@@ -3626,8 +3650,12 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       selectedSectionId: sectionId,
       syncRail: true,
     });
-    this.selectedComponentId.set(nextIds[nextIds.length - 1] ?? null);
-    this.selectedComponentIds.set(nextIds);
+    const nextRootIds = rootSourceIds
+      .map((sourceId) => componentIdMap.get(sourceId))
+      .filter((id): id is string => Boolean(id));
+    const selectionIds = nextRootIds.length ? nextRootIds : nextIds;
+    this.selectedComponentId.set(selectionIds[selectionIds.length - 1] ?? null);
+    this.selectedComponentIds.set(selectionIds);
     this.isolatedGroupComponentId.set(null);
     this.closeComponentContextMenu();
   }
@@ -3744,10 +3772,26 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.selectComponent(sectionId, componentId, event);
     this.componentContextMenuSectionId.set(sectionId);
     this.componentContextMenuComponentId.set(componentId);
+    const preferredPosition = this.getPreferredContextMenuPosition(event.clientX, event.clientY);
     this.componentContextMenuPosition.set(
-      this.getClampedFloatingPanelPosition(event.clientX, event.clientY, 220, 460)
+      this.getClampedFloatingPanelPosition(preferredPosition.x, preferredPosition.y, 220, 460)
     );
+    this.updateComponentContextMenuSubmenuDirection(this.componentContextMenuPosition().x, 220);
     this.isComponentContextMenuOpen.set(true);
+    this.syncFloatingPanelPosition(
+      '.storefront-editor__component-context-menu',
+      this.componentContextMenuPosition,
+      preferredPosition.x,
+      preferredPosition.y
+    );
+    window.requestAnimationFrame(() => {
+      const panel = document.querySelector('.storefront-editor__component-context-menu');
+      if (!(panel instanceof HTMLElement)) {
+        return;
+      }
+
+      this.updateComponentContextMenuSubmenuDirection(this.componentContextMenuPosition().x, panel.offsetWidth);
+    });
     this.sectionOptionsMenuId.set(null);
   }
 
@@ -3769,13 +3813,55 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       this.selectedComponentIds.set([]);
       this.isolatedGroupComponentId.set(null);
       this.closeComponentContextMenu();
-      this.openSectionOptionsAt(sectionId, event.clientX, event.clientY);
+      const preferredPosition = this.getPreferredContextMenuPosition(event.clientX, event.clientY);
+      this.openSectionOptionsAt(sectionId, preferredPosition.x, preferredPosition.y);
   }
 
   closeComponentContextMenu(): void {
     this.isComponentContextMenuOpen.set(false);
+    this.componentContextMenuSubmenuDirection.set('right');
+    this.componentContextArrangeSubmenuPosition.set({ x: 0, y: 0 });
+    this.componentContextAlignSubmenuPosition.set({ x: 0, y: 0 });
     this.componentContextMenuSectionId.set(null);
     this.componentContextMenuComponentId.set(null);
+  }
+
+  updateComponentContextSubmenuPosition(
+    group: HTMLElement,
+    submenu: HTMLElement,
+    kind: 'arrange' | 'align'
+  ): void {
+    window.requestAnimationFrame(() => {
+      const viewportMargin = 12;
+      const submenuGap = 10;
+      const groupRect = group.getBoundingClientRect();
+      const submenuWidth = submenu.offsetWidth;
+      const submenuHeight = submenu.offsetHeight;
+
+      const openRight =
+        groupRect.right + submenuGap + submenuWidth <= window.innerWidth - viewportMargin;
+
+      this.componentContextMenuSubmenuDirection.set(openRight ? 'right' : 'left');
+
+      const nextX = openRight
+        ? groupRect.right + submenuGap
+        : Math.max(viewportMargin, groupRect.left - submenuGap - submenuWidth);
+
+      let nextY = groupRect.top;
+      if (nextY + submenuHeight > window.innerHeight - viewportMargin) {
+        nextY = window.innerHeight - viewportMargin - submenuHeight;
+      }
+      if (nextY < viewportMargin) {
+        nextY = viewportMargin;
+      }
+
+      const nextPosition = { x: nextX, y: nextY };
+      if (kind === 'arrange') {
+        this.componentContextArrangeSubmenuPosition.set(nextPosition);
+      } else {
+        this.componentContextAlignSubmenuPosition.set(nextPosition);
+      }
+    });
   }
 
   closeSectionOptionsMenu(): void {
@@ -3858,7 +3944,9 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
+    const rootSourceIds = this.getSelectedRootComponentsForBatchAction(section).map((component) => component.id);
     const nextIds: string[] = [];
+    const nextRootIds: string[] = [];
     this.applyStorefrontMutation((storefront) => ({
       ...storefront,
       draftHomepage: {
@@ -3871,20 +3959,26 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           const components = this.readSectionComponents(item);
           let nextZIndex = components.reduce((max, component) => Math.max(max, component.zIndex ?? 1), 0) + 1;
           const selectedComponents = this.getSelectedComponentsForBatchAction(item);
-          const { clones, nextIds: duplicateIds } = this.cloneComponentsForBatchInsert(
+          const { clones, nextIds: duplicateIds, componentIdMap } = this.cloneComponentsForBatchInsert(
             selectedComponents,
             nextZIndex,
             24
           );
           nextIds.push(...duplicateIds);
+          nextRootIds.push(
+            ...rootSourceIds
+              .map((sourceId) => componentIdMap.get(sourceId))
+              .filter((id): id is string => Boolean(id))
+          );
 
           return this.writeSectionComponents(item, [...components, ...clones]);
         }),
       },
     }), { syncRail: false });
 
-    this.selectedComponentIds.set(nextIds);
-    this.selectedComponentId.set(nextIds[nextIds.length - 1] ?? null);
+    const selectionIds = nextRootIds.length ? nextRootIds : nextIds;
+    this.selectedComponentIds.set(selectionIds);
+    this.selectedComponentId.set(selectionIds[selectionIds.length - 1] ?? null);
     this.closeComponentContextMenu();
   }
 
@@ -4425,9 +4519,61 @@ finishEditingComponentText(): void {
     this.openSectionOptionsAt(sectionId, window.innerWidth / 2, window.innerHeight / 2);
   }
 
-  private openSectionOptionsAt(sectionId: string, x: number, y: number): void {
-    this.sectionContextMenuPosition.set(this.getClampedFloatingPanelPosition(x, y, 232, 340));
-    this.sectionOptionsMenuId.set(sectionId);
+private openSectionOptionsAt(sectionId: string, x: number, y: number): void {
+  this.sectionContextMenuPosition.set(
+    this.getClampedFloatingPanelPosition(x, y, 232, this.isStableSectionId(sectionId) ? 76 : 340)
+  );
+  this.sectionOptionsMenuId.set(sectionId);
+  this.syncFloatingPanelPosition(
+    '.storefront-editor__preview-section-menu--floating',
+    this.sectionContextMenuPosition,
+      x,
+      y
+    );
+  }
+
+  private getPreferredContextMenuPosition(x: number, y: number): { x: number; y: number } {
+    const offset = 8;
+    return {
+      x: x + offset,
+      y: y + offset,
+    };
+  }
+
+  private syncFloatingPanelPosition(
+    selector: string,
+    positionSignal: WritableSignal<{ x: number; y: number }>,
+    preferredX: number,
+    preferredY: number
+  ): void {
+    window.requestAnimationFrame(() => {
+      const panel = document.querySelector(selector);
+      if (!(panel instanceof HTMLElement)) {
+        return;
+      }
+
+      positionSignal.set(
+        this.getClampedFloatingPanelPosition(
+          preferredX,
+          preferredY,
+          panel.offsetWidth,
+          panel.offsetHeight
+        )
+      );
+
+      if (selector === '.storefront-editor__component-context-menu') {
+        this.updateComponentContextMenuSubmenuDirection(positionSignal().x, panel.offsetWidth);
+      }
+    });
+  }
+
+  private updateComponentContextMenuSubmenuDirection(menuX: number, menuWidth: number): void {
+    const viewportMargin = 12;
+    const submenuGap = 8;
+    const estimatedSubmenuWidth = 248;
+    const opensRightWithinViewport =
+      menuX + menuWidth + submenuGap + estimatedSubmenuWidth <= window.innerWidth - viewportMargin;
+    this.componentContextMenuSubmenuDirection.set(opensRightWithinViewport ? 'right' : 'left');
   }
 
   private getSectionAddMenuPlacement(anchorRect: DOMRect | null, menuHeight: number): 'above' | 'below' {
@@ -6892,6 +7038,10 @@ updatePageDesignTabScrollState(): void {
       return;
     }
 
+    if (!this.canMoveSection(selectedSectionId, direction)) {
+      return;
+    }
+
     this.applyStorefrontMutation((storefront) => {
       const sections = [...storefront.draftHomepage.sections];
       const currentIndex = sections.findIndex((section) => section.id === selectedSectionId);
@@ -6945,16 +7095,11 @@ updatePageDesignTabScrollState(): void {
     props?: Record<string, unknown>
   ): void {
     let insertedId: string | null = null;
-    this.applyStorefrontMutation((storefront) => {
+  this.applyStorefrontMutation((storefront) => {
       const section = this.createSection(type, props);
       insertedId = section.id;
       const sections = [...storefront.draftHomepage.sections];
-      const selectedSectionId = this.selectedSectionId();
-      const selectedIndex = selectedSectionId
-        ? sections.findIndex((item) => item.id === selectedSectionId)
-        : -1;
-      const insertAt =
-        mode === 'after-selected' && selectedIndex >= 0 ? selectedIndex + 1 : sections.length;
+      const insertAt = this.getSectionInsertIndex(sections, this.selectedSectionId(), mode);
 
       sections.splice(insertAt, 0, section);
 
@@ -6991,8 +7136,7 @@ updatePageDesignTabScrollState(): void {
       insertedId = section.id;
 
       const sections = [...storefront.draftHomepage.sections];
-      const selectedIndex = sections.findIndex((item) => item.id === sectionId);
-      const insertAt = selectedIndex >= 0 ? selectedIndex + 1 : sections.length;
+      const insertAt = this.getSectionInsertIndex(sections, sectionId, 'after-selected');
       sections.splice(insertAt, 0, section);
 
       return {
@@ -7033,9 +7177,23 @@ updatePageDesignTabScrollState(): void {
         return storefront;
       }
 
+      if (this.isStableSectionType(sections[draggedIndex].type)) {
+        return storefront;
+      }
+
       const [draggedSection] = sections.splice(draggedIndex, 1);
       const nextTargetIndex = sections.findIndex((section) => section.id === targetSectionId);
-      sections.splice(nextTargetIndex, 0, draggedSection);
+      if (nextTargetIndex < 0) {
+        return storefront;
+      }
+
+      const targetSection = sections[nextTargetIndex];
+      const insertAt =
+        targetSection?.type === 'header' ? nextTargetIndex + 1 :
+        targetSection?.type === 'footer' ? nextTargetIndex :
+        nextTargetIndex;
+
+      sections.splice(insertAt, 0, draggedSection);
 
       return {
         ...storefront,
@@ -7048,6 +7206,10 @@ updatePageDesignTabScrollState(): void {
   }
 
   duplicateSection(sectionId: string): void {
+    if (this.isStableSectionId(sectionId)) {
+      return;
+    }
+
     let duplicateId: string | null = null;
     this.applyStorefrontMutation((storefront) => {
       const sections = [...storefront.draftHomepage.sections];
@@ -7085,7 +7247,7 @@ updatePageDesignTabScrollState(): void {
 
   cutSection(sectionId: string): void {
     const section = this.sections().find((item) => item.id === sectionId);
-    if (!section || this.sections().length <= 1) {
+    if (!section || !this.canRemoveSection(sectionId)) {
       return;
     }
 
@@ -7093,13 +7255,22 @@ updatePageDesignTabScrollState(): void {
     this.removeSection(sectionId);
   }
 
-  canPasteSection(): boolean {
-    return this.sectionClipboard() !== null;
+  canPasteSection(sectionId?: string): boolean {
+    const clipboardSection = this.sectionClipboard();
+    if (!clipboardSection || this.isStableSectionType(clipboardSection.type)) {
+      return false;
+    }
+
+    if (!sectionId) {
+      return true;
+    }
+
+    return this.sections().some((section) => section.id === sectionId);
   }
 
   pasteSection(sectionId: string): void {
     const clipboardSection = this.sectionClipboard();
-    if (!clipboardSection) {
+    if (!clipboardSection || this.isStableSectionType(clipboardSection.type)) {
       return;
     }
 
@@ -7114,7 +7285,7 @@ updatePageDesignTabScrollState(): void {
       const pastedSection = this.cloneSection(clipboardSection);
       pastedSection.id = this.createSectionId(pastedSection.type);
       pastedId = pastedSection.id;
-      sections.splice(targetIndex + 1, 0, pastedSection);
+      sections.splice(this.getSectionInsertIndex(sections, sectionId, 'after-selected'), 0, pastedSection);
 
       return {
         ...storefront,
@@ -7127,13 +7298,13 @@ updatePageDesignTabScrollState(): void {
   }
 
   removeSection(sectionId: string): void {
+    if (!this.canRemoveSection(sectionId)) {
+      return;
+    }
+
     const nextSelected: string | null = null;
     this.applyStorefrontMutation((storefront) => {
       const sections = storefront.draftHomepage.sections;
-      if (sections.length <= 1) {
-        return storefront;
-      }
-
       const index = sections.findIndex((section) => section.id === sectionId);
       if (index < 0) {
         return storefront;
@@ -7151,6 +7322,47 @@ updatePageDesignTabScrollState(): void {
     }, { selectedSectionId: nextSelected, syncRail: true });
   }
 
+  isStableSectionType(type: StorefrontSectionType): boolean {
+    return type === 'header' || type === 'footer';
+  }
+
+  isStableSectionId(sectionId: string | null | undefined): boolean {
+    if (!sectionId) {
+      return false;
+    }
+
+    const section = this.sections().find((item) => item.id === sectionId);
+    return !!section && this.isStableSectionType(section.type);
+  }
+
+  isFooterSection(section: StorefrontHomepageSection | null | undefined): boolean {
+    return section?.type === 'footer';
+  }
+
+  private getSectionInsertIndex(
+    sections: StorefrontHomepageSection[],
+    targetSectionId: string | null,
+    mode: SectionInsertMode
+  ): number {
+    const footerIndex = sections.findIndex((section) => section.type === 'footer');
+    const appendIndex = footerIndex >= 0 ? footerIndex : sections.length;
+    if (mode !== 'after-selected' || !targetSectionId) {
+      return appendIndex;
+    }
+
+    const targetIndex = sections.findIndex((section) => section.id === targetSectionId);
+    if (targetIndex < 0) {
+      return appendIndex;
+    }
+
+    const targetSection = sections[targetIndex];
+    if (targetSection.type === 'footer') {
+      return targetIndex;
+    }
+
+    return targetIndex + 1;
+  }
+
   toggleSectionEnabled(sectionId: string): void {
     this.applyStorefrontMutation((storefront) => ({
         ...storefront,
@@ -7166,16 +7378,36 @@ updatePageDesignTabScrollState(): void {
   }
 
   canMoveSection(sectionId: string, direction: 'up' | 'down'): boolean {
-    const index = this.sections().findIndex((section) => section.id === sectionId);
+    const sections = this.sections();
+    const index = sections.findIndex((section) => section.id === sectionId);
     if (index < 0) {
       return false;
     }
 
-    return direction === 'up' ? index > 0 : index < this.sections().length - 1;
+    const currentSection = sections[index];
+    if (this.isStableSectionType(currentSection.type)) {
+      return false;
+    }
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= sections.length) {
+      return false;
+    }
+
+    return !this.isStableSectionType(sections[targetIndex].type);
   }
 
-  canRemoveSection(): boolean {
-    return this.sections().length > 1;
+  canRemoveSection(sectionId: string | null = this.selectedSectionId()): boolean {
+    if (!sectionId) {
+      return false;
+    }
+
+    const section = this.sections().find((item) => item.id === sectionId);
+    if (!section) {
+      return false;
+    }
+
+    return !this.isStableSectionType(section.type);
   }
 
   updateSelectedStringProp(key: string, value: string): void {
@@ -7316,7 +7548,9 @@ updatePageDesignTabScrollState(): void {
       return customLabel;
     }
 
-    switch (section.type) {
+  switch (section.type) {
+      case 'header':
+        return 'Header';
       case 'announcement-bar':
         return 'Announcement Bar';
       case 'featured-products':
@@ -7331,7 +7565,9 @@ updatePageDesignTabScrollState(): void {
   }
 
   sectionDescription(section: StorefrontHomepageSection): string {
-    switch (section.type) {
+  switch (section.type) {
+      case 'header':
+        return 'Editable site header';
       case 'announcement-bar':
         return this.readStringProp(section, 'text');
       case 'featured-products': {
@@ -7339,7 +7575,7 @@ updatePageDesignTabScrollState(): void {
         return `${count} selected product${count === 1 ? '' : 's'}`;
       }
       case 'footer':
-        return this.readStringProp(section, 'brandText');
+        return 'Editable site footer';
       case 'contact':
         return this.readStringProp(section, 'title') || this.readStringProp(section, 'email');
       default:
@@ -7909,6 +8145,8 @@ switch (component.type) {
 
   sectionTypeIcon(type: StorefrontSectionType): 'layout-grid' | 'package' | 'settings' {
   switch (type) {
+    case 'header':
+      return 'layout-grid';
     case 'featured-products':
       return 'package';
     case 'contact':
@@ -7922,6 +8160,8 @@ switch (component.type) {
 
   sectionLibraryDescription(type: StorefrontSectionType): string {
     switch (type) {
+      case 'header':
+        return 'Keep a persistent top area for navigation, branding, and utility content.';
       case 'announcement-bar':
         return 'Highlight a quick message, notice, or promo banner.';
       case 'hero':
@@ -7931,12 +8171,14 @@ switch (component.type) {
     case 'contact':
       return 'Show customers how to reach you with email, phone, and location details.';
     case 'footer':
-      return 'Add brand details and contact information at the bottom.';
+      return 'Keep a persistent bottom area for links, notes, and closing content.';
     }
   }
 
   sectionLibraryTypeLabel(type: StorefrontSectionType): string {
     switch (type) {
+      case 'header':
+        return 'Header';
       case 'announcement-bar':
         return 'Announcement';
     case 'featured-products':
@@ -8189,22 +8431,187 @@ private updateSelectedSection(
   trackSnapGuide = (_: number, guide: EditorSnapGuide): string =>
     `${guide.orientation}-${guide.kind}-${Math.round(guide.offset)}`;
 
-  private getSelectedComponentsForBatchAction(
-    section: StorefrontHomepageSection
-  ): StorefrontEditorComponentNode[] {
-    const components = this.readSectionComponents(section);
-    const selectedIds = new Set(this.selectedComponentIds());
-    if (!selectedIds.size) {
-      return [];
-    }
+private getSelectedRootComponentsForBatchAction(
+  section: StorefrontHomepageSection
+): StorefrontEditorComponentNode[] {
+  const components = this.readSectionComponents(section);
+  const selectedIds = new Set(this.selectedComponentIds());
+  if (!selectedIds.size) {
+    return [];
+  }
 
     const selectedGroupId = this.selectedComponentGroupId();
     if (selectedGroupId && selectedIds.has(this.selectedComponentId() ?? '')) {
       return components.filter((component) => component.groupId === selectedGroupId);
     }
 
-    return components.filter((component) => selectedIds.has(component.id));
+  return components.filter((component) => selectedIds.has(component.id));
+}
+
+private getSelectedComponentsForBatchAction(
+  section: StorefrontHomepageSection
+): StorefrontEditorComponentNode[] {
+  const rootComponents = this.getSelectedRootComponentsForBatchAction(section);
+  if (!rootComponents.length) {
+    return [];
   }
+
+  const expanded = new Map<string, StorefrontEditorComponentNode>();
+  for (const component of rootComponents) {
+    expanded.set(component.id, component);
+    if (component.type === 'container') {
+      for (const descendant of this.getContainerAssociatedComponentsDeep(section, component.id)) {
+        expanded.set(descendant.id, descendant);
+      }
+    }
+  }
+
+  return this.sortComponentsForContainerBundle([...expanded.values()]);
+}
+
+private getContainerAssociatedComponentsDeep(
+  section: StorefrontHomepageSection,
+  containerId: string,
+  visited = new Set<string>()
+): StorefrontEditorComponentNode[] {
+  if (visited.has(containerId)) {
+    return [];
+  }
+
+  visited.add(containerId);
+  const components = this.readSectionComponents(section);
+  const directChildren = components.filter(
+    (component) => component.id !== containerId && component.parentContainerId === containerId
+  );
+  const descendants = [...directChildren];
+
+  for (const child of directChildren) {
+    if (child.type === 'container') {
+      descendants.push(...this.getContainerAssociatedComponentsDeep(section, child.id, visited));
+    }
+  }
+
+  return descendants;
+}
+
+private sortComponentsForContainerBundle(
+  components: StorefrontEditorComponentNode[]
+): StorefrontEditorComponentNode[] {
+  if (components.length <= 1) {
+    return components;
+  }
+
+  const componentsById = new Map(components.map((component) => [component.id, component]));
+  const childrenByParent = new Map<string, StorefrontEditorComponentNode[]>();
+
+  for (const component of components) {
+    const parentId = component.parentContainerId;
+    if (!parentId || !componentsById.has(parentId)) {
+      continue;
+    }
+
+    const siblings = childrenByParent.get(parentId) ?? [];
+    siblings.push(component);
+    childrenByParent.set(parentId, siblings);
+  }
+
+  for (const siblings of childrenByParent.values()) {
+    siblings.sort((left, right) => (left.zIndex ?? 0) - (right.zIndex ?? 0));
+  }
+
+  const orderedByDepth = [...components].sort((left, right) => {
+    const zIndexDelta = (left.zIndex ?? 0) - (right.zIndex ?? 0);
+    if (zIndexDelta !== 0) {
+      return zIndexDelta;
+    }
+
+    return left.id.localeCompare(right.id);
+  });
+
+  const result: StorefrontEditorComponentNode[] = [];
+  const visited = new Set<string>();
+  const appendComponent = (component: StorefrontEditorComponentNode): void => {
+    if (visited.has(component.id)) {
+      return;
+    }
+
+    visited.add(component.id);
+    result.push(component);
+
+    const children = childrenByParent.get(component.id) ?? [];
+    for (const child of children) {
+      appendComponent(child);
+    }
+  };
+
+  for (const component of orderedByDepth) {
+    if (component.parentContainerId && componentsById.has(component.parentContainerId)) {
+      continue;
+    }
+
+    appendComponent(component);
+  }
+
+  for (const component of orderedByDepth) {
+    appendComponent(component);
+  }
+
+  return result;
+}
+
+private expandPositionUpdatesForAttachedDescendants(
+  section: StorefrontHomepageSection,
+  rootPositions: Array<{ componentId: string; x: number; y: number }>
+): Array<{ componentId: string; x: number; y: number }> {
+  if (!rootPositions.length) {
+    return [];
+  }
+
+  const components = this.readSectionComponents(section);
+  const componentsById = new Map(components.map((component) => [component.id, component]));
+  const childIdsByParent = new Map<string, string[]>();
+  for (const component of components) {
+    if (!component.parentContainerId) {
+      continue;
+    }
+
+    const siblings = childIdsByParent.get(component.parentContainerId) ?? [];
+    siblings.push(component.id);
+    childIdsByParent.set(component.parentContainerId, siblings);
+  }
+
+  const expandedPositions = new Map<string, { componentId: string; x: number; y: number }>();
+  const applyDelta = (componentId: string, deltaX: number, deltaY: number): void => {
+    const component = componentsById.get(componentId);
+    if (!component) {
+      return;
+    }
+
+    const frame = this.getComponentFrame(component);
+    expandedPositions.set(componentId, {
+      componentId,
+      x: frame.x + deltaX,
+      y: frame.y + deltaY,
+    });
+
+    const childIds = childIdsByParent.get(componentId) ?? [];
+    for (const childId of childIds) {
+      applyDelta(childId, deltaX, deltaY);
+    }
+  };
+
+  for (const rootPosition of rootPositions) {
+    const component = componentsById.get(rootPosition.componentId);
+    if (!component) {
+      continue;
+    }
+
+    const frame = this.getComponentFrame(component);
+    applyDelta(rootPosition.componentId, rootPosition.x - frame.x, rootPosition.y - frame.y);
+  }
+
+  return [...expandedPositions.values()];
+}
 
   private getSnapStep(): number {
     return this.snapSpacingToken();
@@ -8357,8 +8764,9 @@ private updateSelectedSection(
     sourceComponents: StorefrontEditorComponentNode[],
     startingZIndex: number,
     offset: number
-  ): { clones: StorefrontEditorComponentNode[]; nextIds: string[] } {
+  ): { clones: StorefrontEditorComponentNode[]; nextIds: string[]; componentIdMap: Map<string, string> } {
     const groupIdMap = new Map<string, string>();
+    const componentIdMap = new Map<string, string>();
     const nextIds: string[] = [];
     let nextZIndex = startingZIndex;
     const batchSeed = Date.now();
@@ -8366,6 +8774,7 @@ private updateSelectedSection(
     const clones = sourceComponents.map((component) => {
       const clone = JSON.parse(JSON.stringify(component)) as StorefrontEditorComponentNode;
       clone.id = createStorefrontEditorComponentNode(component.type).id;
+      componentIdMap.set(component.id, clone.id);
       const frame = this.getComponentFrame(clone);
       Object.assign(clone, this.writeComponentFrame(clone, {
         ...frame,
@@ -8385,15 +8794,42 @@ private updateSelectedSection(
 
       nextIds.push(clone.id);
       return clone;
+    }).map((clone, index) => {
+      const sourceComponent = sourceComponents[index];
+      if (!sourceComponent) {
+        return clone;
+      }
+
+      const nextParentContainerId = sourceComponent.parentContainerId
+        ? componentIdMap.get(sourceComponent.parentContainerId) ?? sourceComponent.parentContainerId
+        : sourceComponent.parentContainerId ?? null;
+
+      return {
+        ...clone,
+        parentContainerId: nextParentContainerId,
+      };
     });
 
-    return { clones, nextIds };
+    return { clones, nextIds, componentIdMap };
+  }
+
+  private getBatchRootSourceComponentIds(
+    sourceComponents: readonly StorefrontEditorComponentNode[]
+  ): string[] {
+    const sourceIds = new Set(sourceComponents.map((component) => component.id));
+    return sourceComponents
+      .filter((component) => !component.parentContainerId || !sourceIds.has(component.parentContainerId))
+      .map((component) => component.id);
   }
 
   private reorderSelectedComponentDepth(direction: 'front' | 'back'): void {
     const section = this.selectedSection();
-    const selectedIds = new Set(this.selectedComponentIds());
-    if (!section || !selectedIds.size) {
+    if (!section) {
+      return;
+    }
+
+    const selectedIds = new Set(this.getSelectedComponentsForBatchAction(section).map((component) => component.id));
+    if (!selectedIds.size) {
       return;
     }
 
@@ -8402,18 +8838,20 @@ private updateSelectedSection(
       draftHomepage: {
         ...storefront.draftHomepage,
         sections: storefront.draftHomepage.sections.map((item) => {
-          if (item.id !== section.id) {
-            return item;
-          }
+        if (item.id !== section.id) {
+          return item;
+        }
 
-          const components = this.readSectionComponents(item);
-          const selected = components.filter((component) => selectedIds.has(component.id));
-          const rest = components.filter((component) => !selectedIds.has(component.id));
-          const ordered = direction === 'front' ? [...rest, ...selected] : [...selected, ...rest];
-          return this.writeSectionComponents(
-            item,
-            ordered.map((component, index) => ({
-              ...component,
+        const components = [...this.readSectionComponents(item)].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+        const selected = this.sortComponentsForContainerBundle(
+          components.filter((component) => selectedIds.has(component.id))
+        );
+        const rest = components.filter((component) => !selectedIds.has(component.id));
+        const ordered = direction === 'front' ? [...rest, ...selected] : [...selected, ...rest];
+        return this.writeSectionComponents(
+          item,
+          ordered.map((component, index) => ({
+            ...component,
               zIndex: index + 1,
             }))
           );
@@ -8426,8 +8864,12 @@ private updateSelectedSection(
 
   private stepSelectedComponentDepth(direction: 'forward' | 'backward'): void {
     const section = this.selectedSection();
-    const selectedIds = new Set(this.selectedComponentIds());
-    if (!section || !selectedIds.size) {
+    if (!section) {
+      return;
+    }
+
+    const selectedIds = new Set(this.getSelectedComponentsForBatchAction(section).map((component) => component.id));
+    if (!selectedIds.size) {
       return;
     }
 
@@ -8436,38 +8878,51 @@ private updateSelectedSection(
       draftHomepage: {
         ...storefront.draftHomepage,
         sections: storefront.draftHomepage.sections.map((item) => {
-          if (item.id !== section.id) {
+        if (item.id !== section.id) {
+          return item;
+        }
+
+        const components = [...this.readSectionComponents(item)].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+        const selected = this.sortComponentsForContainerBundle(
+          components.filter((component) => selectedIds.has(component.id))
+        );
+        const rest = components.filter((component) => !selectedIds.has(component.id));
+        if (!selected.length || !rest.length) {
+          return item;
+        }
+
+        const earliestSelectedIndex = components.findIndex((component) => selectedIds.has(component.id));
+        const latestSelectedIndex = components.length - 1 - [...components].reverse().findIndex((component) => selectedIds.has(component.id));
+
+        let ordered = components;
+        if (direction === 'forward') {
+          const nextUnselected = components
+            .slice(latestSelectedIndex + 1)
+            .find((component) => !selectedIds.has(component.id));
+          if (!nextUnselected) {
             return item;
           }
 
-          const components = [...this.readSectionComponents(item)].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
-          if (direction === 'forward') {
-            for (let index = components.length - 2; index >= 0; index -= 1) {
-              const current = components[index];
-              const next = components[index + 1];
-              if (selectedIds.has(current.id) && !selectedIds.has(next.id)) {
-                components[index] = next;
-                components[index + 1] = current;
-              }
-            }
-          } else {
-            for (let index = 1; index < components.length; index += 1) {
-              const current = components[index];
-              const previous = components[index - 1];
-              if (selectedIds.has(current.id) && !selectedIds.has(previous.id)) {
-                components[index] = previous;
-                components[index - 1] = current;
-              }
-            }
+          const insertionIndex = rest.findIndex((component) => component.id === nextUnselected.id) + 1;
+          ordered = [...rest.slice(0, insertionIndex), ...selected, ...rest.slice(insertionIndex)];
+        } else {
+          const previousCandidates = components.slice(0, earliestSelectedIndex).filter((component) => !selectedIds.has(component.id));
+          const previousUnselected = previousCandidates[previousCandidates.length - 1] ?? null;
+          if (!previousUnselected) {
+            return item;
           }
 
-          return this.writeSectionComponents(
-            item,
-            components.map((component, index) => ({ ...component, zIndex: index + 1 }))
-          );
-        }),
-      },
-    }), { syncRail: false });
+          const insertionIndex = rest.findIndex((component) => component.id === previousUnselected.id);
+          ordered = [...rest.slice(0, insertionIndex), ...selected, ...rest.slice(insertionIndex)];
+        }
+
+        return this.writeSectionComponents(
+          item,
+          ordered.map((component, index) => ({ ...component, zIndex: index + 1 }))
+        );
+      }),
+    },
+  }), { syncRail: false });
 
     this.closeComponentContextMenu();
   }
@@ -9820,6 +10275,20 @@ private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['sha
     };
   }
 
+  private getMinimumSectionResizeHeight(sectionId: string): number {
+    const section = this.sections().find((item) => item.id === sectionId) ?? null;
+    if (!section) {
+      return 24;
+    }
+
+    const contentBottom = this.readSectionComponents(section).reduce((maxBottom, component) => {
+      const frame = this.getComponentFrame(component);
+      return Math.max(maxBottom, frame.y + frame.height);
+    }, 0);
+
+    return Math.max(24, Math.ceil(contentBottom));
+  }
+
   private getSectionLayoutCellBounds(
     section: StorefrontHomepageSection | null,
     containerWidth: number,
@@ -10228,52 +10697,96 @@ private appendComponentToContainer(
   containerId: string,
   component: StorefrontEditorComponentNode
 ): void {
-  const childComponent = {
+  const attachedComponent = {
     ...component,
-    frame: {
-      ...component.frame,
-      x: 0,
-      y: 0,
-    },
-    responsiveFrames: undefined,
+    parentContainerId: containerId,
   };
 
-  this.updateComponentNode(sectionId, containerId, (current) =>
-    current.type === 'container'
-      ? {
-          ...current,
-          children: [...current.children, childComponent],
-        }
-      : current
-  );
-  this.selectedComponentId.set(containerId);
-  this.selectedComponentIds.set([containerId]);
-  this.isolatedGroupComponentId.set(null);
+  this.insertComponentIntoSection(sectionId, attachedComponent, {
+    selectedSectionId: sectionId,
+    syncRail: true,
+  });
 }
 
 private getContainerAssociatedComponents(
   components: StorefrontEditorComponentNode[],
   container: StorefrontEditorContainerNode
 ): StorefrontEditorComponentNode[] {
-  const containerFrame = this.getComponentFrame(container);
-  const containerArea = containerFrame.width * containerFrame.height;
+  const descendants: StorefrontEditorComponentNode[] = [];
+  const visited = new Set<string>([container.id]);
 
-  return components.filter((component) => {
-    if (component.id === container.id) {
-      return false;
-    }
-
-    const frame = this.getComponentFrame(component);
-    const componentArea = frame.width * frame.height;
-    if (componentArea >= containerArea) {
-      return false;
-    }
-
-    return this.isPointInsideFrame(
-      frame.x + frame.width / 2,
-      frame.y + frame.height / 2,
-      containerFrame
+  const collectChildren = (parentId: string): void => {
+    const directChildren = components.filter(
+      (component) => component.id !== parentId && component.parentContainerId === parentId
     );
+
+    for (const child of directChildren) {
+      if (visited.has(child.id)) {
+        continue;
+      }
+
+      visited.add(child.id);
+      descendants.push(child);
+
+      if (child.type === 'container') {
+        collectChildren(child.id);
+      }
+    }
+  };
+
+  collectChildren(container.id);
+  return descendants;
+}
+
+private updateComponentContainerParentIds(
+  sectionId: string,
+  componentIds: readonly string[],
+  parentContainerId: string | null,
+  options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean; preview?: boolean } = {}
+): void {
+  if (!componentIds.length) {
+    return;
+  }
+
+  this.updateSectionComponents(
+    sectionId,
+    (components) => componentIds.reduce(
+      (nextComponents, componentId) =>
+        this.updateComponentTree(nextComponents, componentId, (component) => ({
+          ...component,
+          parentContainerId,
+        })),
+      components
+    ),
+    options
+  );
+}
+
+private getContainerAttachRootComponentIds(
+  sectionId: string,
+  componentIds: readonly string[]
+): string[] {
+  if (!componentIds.length) {
+    return [];
+  }
+
+  const section = this.sections().find((item) => item.id === sectionId);
+  if (!section) {
+    return [...componentIds];
+  }
+
+  const componentsById = new Map(
+    this.readSectionComponents(section).map((component) => [component.id, component] as const)
+  );
+  const componentIdSet = new Set(componentIds);
+
+  return componentIds.filter((componentId) => {
+    const component = componentsById.get(componentId);
+    if (!component?.parentContainerId) {
+      return true;
+    }
+
+    return !componentIdSet.has(component.parentContainerId);
   });
 }
 
@@ -10295,9 +10808,12 @@ private elevateDraggedComponentsAboveContainers(sectionId: string, componentIds:
     .filter((component): component is StorefrontEditorComponentNode => component !== null)
     .sort((left, right) => (left.zIndex ?? 0) - (right.zIndex ?? 0))
     .forEach((component) => {
+      const explicitParentContainer = component.parentContainerId
+        ? containers.find((container) => container.id === component.parentContainerId) ?? null
+        : null;
       const frame = this.getComponentFrame(component);
       const componentArea = Math.max(1, frame.width * frame.height);
-      const containingContainer = containers
+      const containingContainer = explicitParentContainer ?? containers
         .filter((container) => {
           if (container.id === component.id || draggedIds.has(container.id)) {
             return false;
@@ -10849,7 +11365,11 @@ isSectionAttachTarget(sectionId: string): boolean {
       return;
     }
 
-    const nextHeight = Math.max(24, Math.round(this.activeSectionResize.startHeight + (event.clientY - this.activeSectionResize.startY)));
+    const minHeight = this.getMinimumSectionResizeHeight(this.activeSectionResize.sectionId);
+    const nextHeight = Math.max(
+      minHeight,
+      Math.round(this.activeSectionResize.startHeight + (event.clientY - this.activeSectionResize.startY))
+    );
     const dimensions = this.getSectionContentDimensions(this.activeSectionResize.sectionId);
     this.applyStorefrontMutation((storefront) => ({
       ...storefront,

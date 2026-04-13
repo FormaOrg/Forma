@@ -3,6 +3,7 @@ export type StorefrontPageKey = 'home';
 export type StorefrontEditorViewport = 'desktop' | 'tablet' | 'mobile';
 export type StorefrontEditorManagedPageKind = 'home' | 'blank' | 'designed';
 export type StorefrontSectionType =
+  | 'header'
   | 'announcement-bar'
   | 'hero'
   | 'featured-products'
