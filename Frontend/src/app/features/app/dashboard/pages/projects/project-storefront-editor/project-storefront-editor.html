@@ -1273,14 +1273,16 @@
           (click)="$event.stopPropagation()"
         >
           <div class="storefront-editor__add-elements-browser-shell">
-            <aside class="storefront-editor__add-elements-browser-sidebar">
-              <div class="storefront-editor__add-elements-browser-brand">
-                <div>
-                  <strong>Element library</strong>
-                  <small>Browse every building block for this storefront</small>
-                </div>
+          <aside class="storefront-editor__add-elements-browser-sidebar">
+            <div class="storefront-editor__add-elements-browser-brand">
+              <div>
+                <strong>Element library</strong>
+                <small>Browse every building block for this storefront</small>
               </div>
+            </div>
 
+            <div class="storefront-editor__add-elements-browser-sidebar-group">
+              <p>Overview</p>
               <div class="storefront-editor__add-elements-browser-stats">
                 <article>
                   <strong>{{ addElementsLibraryItems.length }}</strong>
@@ -1291,7 +1293,10 @@
                   <span>Showing now</span>
                 </article>
               </div>
+            </div>
 
+            <div class="storefront-editor__add-elements-browser-sidebar-group">
+              <p>Browse</p>
               <nav class="storefront-editor__add-elements-browser-categories">
                 @for (category of addElementsCategories; track category.id) {
                   <button
@@ -1349,7 +1354,8 @@
                   </button>
                 }
               </nav>
-            </aside>
+            </div>
+          </aside>
 
             <section class="storefront-editor__add-elements-browser-main">
               <div class="storefront-editor__add-elements-browser-head">
@@ -1832,6 +1838,20 @@
       }
   
     <div class="storefront-editor__body">
+    <button
+      type="button"
+      class="storefront-editor__layers-trigger"
+      [class.storefront-editor__layers-trigger--active]="isLayersPopupOpen()"
+      [disabled]="!selectedSection()"
+      (click)="toggleLayersPopup()"
+      aria-label="Open layers"
+      title="Layers"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+        <path d="M11.22 5.06c.18-.08.38-.08.56 0l6.75 2.75c.29.11.47.39.47.69 0 .3-.18.58-.47.69l-3.22 1.31 3.22 1.31c.29.11.47.39.47.69 0 .3-.18.58-.47.69l-3.22 1.31 3.22 1.31h.02c.29.11.47.39.47.69 0 .3-.18.58-.47.69l-6.75 2.75c-.18.08-.38.08-.56 0l-6.75-2.75a.736.736 0 0 1-.47-.69c0-.3.18-.58.47-.69l3.21-1.306-.01-.004-3.22-1.31A.735.735 0 0 1 4 12.5c0-.3.18-.58.47-.69l3.22-1.31-3.22-1.31A.735.735 0 0 1 4 8.5c0-.3.18-.58.47-.69l6.75-2.75Zm.56 10.88a.692.692 0 0 1-.351.056.695.695 0 0 1-.21-.056l-1.55-.63L6.74 16.5l4.76 1.94 4.76-1.94-2.93-1.19-1.55.63ZM6.76 12.5l2.93 1.19.98.4.84.35.84-.35.98-.4 2.93-1.19-2.92-1.186-1.54.626a.688.688 0 0 1-.29.06.688.688 0 0 1-.29-.06l-1.541-.626-2.92 1.186Zm-.02-4 2.93 1.19.98.4.85.35.85-.35.98-.4 2.93-1.19-4.76-1.94L6.74 8.5Z"></path>
+      </svg>
+      <span class="storefront-editor__layers-trigger-label">Layers</span>
+    </button>
     <div
       class="storefront-editor__context-toolbar-shell"
       [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
@@ -4997,6 +5017,7 @@
                         }
 
                         @for (component of readSectionComponents(section); track component.id) {
+                          @if (component.isVisible) {
                           @let visualFrame = componentVisualFrame(component);
                           <button
                             type="button"
@@ -5082,7 +5103,7 @@
                               </div>
                             </div>
                           }
-                            @if (selectedComponentId() === component.id && selectedComponentIds().length === 1 && !isResizingComponent() && !isRotatingComponent() && !isImageCropModeForComponent(component.id)) {
+                            @if (selectedComponentId() === component.id && selectedComponentIds().length === 1 && !isResizingComponent() && !isRotatingComponent() && !isImageCropModeForComponent(component.id) && !component.isLocked) {
                               <span
                                 class="storefront-editor__preview-component-name-label"
                                 [class.storefront-editor__preview-component-name-label--flipped]="isComponentRotationFlipped(component.rotation || 0)"
@@ -5175,6 +5196,7 @@
                               }
                             }
                           </button>
+                          }
                         }
                         </div>
                         <div class="storefront-editor__preview-section-chrome">
@@ -5301,6 +5323,144 @@
             }
           </div>
       </section>
+
+      @if (isLayersPopupOpen()) {
+        <section class="storefront-editor__layers-popup" (click)="$event.stopPropagation()">
+          <div class="storefront-editor__layers-popup-head">
+            <div class="storefront-editor__layers-popup-title">
+              <span class="storefront-editor__layers-popup-eyebrow">Layers</span>
+              <strong>{{ selectedSection() ? sectionLabel(selectedSection()!) : 'Select a section' }}</strong>
+              <small>
+                @if (selectedSection()) {
+                  Drag to reorder the stack
+                } @else {
+                  Choose a section to inspect its component stack.
+                }
+              </small>
+            </div>
+
+            <button
+              type="button"
+              class="storefront-editor__layers-popup-close"
+              aria-label="Close layers"
+              (click)="closeLayersPopup()"
+            >
+              <app-icon name="x" [size]="16"></app-icon>
+            </button>
+          </div>
+
+          @if (selectedSection()) {
+            <div class="storefront-editor__components-structure storefront-editor__layers-popup-body">
+              <div class="storefront-editor__layers-popup-summary">
+                <div class="storefront-editor__layers-popup-stats">
+                  <article>
+                    <strong>{{ selectedSectionLayerStats().total }}</strong>
+                    <span>Total</span>
+                  </article>
+                  <article>
+                    <strong>{{ selectedSectionLayerStats().hidden }}</strong>
+                    <span>Hidden</span>
+                  </article>
+                  <article>
+                    <strong>{{ selectedSectionLayerStats().locked }}</strong>
+                    <span>Locked</span>
+                  </article>
+                </div>
+
+                @if (activeLayerItem(); as activeItem) {
+                  <div class="storefront-editor__layers-popup-focus">
+                    <strong>{{ activeItem.name }}</strong>
+                    <small>{{ activeItem.typeLabel }} · {{ activeItem.width }} by {{ activeItem.height }}</small>
+                  </div>
+                }
+              </div>
+
+              <div class="storefront-editor__components-structure-head">
+                <div>
+                  <strong>Stack</strong>
+                  <small>Top layers first</small>
+                </div>
+              </div>
+
+              @if (selectedSectionLayerItems().length) {
+                <div class="storefront-editor__components-structure-list">
+                  @for (item of selectedSectionLayerItems(); track item.componentId) {
+                    <div
+                      class="storefront-editor__components-structure-item storefront-editor__layers-item"
+                      draggable="true"
+                      tabindex="0"
+                      [class.storefront-editor__components-structure-item--selected]="isComponentSelected(item.componentId)"
+                      [class.storefront-editor__components-structure-item--drop-target]="componentReorderTargetId() === item.componentId"
+                      [class.storefront-editor__layers-item--muted]="!item.isVisible"
+                      (click)="selectLayer(item.componentId, $event)"
+                      (keydown.enter)="selectLayer(item.componentId, $event)"
+                      (keydown.space)="selectLayer(item.componentId, $event); $event.preventDefault()"
+                      (dragstart)="startComponentReorder(item.componentId, $event)"
+                      (dragenter)="allowComponentDrop($event, item.componentId)"
+                      (dragover)="allowComponentDrop($event, item.componentId)"
+                      (dragleave)="clearComponentDropTarget()"
+                      (drop)="dropComponentReorder($event, item.componentId)"
+                      (dragend)="endComponentReorder()"
+                    >
+                      <span class="storefront-editor__components-structure-handle storefront-editor__layers-item-handle" aria-hidden="true">
+                        ⋮⋮
+                      </span>
+
+                      <span class="storefront-editor__components-structure-copy storefront-editor__layers-item-copy">
+                        <strong>{{ item.name }}</strong>
+                        <small>{{ item.typeLabel }} · {{ item.width }} × {{ item.height }}</small>
+                      </span>
+
+                      <span class="storefront-editor__layers-item-meta">
+                        @if (item.childCount) {
+                          <span class="storefront-editor__layers-pill">{{ item.childCount }} child{{ item.childCount === 1 ? '' : 'ren' }}</span>
+                        }
+                        @if (!item.isVisible) {
+                          <span class="storefront-editor__layers-pill">Hidden</span>
+                        }
+                        @if (item.isLocked) {
+                          <span class="storefront-editor__layers-pill">Locked</span>
+                        }
+                      </span>
+
+                      <span class="storefront-editor__layers-item-actions">
+                        <button
+                          type="button"
+                          class="storefront-editor__layers-action"
+                          [class.storefront-editor__layers-action--active]="item.isVisible"
+                          [attr.aria-pressed]="item.isVisible"
+                          [attr.aria-label]="item.isVisible ? 'Hide layer' : 'Show layer'"
+                          (click)="toggleLayerVisibility(item.componentId, $event)"
+                        >
+                          <app-icon name="eye" [size]="14"></app-icon>
+                        </button>
+                        <button
+                          type="button"
+                          class="storefront-editor__layers-action"
+                          [class.storefront-editor__layers-action--active]="item.isLocked"
+                          [attr.aria-pressed]="item.isLocked"
+                          [attr.aria-label]="item.isLocked ? 'Unlock layer' : 'Lock layer'"
+                          (click)="toggleLayerLock(item.componentId, $event)"
+                        >
+                          <span aria-hidden="true">{{ item.isLocked ? 'L' : 'U' }}</span>
+                        </button>
+                      </span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="storefront-editor__components-structure-empty storefront-editor__layers-empty">
+                  This section does not have any elements yet.
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="storefront-editor__layers-empty">
+              Pick a section on the canvas, then open Layers to inspect its elements.
+            </div>
+          }
+        </section>
+      }
     </div>
 
     @if (isSectionLibraryVisible()) {

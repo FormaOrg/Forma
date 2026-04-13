@@ -97,6 +97,21 @@ type SectionInsertMode = 'append' | 'after-selected';
 type EditorSidebarMode = 'structure' | 'page' | 'theme' | 'assets';
 type PagesPanelLayoutMode = 'grid' | 'rows';
 type ComponentSelectionBox = { x: number; y: number; width: number; height: number };
+type StorefrontEditorLayerItem = {
+  componentId: string;
+  name: string;
+  typeLabel: string;
+  width: number;
+  height: number;
+  childCount: number;
+  isVisible: boolean;
+  isLocked: boolean;
+};
+type StorefrontEditorLayerStats = {
+  total: number;
+  hidden: number;
+  locked: number;
+};
 type EditorSnapGuide = {
   orientation: 'vertical' | 'horizontal';
   offset: number;
@@ -572,6 +587,7 @@ readonly activeBrandKitPresetId = signal<string | null>(null);
   readonly isPagesPanelClosing = signal(false);
   readonly isManagePagesOpen = signal(false);
   readonly isManagePagesClosing = signal(false);
+  readonly isLayersPopupOpen = signal(false);
   readonly isMediaManagerOpen = signal(false);
 readonly pagesPanelLayout = signal<PagesPanelLayoutMode>('grid');
 readonly pagesManagerSearch = signal('');
@@ -677,6 +693,33 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   readonly selectedSectionComponents = computed(() => {
     const section = this.selectedSection();
     return section ? this.readSectionComponents(section) : [];
+  });
+  readonly selectedSectionLayerItems = computed<StorefrontEditorLayerItem[]>(() =>
+    [...this.selectedSectionComponents()]
+      .sort((left, right) => (right.zIndex ?? 0) - (left.zIndex ?? 0))
+      .map((component) => ({
+        componentId: component.id,
+        name: this.componentDisplayName(component),
+        typeLabel: this.componentTypeLabel(component),
+        width: this.roundedComponentWidth(component),
+        height: this.roundedComponentHeight(component),
+        childCount: component.children.length,
+        isVisible: component.isVisible,
+        isLocked: component.isLocked,
+      }))
+  );
+  readonly selectedSectionLayerStats = computed<StorefrontEditorLayerStats>(() => {
+    const items = this.selectedSectionLayerItems();
+    return {
+      total: items.length,
+      hidden: items.filter((item) => !item.isVisible).length,
+      locked: items.filter((item) => item.isLocked).length,
+    };
+  });
+  readonly activeLayerItem = computed<StorefrontEditorLayerItem | null>(() => {
+    const items = this.selectedSectionLayerItems();
+    const selectedId = this.selectedComponentId();
+    return items.find((item) => item.componentId === selectedId) ?? items[0] ?? null;
   });
   readonly selectedComponents = computed(() => {
     const section = this.selectedSection();
@@ -1501,6 +1544,7 @@ readonly hasFloatingUi = computed(
       this.isAddElementsLibraryModalVisible() ||
       this.isPageDesignPickerVisible() ||
       this.isSectionLibraryVisible() ||
+      this.isLayersPopupOpen() ||
       this.isMediaManagerOpen() ||
       this.isSectionLibraryOpen() ||
       this.sectionOptionsMenuId() !== null
@@ -1866,6 +1910,12 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
     if (event.key === 'Escape' && this.isAddElementsLibraryModalVisible()) {
       event.preventDefault();
       this.closeAddElementsLibraryModal();
+      return;
+    }
+
+    if (event.key === 'Escape' && this.isLayersPopupOpen()) {
+      event.preventDefault();
+      this.closeLayersPopup();
       return;
     }
 
@@ -2915,6 +2965,76 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }, ProjectStorefrontEditor.ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS);
   }
 
+  toggleLayersPopup(): void {
+    if (this.isLayersPopupOpen()) {
+      this.closeLayersPopup();
+      return;
+    }
+
+    this.closeFloatingUi();
+    this.isLayersPopupOpen.set(true);
+  }
+
+  closeLayersPopup(): void {
+    this.isLayersPopupOpen.set(false);
+  }
+
+  selectLayer(componentId: string, event?: Event): void {
+    const sectionId = this.selectedSectionId();
+    if (!sectionId) {
+      return;
+    }
+
+    this.selectComponent(sectionId, componentId, event instanceof MouseEvent ? event : undefined);
+  }
+
+  toggleLayerVisibility(componentId: string, event?: MouseEvent): void {
+    event?.stopPropagation();
+    const sectionId = this.selectedSectionId();
+    if (!sectionId) {
+      return;
+    }
+
+    const component = this.findSectionComponent(sectionId, componentId);
+    if (!component) {
+      return;
+    }
+
+    this.updateComponentNode(sectionId, componentId, (component) => ({
+      ...component,
+      isVisible: !component.isVisible,
+    }));
+
+    if (component.isVisible && this.selectedComponentIds().includes(componentId)) {
+      const nextSelectedIds = this.selectedComponentIds().filter((id) => id !== componentId);
+      this.selectedComponentIds.set(nextSelectedIds);
+      this.selectedComponentId.set(nextSelectedIds[nextSelectedIds.length - 1] ?? null);
+
+      if (this.croppingImageComponentId() === componentId) {
+        this.exitImageCropMode();
+      }
+      if (this.editingComponentNameId() === componentId) {
+        this.cancelComponentNameEditing();
+      }
+      if (this.editingComponentTextId() === componentId) {
+        this.cancelComponentTextEditing();
+      }
+    }
+  }
+
+  toggleLayerLock(componentId: string, event?: MouseEvent): void {
+    event?.stopPropagation();
+    const sectionId = this.selectedSectionId();
+    if (!sectionId) {
+      return;
+    }
+
+    this.updateComponentNode(sectionId, componentId, (component) => ({
+      ...component,
+      isLocked: !component.isLocked,
+    }));
+  }
+
   setActiveAddElementsCategory(category: StorefrontEditorAddElementsCategory): void {
     this.activeAddElementsCategory.set(category);
     this.activeAddElementsSubcategory.set(this.getDefaultAddElementsSubcategory(category));
@@ -3251,7 +3371,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
-    if (!section || !component) {
+    if (!section || !component || component.isLocked || !component.isVisible) {
       return;
     }
 
@@ -3384,7 +3504,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
             return item;
           }
 
-          const components = [...this.readSectionComponents(item)];
+          const components = [...this.readSectionComponents(item)].sort((left, right) => (right.zIndex ?? 0) - (left.zIndex ?? 0));
           const draggedIndex = components.findIndex((component) => component.id === draggedComponentId);
           const targetIndex = components.findIndex((component) => component.id === targetComponentId);
           if (draggedIndex < 0 || targetIndex < 0) {
@@ -3394,7 +3514,13 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           const [draggedComponent] = components.splice(draggedIndex, 1);
           const nextTargetIndex = components.findIndex((component) => component.id === targetComponentId);
           components.splice(nextTargetIndex, 0, draggedComponent);
-          return this.writeSectionComponents(item, components);
+          return this.writeSectionComponents(
+            item,
+            components.map((component, index, orderedComponents) => ({
+              ...component,
+              zIndex: orderedComponents.length - index,
+            }))
+          );
         }),
       },
     }), { syncRail: false });
@@ -3420,6 +3546,14 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     const selectedIds = selectedGroupId
       ? new Set(this.selectedComponentGroupComponents().map((component) => component.id))
       : new Set(componentIds);
+    const removableIds = new Set(
+      this.readSectionComponents(section)
+        .filter((component) => selectedIds.has(component.id) && !component.isLocked)
+        .map((component) => component.id)
+    );
+    if (!removableIds.size) {
+      return;
+    }
     this.applyStorefrontMutation((storefront) => ({
         ...storefront,
         draftHomepage: {
@@ -3431,7 +3565,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
           return this.writeSectionComponents(
             item,
-            this.readSectionComponents(item).filter((component) => !selectedIds.has(component.id))
+            this.readSectionComponents(item).filter((component) => !removableIds.has(component.id))
           );
         }),
       },
@@ -3769,7 +3903,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
     const section = this.sections().find((item) => item.id === sectionId);
     const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
-    if (!section || !component) {
+    if (!section || !component || component.isLocked || !component.isVisible) {
       return;
     }
 
@@ -3800,7 +3934,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     const container = document.querySelector(
       `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
     );
-    if (!component || !(container instanceof HTMLElement)) {
+    if (!component || component.isLocked || !component.isVisible || !(container instanceof HTMLElement)) {
       return;
     }
 
@@ -3950,7 +4084,7 @@ startEditingComponentText(sectionId: string, componentId: string, event: MouseEv
 handleComponentDoubleClick(sectionId: string, componentId: string, event: MouseEvent): void {
   const section = this.sections().find((item) => item.id === sectionId);
   const component = section ? this.readSectionComponents(section).find((item) => item.id === componentId) : null;
-  if (!component) {
+  if (!component || component.isLocked || !component.isVisible) {
     return;
   }
 
@@ -4238,6 +4372,7 @@ finishEditingComponentText(): void {
     this.closePagesPanel();
     this.closeManagePages();
     this.closePageDesignPicker();
+    this.closeLayersPopup();
     this.isMediaManagerOpen.set(false);
     this.pageCardMenuId.set(null);
     this.closeSectionLibrary();
@@ -8623,7 +8758,7 @@ private updateSelectedSection(
 
     this.updateSectionComponents(section.id, (components) =>
       components.map((component) => {
-        if (!selectedIds.has(component.id)) {
+        if (!selectedIds.has(component.id) || component.isLocked || !component.isVisible) {
           return component;
         }
 
@@ -8637,6 +8772,11 @@ private updateSelectedSection(
         });
       })
     );
+  }
+
+  private findSectionComponent(sectionId: string, componentId: string): StorefrontEditorComponentNode | null {
+    const section = this.sections().find((item) => item.id === sectionId);
+    return section ? this.readSectionComponents(section).find((item) => item.id === componentId) ?? null : null;
   }
 
   private canEditComponentText(component: StorefrontEditorComponentNode): boolean {
