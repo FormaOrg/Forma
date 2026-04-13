@@ -1774,8 +1774,8 @@
     <div class="storefront-editor__body">
     <div
       class="storefront-editor__context-toolbar-shell"
-      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
-      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
+      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible()"
+      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isButtonToolbarVisible() || isProductFeedToolbarVisible())"
       (mousedown)="preserveRichTextEditing($event)"
     >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
@@ -3201,7 +3201,36 @@
                 <div class="storefront-editor__button-toolbar-option-row storefront-editor__button-toolbar-option-row--shadow">
                   @for (shadowOption of buttonShadowOptions; track shadowOption.id) {
                     <button type="button" class="storefront-editor__button-toolbar-choice storefront-editor__button-toolbar-choice--shadow" [class.storefront-editor__button-toolbar-choice--active]="imageShadow(image) === shadowOption.id" (click)="updateSelectedImageShadow(shadowOption.id)">
-                      <span class="storefront-editor__button-toolbar-shadow-preview" [ngStyle]="buttonShadowPreviewStyle(shadowOption.id)"></span>
+                      <span class="storefront-editor__button-toolbar-shadow-preview" aria-hidden="true">
+                        @switch (shadowOption.id) {
+                          @case ('none') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                              <path stroke="red" d="m4.5 17.5 13-13"></path>
+                              <rect width="15" height="15" x="3.5" y="3.5" stroke="#000" rx="4" ry="4"></rect>
+                            </svg>
+                          }
+                          @case ('soft') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                              <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                            </svg>
+                          }
+                          @case ('medium') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                              <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(-2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                            </svg>
+                          }
+                          @case ('bottom') {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                              <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 2px 0.8px rgba(0,0,0,0.4));"></rect>
+                            </svg>
+                          }
+                          @default {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                              <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 0 1.6px rgba(0,0,0,0.8));"></rect>
+                            </svg>
+                          }
+                        }
+                      </span>
                     </button>
                   }
                 </div>
@@ -3210,6 +3239,470 @@
           </div>
         </div>
       }
+
+        @if (selectedContainerComponent(); as container) {
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__container-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeContainerToolbarMenu() === 'designs'"
+              (click)="toggleContainerToolbarMenu('designs')"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M13.94 6a1.94 1.94 0 0 1 1.716 1.043c.024.009.05.016.074.026l3.578 1.471a1.919 1.919 0 0 1 1.045 2.512l-2.389 5.745a1.948 1.948 0 0 1-1.79 1.194c-.241 0-.493-.049-.735-.145l-3.427-1.41-3.451 1.42a1.938 1.938 0 0 1-2.524-1.05l-2.39-5.744A1.93 1.93 0 0 1 4.701 8.54L8.28 7.07c.024-.01.049-.018.073-.027A1.941 1.941 0 0 1 10.07 6h3.87ZM9.016 8.367a.424.424 0 0 0-.184.039l-3.58 1.472a.477.477 0 0 0-.26.625L7.38 16.25a.48.48 0 0 0 .629.26l3.578-1.473a.477.477 0 0 0 .262-.625L9.461 8.665a.48.48 0 0 0-.445-.298Zm6.858 5.332c0 1.058-.87 1.924-1.934 1.924h-.091L16 16.51a.48.48 0 0 0 .63-.26l2.388-5.746a.48.48 0 0 0-.26-.625l-2.884-1.186V13.7Zm-5.558-6.255c.202.184.368.414.48.683l2.389 5.745c.043.1.075.204.099.308h.656c.27 0 .483-.212.483-.481V7.925a.478.478 0 0 0-.483-.481h-3.624Z"></path>
+              </svg>
+              <span>Explore Designs</span>
+            </button>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+                [class.storefront-editor__button-toolbar-text-trigger--active]="activeContainerToolbarMenu() === 'background'"
+                (click)="toggleContainerToolbarMenu('background')"
+                [style.--toolbar-color]="containerBackgroundColor(container) ?? '#ffffff'"
+              >
+                <span class="storefront-editor__context-toolbar-color-ring" aria-hidden="true">
+                  <span class="storefront-editor__context-toolbar-color-swatch"></span>
+                </span>
+                <span>Replace Background</span>
+              </button>
+
+              @if (activeContainerToolbarMenu() === 'background') {
+                <div class="storefront-editor__context-toolbar-color-panel storefront-editor__section-background-panel storefront-editor__section-toolbar-popup storefront-editor__container-toolbar-popup">
+                  <div class="storefront-editor__section-background-mode-row">
+                    <button type="button" class="storefront-editor__section-background-mode storefront-editor__section-background-mode--active" aria-label="Color background" [style.--section-background-icon-color]="containerBackgroundColor(container) ?? '#ffffff'">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="4.75" width="14.5" height="14.5" rx="2.2" stroke="currentColor" stroke-width="1.5" [attr.fill]="containerBackgroundColor(container) ?? '#ffffff'"></rect>
+                      </svg>
+                    </button>
+                    <button type="button" class="storefront-editor__section-background-mode" disabled aria-label="Image background">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="5.25" width="14.5" height="13.5" rx="2.2" stroke="currentColor" stroke-width="1.5"></rect>
+                        <circle cx="10" cy="10" r="1.8" fill="currentColor"></circle>
+                        <path d="M7.5 16.25 11 12.75l2.4 2.4 1.9-1.9 1.2 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="storefront-editor__section-background-mode" disabled aria-label="Video background">
+                      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true">
+                        <rect x="4.75" y="6.25" width="10.5" height="11.5" rx="2.2" stroke="currentColor" stroke-width="1.5"></rect>
+                        <path d="m15.5 10.25 3.75-2v7.5l-3.75-2z" fill="currentColor"></path>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="storefront-editor__context-toolbar-color-panel-tabs">
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-color-panel-tab"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeContainerBackgroundTab() === 'brand'"
+                      (click)="setActiveContainerBackgroundTab('brand')"
+                    >
+                      Brand
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-color-panel-tab"
+                      [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeContainerBackgroundTab() === 'custom'"
+                      (click)="setActiveContainerBackgroundTab('custom')"
+                    >
+                      Custom
+                    </button>
+                  </div>
+
+                  @if (activeContainerBackgroundTab() === 'custom') {
+                    <div class="storefront-editor__context-toolbar-color-panel-body">
+                      <div
+                        class="storefront-editor__context-toolbar-color-canvas storefront-editor__container-background-color-canvas"
+                        [style.--color-picker-hue]="containerBackgroundCustomColorCanvasBackground()"
+                        (mousedown)="startContainerBackgroundColorCanvasDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-canvas-knob"
+                          [style.left]="containerBackgroundCustomColorCanvasHandleLeft()"
+                          [style.top]="containerBackgroundCustomColorCanvasHandleTop()"
+                        ></span>
+                      </div>
+
+                      <div
+                        class="storefront-editor__context-toolbar-color-spectrum storefront-editor__container-background-color-spectrum"
+                        (mousedown)="startContainerBackgroundHueDrag($event)"
+                      >
+                        <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                        <span
+                          class="storefront-editor__context-toolbar-color-spectrum-thumb"
+                          [style.left]="containerBackgroundCustomColorSpectrumHandleLeft()"
+                        ></span>
+                      </div>
+
+                      <div class="storefront-editor__context-toolbar-color-meta">
+                        <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                        <label class="storefront-editor__context-toolbar-color-hex">
+                          <span>#</span>
+                          <input
+                            type="text"
+                            [value]="containerBackgroundHexValue()"
+                            (change)="updateContainerBackgroundHex($any($event.target).value)"
+                            aria-label="Container background color"
+                          />
+                        </label>
+                        <span
+                          class="storefront-editor__context-toolbar-color-current"
+                          [style.background]="containerBackgroundColor(container) ?? '#ffffff'"
+                        ></span>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="storefront-editor__context-toolbar-color-panel-body">
+                      <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                      <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                        @for (brandColor of brandSectionBackgroundColors; track brandColor) {
+                          <button
+                            type="button"
+                            class="storefront-editor__context-toolbar-saved-color"
+                            [class.storefront-editor__context-toolbar-saved-color--active]="containerBackgroundColor(container) === brandColor"
+                            [style.--saved-color]="brandColor"
+                            (click)="updateSelectedContainerBackgroundColor(brandColor)"
+                          >
+                            <span></span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeContainerToolbarMenu() === 'borders'"
+                (click)="toggleContainerToolbarMenu('borders')"
+                aria-label="Borders"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M17.75 16a1.25 1.25 0 0 1 0 2.5H6.25a1.25 1.25 0 0 1 0-2.5h11.5Zm.25-5.5c.55 0 1 .45 1 1s-.45 1-1 1H6c-.55 0-1-.45-1-1s.45-1 1-1h12Zm.25-5c.41 0 .75.34.75.75s-.34.75-.75.75H5.75C5.34 7 5 6.66 5 6.25s.34-.75.75-.75h12.5Z"></path>
+                </svg>
+              </button>
+
+              @if (activeContainerToolbarMenu() === 'borders') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__section-toolbar-popup--borders storefront-editor__container-toolbar-popup">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Borders</h3>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-inline-fields storefront-editor__button-toolbar-inline-fields--borders">
+                    <div class="storefront-editor__section-borders-color-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--round storefront-editor__section-border-color-trigger storefront-editor__container-border-color-trigger"
+                        [style.background]="containerBorderColor(container)"
+                        (click)="toggleContainerBorderColorPicker()"
+                        aria-label="Container border color"
+                      ></button>
+
+                      @if (isContainerBorderColorPickerOpen()) {
+                        <div class="storefront-editor__context-toolbar-color-panel storefront-editor__section-borders-color-panel storefront-editor__container-borders-color-panel storefront-editor__section-toolbar-popup">
+                          <div class="storefront-editor__context-toolbar-color-panel-header">
+                            <h3>Color Picker</h3>
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-close"
+                              (click)="toggleContainerBorderColorPicker()"
+                              aria-label="Close container border color picker"
+                            >
+                              x
+                            </button>
+                          </div>
+
+                          <div class="storefront-editor__context-toolbar-color-panel-tabs">
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-tab"
+                              [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeContainerBorderColorTab() === 'brand'"
+                              (click)="setActiveContainerBorderColorTab('brand')"
+                            >
+                              Brand
+                            </button>
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-color-panel-tab"
+                              [class.storefront-editor__context-toolbar-color-panel-tab--active]="activeContainerBorderColorTab() === 'custom'"
+                              (click)="setActiveContainerBorderColorTab('custom')"
+                            >
+                              Custom
+                            </button>
+                          </div>
+
+                          @if (activeContainerBorderColorTab() === 'custom') {
+                            <div class="storefront-editor__context-toolbar-color-panel-body">
+                              <div
+                                class="storefront-editor__context-toolbar-color-canvas storefront-editor__container-borders-color-canvas"
+                                [style.--color-picker-hue]="containerBorderCustomColorCanvasBackground()"
+                                (mousedown)="startContainerBorderColorCanvasDrag($event)"
+                              >
+                                <span class="storefront-editor__context-toolbar-color-canvas-surface"></span>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-canvas-knob"
+                                  [style.left]="containerBorderCustomColorCanvasHandleLeft()"
+                                  [style.top]="containerBorderCustomColorCanvasHandleTop()"
+                                ></span>
+                              </div>
+
+                              <div
+                                class="storefront-editor__context-toolbar-color-spectrum storefront-editor__container-borders-color-spectrum"
+                                (mousedown)="startContainerBorderHueDrag($event)"
+                              >
+                                <span class="storefront-editor__context-toolbar-color-spectrum-track"></span>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-spectrum-thumb"
+                                  [style.left]="containerBorderCustomColorSpectrumHandleLeft()"
+                                ></span>
+                              </div>
+
+                              <div class="storefront-editor__context-toolbar-color-meta">
+                                <span class="storefront-editor__context-toolbar-color-meta-icon" aria-hidden="true">◔</span>
+                                <label class="storefront-editor__context-toolbar-color-hex">
+                                  <span>#</span>
+                                  <input
+                                    type="text"
+                                    [value]="containerBorderHexValue()"
+                                    (change)="updateContainerBorderHex($any($event.target).value)"
+                                    aria-label="Container border color"
+                                  />
+                                </label>
+                                <span
+                                  class="storefront-editor__context-toolbar-color-current"
+                                  [style.background]="containerBorderColor(container)"
+                                ></span>
+                              </div>
+                            </div>
+                          } @else {
+                            <div class="storefront-editor__context-toolbar-color-panel-body">
+                              <div class="storefront-editor__context-toolbar-brand-label">Color palette</div>
+                              <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                                @for (brandColor of brandSectionBorderColors; track brandColor) {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__context-toolbar-saved-color"
+                                    [class.storefront-editor__context-toolbar-saved-color--active]="containerBorderColor(container) === brandColor"
+                                    [style.--saved-color]="brandColor"
+                                    (click)="updateSelectedContainerBorderColor(brandColor)"
+                                  >
+                                    <span></span>
+                                  </button>
+                                }
+                              </div>
+
+                              <div class="storefront-editor__context-toolbar-brand-label">Saved colors</div>
+                              <div class="storefront-editor__context-toolbar-saved-colors storefront-editor__context-toolbar-saved-colors--brand">
+                                @for (savedColor of savedSectionBorderColors().length ? savedSectionBorderColors() : [containerBorderColor(container)]; track savedColor) {
+                                  <button
+                                    type="button"
+                                    class="storefront-editor__context-toolbar-saved-color"
+                                    [class.storefront-editor__context-toolbar-saved-color--active]="containerBorderColor(container) === savedColor"
+                                    [style.--saved-color]="savedColor"
+                                    (click)="applySavedContainerBorderColor(savedColor)"
+                                  >
+                                    <span></span>
+                                  </button>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <label class="storefront-editor__button-toolbar-field storefront-editor__button-toolbar-field--numeric">
+                      <div class="storefront-editor__button-toolbar-field-input-wrap storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="containerBorderWidth(container)" (input)="updateSelectedContainerBorderWidth($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">px</span>
+                      </div>
+                    </label>
+
+                    <div class="storefront-editor__section-border-style-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__section-border-style-trigger storefront-editor__container-border-style-trigger"
+                        (click)="toggleContainerBorderStylePicker()"
+                        aria-label="Container border style"
+                      >
+                        <span class="storefront-editor__section-border-style-preview">
+                          <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + containerBorderStyle(container)"></span>
+                        </span>
+                        <span class="storefront-editor__section-border-style-chevron" aria-hidden="true">
+                          <svg fill="currentColor" viewBox="0 0 8 5" width="8" height="5">
+                            <g>
+                              <path d="M7.852.852 4 4.712.146.85a.496.496 0 0 1 .7-.701L4 3.298 7.153.148a.494.494 0 0 1 .699 0l.001.001a.499.499 0 0 1-.001.703Z"></path>
+                            </g>
+                          </svg>
+                        </span>
+                      </button>
+
+                      @if (isContainerBorderStylePickerOpen()) {
+                        <div class="storefront-editor__section-border-style-menu storefront-editor__section-toolbar-popup storefront-editor__container-border-style-menu">
+                          @for (borderStyle of sectionBorderStyleOptions; track borderStyle.id) {
+                            <button
+                              type="button"
+                              class="storefront-editor__section-border-style-option"
+                              [class.storefront-editor__section-border-style-option--active]="containerBorderStyle(container) === borderStyle.id"
+                              (click)="updateSelectedContainerBorderStyle(borderStyle.id)"
+                            >
+                              <span [class]="'storefront-editor__section-border-style-line storefront-editor__section-border-style-line--' + borderStyle.id"></span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeContainerToolbarMenu() === 'corners'"
+                (click)="toggleContainerToolbarMenu('corners')"
+                aria-label="Corners"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M17 5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c.27 0 .5.23.5.5v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-1.1-.9-2-2-2ZM7 5c-1.1 0-2 .9-2 2v3.25c0 .41.34.75.75.75s.75-.34.75-.75V7c0-.27.23-.5.5-.5h3.25c.41 0 .75-.34.75-.75S10.66 5 10.25 5H7Zm10.5 12c0 .27-.23.5-.5.5h-3.25c-.41 0-.75.34-.75.75s.34.75.75.75H17c1.1 0 2-.9 2-2v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17ZM7 17.5c-.27 0-.5-.23-.5-.5v-3.25c0-.41-.34-.75-.75-.75s-.75.34-.75.75V17c0 1.1.9 2 2 2h3.25c.41 0 .75-.34.75-.75s-.34-.75-.75-.75H7Z"></path>
+                </svg>
+              </button>
+
+              @if (activeContainerToolbarMenu() === 'corners') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__container-toolbar-popup">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Corners</h3>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-option-row">
+                    @for (radiusOption of [0, 8, 14, 20, 999]; track radiusOption) {
+                      <button type="button" class="storefront-editor__button-toolbar-choice" [class.storefront-editor__button-toolbar-choice--active]="containerRadius(container) === radiusOption" (click)="updateSelectedContainerRadius(radiusOption)">
+                        <span class="storefront-editor__button-toolbar-choice-box storefront-editor__button-toolbar-choice-box--radius storefront-editor__section-corner-preview" [style.--button-radius-preview.px]="radiusOption === 999 ? 999 : radiusOption === 20 ? 12 : radiusOption === 14 ? 8 : radiusOption === 8 ? 4 : 0"></span>
+                      </button>
+                    }
+                  </div>
+
+                  <label class="storefront-editor__button-toolbar-slider-block">
+                    <span>Radius</span>
+                    <div class="storefront-editor__button-toolbar-slider-row">
+                      <input type="range" min="0" max="64" [value]="containerRadius(container)" (input)="updateSelectedContainerRadius($any($event.target).value)" />
+                      <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="containerRadius(container)" (input)="updateSelectedContainerRadius($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">px</span>
+                      </label>
+                    </div>
+                  </label>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeContainerToolbarMenu() === 'shadow'"
+                (click)="toggleContainerToolbarMenu('shadow')"
+                aria-label="Shadow"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M15 5c1.1 0 2 .9 2 2 1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8ZM7 6.5c-.28 0-.5.22-.5.5v8c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V7c0-.28-.22-.5-.5-.5H7Z"></path>
+                </svg>
+              </button>
+
+              @if (activeContainerToolbarMenu() === 'shadow') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__container-toolbar-popup">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Shadow</h3>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-option-row storefront-editor__button-toolbar-option-row--shadow">
+                    @for (shadowOption of buttonShadowOptions; track shadowOption.id) {
+                      <button type="button" class="storefront-editor__button-toolbar-choice storefront-editor__button-toolbar-choice--shadow" [class.storefront-editor__button-toolbar-choice--active]="containerShadow(container) === shadowOption.id" (click)="updateSelectedContainerShadow(shadowOption.id)">
+                        <span class="storefront-editor__button-toolbar-shadow-preview" aria-hidden="true">
+                          @switch (shadowOption.id) {
+                            @case ('none') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <path stroke="red" d="m4.5 17.5 13-13"></path>
+                                <rect width="15" height="15" x="3.5" y="3.5" stroke="#000" rx="4" ry="4"></rect>
+                              </svg>
+                            }
+                            @case ('soft') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @case ('medium') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(-2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @case ('bottom') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @default {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 0 1.6px rgba(0,0,0,0.8));"></rect>
+                              </svg>
+                            }
+                          }
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="storefront-editor__context-toolbar-floating-shell">
+              <button
+                type="button"
+                class="storefront-editor__button-toolbar-icon-trigger"
+                [class.storefront-editor__button-toolbar-icon-trigger--active]="activeContainerToolbarMenu() === 'opacity'"
+                (click)="toggleContainerToolbarMenu('opacity')"
+                aria-label="Opacity"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M6.5 16c.83 0 1.5.67 1.5 1.5S7.33 19 6.5 19 5 18.33 5 17.5 5.67 16 6.5 16Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Zm-9.67-3.37c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 10.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S5 12.83 5 12s.67-1.5 1.5-1.5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75ZM8.58 7.88c.76 0 1.38.62 1.38 1.38 0 .76-.62 1.38-1.38 1.38-.76 0-1.38-.62-1.38-1.38 0-.76.62-1.38 1.38-1.38Zm4.17.24c.62 0 1.12.5 1.12 1.12 0 .62-.5 1.12-1.12 1.12-.62 0-1.12-.5-1.12-1.12 0-.62.5-1.12 1.12-1.12Zm3.67.26c.49 0 .88.39.88.88s-.39.88-.88.88-.88-.39-.88-.88.4-.88.88-.88ZM6.5 5C7.33 5 8 5.67 8 6.5S7.33 8 6.5 8 5 7.33 5 6.5 5.67 5 6.5 5Zm4.42.25a1.25 1.25 0 1 1-.001 2.5 1.25 1.25 0 0 1 0-2.5Zm3.91.25c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1Zm3.42.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75Z"></path>
+                </svg>
+              </button>
+
+              @if (activeContainerToolbarMenu() === 'opacity') {
+                <div class="storefront-editor__button-toolbar-menu storefront-editor__button-toolbar-menu--compact storefront-editor__section-toolbar-popup storefront-editor__section-toolbar-popup--compact storefront-editor__container-toolbar-popup">
+                  <div class="storefront-editor__button-toolbar-panel-header storefront-editor__button-toolbar-panel-header--compact">
+                    <h3>Background opacity</h3>
+                  </div>
+
+                  <label class="storefront-editor__button-toolbar-slider-block storefront-editor__section-opacity-block">
+                    <div class="storefront-editor__button-toolbar-slider-row storefront-editor__section-opacity-row">
+                      <input type="range" min="0" max="100" [value]="containerOpacity(container)" (input)="updateSelectedContainerOpacity($any($event.target).value)" />
+                      <label class="storefront-editor__button-toolbar-slider-value storefront-editor__section-value-input-wrap">
+                        <input type="text" inputmode="numeric" [value]="containerOpacity(container)" (input)="updateSelectedContainerOpacity($any($event.target).value)" />
+                        <span class="storefront-editor__section-value-input-suffix">%</span>
+                      </label>
+                    </div>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
 
         <div
           class="storefront-editor__context-toolbar storefront-editor__button-toolbar"
@@ -3625,7 +4118,36 @@
                   <div class="storefront-editor__button-toolbar-option-row storefront-editor__button-toolbar-option-row--shadow">
                     @for (shadowOption of buttonShadowOptions; track shadowOption.id) {
                       <button type="button" class="storefront-editor__button-toolbar-choice storefront-editor__button-toolbar-choice--shadow" [class.storefront-editor__button-toolbar-choice--active]="button.props.shadow === shadowOption.id" (click)="updateSelectedButtonShadow(shadowOption.id)">
-                        <span class="storefront-editor__button-toolbar-shadow-preview" [ngStyle]="buttonShadowPreviewStyle(shadowOption.id)"></span>
+                        <span class="storefront-editor__button-toolbar-shadow-preview" aria-hidden="true">
+                          @switch (shadowOption.id) {
+                            @case ('none') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <path stroke="red" d="m4.5 17.5 13-13"></path>
+                                <rect width="15" height="15" x="3.5" y="3.5" stroke="#000" rx="4" ry="4"></rect>
+                              </svg>
+                            }
+                            @case ('soft') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @case ('medium') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(-2px -2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @case ('bottom') {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 2px 0.8px rgba(0,0,0,0.4));"></rect>
+                              </svg>
+                            }
+                            @default {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 22 22">
+                                <rect width="15" height="15" x="3.5" y="3.5" fill="#fff" stroke="#000" rx="4" ry="4" style="filter: drop-shadow(0 0 1.6px rgba(0,0,0,0.8));"></rect>
+                              </svg>
+                            }
+                          }
+                        </span>
                       </button>
                     }
                   </div>
@@ -3816,6 +4338,41 @@
                   <ng-container *ngTemplateOutlet="imageLinkPopupTemplate"></ng-container>
                 }
               </div>
+            </div>
+          </aside>
+        }
+      }
+
+      @if (selectedContainerComponent(); as container) {
+        @if (activeContainerToolbarMenu() === 'designs') {
+          <aside class="storefront-editor__container-toolbar-designs-panel storefront-editor__button-toolbar-designs-panel">
+            <div class="storefront-editor__button-toolbar-panel-header">
+              <h3>Explore Designs</h3>
+              <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleContainerToolbarMenu('designs')">
+                <app-icon name="x" [size]="14"></app-icon>
+              </button>
+            </div>
+
+            <div class="storefront-editor__container-designs-grid">
+              @for (preset of containerDesignPresets; track preset.id) {
+                <button type="button" class="storefront-editor__container-design-card" (click)="applyContainerDesignPreset(preset)">
+                  <span
+                    class="storefront-editor__container-design-card-preview"
+                    [class.storefront-editor__container-design-card-preview--row]="preset.previewLayout === 'row'"
+                    [class.storefront-editor__container-design-card-preview--grid]="preset.previewLayout === 'grid'"
+                    [class.storefront-editor__container-design-card-preview--outlined]="preset.previewTone === 'outlined'"
+                    [class.storefront-editor__container-design-card-preview--dark]="preset.previewTone === 'dark'"
+                    [class.storefront-editor__container-design-card-preview--soft]="preset.previewTone === 'soft'"
+                    [ngStyle]="containerDesignPreviewStyle(preset)"
+                  >
+                    <span class="storefront-editor__container-design-card-node"></span>
+                    <span class="storefront-editor__container-design-card-node"></span>
+                    <span class="storefront-editor__container-design-card-node"></span>
+                    <span class="storefront-editor__container-design-card-node storefront-editor__container-design-card-node--grid-extra"></span>
+                  </span>
+                  <span class="storefront-editor__container-design-card-label">{{ preset.label }}</span>
+                </button>
+              }
             </div>
           </aside>
         }
@@ -4191,7 +4748,7 @@
                           [attr.data-section-content-id]="section.id"
                           draggable="false"
                           [style.height.px]="sectionPreviewHeight(section)"
-                          [class.storefront-editor__preview-section-content--attach-target]="isLibraryComponentDragging() && componentAttachSectionId() === section.id"
+                          [class.storefront-editor__preview-section-content--attach-target]="isSectionAttachTarget(section.id)"
                           [class.storefront-editor__preview-section-content--component-dragging]="draggedComponentId() !== null"
                           (mousedown)="startComponentSelectionBox(section.id, $event)"
                           (click)="clearComponentSelection(section.id, $event)"
@@ -4201,7 +4758,7 @@
                           (dragleave)="leaveLibraryComponentAttach(section.id)"
                           (drop)="dropLibraryComponentIntoSection($event, section.id)"
                         >
-                        @if (isLibraryComponentDragging() && componentAttachSectionId() === section.id) {
+                        @if (isSectionAttachTarget(section.id)) {
                           <div class="storefront-editor__preview-section-attach-indicator">Attach to section</div>
                         }
                         <div
@@ -4406,6 +4963,9 @@
                             [style.--storefront-editor-image-fit]="component.type === 'image' ? component.props.objectFit : null"
                             [style.--storefront-editor-container-bg]="component.type === 'container' ? component.props.backgroundColor : null"
                           >
+                          @if (component.type === 'container' && isContainerAttachTarget(section.id, component.id)) {
+                            <div class="storefront-editor__preview-component-attach-indicator">Attach to container</div>
+                          }
                           <div class="storefront-editor__preview-component-content">
                           <app-storefront-editor-component-host
                             [node]="component"
@@ -4505,6 +5065,16 @@
                               >
                                 <span class="storefront-editor__preview-component-size-indicator-text">
                                   {{ roundedComponentWidth(component) }} x {{ roundedComponentHeight(component) }}
+                                </span>
+                              </span>
+                            }
+                            @if (isComponentBeingRotated(component.id)) {
+                              <span
+                                class="storefront-editor__preview-component-rotation-indicator"
+                                [class.storefront-editor__preview-component-rotation-indicator--flipped]="isComponentRotationFlipped(component.rotation || 0)"
+                              >
+                                <span class="storefront-editor__preview-component-rotation-indicator-text">
+                                  {{ displayComponentRotationAngle(component.rotation || 0) }}°
                                 </span>
                               </span>
                             }
@@ -4919,20 +5489,6 @@
             <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerLayout()">
               <span>Container layout</span>
               <small>{{ selectedContainer.props.layout }}</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerGap(-4)">
-              <span>Gap -</span>
-              <small>{{ selectedContainer.props.gap }}px</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerGap(4)">
-              <span>Gap +</span>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerPadding(-4)">
-              <span>Padding -</span>
-              <small>{{ selectedContainer.props.padding }}px</small>
-            </button>
-            <button type="button" class="storefront-editor__component-context-item" (click)="adjustSelectedContainerPadding(4)">
-              <span>Padding +</span>
             </button>
             <button type="button" class="storefront-editor__component-context-item" (click)="cycleSelectedContainerJustify()">
               <span>Justify</span>
