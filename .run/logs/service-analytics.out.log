@@ -98,3 +98,54 @@ Identify and stop the process that's listening on port 8084 or configure this ap
 [INFO] Total time:  27.431 s
 [INFO] Finished at: 2026-04-13T12:38:04+02:00
 [INFO] ------------------------------------------------------------------------
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           2026-04-13T18:13:54.453+02:00  INFO 6164 --- [service-analytics] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-13T18:13:54.574+02:00  INFO 6164 --- [service-analytics] [       Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-13T18:13:54.611+02:00  INFO 6164 --- [service-analytics] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-13T18:13:54.629+02:00  INFO 6164 --- [service-analytics] [       Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-13T18:13:54.645+02:00  INFO 6164 --- [service-analytics] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-13T18:13:54.701+02:00  INFO 6164 --- [service-analytics] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-13T18:13:54.925+02:00  INFO 6164 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 6164 (G:\Coding\Forma\Backend\service-analytics\target\classes started by MSI in G:\Coding\Forma\Backend\service-analytics)
+2026-04-13T18:13:54.926+02:00  INFO 6164 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-13T18:13:58.079+02:00  INFO 6164 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-13T18:13:58.179+02:00  INFO 6164 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96 ms. Found 15 JPA repository interfaces.
+2026-04-13T18:13:58.713+02:00  INFO 6164 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8084 (http)
+2026-04-13T18:13:58.719+02:00  INFO 6164 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-13T18:13:58.720+02:00  INFO 6164 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-13T18:13:58.770+02:00  INFO 6164 --- [service-analytics] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3836 ms
+2026-04-13T18:13:58.863+02:00  INFO 6164 --- [service-analytics] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-13T18:13:58.949+02:00  INFO 6164 --- [service-analytics] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-13T18:13:58.953+02:00  WARN 6164 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariConfig           : HikariPool-2 - keepaliveTime is greater than or equal to maxLifetime, disabling it.
+2026-04-13T18:13:58.954+02:00  INFO 6164 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-04-13T18:13:59.536+02:00  INFO 6164 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@6b544714
+2026-04-13T18:13:59.599+02:00  INFO 6164 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-04-13T18:13:59.684+02:00  WARN 6164 --- [service-analytics] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-13T18:13:59.922+02:00  INFO 6164 --- [service-analytics] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 17.6
+	Default catalog/schema: postgres/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-13T18:14:00.358+02:00  INFO 6164 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-13T18:14:01.185+02:00  INFO 6164 --- [service-analytics] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-13T18:14:01.609+02:00  WARN 6164 --- [service-analytics] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-13T18:14:01.665+02:00  INFO 6164 --- [service-analytics] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-13T18:14:01.667+02:00  WARN 6164 --- [service-analytics] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-13T18:14:02.041+02:00  INFO 6164 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
+2026-04-13T18:14:02.044+02:00  INFO 6164 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Started Application in 7.193 seconds (process running for 32313.679)
+2026-04-13T18:14:02.210+02:00  INFO 6164 --- [service-analytics] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
