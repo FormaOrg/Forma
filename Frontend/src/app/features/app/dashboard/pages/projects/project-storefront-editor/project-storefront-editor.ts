@@ -348,6 +348,7 @@ export class ProjectStorefrontEditor {
         }>;
       }
     | null = null;
+  private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
   private activeSelectionDrag:
     | {
         sectionId: string;
@@ -2034,7 +2035,8 @@ if (this.activeProductFeedToolbarMenu()) {
       })),
       rect.width,
       rect.height,
-      previewVisibleHeight
+      previewVisibleHeight,
+      { transient: true, syncRail: false }
     );
   }
 
@@ -2085,9 +2087,21 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     return;
   }
 
+  const dragUndoSnapshot = this.activeComponentDragUndoSnapshot;
 this.finalizeDraggedComponentsLayoutSnap();
   this.clearSnapGuides();
 
+  if (dragUndoSnapshot) {
+    const current = this.workingStorefront();
+    if (current) {
+      const afterSnapshot = this.createEditorSnapshot(current, this.selectedSectionId());
+      if (JSON.stringify(afterSnapshot) !== JSON.stringify(dragUndoSnapshot)) {
+        this.pushUndoSnapshot(dragUndoSnapshot);
+      }
+    }
+  }
+
+  this.activeComponentDragUndoSnapshot = null;
   this.activeComponentDrag = null;
     this.activeResize = null;
     this.activeRotation = null;
@@ -2902,10 +2916,15 @@ this.finalizeDraggedComponentsLayoutSnap();
       }),
       };
 
+    const storefront = this.workingStorefront();
+    this.activeComponentDragUndoSnapshot = storefront
+      ? this.createEditorSnapshot(storefront, this.selectedSectionId())
+      : null;
+
     this.removeSectionLayoutAssignments(
       sectionId,
       orderedComponents.map((item) => item.id),
-      { selectedSectionId: sectionId, syncRail: false }
+      { selectedSectionId: sectionId, syncRail: false, transient: true }
     );
 
     this.suppressNextComponentClickSelectionId = componentId;
@@ -3571,6 +3590,10 @@ finishEditingComponentText(): void {
 
   onRichTextEditorInput(event: Event): void {
     event.stopPropagation();
+    const editor = event.target;
+    if (editor instanceof HTMLElement) {
+      this.editingComponentTextValue.set(editor.innerHTML);
+    }
   }
 
   preserveRichTextEditing(event: MouseEvent): void {
@@ -7229,7 +7252,8 @@ private updateSelectedSection(
     positions: Array<{ componentId: string; x: number; y: number }>,
     containerWidth: number,
     containerHeight: number,
-    maxVisibleHeight = containerHeight
+    maxVisibleHeight = containerHeight,
+    options: { transient?: boolean; syncRail?: boolean } = {}
   ): void {
     const positionsById = new Map(positions.map((position) => [position.componentId, position]));
     this.applyStorefrontMutation((storefront) => ({
@@ -7262,7 +7286,7 @@ private updateSelectedSection(
           return this.writeSectionComponents(section, components);
         }),
       },
-    }), { syncRail: false });
+    }), { syncRail: false, ...options });
   }
 
   private updateComponentSelectionBox(event: MouseEvent): void {
@@ -8263,6 +8287,12 @@ private focusActiveTextEditor(): HTMLElement | null {
       return null;
     }
 
+  const desiredHtml = this.editingComponentTextValue();
+  if (editor.innerHTML !== desiredHtml) {
+    editor.innerHTML = desiredHtml;
+    this.placeCaretAtEnd(editor);
+  }
+
   editor.focus();
   return editor;
 }
@@ -8322,6 +8352,19 @@ private readActiveTextEditorHtml(): string {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  private placeCaretAtEnd(editor: HTMLElement): void {
+    const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 
 private updateSelectedButtonProps(
@@ -9080,7 +9123,7 @@ private updateSelectedProductFeedProps(
   private removeSectionLayoutAssignments(
     sectionId: string,
     componentIds: string[],
-    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
+    options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean } = {}
   ): void {
     if (!componentIds.length) {
       return;
@@ -9637,7 +9680,7 @@ private buildLibraryComponentForSection(
           });
         })(),
       },
-  }), { selectedSectionId: targetSectionId, syncRail: true });
+  }), { selectedSectionId: targetSectionId, syncRail: true, transient: true });
 
     this.selectedSectionId.set(targetSectionId);
     setTimeout(() => {
@@ -9780,7 +9823,7 @@ private buildLibraryComponentForSection(
           );
         }),
       },
-    }), { selectedSectionId: section.id, syncRail: false });
+    }), { selectedSectionId: section.id, syncRail: false, transient: true });
   }
 
   private createDefaultEditorSession(): StorefrontEditorSession {
@@ -9885,7 +9928,7 @@ private buildLibraryComponentForSection(
 
   private applyStorefrontMutation(
     mutator: (storefront: ProjectStorefront) => ProjectStorefront,
-    options: { selectedSectionId?: string | null; syncRail?: boolean } = {}
+    options: { selectedSectionId?: string | null; syncRail?: boolean; transient?: boolean } = {}
   ): void {
     const current = this.workingStorefront();
     if (!current) {
@@ -9904,7 +9947,9 @@ private buildLibraryComponentForSection(
       return;
     }
 
-    this.pushUndoSnapshot(beforeSnapshot);
+    if (!options.transient) {
+      this.pushUndoSnapshot(beforeSnapshot);
+    }
     this.workingStorefront.set(next);
     if (options.selectedSectionId !== undefined) {
       this.selectedSectionId.set(options.selectedSectionId);

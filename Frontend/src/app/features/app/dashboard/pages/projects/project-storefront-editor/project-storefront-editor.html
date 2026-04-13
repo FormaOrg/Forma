@@ -4513,6 +4513,7 @@
                                 <div
                                   class="storefront-editor__preview-component-text-editor storefront-editor__preview-component-text-editor--rich"
                                   [attr.data-component-id]="component.id"
+                                  dir="ltr"
                                   [style.font-family]="component.props.fontFamily"
                                   [style.font-size.px]="component.props.fontSize"
                                   [style.font-weight]="component.props.fontWeight"
@@ -4522,7 +4523,6 @@
                                   [style.text-align]="component.props.align"
                                   [style.line-height]="component.props.lineHeight"
                                   [style.letter-spacing.em]="component.props.letterSpacing"
-                                  [innerHTML]="editingComponentTextValue()"
                                   contenteditable="true"
                                   spellcheck="true"
                                   (input)="onRichTextEditorInput($event)"
@@ -4534,6 +4534,7 @@
                               } @else {
                                 <textarea
                                   class="storefront-editor__preview-component-text-editor"
+                                  dir="ltr"
                                   [value]="editingComponentTextValue()"
                                   (input)="editingComponentTextValue.set($any($event.target).value)"
                                   (keydown)="onComponentTextInputKeydown($event)"
