@@ -108,7 +108,11 @@ export interface StorefrontEditorButtonProps {
   fontFamily: string;
   fontSize: number;
   fontWeight: 400 | 500 | 600 | 700;
+  fontStyle: 'normal' | 'italic';
+  textDecoration: 'none' | 'underline';
   textColor: string;
+  lineHeight: number;
+  letterSpacing: number;
   backgroundColor: string;
   borderColor: string;
   borderWidth: number;
@@ -750,7 +754,11 @@ export function createStorefrontEditorComponentNode(
           fontFamily: 'Fira Mono',
           fontSize: 15,
           fontWeight: 500,
+          fontStyle: 'normal',
+          textDecoration: 'none',
           textColor: '#ffffff',
+          lineHeight: 1.5,
+          letterSpacing: 0,
           backgroundColor: '#0f172a',
           borderColor: '#0f172a',
           borderWidth: 0,
