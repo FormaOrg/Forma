@@ -8,30 +8,42 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (node().props.richTextHtml) {
-      <span
-        class="storefront-editor-block-text storefront-editor-block-text--rich"
-        dir="ltr"
-        [ngStyle]="textStyles()"
-        [innerHTML]="node().props.richTextHtml"
-      ></span>
-    } @else if (node().props.href) {
-      <a
-        class="storefront-editor-block-text"
-        dir="ltr"
-        [attr.href]="node().props.href"
-        [attr.target]="node().props.openInNewTab ? '_blank' : null"
-        [attr.rel]="node().props.openInNewTab ? 'noreferrer noopener' : null"
-        [ngStyle]="textStyles()"
-        (click)="$event.preventDefault()"
-      >
-        {{ node().props.text }}
-      </a>
-    } @else {
-      <span class="storefront-editor-block-text" dir="ltr" [ngStyle]="textStyles()">
-        {{ node().props.text }}
-      </span>
-    }
+    <span class="storefront-editor-block-text-shell" dir="ltr" [ngStyle]="textStyles()">
+      @if (node().props.richTextHtml) {
+        @if (shouldWrapRichTextWithLink()) {
+          <a
+            class="storefront-editor-block-text storefront-editor-block-text--rich storefront-editor-block-text--link"
+            [class.storefront-editor-block-text--interactive]="interactiveLinks()"
+            [attr.href]="resolvedHref()"
+            [attr.target]="node().props.openInNewTab ? '_blank' : null"
+            [attr.rel]="node().props.openInNewTab ? 'noreferrer noopener' : null"
+            [innerHTML]="resolvedRichTextHtml()"
+            (click)="handleAnchorClick($event)"
+          ></a>
+        } @else {
+          <span
+            class="storefront-editor-block-text storefront-editor-block-text--rich"
+            [innerHTML]="resolvedRichTextHtml()"
+            (click)="handleRichTextClick($event)"
+          ></span>
+        }
+      } @else if (node().props.href) {
+        <a
+          class="storefront-editor-block-text storefront-editor-block-text--link"
+          [class.storefront-editor-block-text--interactive]="interactiveLinks()"
+          [attr.href]="resolvedHref()"
+          [attr.target]="node().props.openInNewTab ? '_blank' : null"
+          [attr.rel]="node().props.openInNewTab ? 'noreferrer noopener' : null"
+          (click)="handleAnchorClick($event)"
+        >
+          {{ node().props.text }}
+        </a>
+      } @else {
+        <span class="storefront-editor-block-text">
+          {{ node().props.text }}
+        </span>
+      }
+    </span>
   `,
   styles: [`
     :host {
@@ -40,22 +52,33 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
       height: 100%;
     }
 
-    .storefront-editor-block-text {
+    .storefront-editor-block-text-shell {
       display: block;
       width: 100%;
       height: 100%;
-      white-space: pre-wrap;
       background: transparent;
       text-decoration-skip-ink: auto;
       direction: ltr;
       unicode-bidi: plaintext;
+      white-space: pre-wrap;
+    }
+
+    .storefront-editor-block-text {
+      background: transparent;
+      color: inherit;
     }
 
     .storefront-editor-block-text--rich {
+      display: block;
+      width: 100%;
       white-space: normal;
     }
 
-    .storefront-editor-block-text--rich:where(span) {
+    .storefront-editor-block-text--link {
+      display: inline;
+    }
+
+    .storefront-editor-block-text--rich:where(span, a) {
       overflow-wrap: anywhere;
     }
 
@@ -83,6 +106,14 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
       color: inherit;
     }
 
+    .storefront-editor-block-text--interactive :where(a) {
+      cursor: pointer;
+    }
+
+    .storefront-editor-block-text--interactive.storefront-editor-block-text--link {
+      cursor: pointer;
+    }
+
     .storefront-editor-block-text--rich :where(mark) {
       padding: 0 0.12em;
       border-radius: 0.24em;
@@ -91,6 +122,8 @@ import { StorefrontEditorTextNode } from '../storefront-editor-component.model';
 })
 export class StorefrontEditorBlockTextComponent {
   readonly node = input.required<StorefrontEditorTextNode>();
+  readonly interactiveLinks = input(false);
+  readonly linkHrefResolver = input<((value: string) => string) | null>(null);
 
   readonly textStyles = computed(() => {
     const props = this.node().props;
@@ -124,4 +157,66 @@ export class StorefrontEditorBlockTextComponent {
       letterSpacing: `${props.letterSpacing ?? Number.parseFloat(defaultLetterSpacing)}em`,
     } as Record<string, string>;
   });
+
+  readonly resolvedHref = computed(() => this.resolveHrefValue(this.node().props.href ?? ''));
+
+  readonly richTextContainsAnchors = computed(() => {
+    const html = this.node().props.richTextHtml ?? '';
+    if (!html) {
+      return false;
+    }
+
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    return container.querySelector('a[href]') !== null;
+  });
+
+  readonly shouldWrapRichTextWithLink = computed(() => {
+    return Boolean(this.node().props.href?.trim()) && !this.richTextContainsAnchors();
+  });
+
+  readonly resolvedRichTextHtml = computed(() => {
+    const html = this.node().props.richTextHtml ?? '';
+    if (!html || !this.interactiveLinks()) {
+      return html;
+    }
+
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    for (const anchor of Array.from(container.querySelectorAll('a[href]'))) {
+      const href = anchor.getAttribute('href') ?? '';
+      anchor.setAttribute('href', this.resolveHrefValue(href));
+      if (this.node().props.openInNewTab) {
+        anchor.setAttribute('target', '_blank');
+        anchor.setAttribute('rel', 'noreferrer noopener');
+      }
+    }
+    return container.innerHTML;
+  });
+
+  handleAnchorClick(event: MouseEvent): void {
+    if (!this.interactiveLinks()) {
+      event.preventDefault();
+    }
+  }
+
+  handleRichTextClick(event: MouseEvent): void {
+    if (this.interactiveLinks()) {
+      return;
+    }
+
+    const target = event.target;
+    if (target instanceof HTMLElement && target.closest('a')) {
+      event.preventDefault();
+    }
+  }
+
+  private resolveHrefValue(value: string): string {
+    const href = value.trim();
+    if (!href) {
+      return '#';
+    }
+
+    return this.linkHrefResolver()?.(href) ?? href;
+  }
 }
