@@ -8,11 +8,12 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent],
   templateUrl: './storefront-product-detail.html',
   styleUrl: './storefront-product-detail.css',
 })

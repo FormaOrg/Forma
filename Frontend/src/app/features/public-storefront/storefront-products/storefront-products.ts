@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
@@ -8,11 +8,12 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-products',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, StorefrontPublicHeaderComponent],
   templateUrl: './storefront-products.html',
   styleUrl: './storefront-products.css',
 })

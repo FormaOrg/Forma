@@ -7,11 +7,12 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
+import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent],
   templateUrl: './storefront-home.html',
   styleUrl: './storefront-home.css',
 })
