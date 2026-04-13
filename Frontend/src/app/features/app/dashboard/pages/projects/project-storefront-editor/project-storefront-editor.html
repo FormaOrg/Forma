@@ -390,7 +390,7 @@
               <div
                 class="storefront-editor__brand-kit-font-sample"
                 [style.background]="brandButtonColors()[0]"
-                [style.color]="brandButtonColors()[4] ?? '#ffffff'"
+                [style.color]="brandButtonColors()[4]"
               >
                 <span [style.font-family]="$any(brandKitHeadingFont())">{{ brandKitHeadingFont() }}</span>
                 <strong [style.font-family]="$any(brandKitHeadingFont())">AaBb</strong>
@@ -439,7 +439,7 @@
                 <span
                   class="storefront-editor__brand-kit-button storefront-editor__brand-kit-button--primary"
                   [style.background]="brandButtonColors()[0]"
-                  [style.color]="brandButtonColors()[4] ?? '#ffffff'"
+                  [style.color]="brandButtonColors()[4]"
                   [style.font-family]="$any(brandKitBodyFont())"
               >
                 Primary
@@ -5097,7 +5097,7 @@
                                   spellcheck="true"
                                   (input)="onRichTextEditorInput($event)"
                                   (keydown)="onComponentTextInputKeydown($event)"
-                                  (blur)="onComponentTextEditorBlur()"
+                                (blur)="onComponentTextEditorBlur($event)"
                                   (mousedown)="$event.stopPropagation()"
                                   (click)="$event.stopPropagation()"
                                 ></div>
@@ -5108,7 +5108,7 @@
                                   [value]="editingComponentTextValue()"
                                   (input)="editingComponentTextValue.set($any($event.target).value)"
                                   (keydown)="onComponentTextInputKeydown($event)"
-                                  (blur)="onComponentTextEditorBlur()"
+                                (blur)="onComponentTextEditorBlur($event)"
                                   (mousedown)="$event.stopPropagation()"
                                   (click)="$event.stopPropagation()"
                                 ></textarea>
