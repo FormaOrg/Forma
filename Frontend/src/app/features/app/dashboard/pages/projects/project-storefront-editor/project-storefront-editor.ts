@@ -391,6 +391,7 @@ type SectionLibraryTemplate = {
 export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
+  private static readonly COMPONENT_MIN_SIZE = 20;
   private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
   private static readonly ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS = 180;
   private static readonly PAGES_MANAGER_CLOSE_MS = 180;
@@ -669,9 +670,10 @@ readonly hoveredSectionId = signal<string | null>(null);
 readonly hoveredSectionRailTop = signal(0);
 readonly isSelectedSectionRailVisible = signal(false);
 readonly hasPreviewStageScrollbar = signal(false);
-  readonly previewStageScrollbarWidth = signal(0);
-  readonly previewStageScrollCompensation = signal(0);
-  readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
+readonly previewStageScrollbarWidth = signal(0);
+readonly previewStageScrollCompensation = signal(0);
+readonly previewStageLogicalHeight = signal<number | null>(null);
+readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
   readonly zoomPercent = signal(120);
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
@@ -1681,13 +1683,15 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
 
     return 'Autosave is on. Changes are saved automatically.';
   });
-  readonly previewViewportWidth = computed(() => this.getViewportBaseWidth(this.viewport()));
-  readonly previewZoomScale = computed(() => this.zoomPercent() / 100);
-  readonly previewFrameWidth = computed(() => this.previewViewportWidth());
-  readonly previewStageWidth = computed(() => this.previewViewportWidth() + 4 + this.previewStageScrollbarWidth());
-  readonly isCompactPreviewChrome = computed(() => this.previewViewportWidth() <= 780);
-  readonly isNarrowPreviewChrome = computed(() => this.previewViewportWidth() <= 620);
-  readonly isUltraNarrowPreviewChrome = computed(() => this.previewViewportWidth() <= 460);
+readonly previewViewportWidth = computed(() => this.getViewportBaseWidth(this.viewport()));
+readonly previewZoomScale = computed(() => this.zoomPercent() / 100);
+readonly previewFrameWidth = computed(() => this.previewViewportWidth());
+readonly previewStageWidth = computed(() => this.previewViewportWidth() + 4 + this.previewStageScrollbarWidth());
+readonly previewDisplayWidth = computed(() => Math.round(this.previewStageWidth() * this.previewZoomScale()));
+readonly isCompactPreviewChrome = computed(() => this.viewport() === 'mobile' || this.previewDisplayWidth() <= 780);
+  readonly isNarrowPreviewChrome = computed(() => this.viewport() !== 'mobile' && this.previewDisplayWidth() <= 620);
+  readonly isUltraNarrowPreviewChrome = computed(() => this.previewDisplayWidth() <= 460);
+  readonly hideMobileDomainChrome = computed(() => this.viewport() === 'mobile' && this.previewDisplayWidth() <= 460);
   readonly availableSectionTypes: StorefrontSectionType[] = [
     'announcement-bar',
     'hero',
@@ -4925,24 +4929,25 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   const previewStage = shell.closest('.storefront-editor__preview-stage') as HTMLElement | null;
-  if (!previewStage) {
+  const previewBody = shell.closest('.storefront-editor__preview-body') as HTMLElement | null;
+  if (!previewStage || !previewBody) {
     this.isSelectedSectionRailVisible.set(false);
     return;
   }
 
   const shellRect = shell.getBoundingClientRect();
   const previewStageRect = previewStage.getBoundingClientRect();
-  const zoom = Math.max(this.previewZoomScale(), 0.01);
+  const previewBodyRect = previewBody.getBoundingClientRect();
   const isVisible = shellRect.bottom > previewStageRect.top && shellRect.top < previewStageRect.bottom;
   this.isSelectedSectionRailVisible.set(isVisible);
   if (!isVisible) {
     return;
   }
 
-  const unclampedTop = (shellRect.top - previewStageRect.top + shellRect.height / 2) / zoom;
+  const unclampedTop = shellRect.top - previewBodyRect.top + shellRect.height / 2;
   const clampedTop = Math.min(
     Math.max(28, unclampedTop),
-    Math.max(28, previewStageRect.height / zoom - 28)
+    Math.max(28, previewStageRect.height - 28)
   );
   this.hoveredSectionRailTop.set(clampedTop);
 }
@@ -9781,8 +9786,8 @@ private expandPositionUpdatesForAttachedDescendants(
       return frame;
     }
 
-    const snappedWidth = Math.max(50, this.roundToSnapStep(frame.width));
-    const snappedHeight = Math.max(50, this.roundToSnapStep(frame.height));
+    const snappedWidth = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToSnapStep(frame.width));
+    const snappedHeight = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToSnapStep(frame.height));
     let nextX = frame.x;
     let nextY = frame.y;
 
@@ -10021,7 +10026,7 @@ private expandPositionUpdatesForAttachedDescendants(
       }
     }
 
-    const minSize = 50;
+    const minSize = ProjectStorefrontEditor.COMPONENT_MIN_SIZE;
     if (this.activeResize.preserveAspectRatio) {
       const aspectRatio = Math.max(this.activeResize.startAspectRatio || 1, 0.01);
       const startWidth = Math.max(startFrame.width, 1);
@@ -10571,9 +10576,12 @@ private computeImageFrameForAspectRatio(
   aspectRatio: number
 ): StorefrontEditorComponentNode['frame'] {
   const safeAspectRatio = Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 1;
-  const area = Math.max(frame.width * frame.height, 50 * 50);
-  const width = Math.max(50, Math.sqrt(area * safeAspectRatio));
-  const height = Math.max(50, width / safeAspectRatio);
+  const area = Math.max(
+    frame.width * frame.height,
+    ProjectStorefrontEditor.COMPONENT_MIN_SIZE * ProjectStorefrontEditor.COMPONENT_MIN_SIZE
+  );
+  const width = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, Math.sqrt(area * safeAspectRatio));
+  const height = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, width / safeAspectRatio);
 
   return {
     x: frame.x + (frame.width - width) / 2,
@@ -13141,13 +13149,26 @@ isSectionAttachTarget(sectionId: string): boolean {
       this.hasPreviewStageScrollbar.set(false);
       this.previewStageScrollbarWidth.set(0);
       this.previewStageScrollCompensation.set(0);
+      this.previewStageLogicalHeight.set(null);
       return;
     }
 
-    const canvas = stage.querySelector('.storefront-editor__preview-canvas') as HTMLElement | null;
+    const workspace = document.querySelector('.storefront-editor__preview-workspace') as HTMLElement | null;
     const zoom = Math.max(this.previewZoomScale(), 0.01);
+    if (workspace) {
+      const workspaceRect = workspace.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const availableVisualHeight = Math.max(0, workspaceRect.bottom - stageRect.top);
+      this.previewStageLogicalHeight.set(Math.max(0, Math.round(availableVisualHeight / zoom)));
+    } else {
+      this.previewStageLogicalHeight.set(null);
+    }
+
+    const canvas = stage.querySelector('.storefront-editor__preview-canvas') as HTMLElement | null;
     const compensation = canvas
-      ? Math.max(0, Math.round(canvas.scrollHeight * Math.max(0, zoom - 1)))
+      ? zoom > 1.2
+        ? Math.max(0, Math.round(canvas.getBoundingClientRect().height - canvas.offsetHeight))
+        : 0
       : 0;
     this.previewStageScrollCompensation.set(compensation);
 
