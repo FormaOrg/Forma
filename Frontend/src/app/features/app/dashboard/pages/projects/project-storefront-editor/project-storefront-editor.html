@@ -4298,37 +4298,264 @@
                   </div>
 
                   <label class="storefront-editor__button-toolbar-field">
-                    <select [value]="button.props.textPreset" (change)="updateSelectedButtonTextPreset($any($event.target).value)">
-                      @for (textPreset of buttonTextPresets; track textPreset) {
-                        <option [value]="textPreset">{{ textPreset }}</option>
+                    <span>Preset</span>
+                    <div class="storefront-editor__button-toolbar-dropdown-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__button-toolbar-dropdown-trigger"
+                        [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'preset'"
+                        (click)="toggleButtonTextDropdownMenu('preset')"
+                      >
+                        <span class="storefront-editor__button-toolbar-dropdown-trigger-label">{{ button.props.textPreset }}</span>
+                        <app-icon name="chevron-down" [size]="14"></app-icon>
+                      </button>
+
+                      @if (activeButtonTextDropdownMenu() === 'preset') {
+                        <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--compact">
+                          @for (textPreset of buttonTextPresets; track textPreset) {
+                            <button
+                              type="button"
+                              class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--size"
+                              [class.storefront-editor__context-toolbar-menu-item--active]="button.props.textPreset === textPreset"
+                              (click)="updateSelectedButtonTextPreset(textPreset)"
+                            >
+                              {{ textPreset }}
+                            </button>
+                          }
+                        </div>
                       }
-                    </select>
+                    </div>
                   </label>
 
-                  <label class="storefront-editor__button-toolbar-field">
-                    <select [value]="button.props.fontFamily" (change)="updateSelectedButtonFontFamily($any($event.target).value)">
-                      @for (fontFamily of buttonFontFamilies; track fontFamily) {
-                        <option [value]="fontFamily">{{ fontFamily }}</option>
+                  <div class="storefront-editor__button-toolbar-field">
+                    <span>Font family</span>
+                    <div class="storefront-editor__button-toolbar-dropdown-shell">
+                      <button
+                        type="button"
+                        class="storefront-editor__button-toolbar-dropdown-trigger"
+                        [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'font-family'"
+                        (click)="toggleButtonTextDropdownMenu('font-family')"
+                      >
+                        <span
+                          class="storefront-editor__button-toolbar-dropdown-trigger-label storefront-editor__button-toolbar-dropdown-trigger-label--font"
+                          [style.fontFamily]="button.props.fontFamily"
+                        >
+                          {{ button.props.fontFamily }}
+                        </span>
+                        <app-icon name="chevron-down" [size]="14"></app-icon>
+                      </button>
+
+                      @if (activeButtonTextDropdownMenu() === 'font-family') {
+                        <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--font">
+                          <div class="storefront-editor__button-toolbar-font-search">
+                            <app-icon name="search" [size]="14"></app-icon>
+                            <input
+                              type="text"
+                              [value]="buttonTextFontSearch()"
+                              (input)="updateButtonTextFontSearch($any($event.target).value)"
+                              placeholder="Search fonts"
+                            />
+                          </div>
+                          <div class="storefront-editor__button-toolbar-font-scroll">
+                            @for (font of filteredButtonFontOptions(); track font.family) {
+                              <button
+                                type="button"
+                                class="storefront-editor__button-toolbar-font-option"
+                                [class.storefront-editor__button-toolbar-font-option--active]="button.props.fontFamily === font.family"
+                                (click)="updateSelectedButtonFontFamily(font.family)"
+                              >
+                                <span class="storefront-editor__button-toolbar-font-option-copy">
+                                  <span
+                                    class="storefront-editor__button-toolbar-font-option-family"
+                                    [style.fontFamily]="font.family"
+                                  >
+                                    {{ font.family }}
+                                  </span>
+                                  <span class="storefront-editor__button-toolbar-font-option-meta">
+                                    {{ font.category }} - {{ font.description }}
+                                  </span>
+                                </span>
+                                <span
+                                  class="storefront-editor__button-toolbar-font-option-preview"
+                                  [style.fontFamily]="font.family"
+                                >
+                                  {{ font.preview }}
+                                </span>
+                              </button>
+                            }
+                            @if (!filteredButtonFontOptions().length) {
+                              <div class="storefront-editor__text-font-empty-state">
+                                No fonts matched "{{ buttonTextFontSearch() }}"
+                              </div>
+                            }
+                          </div>
+                        </div>
                       }
-                    </select>
-                  </label>
+                    </div>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-type-actions">
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-icon"
+                      [class.storefront-editor__context-toolbar-icon--active]="button.props.fontWeight >= 600"
+                      (click)="toggleSelectedButtonBold()"
+                      aria-label="Bold"
+                    >
+                      B
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-icon storefront-editor__context-toolbar-icon--italic"
+                      [class.storefront-editor__context-toolbar-icon--active]="button.props.fontStyle === 'italic'"
+                      (click)="toggleSelectedButtonItalic()"
+                      aria-label="Italic"
+                    >
+                      I
+                    </button>
+                    <button
+                      type="button"
+                      class="storefront-editor__context-toolbar-icon storefront-editor__context-toolbar-icon--underline"
+                      [class.storefront-editor__context-toolbar-icon--active]="button.props.textDecoration === 'underline'"
+                      (click)="toggleSelectedButtonUnderline()"
+                      aria-label="Underline"
+                    >
+                      U
+                    </button>
+                  </div>
 
                   <div class="storefront-editor__button-toolbar-inline-fields">
                     <label class="storefront-editor__button-toolbar-field">
-                      <select [value]="button.props.fontWeight" (change)="updateSelectedButtonFontWeight($any($event.target).value)">
-                        @for (fontWeight of buttonFontWeights; track fontWeight) {
-                          <option [value]="fontWeight">{{ fontWeight === 400 ? 'Regular' : fontWeight === 500 ? 'Medium' : fontWeight === 600 ? 'Semibold' : 'Bold' }}</option>
+                      <span>Weight</span>
+                      <div class="storefront-editor__button-toolbar-dropdown-shell">
+                        <button
+                          type="button"
+                          class="storefront-editor__button-toolbar-dropdown-trigger"
+                          [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'font-weight'"
+                          (click)="toggleButtonTextDropdownMenu('font-weight')"
+                        >
+                          <span class="storefront-editor__button-toolbar-dropdown-trigger-label">
+                            {{ buttonFontWeightLabel(button.props.fontWeight) }}
+                          </span>
+                          <app-icon name="chevron-down" [size]="14"></app-icon>
+                        </button>
+
+                        @if (activeButtonTextDropdownMenu() === 'font-weight') {
+                          <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--compact">
+                            @for (fontWeight of buttonFontWeights; track fontWeight) {
+                              <button
+                                type="button"
+                                class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--size"
+                                [class.storefront-editor__context-toolbar-menu-item--active]="button.props.fontWeight === fontWeight"
+                                (click)="updateSelectedButtonFontWeight(fontWeight)"
+                              >
+                                {{ buttonFontWeightLabel(fontWeight) }}
+                              </button>
+                            }
+                          </div>
                         }
-                      </select>
+                      </div>
                     </label>
 
-                    <label class="storefront-editor__button-toolbar-field storefront-editor__button-toolbar-field--numeric">
-                      <input type="number" min="10" max="96" [value]="button.props.fontSize" (input)="updateSelectedButtonFontSize($any($event.target).value)" />
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Size</span>
+                      <div class="storefront-editor__button-toolbar-dropdown-shell">
+                        <button
+                          type="button"
+                          class="storefront-editor__button-toolbar-dropdown-trigger"
+                          [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'font-size'"
+                          (click)="toggleButtonTextDropdownMenu('font-size')"
+                        >
+                          <span class="storefront-editor__button-toolbar-dropdown-trigger-label">{{ button.props.fontSize }} px</span>
+                          <app-icon name="chevron-down" [size]="14"></app-icon>
+                        </button>
+
+                        @if (activeButtonTextDropdownMenu() === 'font-size') {
+                          <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--compact storefront-editor__button-toolbar-dropdown-menu--size">
+                            <div class="storefront-editor__context-toolbar-size-scroll">
+                              @for (fontSize of buttonFontSizes; track fontSize) {
+                                <button
+                                  type="button"
+                                  class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--size"
+                                  [class.storefront-editor__context-toolbar-menu-item--active]="button.props.fontSize === fontSize"
+                                  (click)="updateSelectedButtonFontSize(fontSize)"
+                                >
+                                  {{ fontSize }} px
+                                </button>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
                     </label>
 
                     <span class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--round">
                       <input type="color" [value]="button.props.textColor" (input)="updateSelectedButtonTextColor($any($event.target).value)" />
                     </span>
+                  </div>
+
+                  <div class="storefront-editor__button-toolbar-inline-fields storefront-editor__button-toolbar-inline-fields--typography">
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Line height</span>
+                      <div class="storefront-editor__button-toolbar-dropdown-shell">
+                        <button
+                          type="button"
+                          class="storefront-editor__button-toolbar-dropdown-trigger"
+                          [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'line-height'"
+                          (click)="toggleButtonTextDropdownMenu('line-height')"
+                        >
+                          <span class="storefront-editor__button-toolbar-dropdown-trigger-label">{{ button.props.lineHeight }}</span>
+                          <app-icon name="chevron-down" [size]="14"></app-icon>
+                        </button>
+
+                        @if (activeButtonTextDropdownMenu() === 'line-height') {
+                          <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--compact">
+                            @for (option of textLineHeightOptions; track option) {
+                              <button
+                                type="button"
+                                class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--size"
+                                [class.storefront-editor__context-toolbar-menu-item--active]="button.props.lineHeight === option"
+                                (click)="updateSelectedButtonLineHeight(option)"
+                              >
+                                {{ option }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </label>
+
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Spacing</span>
+                      <div class="storefront-editor__button-toolbar-dropdown-shell">
+                        <button
+                          type="button"
+                          class="storefront-editor__button-toolbar-dropdown-trigger"
+                          [class.storefront-editor__button-toolbar-dropdown-trigger--active]="activeButtonTextDropdownMenu() === 'letter-spacing'"
+                          (click)="toggleButtonTextDropdownMenu('letter-spacing')"
+                        >
+                          <span class="storefront-editor__button-toolbar-dropdown-trigger-label">
+                            {{ buttonLetterSpacingLabel(button.props.letterSpacing) }}
+                          </span>
+                          <app-icon name="chevron-down" [size]="14"></app-icon>
+                        </button>
+
+                        @if (activeButtonTextDropdownMenu() === 'letter-spacing') {
+                          <div class="storefront-editor__button-toolbar-dropdown-menu storefront-editor__button-toolbar-dropdown-menu--compact">
+                            @for (option of textLetterSpacingOptions; track option) {
+                              <button
+                                type="button"
+                                class="storefront-editor__context-toolbar-menu-item storefront-editor__context-toolbar-menu-item--size"
+                                [class.storefront-editor__context-toolbar-menu-item--active]="button.props.letterSpacing === option"
+                                (click)="updateSelectedButtonLetterSpacing(option)"
+                              >
+                                {{ buttonLetterSpacingLabel(option) }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </label>
                   </div>
 
                 </div>

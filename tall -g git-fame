@@ -1,0 +1,202 @@
+sakamata0
+
+9	62	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-image.component.ts
+119	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+15	18	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+101	98	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+sakamata0
+sakamata0
+
+41	9	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-image.component.ts
+3	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+7	11	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+230	65	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+59	79	.run/logs/service-analytics.out.log
+59	79	.run/logs/service-billing.out.log
+27	27	.run/logs/service-commerce.out.log
+75	0	.run/logs/service-projets.out.log
+17109	132641	.run/logs/service-utilisateurs.out.log
+1	1	.run/pids/service-analytics.pid
+1	1	.run/pids/service-billing.pid
+1	1	.run/pids/service-commerce.pid
+1	0	.run/pids/service-projets.pid
+1	1	.run/pids/service-utilisateurs.pid
+12	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-text.component.ts
+368	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+170	20	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+151	24	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+2	1	start-backend-local.ps1
+6	5	stop-backend-local.ps1
+sakamata0
+
+3	3	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+sakamata0
+
+161	6	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-image.component.ts
+9	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component.ts
+34	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+324	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+554	17	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+966	55	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+9015	0	.run/logs/service-utilisateurs.out.log
+36	5	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-text.component.ts
+47	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+91	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+126	14	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+234	7	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+15445	0	.run/logs/service-utilisateurs.out.log
+119	21	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-container.component.ts
+2	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component.ts
+6	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+33	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+202	18	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+14874	0	.run/logs/service-utilisateurs.out.log
+23	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+49	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+344	6	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+sakamata0
+
+567	13	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+635	99	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+1902	173	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+1	3	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+9	9	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+78	11	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+sakamata0
+sakamata0
+
+3	22	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-library.ts
+88	3	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+98	47	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+118	4	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+5666	0	.run/logs/service-utilisateurs.out.log
+490	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+500	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+246	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+7198	0	.run/logs/service-utilisateurs.out.log
+372	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-contact-form.component.ts
+5	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component.ts
+12	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-library.ts
+27	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+77	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+26	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+4	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+Ismail Mechkene
+
+12117	0	.run/logs/service-utilisateurs.out.log
+252	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-faq.component.ts
+57	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-icon.component.ts
+94	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-social-links.component.ts
+58	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/blocks/storefront-editor-block-spacer.component.ts
+20	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component.ts
+49	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-library.ts
+102	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model.ts
+74	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+50	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+20	4	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+15	1	Frontend/src/app/shared/app/icons/app-icon.ts
+Ismail Mechkene
+
+7730	1222	.run/logs/service-utilisateurs.out.log
+1	1	.run/pids/service-utilisateurs.pid
+13	0	Frontend/src/app/core/models/project-storefront.model.ts
+95	20	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/config/storefront-editor-feature-domains.ts
+18	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/domains/storefront-editor-storefront.domain.ts
+120	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+33	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+54	27	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+61	0	Frontend/src/app/features/public-storefront/storefront-home/storefront-home.css
+43	0	Frontend/src/app/features/public-storefront/storefront-home/storefront-home.html
+sakamata0
+
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-blog-feed.component.ts
+2	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-button.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-container.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-graphic.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-heading.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-image.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-paragraph.component.ts
+2	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-product-feed.component.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/blocks}/storefront-editor-block-text.component.ts
+0	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/media-manager}/project-storefront-media-manager.css
+0	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/media-manager}/project-storefront-media-manager.html
+2	2	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components/media-manager}/project-storefront-media-manager.ts
+10	10	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components}/storefront-editor-component-host.component.ts
+68	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components}/storefront-editor-component-library.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/{ => components}/storefront-editor-component.model.ts
+1	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/domains/storefront-editor-media.domain.ts
+182	30	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+156	100	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+83	5	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+0	98	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-feature-domains.ts
+0	67	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-media.domain.ts
+0	272	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-pages.domain.ts
+0	45	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-shared.utils.ts
+0	202	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-storefront.domain.ts
+94	0	project-memory/README.md
+54	0	project-memory/ai-handoff-template.md
+130	0	project-memory/backend-memory.md
+88	0	project-memory/deployment-memory.md
+58	0	project-memory/feature-map.md
+170	0	project-memory/frontend-backend-links.md
+145	0	project-memory/frontend-memory.md
+81	0	project-memory/known-rules-and-regressions.md
+92	0	project-memory/project-overview.md
+316	0	project-memory/storefront-editor-memory.md
+sakamata0
+
+15	0	Frontend/src/app/core/guards/project-workspace.guard.ts
+30	4	Frontend/src/app/core/services/project-workspace-context.service.ts
+sakamata0
+
+59	11	Frontend/src/app/core/services/auth.service.ts
+sakamata0
+
+-	-	Frontend/public/assets/app/project/editor/grid gallery/add_to_cart.png
+-	-	Frontend/public/assets/app/project/editor/grid gallery/default.png
+-	-	Frontend/public/assets/app/project/editor/grid gallery/filtered.png
+-	-	Frontend/public/assets/app/project/editor/grid gallery/minimal.png
+-	-	Frontend/public/assets/app/project/editor/grid gallery/quick_add.png
+5	5	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+379	14	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-block-product-feed.component.ts
+6	14	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-component-library.ts
+sakamata0
+
+537	17	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+458	102	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+454	44	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+sakamata0
+
+80	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-block-text.component.ts
+9	1	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-component-host.component.ts
+1	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-component-library.ts
+243	6	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-component.model.ts
+sakamata0
+sakamata0
+
+-	-	Frontend/public/assets/cursors/rotate_icon-ne.png
+-	-	Frontend/public/assets/cursors/rotate_icon-nw.png
+-	-	Frontend/public/assets/cursors/rotate_icon-se.png
+-	-	Frontend/public/assets/cursors/rotate_icon-sw.png
+-	-	Frontend/public/assets/cursors/rotate_icon.png
+647	22	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.css
+562	7	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.html
+811	63	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/project-storefront-editor.ts
+116	13	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-block-button.component.ts
+36	0	Frontend/src/app/features/app/dashboard/pages/projects/project-storefront-editor/storefront-editor-component.model.ts
