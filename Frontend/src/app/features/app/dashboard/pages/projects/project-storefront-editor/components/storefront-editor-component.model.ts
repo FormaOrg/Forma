@@ -6,6 +6,8 @@ export type StorefrontEditorComponentType =
   | 'paragraph'
   | 'image'
   | 'button'
+  | 'menu'
+  | 'cart'
   | 'icon'
   | 'spacer'
   | 'social-links'
@@ -38,6 +40,10 @@ export interface StorefrontEditorComponentFrame {
 
 export type StorefrontEditorResponsiveFrames = Partial<
   Record<Exclude<StorefrontEditorViewport, 'desktop'>, StorefrontEditorComponentFrame>
+>;
+
+export type StorefrontEditorResponsiveProps<TProps> = Partial<
+  Record<Exclude<StorefrontEditorViewport, 'desktop'>, Partial<TProps>>
 >;
 
 export interface StorefrontEditorTextProps {
@@ -122,6 +128,51 @@ export interface StorefrontEditorButtonProps {
   customIconSrc: string | null;
   iconMotion: 'static' | 'animated';
   iconPosition: 'left' | 'right';
+}
+
+export interface StorefrontEditorMenuItem {
+  id: string;
+  label: string;
+  href: string;
+  openInNewTab: boolean;
+}
+
+export interface StorefrontEditorMenuProps {
+  items: StorefrontEditorMenuItem[];
+  displayMode: 'menu-bar' | 'hamburger';
+  orientation: 'horizontal' | 'vertical';
+  textPreset: 'Paragraph 1' | 'Paragraph 2' | 'Heading 4';
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 400 | 500 | 600 | 700;
+  textColor: string;
+  borderColor: string;
+  borderWidth: number;
+  borderStyle: 'none' | 'solid' | 'dashed' | 'dotted' | 'double';
+  radius: number;
+  spacing: number;
+}
+
+export type StorefrontEditorCartIconStyle =
+  | 'bag-filled'
+  | 'bag-outline'
+  | 'basket-outline'
+  | 'cart-outline'
+  | 'text-inline'
+  | 'cart-inline'
+  | 'badge-only'
+  | 'basket-badge'
+  | 'text-badge';
+
+export interface StorefrontEditorCartProps {
+  label: string;
+  iconStyle: StorefrontEditorCartIconStyle;
+  labelFontFamily: string;
+  labelColor: string;
+  badgeFontFamily: string;
+  badgeTextColor: string;
+  badgeBackgroundColor: string;
+  openMode: 'side' | 'page';
 }
 
 export interface StorefrontEditorIconProps {
@@ -215,10 +266,12 @@ export interface StorefrontEditorComponentBase<TType extends StorefrontEditorCom
   isLocked: boolean;
   isVisible: boolean;
   zIndex: number;
+  parentContainerId?: string | null;
   groupId?: string;
   rotation: number;
   frame: StorefrontEditorComponentFrame;
   responsiveFrames?: StorefrontEditorResponsiveFrames;
+  responsiveProps?: StorefrontEditorResponsiveProps<TProps>;
   props: TProps;
   children: StorefrontEditorComponentNode[];
 }
@@ -228,6 +281,8 @@ export type StorefrontEditorHeadingNode = StorefrontEditorComponentBase<'heading
 export type StorefrontEditorParagraphNode = StorefrontEditorComponentBase<'paragraph', StorefrontEditorParagraphProps>;
 export type StorefrontEditorImageNode = StorefrontEditorComponentBase<'image', StorefrontEditorImageProps>;
 export type StorefrontEditorButtonNode = StorefrontEditorComponentBase<'button', StorefrontEditorButtonProps>;
+export type StorefrontEditorMenuNode = StorefrontEditorComponentBase<'menu', StorefrontEditorMenuProps>;
+export type StorefrontEditorCartNode = StorefrontEditorComponentBase<'cart', StorefrontEditorCartProps>;
 export type StorefrontEditorIconNode = StorefrontEditorComponentBase<'icon', StorefrontEditorIconProps>;
 export type StorefrontEditorSpacerNode = StorefrontEditorComponentBase<'spacer', StorefrontEditorSpacerProps>;
 export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'social-links', StorefrontEditorSocialLinksProps>;
@@ -244,6 +299,8 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorParagraphNode
   | StorefrontEditorImageNode
   | StorefrontEditorButtonNode
+  | StorefrontEditorMenuNode
+  | StorefrontEditorCartNode
   | StorefrontEditorIconNode
   | StorefrontEditorSpacerNode
   | StorefrontEditorSocialLinksNode
@@ -288,6 +345,10 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 380, y: 36, width: 260, height: 180 };
     case 'button':
       return { x: 32, y: 236, width: 170, height: 48 };
+    case 'menu':
+      return { x: 32, y: 236, width: 320, height: 48 };
+    case 'cart':
+      return { x: 220, y: 236, width: 132, height: 48 };
     case 'icon':
       return { x: 32, y: 300, width: 72, height: 72 };
     case 'spacer':
@@ -673,6 +734,19 @@ function createStorefrontEditorComponentBase<TType extends StorefrontEditorCompo
   };
 }
 
+function createStorefrontEditorMenuItem(
+  label: string,
+  href: string,
+  openInNewTab = false
+): StorefrontEditorMenuItem {
+  return {
+    id: createStorefrontEditorComponentId('menu'),
+    label,
+    href,
+    openInNewTab,
+  };
+}
+
 export function createStorefrontEditorComponentNode(
   type: StorefrontEditorComponentType
 ): StorefrontEditorComponentNode {
@@ -764,6 +838,45 @@ export function createStorefrontEditorComponentNode(
           customIconSrc: null,
           iconMotion: 'static',
           iconPosition: 'right',
+        },
+      };
+    case 'menu':
+      return {
+        ...createStorefrontEditorComponentBase('menu'),
+        name: 'Menu',
+        props: {
+          items: [
+            createStorefrontEditorMenuItem('Home', '/'),
+            createStorefrontEditorMenuItem('Shop', '/products'),
+            createStorefrontEditorMenuItem('Contact', '/contact'),
+          ],
+          displayMode: 'menu-bar',
+          orientation: 'horizontal',
+          textPreset: 'Paragraph 2',
+          fontFamily: 'Poppins',
+          fontSize: 15,
+          fontWeight: 500,
+          textColor: '#18263c',
+          borderColor: '#d6deec',
+          borderWidth: 0,
+          borderStyle: 'none',
+          radius: 16,
+          spacing: 22,
+        },
+      };
+    case 'cart':
+      return {
+        ...createStorefrontEditorComponentBase('cart'),
+        name: 'Cart',
+        props: {
+          label: 'Cart',
+          iconStyle: 'cart-outline',
+          labelFontFamily: 'Poppins',
+          labelColor: '#2563eb',
+          badgeFontFamily: 'Poppins',
+          badgeTextColor: '#ffffff',
+          badgeBackgroundColor: '#2563eb',
+          openMode: 'side',
         },
       };
     case 'icon':
