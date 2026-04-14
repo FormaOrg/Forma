@@ -43,11 +43,15 @@ import {
   filterStorefrontEditorAddElementsLibraryItems,
 } from './components/storefront-editor-component-library';
 import {
+  StorefrontEditorCartIconStyle,
+  StorefrontEditorCartNode,
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
   StorefrontEditorContainerNode,
   StorefrontEditorImageNode,
+  StorefrontEditorMenuItem,
+  StorefrontEditorMenuNode,
   StorefrontEditorParagraphNode,
   StorefrontEditorProductFeedNode,
   StorefrontEditorTextNode,
@@ -66,6 +70,7 @@ import {
   StorefrontMediaManagerAsset,
 } from './components/media-manager/project-storefront-media-manager';
 import { StorefrontEditorComponentHostComponent } from './components/storefront-editor-component-host.component';
+import { StorefrontEditorBlockCartComponent } from './components/blocks/storefront-editor-block-cart.component';
 import {
   buildStorefrontMediaManagerAssets,
   describeStorefrontMediaAsset,
@@ -132,6 +137,19 @@ type ButtonToolbarMenu =
   | 'shadow'
   | 'spacing'
   | null;
+type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
+type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
+type CartToolbarMenu = 'edit-text' | 'settings' | null;
+type MenuItemReorderState = {
+  itemId: string;
+  rowTop: number;
+  rowHeight: number;
+  pointerOffsetY: number;
+  minTranslateY: number;
+  maxTranslateY: number;
+  currentTranslateY: number;
+};
+type CartSettingsSection = 'cart-icon' | 'settings';
 type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
 type ContainerToolbarMenu = 'designs' | 'background' | 'borders' | 'corners' | 'shadow' | 'opacity' | null;
 type SectionToolbarMenu = 'layout' | 'background' | 'borders' | 'corners' | 'opacity' | null;
@@ -365,7 +383,7 @@ type SectionLibraryTemplate = {
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent],
+  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockCartComponent],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
@@ -651,6 +669,7 @@ readonly hoveredSectionRailTop = signal(0);
 readonly isSelectedSectionRailVisible = signal(false);
 readonly hasPreviewStageScrollbar = signal(false);
   readonly previewStageScrollbarWidth = signal(0);
+  readonly previewStageScrollCompensation = signal(0);
   readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
   readonly zoomPercent = signal(120);
   readonly isLoading = signal(true);
@@ -744,6 +763,14 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'button' ? component : null;
   });
+  readonly selectedMenuComponent = computed<StorefrontEditorMenuNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'menu' ? this.resolveResponsiveComponentNode(component) : null;
+  });
+  readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'cart' ? component : null;
+  });
   readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
     const component = this.selectedComponent();
     return component?.type === 'container' ? component : null;
@@ -767,6 +794,12 @@ readonly isParagraphToolbarVisible = computed(
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
   );
+  readonly isMenuToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedMenuComponent() !== null
+  );
+  readonly isCartToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartComponent() !== null
+  );
   readonly isProductFeedToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
   );
@@ -784,11 +817,11 @@ readonly activeTextToolbarMenu = signal<
   readonly customPickerSaturation = signal(74);
   readonly customPickerBrightness = signal(22);
   readonly textFontSearch = signal('');
-  readonly textLinkPageId = signal<string>('home');
-  readonly textLinkOpenMode = signal<'current' | 'new'>('current');
-  readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
-  readonly imageLinkPageId = signal<string>('home');
-  readonly imageLinkOpenMode = signal<'current' | 'new'>('current');
+readonly textLinkPageId = signal<string>('');
+readonly textLinkOpenMode = signal<'current' | 'new'>('current');
+readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
+readonly imageLinkPageId = signal<string>('');
+readonly imageLinkOpenMode = signal<'current' | 'new'>('current');
   readonly isImageSettingsLinkPopupOpen = signal(false);
   readonly imageSettingsLinkPopupPlacement = signal<'below' | 'viewport-bottom'>('below');
   readonly imageSettingsLinkPopupViewportLeft = signal(12);
@@ -837,6 +870,24 @@ readonly activeTextToolbarMenu = signal<
   readonly activeSectionBorderColorTab = signal<'brand' | 'custom'>('brand');
   readonly isSectionBorderStylePickerOpen = signal(false);
   readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
+  readonly activeMenuToolbarMenu = signal<MenuToolbarMenu>(null);
+  readonly activeMenuFormatDropdown = signal<MenuFormatDropdown>(null);
+  readonly activeMenuItemActionsId = signal<string | null>(null);
+  readonly menuItemActionsPopupPosition = signal({ x: 12, y: 12 });
+  readonly activeMenuItemLinkId = signal<string | null>(null);
+  readonly menuItemLinkPopupPosition = signal({ x: 12, y: 12 });
+  readonly menuLinkValue = signal('');
+  readonly menuLinkPageId = signal<string>('home');
+  readonly menuLinkOpenMode = signal<'current' | 'new'>('current');
+  readonly renamingMenuItemId = signal<string | null>(null);
+  readonly renamingMenuItemValue = signal('');
+  readonly draggedMenuItemId = signal<string | null>(null);
+  readonly menuItemDropTargetId = signal<string | null>(null);
+  readonly activeMenuItemReorder = signal<MenuItemReorderState | null>(null);
+  readonly isMenuAddPagesPopupOpen = signal(false);
+  readonly selectedMenuPageIds = signal<string[]>([]);
+  readonly activeCartToolbarMenu = signal<CartToolbarMenu>(null);
+  readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
   readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
@@ -845,6 +896,7 @@ readonly activeTextToolbarMenu = signal<
   readonly buttonCustomPickerSaturation = signal(72);
   readonly buttonCustomPickerBrightness = signal(96);
   readonly buttonEditTextValue = signal('');
+  readonly cartEditTextValue = signal('');
   readonly buttonLinkValue = signal('');
   readonly productFeedTextColorValue = signal('#202124');
   readonly brandParagraphColors = computed(() => {
@@ -1193,6 +1245,17 @@ readonly brandSectionBorderColors = [
     'package',
     'wand',
     'eye',
+  ];
+  readonly cartIconStyleOptions: ReadonlyArray<{ id: StorefrontEditorCartIconStyle; label: string }> = [
+    { id: 'bag-filled', label: 'Bag filled' },
+    { id: 'bag-outline', label: 'Bag outline' },
+    { id: 'basket-outline', label: 'Basket' },
+    { id: 'cart-outline', label: 'Cart' },
+    { id: 'text-inline', label: 'Text' },
+    { id: 'cart-inline', label: 'Cart + text' },
+    { id: 'badge-only', label: 'Badge' },
+    { id: 'basket-badge', label: 'Basket + badge' },
+    { id: 'text-badge', label: 'Text + badge' },
   ];
   readonly buttonDesignPresets: ReadonlyArray<StorefrontEditorButtonDesignPreset> = [
     {
@@ -1602,14 +1665,13 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
 
     return 'Autosave is on. Changes are saved automatically.';
   });
-  readonly previewFrameWidth = computed(() => {
-    const baseWidth = this.getViewportBaseWidth(this.viewport());
-    return Math.round(baseWidth * (this.zoomPercent() / 100));
-  });
-  readonly previewStageWidth = computed(() => this.previewFrameWidth() + 4 + this.previewStageScrollbarWidth());
-  readonly isCompactPreviewChrome = computed(() => this.previewFrameWidth() <= 780);
-  readonly isNarrowPreviewChrome = computed(() => this.previewFrameWidth() <= 620);
-  readonly isUltraNarrowPreviewChrome = computed(() => this.previewFrameWidth() <= 460);
+  readonly previewViewportWidth = computed(() => this.getViewportBaseWidth(this.viewport()));
+  readonly previewZoomScale = computed(() => this.zoomPercent() / 100);
+  readonly previewFrameWidth = computed(() => this.previewViewportWidth());
+  readonly previewStageWidth = computed(() => this.previewViewportWidth() + 4 + this.previewStageScrollbarWidth());
+  readonly isCompactPreviewChrome = computed(() => this.previewViewportWidth() <= 780);
+  readonly isNarrowPreviewChrome = computed(() => this.previewViewportWidth() <= 620);
+  readonly isUltraNarrowPreviewChrome = computed(() => this.previewViewportWidth() <= 460);
   readonly availableSectionTypes: StorefrontSectionType[] = [
     'announcement-bar',
     'hero',
@@ -1780,6 +1842,40 @@ effect(() => {
 });
 
 effect(() => {
+  const component = this.selectedMenuComponent();
+  if (!component) {
+    this.activeMenuToolbarMenu.set(null);
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.selectedMenuPageIds.set([]);
+    this.isMenuAddPagesPopupOpen.set(false);
+    return;
+  }
+
+  const firstItem = component.props.items[0] ?? null;
+  if (firstItem && !this.activeMenuItemLinkId()) {
+    this.syncManagedPageLinkSelection(
+      firstItem.href ?? '',
+      firstItem.openInNewTab ?? false,
+      this.menuLinkPageId,
+      this.menuLinkOpenMode
+    );
+    this.menuLinkValue.set(firstItem.href ?? '');
+  }
+});
+
+effect(() => {
+  if (!this.selectedCartComponent()) {
+    this.activeCartToolbarMenu.set(null);
+    this.activeCartSettingsSection.set('cart-icon');
+    return;
+  }
+
+  this.cartEditTextValue.set(this.selectedCartComponent()!.props.label);
+});
+
+effect(() => {
   if (!this.selectedProductFeedComponent()) {
     this.activeProductFeedToolbarMenu.set(null);
     this.activeProductFeedSettingsSection.set('category');
@@ -1863,6 +1959,22 @@ effect(() => {
   if (event.key === 'Escape' && this.activeButtonToolbarMenu()) {
     event.preventDefault();
     this.activeButtonToolbarMenu.set(null);
+    return;
+  }
+
+  if (event.key === 'Escape' && this.activeMenuToolbarMenu()) {
+    event.preventDefault();
+    this.activeMenuToolbarMenu.set(null);
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.isMenuAddPagesPopupOpen.set(false);
+    return;
+  }
+
+  if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
+    event.preventDefault();
+    this.activeCartToolbarMenu.set(null);
     return;
   }
 
@@ -2056,6 +2168,11 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
    this.isSectionBorderColorPickerOpen.set(false);
    this.isSectionBorderStylePickerOpen.set(false);
    this.activeButtonToolbarMenu.set(null);
+   this.activeMenuToolbarMenu.set(null);
+   this.activeMenuItemActionsId.set(null);
+   this.activeMenuItemLinkId.set(null);
+   this.renamingMenuItemId.set(null);
+   this.isMenuAddPagesPopupOpen.set(false);
    this.activeProductFeedToolbarMenu.set(null);
    this.closeComponentContextMenu();
    return;
@@ -2205,6 +2322,39 @@ if (this.activeButtonToolbarMenu()) {
   }
 }
 
+if (this.activeMenuToolbarMenu()) {
+  if (
+    !target.closest(
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__menu-toolbar-side-panel, .storefront-editor__menu-add-pages-popup, .storefront-editor__menu-item-actions-popup, .storefront-editor__menu-item-link-popup'
+    )
+  ) {
+    this.activeMenuToolbarMenu.set(null);
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.isMenuAddPagesPopupOpen.set(false);
+  }
+}
+
+if (this.activeMenuFormatDropdown()) {
+  if (!target.closest('.storefront-editor__menu-format-select')) {
+    this.activeMenuFormatDropdown.set(null);
+  }
+}
+
+if (this.activeMenuItemActionsId() || this.activeMenuItemLinkId()) {
+  if (!target.closest('.storefront-editor__menu-manage-item, .storefront-editor__menu-item-actions-popup, .storefront-editor__menu-item-link-popup')) {
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+  }
+}
+
+if (this.isMenuAddPagesPopupOpen()) {
+  if (!target.closest('.storefront-editor__menu-add-pages-popup, .storefront-editor__menu-toolbar-add-item')) {
+    this.closeMenuAddPagesPopup();
+  }
+}
+
 if (this.activeProductFeedToolbarMenu()) {
   if (
     !target.closest(
@@ -2308,6 +2458,12 @@ if (this.activeProductFeedToolbarMenu()) {
     return;
   }
 
+    if (this.activeMenuItemReorder()) {
+      event.preventDefault();
+      this.updateMenuItemReorder(event);
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -2357,11 +2513,12 @@ if (this.activeProductFeedToolbarMenu()) {
     event.preventDefault();
 
     const bounds = this.getDraggedComponentsBounds(this.activeComponentDrag.components);
+    const scale = this.getPreviewInteractionScale();
     const draggedRect = {
       left: event.clientX - this.activeComponentDrag.pointerOffsetX,
       top: event.clientY - this.activeComponentDrag.pointerOffsetY,
-      width: bounds.width,
-      height: bounds.height,
+      width: bounds.width * scale,
+      height: bounds.height * scale,
     };
     const targetContainer = this.getSectionContentElementForDraggedBounds(
       draggedRect,
@@ -2400,11 +2557,12 @@ if (this.activeProductFeedToolbarMenu()) {
     }
 
     const rect = container.getBoundingClientRect();
-    const anchorX = event.clientX - rect.left - this.activeComponentDrag.pointerOffsetX;
-    const anchorY = event.clientY - rect.top - this.activeComponentDrag.pointerOffsetY;
+    const containerDimensions = this.getLogicalElementDimensions(container);
+    const anchorX = this.toLogicalPreviewDistance(event.clientX - rect.left - this.activeComponentDrag.pointerOffsetX);
+    const anchorY = this.toLogicalPreviewDistance(event.clientY - rect.top - this.activeComponentDrag.pointerOffsetY);
     const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
     const minAnchorX = -bounds.width + 20;
-    const maxAnchorX = rect.width - 20;
+    const maxAnchorX = containerDimensions.width - 20;
     const minAnchorY = -bounds.height + 20;
     const maxAnchorY = previewVisibleHeight - bounds.height - 20;
     const snappedBounds = this.snapDraggedBoundsToConstraints(
@@ -2416,7 +2574,7 @@ if (this.activeProductFeedToolbarMenu()) {
         width: bounds.width,
         height: bounds.height,
       },
-      rect.width,
+      containerDimensions.width,
       previewVisibleHeight
     );
     const clampedAnchorX = Math.max(minAnchorX, Math.min(snappedBounds.x, maxAnchorX));
@@ -2430,8 +2588,8 @@ if (this.activeProductFeedToolbarMenu()) {
         x: clampedAnchorX + (component.startX - bounds.x),
         y: clampedAnchorY + (component.startY - bounds.y),
       })),
-      rect.width,
-      rect.height,
+      containerDimensions.width,
+      containerDimensions.height,
       previewVisibleHeight,
       { transient: true, syncRail: false }
     );
@@ -2480,6 +2638,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   this.activeImageBorderColorHueDrag = false;
   return;
 }
+
+  if (this.activeMenuItemReorder()) {
+    this.finalizeMenuItemReorder();
+    return;
+  }
 
   if (this.activeImageCrop) {
     this.activeImageCrop = null;
@@ -3124,6 +3287,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         return 'Highlights';
       case 'container':
         return 'Structure';
+      case 'menu':
+        return 'Navigation';
       case 'graphic':
         return 'Decorative';
       case 'blog-feed':
@@ -3155,6 +3320,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         return 'Works well in feature rows, contact details, and trust badges.';
       case 'container':
         return 'Useful for grouping custom layouts inside a section.';
+      case 'menu':
+        return 'Best for headers, footers, and site navigation links.';
       case 'graphic':
         return 'Adds visual rhythm without adding more copy.';
       case 'blog-feed':
@@ -3434,9 +3601,14 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         ? selectedIds.has(componentId)
         : item.id === componentId;
     });
-    const dragComponentIds = new Set((dragComponents.length ? dragComponents : [component]).map((item) => item.id));
-    if (component.type === 'container') {
-      this.getContainerAssociatedComponents(sectionComponents, component).forEach((item) => {
+    const dragRoots = dragComponents.length ? dragComponents : [component];
+    const dragComponentIds = new Set(dragRoots.map((item) => item.id));
+    for (const dragRoot of dragRoots) {
+      if (dragRoot.type !== 'container') {
+        continue;
+      }
+
+      this.getContainerAssociatedComponents(sectionComponents, dragRoot).forEach((item) => {
         dragComponentIds.add(item.id);
       });
     }
@@ -3453,11 +3625,12 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }));
     const container = target.closest('.storefront-editor__preview-section-content');
     const containerRect = container instanceof HTMLElement ? container.getBoundingClientRect() : target.getBoundingClientRect();
+    const scale = this.getPreviewInteractionScale();
     this.activeComponentDrag = {
       sectionId,
       sourceContainerId: component.parentContainerId ?? null,
-      pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x),
-      pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y),
+      pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x * scale),
+      pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y * scale),
       components: orderedComponents.map((item) => {
         const frame = this.getComponentFrame(item);
         return {
@@ -3672,6 +3845,10 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         return 'Image';
     case 'button':
       return 'Button';
+    case 'menu':
+      return 'Menu';
+    case 'cart':
+      return 'Cart';
     case 'icon':
       return 'Icon';
     case 'spacer':
@@ -3752,9 +3929,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
-    const rect = previewCanvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const { x, y } = this.getLogicalPointWithinElement(previewCanvas, event.clientX, event.clientY);
 
     this.activeSelectionDrag = {
       sectionId,
@@ -4040,9 +4215,10 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }
 
     const rect = container.getBoundingClientRect();
+    const scale = this.getPreviewInteractionScale();
     const frame = this.getComponentFrame(component);
-    const centerX = rect.left + frame.x + frame.width / 2;
-    const centerY = rect.top + frame.y + frame.height / 2;
+    const centerX = rect.left + (frame.x + frame.width / 2) * scale;
+    const centerY = rect.top + (frame.y + frame.height / 2) * scale;
     this.selectComponent(sectionId, componentId);
     this.activeRotation = {
       sectionId,
@@ -4310,7 +4486,7 @@ finishEditingComponentText(): void {
     this.activeSectionResize = {
       sectionId,
       startY: event.clientY,
-      startHeight: content.getBoundingClientRect().height,
+      startHeight: this.getLogicalElementDimensions(content).height,
     };
     this.isResizingSection.set(true);
     this.closeComponentContextMenu();
@@ -4474,6 +4650,12 @@ finishEditingComponentText(): void {
   this.isSectionBorderColorPickerOpen.set(false);
   this.isSectionBorderStylePickerOpen.set(false);
   this.activeButtonToolbarMenu.set(null);
+  this.activeMenuToolbarMenu.set(null);
+  this.activeMenuItemActionsId.set(null);
+  this.activeMenuItemLinkId.set(null);
+  this.renamingMenuItemId.set(null);
+  this.isMenuAddPagesPopupOpen.set(false);
+  this.activeCartToolbarMenu.set(null);
   this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
     this.closeAddElementsLibraryModal();
@@ -4574,6 +4756,42 @@ private openSectionOptionsAt(sectionId: string, x: number, y: number): void {
     const opensRightWithinViewport =
       menuX + menuWidth + submenuGap + estimatedSubmenuWidth <= window.innerWidth - viewportMargin;
     this.componentContextMenuSubmenuDirection.set(opensRightWithinViewport ? 'right' : 'left');
+  }
+
+  private positionMenuItemActionsPopup(anchorRect: DOMRect): void {
+    const popupWidth = 204;
+    const popupHeight = 228;
+    const gap = 12;
+    const preferredX = anchorRect.left - popupWidth - gap;
+    const preferredY = anchorRect.top - 8;
+    this.menuItemActionsPopupPosition.set(
+      this.getClampedFloatingPanelPosition(preferredX, preferredY, popupWidth, popupHeight)
+    );
+    this.syncFloatingPanelPosition(
+      '.storefront-editor__menu-item-actions-popup',
+      this.menuItemActionsPopupPosition,
+      preferredX,
+      preferredY
+    );
+  }
+
+  private positionMenuItemLinkPopup(anchorRect: DOMRect | null): void {
+    const popupWidth = 320;
+    const popupHeight = 360;
+    const gap = 12;
+    const fallbackX = this.menuItemActionsPopupPosition().x - popupWidth - gap;
+    const fallbackY = this.menuItemActionsPopupPosition().y;
+    const preferredX = anchorRect ? anchorRect.left - popupWidth - gap : fallbackX;
+    const preferredY = anchorRect ? anchorRect.top - 8 : fallbackY;
+    this.menuItemLinkPopupPosition.set(
+      this.getClampedFloatingPanelPosition(preferredX, preferredY, popupWidth, popupHeight)
+    );
+    this.syncFloatingPanelPosition(
+      '.storefront-editor__menu-item-link-popup',
+      this.menuItemLinkPopupPosition,
+      preferredX,
+      preferredY
+    );
   }
 
   private getSectionAddMenuPlacement(anchorRect: DOMRect | null, menuHeight: number): 'above' | 'below' {
@@ -4695,16 +4913,17 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   const shellRect = shell.getBoundingClientRect();
   const previewStageRect = previewStage.getBoundingClientRect();
+  const zoom = Math.max(this.previewZoomScale(), 0.01);
   const isVisible = shellRect.bottom > previewStageRect.top && shellRect.top < previewStageRect.bottom;
   this.isSelectedSectionRailVisible.set(isVisible);
   if (!isVisible) {
     return;
   }
 
-  const unclampedTop = shellRect.top - previewStageRect.top + shellRect.height / 2;
+  const unclampedTop = (shellRect.top - previewStageRect.top + shellRect.height / 2) / zoom;
   const clampedTop = Math.min(
     Math.max(28, unclampedTop),
-    Math.max(28, previewStageRect.height - 28)
+    Math.max(28, previewStageRect.height / zoom - 28)
   );
   this.hoveredSectionRailTop.set(clampedTop);
 }
@@ -4727,9 +4946,7 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   fitPreviewToScreen(): void {
-    this.zoomPercent.set(120);
-    this.isZoomMenuOpen.set(false);
-    this.syncEditorSessionState({ zoomPercent: 120 });
+    this.setZoom(this.computeFitZoomPercent());
   }
 
   toggleSidebar(): void {
@@ -5010,9 +5227,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.applyRichTextCommand(style === 'bullet' ? 'insertUnorderedList' : 'insertOrderedList');
   }
 
-  saveSelectedTextLink(): void {
-    const href = this.buildManagedPageHref(this.textLinkPageId());
-    if (this.isEditingSelectedTextComponent()) {
+saveSelectedTextLink(): void {
+  if (!this.textLinkPageId()) {
+    return;
+  }
+
+  const href = this.buildManagedPageHref(this.textLinkPageId());
+  if (this.isEditingSelectedTextComponent()) {
       if (!this.focusActiveTextEditor()) {
         return;
       }
@@ -5038,14 +5259,16 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.activeTextToolbarMenu.set(null);
   }
 
-  removeSelectedTextLink(): void {
-    if (this.isEditingSelectedTextComponent()) {
+removeSelectedTextLink(): void {
+  if (this.isEditingSelectedTextComponent()) {
       if (!this.focusActiveTextEditor()) {
         return;
       }
 
       document.execCommand('unlink');
       this.syncEditingTextValueFromDom();
+      this.textLinkPageId.set('');
+      this.textLinkOpenMode.set('current');
       this.activeTextToolbarMenu.set(null);
       return;
     }
@@ -5054,6 +5277,8 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       href: '',
       openInNewTab: false,
     });
+    this.textLinkPageId.set('');
+    this.textLinkOpenMode.set('current');
     this.activeTextToolbarMenu.set(null);
   }
 
@@ -5089,9 +5314,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.imageLinkOpenMode.set(mode);
   }
 
-  saveSelectedImageLink(): void {
-    const href = this.buildManagedPageHref(this.imageLinkPageId());
-    this.updateSelectedImageProps({
+saveSelectedImageLink(): void {
+  if (!this.imageLinkPageId()) {
+    return;
+  }
+
+  const href = this.buildManagedPageHref(this.imageLinkPageId());
+  this.updateSelectedImageProps({
       href,
       openInNewTab: this.imageLinkOpenMode() === 'new',
     });
@@ -5099,14 +5328,16 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     this.activeImageToolbarMenu.set(null);
   }
 
-  removeSelectedImageLink(): void {
-    this.updateSelectedImageProps({
-      href: '',
-      openInNewTab: false,
-    });
-    this.isImageSettingsLinkPopupOpen.set(false);
-    this.activeImageToolbarMenu.set(null);
-  }
+removeSelectedImageLink(): void {
+  this.updateSelectedImageProps({
+    href: '',
+    openInNewTab: false,
+  });
+  this.imageLinkPageId.set('');
+  this.imageLinkOpenMode.set('current');
+  this.isImageSettingsLinkPopupOpen.set(false);
+  this.activeImageToolbarMenu.set(null);
+}
 
   closeImageLinkPopups(): void {
     this.isImageSettingsLinkPopupOpen.set(false);
@@ -5192,7 +5423,11 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
       return this.resolveImageCropEditingFrame(component);
     }
 
-    return component.frame;
+    return this.getComponentFrame(component);
+  }
+
+  componentPreviewNode(component: StorefrontEditorComponentNode): StorefrontEditorComponentNode {
+    return this.resolveResponsiveComponentNode(component);
   }
 
   beginImageCropMove(sectionId: string, componentId: string, event: MouseEvent): void {
@@ -5320,8 +5555,8 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
     }
 
     const interaction = this.activeImageCrop;
-    const deltaX = event.clientX - interaction.startX;
-    const deltaY = event.clientY - interaction.startY;
+    const deltaX = this.toLogicalPreviewDistance(event.clientX - interaction.startX);
+    const deltaY = this.toLogicalPreviewDistance(event.clientY - interaction.startY);
     const localDelta = this.rotateVectorToLocal(deltaX, deltaY, interaction.startRotation);
     const minWidth = Math.min(interaction.viewport.width, Math.max(36, interaction.viewport.width * 0.12));
     const minHeight = Math.min(interaction.viewport.height, Math.max(36, interaction.viewport.height * 0.12));
@@ -5389,13 +5624,14 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
   }
 
   private resolveImageCropEditingFrame(component: StorefrontEditorImageNode): StorefrontEditorComponentNode['frame'] {
-    const outerWidth = Math.max(component.props.cropOuterWidth ?? component.frame.width, component.frame.width);
-    const outerHeight = Math.max(component.props.cropOuterHeight ?? component.frame.height, component.frame.height);
+    const frame = this.getComponentFrame(component);
+    const outerWidth = Math.max(component.props.cropOuterWidth ?? frame.width, frame.width);
+    const outerHeight = Math.max(component.props.cropOuterHeight ?? frame.height, frame.height);
     const offsetX = Number.isFinite(component.props.cropOuterOffsetX) ? component.props.cropOuterOffsetX : 0;
     const offsetY = Number.isFinite(component.props.cropOuterOffsetY) ? component.props.cropOuterOffsetY : 0;
     return {
-      x: component.frame.x + offsetX,
-      y: component.frame.y + offsetY,
+      x: frame.x + offsetX,
+      y: frame.y + offsetY,
       width: outerWidth,
       height: outerHeight,
     };
@@ -5403,8 +5639,9 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
 
   private prepareImageCropEditingState(sectionId: string, component: StorefrontEditorImageNode): void {
     const crop = this.resolveNormalizedImageCropRect(component);
-    const outerWidth = Math.max(component.props.cropOuterWidth ?? component.frame.width, component.frame.width);
-    const outerHeight = Math.max(component.props.cropOuterHeight ?? component.frame.height, component.frame.height);
+    const frame = this.getComponentFrame(component);
+    const outerWidth = Math.max(component.props.cropOuterWidth ?? frame.width, frame.width);
+    const outerHeight = Math.max(component.props.cropOuterHeight ?? frame.height, frame.height);
     const offsetX = Number(component.props.cropOuterOffsetX ?? 0);
     const offsetY = Number(component.props.cropOuterOffsetY ?? 0);
     const epsilon = 0.001;
@@ -5416,14 +5653,13 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
     const hasStoredOuter =
       Math.abs(offsetX) > epsilon
       || Math.abs(offsetY) > epsilon
-      || Math.abs(outerWidth - component.frame.width) > epsilon
-      || Math.abs(outerHeight - component.frame.height) > epsilon;
+      || Math.abs(outerWidth - frame.width) > epsilon
+      || Math.abs(outerHeight - frame.height) > epsilon;
 
     if (!isDefaultCrop || hasStoredOuter || resolveStorefrontEditorImageDisplayMode(component.props) !== 'fill') {
       return;
     }
 
-    const frame = component.frame;
     const frameAspectRatio = frame.width > 0 && frame.height > 0 ? frame.width / frame.height : 1;
     const imageAspectRatio = resolveStorefrontEditorImageAspectRatio(component.props, frameAspectRatio);
 
@@ -5585,15 +5821,19 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
     setTimeout(() => this.focusActiveTextEditor(), 0);
   }
 
-  private buildManagedPageHref(pageId: string): string {
-    if (pageId === 'home') {
-      return '/';
-    }
+private buildManagedPageHref(pageId: string): string {
+  if (!pageId.trim()) {
+    return '';
+  }
 
-    const page = this.managedPages().find((item) => item.id === pageId);
-    if (!page) {
-      return '/';
-    }
+  if (pageId === 'home') {
+    return '/';
+  }
+
+  const page = this.managedPages().find((item) => item.id === pageId);
+  if (!page) {
+    return '';
+  }
 
     const slug = page.name
       .trim()
@@ -5606,15 +5846,19 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
     return slug ? `/${slug}` : '/';
   }
 
-  private findManagedPageIdForHref(href: string): string {
-    const normalizedHref = href.trim();
-    if (!normalizedHref || normalizedHref === '/') {
-      return 'home';
-    }
-
-    const match = this.managedPages().find((page) => this.buildManagedPageHref(page.id) === normalizedHref);
-    return match?.id ?? 'home';
+private findManagedPageIdForHref(href: string): string {
+  const normalizedHref = href.trim();
+  if (!normalizedHref) {
+    return '';
   }
+
+  if (normalizedHref === '/') {
+    return 'home';
+  }
+
+  const match = this.managedPages().find((page) => this.buildManagedPageHref(page.id) === normalizedHref);
+  return match?.id ?? '';
+}
 
   private syncManagedPageLinkSelection(
     href: string,
@@ -6189,7 +6433,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
   this.imageBorderCustomPickerBrightness.set(v);
 }
 
-toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
+  toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
   const next = this.activeButtonToolbarMenu() === menu ? null : menu;
   this.activeButtonToolbarMenu.set(next);
 
@@ -6205,6 +6449,533 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
       this.activeButtonColorPickerTab.set('brand');
       this.syncButtonCustomColorPickerFromHex(this.selectedButtonComponent()?.props.backgroundColor ?? '#355cff');
     }
+  }
+
+  toggleMenuToolbarMenu(menu: Exclude<MenuToolbarMenu, null>): void {
+    const next = this.activeMenuToolbarMenu() === menu ? null : menu;
+    this.activeMenuToolbarMenu.set(next);
+    this.activeMenuFormatDropdown.set(null);
+
+    if (next !== 'manage') {
+      this.activeMenuItemActionsId.set(null);
+      this.activeMenuItemLinkId.set(null);
+      this.renamingMenuItemId.set(null);
+      this.isMenuAddPagesPopupOpen.set(false);
+      this.selectedMenuPageIds.set([]);
+      this.clearMenuItemReorderState();
+    }
+  }
+
+  toggleMenuFormatDropdown(dropdown: Exclude<MenuFormatDropdown, null>, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const next = this.activeMenuFormatDropdown() === dropdown ? null : dropdown;
+    this.activeMenuFormatDropdown.set(next);
+  }
+
+  selectMenuDisplayMode(value: StorefrontEditorMenuNode['props']['displayMode']): void {
+    this.updateSelectedMenuDisplayMode(value);
+    this.activeMenuFormatDropdown.set(null);
+  }
+
+  selectMenuOrientation(value: StorefrontEditorMenuNode['props']['orientation']): void {
+    this.updateSelectedMenuOrientation(value);
+    this.activeMenuFormatDropdown.set(null);
+  }
+
+  selectedMenuDisplayModeLabel(
+    value: StorefrontEditorMenuNode['props']['displayMode'] | null | undefined
+  ): string {
+    return value === 'hamburger' ? 'Hamburger menu' : 'Menu bar';
+  }
+
+  selectedMenuOrientationLabel(
+    value: StorefrontEditorMenuNode['props']['orientation'] | null | undefined
+  ): string {
+    return value === 'vertical' ? 'Vertical' : 'Horizontal';
+  }
+
+  menuItemHasLink(item: StorefrontEditorMenuItem | null | undefined): boolean {
+    return !!item?.href?.trim();
+  }
+
+  updateSelectedMenuDisplayMode(value: StorefrontEditorMenuNode['props']['displayMode']): void {
+    this.updateSelectedMenuProps({ displayMode: value });
+  }
+
+  updateSelectedMenuOrientation(value: StorefrontEditorMenuNode['props']['orientation']): void {
+    this.updateSelectedMenuProps({ orientation: value });
+  }
+
+  updateSelectedMenuTextPreset(value: StorefrontEditorMenuNode['props']['textPreset']): void {
+    const nextPatch: Partial<StorefrontEditorMenuNode['props']> = { textPreset: value };
+
+    switch (value) {
+      case 'Paragraph 1':
+        nextPatch.fontFamily = 'Fira Sans';
+        nextPatch.fontSize = 16;
+        nextPatch.fontWeight = 500;
+        break;
+      case 'Heading 4':
+        nextPatch.fontFamily = 'Poppins';
+        nextPatch.fontSize = 18;
+        nextPatch.fontWeight = 600;
+        break;
+      case 'Paragraph 2':
+      default:
+        nextPatch.fontFamily = 'Poppins';
+        nextPatch.fontSize = 15;
+        nextPatch.fontWeight = 500;
+        break;
+    }
+
+    this.updateSelectedMenuProps(nextPatch);
+  }
+
+  updateSelectedMenuFontFamily(value: string): void {
+    this.updateSelectedMenuProps({ fontFamily: value });
+  }
+
+  updateSelectedMenuFontSize(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ fontSize: Math.max(10, Math.min(96, Math.round(parsed))) });
+  }
+
+  updateSelectedMenuFontWeight(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    const nextWeight = [400, 500, 600, 700].includes(parsed) ? (parsed as 400 | 500 | 600 | 700) : 500;
+    this.updateSelectedMenuProps({ fontWeight: nextWeight });
+  }
+
+  updateSelectedMenuTextColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ textColor: normalized });
+  }
+
+  updateSelectedMenuBorderStyle(value: StorefrontEditorMenuNode['props']['borderStyle']): void {
+    this.updateSelectedMenuProps({
+      borderStyle: value,
+      borderWidth: value === 'none' ? 0 : Math.max(this.selectedMenuComponent()?.props.borderWidth ?? 1, 1),
+    });
+  }
+
+  updateSelectedMenuBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ borderWidth: Math.max(0, Math.min(12, Math.round(parsed))) });
+  }
+
+  updateSelectedMenuBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ borderColor: normalized });
+  }
+
+  updateSelectedMenuRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
+  }
+
+  updateSelectedMenuSpacing(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedMenuProps({ spacing: Math.max(0, Math.min(96, Math.round(parsed))) });
+  }
+
+  openMenuItemActions(itemId: string, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.currentTarget;
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    const nextId = this.activeMenuItemActionsId() === itemId ? null : itemId;
+    this.activeMenuItemActionsId.set(nextId);
+    if (nextId && target instanceof HTMLElement) {
+      this.positionMenuItemActionsPopup(target.getBoundingClientRect());
+    }
+  }
+
+  startRenamingMenuItem(itemId: string, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const item = this.findSelectedMenuItem(itemId);
+    if (!item) {
+      return;
+    }
+
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(itemId);
+    this.renamingMenuItemValue.set(item.label);
+  }
+
+  updateRenamingMenuItemValue(value: string): void {
+    this.renamingMenuItemValue.set(value);
+  }
+
+  commitRenamingMenuItem(): void {
+    const itemId = this.renamingMenuItemId();
+    if (!itemId) {
+      return;
+    }
+
+    const item = this.findSelectedMenuItem(itemId);
+    if (!item) {
+      this.renamingMenuItemId.set(null);
+      return;
+    }
+
+    const nextLabel = this.renamingMenuItemValue().trim() || item.label;
+    this.updateSelectedMenuItem(itemId, (current) => ({
+      ...current,
+      label: nextLabel,
+    }));
+    this.renamingMenuItemId.set(null);
+  }
+
+  handleMenuItemRenameKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitRenamingMenuItem();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.renamingMenuItemId.set(null);
+    }
+  }
+
+  openMenuItemLinkEditor(itemId: string, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const item = this.findSelectedMenuItem(itemId);
+    if (!item) {
+      return;
+    }
+
+    this.activeMenuItemActionsId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.activeMenuItemLinkId.set(itemId);
+    if (item.href?.trim()) {
+      this.syncManagedPageLinkSelection(
+        item.href ?? '',
+        item.openInNewTab ?? false,
+        this.menuLinkPageId,
+        this.menuLinkOpenMode
+      );
+    } else {
+      this.menuLinkPageId.set('');
+      this.menuLinkOpenMode.set('current');
+    }
+    this.menuLinkValue.set(item.href ?? '');
+    const target = event?.currentTarget;
+    if (target instanceof HTMLElement) {
+      this.positionMenuItemLinkPopup(target.getBoundingClientRect());
+    } else {
+      this.positionMenuItemLinkPopup(null);
+    }
+  }
+
+  setMenuLinkPage(pageId: string): void {
+    this.menuLinkPageId.set(pageId);
+  }
+
+  setMenuLinkOpenMode(mode: 'current' | 'new'): void {
+    this.menuLinkOpenMode.set(mode);
+  }
+
+  saveSelectedMenuItemLink(): void {
+    const itemId = this.activeMenuItemLinkId();
+    if (!itemId || !this.menuLinkPageId()) {
+      return;
+    }
+
+    this.updateSelectedMenuItem(itemId, (current) => ({
+      ...current,
+      href: this.buildManagedPageHref(this.menuLinkPageId()),
+      openInNewTab: this.menuLinkOpenMode() === 'new',
+    }));
+    this.activeMenuItemLinkId.set(null);
+  }
+
+  removeSelectedMenuItemLink(itemId: string | null = this.activeMenuItemLinkId()): void {
+    if (!itemId) {
+      return;
+    }
+
+    this.updateSelectedMenuItem(itemId, (current) => ({
+      ...current,
+      href: '',
+      openInNewTab: false,
+    }));
+    this.menuLinkPageId.set('');
+    this.menuLinkOpenMode.set('current');
+    this.activeMenuItemLinkId.set(null);
+    this.activeMenuItemActionsId.set(null);
+  }
+
+  removeSelectedMenuItem(itemId: string, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.updateSelectedMenuItems((items) => items.filter((item) => item.id !== itemId));
+    if (this.activeMenuItemActionsId() === itemId) {
+      this.activeMenuItemActionsId.set(null);
+    }
+    if (this.activeMenuItemLinkId() === itemId) {
+      this.activeMenuItemLinkId.set(null);
+    }
+    if (this.renamingMenuItemId() === itemId) {
+      this.renamingMenuItemId.set(null);
+    }
+  }
+
+  duplicateSelectedMenuItem(itemId: string, event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.updateSelectedMenuItems((items) => {
+      const index = items.findIndex((item) => item.id === itemId);
+      if (index === -1) {
+        return items;
+      }
+
+      const source = items[index]!;
+      const clone: StorefrontEditorMenuItem = {
+        ...source,
+        id: this.createEditorScopedId('menu-item'),
+        label: `${source.label} copy`,
+      };
+
+      return [...items.slice(0, index + 1), clone, ...items.slice(index + 1)];
+    });
+    this.activeMenuItemActionsId.set(null);
+  }
+
+  openMenuAddPagesPopup(): void {
+    this.isMenuAddPagesPopupOpen.set(true);
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.selectedMenuPageIds.set([]);
+  }
+
+  closeMenuAddPagesPopup(): void {
+    this.isMenuAddPagesPopupOpen.set(false);
+    this.selectedMenuPageIds.set([]);
+  }
+
+  toggleMenuAddPageSelection(pageId: string): void {
+    if (this.isManagedPageAlreadyInSelectedMenu(pageId)) {
+      return;
+    }
+
+    this.selectedMenuPageIds.update((current) =>
+      current.includes(pageId)
+        ? current.filter((id) => id !== pageId)
+        : [...current, pageId]
+    );
+  }
+
+  addSelectedPagesToMenu(): void {
+    const pageIds = this.selectedMenuPageIds();
+    if (!pageIds.length) {
+      return;
+    }
+
+    this.updateSelectedMenuItems((items) => {
+      const additions = pageIds
+        .map((pageId) => this.managedPages().find((page) => page.id === pageId))
+        .filter((page): page is StorefrontEditorManagedPage => Boolean(page))
+        .filter((page) => !items.some((item) => this.normalizeHrefValue(item.href) === this.normalizeHrefValue(this.buildManagedPageHref(page.id))))
+        .map((page) => ({
+          id: this.createEditorScopedId('menu-item'),
+          label: page.name,
+          href: this.buildManagedPageHref(page.id),
+          openInNewTab: false,
+        }));
+
+      return additions.length ? [...items, ...additions] : items;
+    });
+
+    this.closeMenuAddPagesPopup();
+  }
+
+  menuPageAlreadyAdded(pageId: string): boolean {
+    return this.isManagedPageAlreadyInSelectedMenu(pageId);
+  }
+
+  startMenuItemReorder(itemId: string, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const handle = event.currentTarget;
+    if (!(handle instanceof HTMLElement)) {
+      return;
+    }
+
+    const itemElement = handle.closest('.storefront-editor__menu-manage-item');
+    const listElement = handle.closest('.storefront-editor__menu-manage-list');
+    if (!(itemElement instanceof HTMLElement) || !(listElement instanceof HTMLElement)) {
+      return;
+    }
+
+    const rowRect = itemElement.getBoundingClientRect();
+    const listRect = listElement.getBoundingClientRect();
+    this.activeMenuItemActionsId.set(null);
+    this.activeMenuItemLinkId.set(null);
+    this.renamingMenuItemId.set(null);
+    this.draggedMenuItemId.set(itemId);
+    this.menuItemDropTargetId.set(itemId);
+    this.activeMenuItemReorder.set({
+      itemId,
+      rowTop: rowRect.top,
+      rowHeight: rowRect.height,
+      pointerOffsetY: event.clientY - rowRect.top,
+      minTranslateY: listRect.top - rowRect.top,
+      maxTranslateY: listRect.bottom - rowRect.bottom,
+      currentTranslateY: 0,
+    });
+    document.body.style.userSelect = 'none';
+  }
+
+  menuItemReorderTransform(itemId: string): string | null {
+    const reorder = this.activeMenuItemReorder();
+    if (!reorder || reorder.itemId !== itemId) {
+      return null;
+    }
+
+    return `translateY(${Math.round(reorder.currentTranslateY)}px)`;
+  }
+
+  isMenuItemBeingReordered(itemId: string): boolean {
+    return this.activeMenuItemReorder()?.itemId === itemId;
+  }
+
+  private updateMenuItemReorder(event: MouseEvent): void {
+    const reorder = this.activeMenuItemReorder();
+    if (!reorder) {
+      return;
+    }
+
+    const nextTop = event.clientY - reorder.pointerOffsetY;
+    const nextTranslateY = Math.max(
+      reorder.minTranslateY,
+      Math.min(nextTop - reorder.rowTop, reorder.maxTranslateY)
+    );
+    const currentCenterY = reorder.rowTop + nextTranslateY + reorder.rowHeight / 2;
+    const itemElements = Array.from(
+      document.querySelectorAll<HTMLElement>('.storefront-editor__menu-manage-item[data-menu-item-id]')
+    );
+
+    let nextTargetId = reorder.itemId;
+    let lastCandidateId = reorder.itemId;
+    for (const itemElement of itemElements) {
+      const candidateId = itemElement.dataset['menuItemId'] ?? null;
+      if (!candidateId || candidateId === reorder.itemId) {
+        continue;
+      }
+
+      const rect = itemElement.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      if (currentCenterY <= centerY) {
+        nextTargetId = candidateId;
+        lastCandidateId = candidateId;
+        break;
+      }
+
+      lastCandidateId = candidateId;
+    }
+
+    if (nextTargetId === reorder.itemId) {
+      nextTargetId = lastCandidateId;
+    }
+
+    this.activeMenuItemReorder.set({
+      ...reorder,
+      currentTranslateY: nextTranslateY,
+    });
+    this.menuItemDropTargetId.set(nextTargetId);
+  }
+
+  private finalizeMenuItemReorder(): void {
+    const reorder = this.activeMenuItemReorder();
+    if (!reorder) {
+      return;
+    }
+
+    const targetId = this.menuItemDropTargetId() ?? reorder.itemId;
+    if (targetId !== reorder.itemId) {
+      this.reorderSelectedMenuItems(reorder.itemId, targetId);
+    }
+
+    this.clearMenuItemReorderState();
+  }
+
+  private reorderSelectedMenuItems(draggedId: string, targetId: string): void {
+    this.updateSelectedMenuItems((items) => {
+      const draggedIndex = items.findIndex((item) => item.id === draggedId);
+      const targetIndex = items.findIndex((item) => item.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return items;
+      }
+
+      const next = [...items];
+      const [dragged] = next.splice(draggedIndex, 1);
+      if (!dragged) {
+        return items;
+      }
+
+      next.splice(targetIndex, 0, dragged);
+      return next;
+    });
+  }
+
+  clearMenuItemReorderState(): void {
+    document.body.style.userSelect = '';
+    this.activeMenuItemReorder.set(null);
+    this.draggedMenuItemId.set(null);
+    this.menuItemDropTargetId.set(null);
+  }
+
+  toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
+    const next = this.activeCartToolbarMenu() === menu ? null : menu;
+    this.activeCartToolbarMenu.set(next);
+
+    if (next === 'edit-text') {
+      this.cartEditTextValue.set(this.selectedCartComponent()?.props.label ?? 'Cart');
+    }
+
+    if (next === 'settings') {
+      this.activeCartSettingsSection.set('cart-icon');
+    }
+  }
+
+  setActiveCartSettingsSection(section: CartSettingsSection): void {
+    this.activeCartSettingsSection.set(section);
   }
 
   toggleProductFeedToolbarMenu(menu: Exclude<ProductFeedToolbarMenu, null>): void {
@@ -6333,6 +7104,54 @@ toggleButtonToolbarMenu(menu: Exclude<ButtonToolbarMenu, null>): void {
   updateSelectedButtonTextValue(value: string): void {
     this.buttonEditTextValue.set(value);
     this.updateSelectedButtonProps({ label: value });
+  }
+
+  updateSelectedCartTextValue(value: string): void {
+    this.cartEditTextValue.set(value);
+    this.updateSelectedCartProps({ label: value });
+  }
+
+  updateSelectedCartIconStyle(value: StorefrontEditorCartIconStyle): void {
+    this.updateSelectedCartProps({ iconStyle: value });
+  }
+
+  updateSelectedCartLabelFontFamily(value: string): void {
+    this.updateSelectedCartProps({ labelFontFamily: value });
+  }
+
+  updateSelectedCartLabelColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedCartProps({ labelColor: normalized });
+  }
+
+  updateSelectedCartBadgeFontFamily(value: string): void {
+    this.updateSelectedCartProps({ badgeFontFamily: value });
+  }
+
+  updateSelectedCartBadgeTextColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedCartProps({ badgeTextColor: normalized });
+  }
+
+  updateSelectedCartBadgeBackgroundColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedCartProps({ badgeBackgroundColor: normalized });
+  }
+
+  updateSelectedCartOpenMode(value: 'side' | 'page'): void {
+    this.updateSelectedCartProps({ openMode: value });
   }
 
   updateSelectedButtonLinkValue(value: string): void {
@@ -7614,6 +8433,13 @@ updatePageDesignTabScrollState(): void {
     const baseFrame = normalizeFrame(component.frame) ?? createStorefrontEditorComponentNode(component.type).frame;
     const tabletFrame = normalizeFrame(component.responsiveFrames?.['tablet']);
     const mobileFrame = normalizeFrame(component.responsiveFrames?.['mobile']);
+    const responsiveProps =
+      component.responsiveProps && typeof component.responsiveProps === 'object'
+        ? {
+            ...(component.responsiveProps['tablet'] ? { tablet: { ...component.responsiveProps['tablet'] } } : {}),
+            ...(component.responsiveProps['mobile'] ? { mobile: { ...component.responsiveProps['mobile'] } } : {}),
+          }
+        : undefined;
 
     return {
       ...component,
@@ -7624,7 +8450,11 @@ updatePageDesignTabScrollState(): void {
             ...(mobileFrame ? { mobile: mobileFrame } : {}),
           }
         : undefined,
-    };
+      responsiveProps:
+        responsiveProps && (responsiveProps['tablet'] || responsiveProps['mobile'])
+          ? (responsiveProps as typeof component.responsiveProps)
+          : undefined,
+    } as StorefrontEditorComponentNode;
   }
 
   private getViewportBaseWidth(viewport: StorefrontEditorViewport): number {
@@ -7632,10 +8462,52 @@ updatePageDesignTabScrollState(): void {
       case 'mobile':
         return 390;
       case 'tablet':
-        return 820;
+        return 768;
       default:
         return 1200;
     }
+  }
+
+  private computeFitZoomPercent(): number {
+    const editorBody = document.querySelector('.storefront-editor__body') as HTMLElement | null;
+    if (!editorBody) {
+      return 120;
+    }
+
+    const horizontalPadding = 56;
+    const usableWidth = Math.max(320, editorBody.clientWidth - horizontalPadding);
+    const chromeWidth = 4 + this.previewStageScrollbarWidth();
+    const targetWidth = Math.max(280, usableWidth - chromeWidth);
+    const viewportWidth = this.previewViewportWidth();
+    const fitPercent = Math.floor((targetWidth / viewportWidth) * 100);
+    return this.clampZoom(fitPercent);
+  }
+
+  private getPreviewInteractionScale(): number {
+    return Math.max(this.previewZoomScale(), 0.01);
+  }
+
+  private toLogicalPreviewDistance(distance: number): number {
+    return distance / this.getPreviewInteractionScale();
+  }
+
+  private getLogicalPointWithinElement(
+    element: HTMLElement,
+    clientX: number,
+    clientY: number
+  ): { x: number; y: number } {
+    const rect = element.getBoundingClientRect();
+    return {
+      x: this.toLogicalPreviewDistance(clientX - rect.left),
+      y: this.toLogicalPreviewDistance(clientY - rect.top),
+    };
+  }
+
+  private getLogicalElementDimensions(element: HTMLElement): { width: number; height: number } {
+    return {
+      width: element.clientWidth || element.offsetWidth,
+      height: element.clientHeight || element.offsetHeight,
+    };
   }
 
   private getComponentFrame(
@@ -7647,6 +8519,67 @@ updatePageDesignTabScrollState(): void {
     }
 
     return component.responsiveFrames?.[viewport] ?? component.frame;
+  }
+
+  private getComponentProps<T extends StorefrontEditorComponentNode>(
+    component: T,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): T['props'] {
+    if (viewport === 'desktop') {
+      return component.props;
+    }
+
+    const override = component.responsiveProps?.[viewport];
+    if (!override) {
+      return component.props;
+    }
+
+    return {
+      ...component.props,
+      ...override,
+    } as T['props'];
+  }
+
+  private writeComponentProps<T extends StorefrontEditorComponentNode>(
+    component: T,
+    patch: Partial<T['props']>,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): T {
+    if (viewport === 'desktop') {
+      return {
+        ...component,
+        props: {
+          ...component.props,
+          ...patch,
+        },
+      };
+    }
+
+    return {
+      ...component,
+      responsiveProps: {
+        ...(component.responsiveProps ?? {}),
+        [viewport]: {
+          ...(component.responsiveProps?.[viewport] ?? {}),
+          ...patch,
+        },
+      },
+    };
+  }
+
+  private resolveResponsiveComponentNode<T extends StorefrontEditorComponentNode>(
+    component: T,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): T {
+    const resolvedProps = this.getComponentProps(component, viewport);
+    if (resolvedProps === component.props) {
+      return component;
+    }
+
+    return {
+      ...component,
+      props: resolvedProps,
+    };
   }
 
   private writeComponentFrame(
@@ -8055,6 +8988,19 @@ imageShadow(component: StorefrontEditorImageNode | null): StorefrontEditorButton
   return value === 'soft' || value === 'medium' || value === 'bottom' || value === 'strong' ? value : 'none';
 }
 
+cartPreviewNode(
+  component: StorefrontEditorCartNode,
+  iconStyle: StorefrontEditorCartIconStyle
+): StorefrontEditorCartNode {
+  return {
+    ...component,
+    props: {
+      ...component.props,
+      iconStyle,
+    },
+  };
+}
+
 componentTypeLabel(component: StorefrontEditorComponentNode): string {
 switch (component.type) {
     case 'text':
@@ -8067,6 +9013,10 @@ switch (component.type) {
         return 'Image';
       case 'button':
         return 'Button';
+      case 'menu':
+        return 'Menu';
+      case 'cart':
+        return 'Cart';
       case 'icon':
         return 'Icon';
       case 'spacer':
@@ -8314,9 +9264,15 @@ private updateSelectedSection(
     }
 
     const previewRect = previewCanvas.getBoundingClientRect();
-    const sectionRect = container.getBoundingClientRect();
-    const currentX = Math.max(0, Math.min(event.clientX - previewRect.left, previewRect.width));
-    const currentY = Math.max(0, Math.min(event.clientY - previewRect.top, previewRect.height));
+    const previewDimensions = this.getLogicalElementDimensions(previewCanvas);
+    const currentX = Math.max(
+      0,
+      Math.min(this.toLogicalPreviewDistance(event.clientX - previewRect.left), previewDimensions.width)
+    );
+    const currentY = Math.max(
+      0,
+      Math.min(this.toLogicalPreviewDistance(event.clientY - previewRect.top), previewDimensions.height)
+    );
     const width = currentX - this.activeSelectionDrag.startX;
     const height = currentY - this.activeSelectionDrag.startY;
     const nextBox = {
@@ -8325,8 +9281,8 @@ private updateSelectedSection(
       width: Math.abs(width),
       height: Math.abs(height),
     };
-    const sectionOffsetX = sectionRect.left - previewRect.left;
-    const sectionOffsetY = sectionRect.top - previewRect.top;
+    const sectionOffsetX = container.offsetLeft;
+    const sectionOffsetY = container.offsetTop;
 
     this.selectionBox.set(nextBox);
     const section = this.sections().find((item) => item.id === this.activeSelectionDrag?.sectionId) ?? null;
@@ -8932,8 +9888,8 @@ private expandPositionUpdatesForAttachedDescendants(
       return;
     }
 
-    const deltaX = event.clientX - this.activeResize.startX;
-    const deltaY = event.clientY - this.activeResize.startY;
+    const deltaX = this.toLogicalPreviewDistance(event.clientX - this.activeResize.startX);
+    const deltaY = this.toLogicalPreviewDistance(event.clientY - this.activeResize.startY);
     const startFrame = this.activeResize.startFrame;
     const localDelta = this.rotateVectorToLocal(deltaX, deltaY, this.activeResize.startRotation);
     const halfWidth = startFrame.width / 2;
@@ -9669,6 +10625,48 @@ private updateSelectedButtonProps(
   );
 }
 
+private updateSelectedMenuProps(
+  patch: Partial<StorefrontEditorMenuNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedMenuComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'menu'
+      ? this.writeComponentProps(current, patch)
+      : current,
+    options
+  );
+}
+
+private updateSelectedCartProps(
+  patch: Partial<StorefrontEditorCartNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedCartComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'cart'
+      ? {
+          ...current,
+          props: {
+            ...current.props,
+            ...patch,
+          },
+        }
+      : current,
+    options
+  );
+}
+
 private updateSelectedContainerProps(
   patch: Partial<StorefrontEditorContainerNode['props']>,
   options: { transient?: boolean; preview?: boolean } = {}
@@ -9691,6 +10689,57 @@ private updateSelectedContainerProps(
       : current,
     options
   );
+}
+
+private updateSelectedMenuItems(
+  updater: (items: StorefrontEditorMenuItem[]) => StorefrontEditorMenuItem[],
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const component = this.selectedMenuComponent();
+  if (!component) {
+    return;
+  }
+
+  this.updateSelectedMenuProps({
+    items: updater([...component.props.items]),
+  }, options);
+}
+
+private updateSelectedMenuItem(
+  itemId: string,
+  updater: (item: StorefrontEditorMenuItem) => StorefrontEditorMenuItem,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  this.updateSelectedMenuItems(
+    (items) => items.map((item) => (item.id === itemId ? updater(item) : item)),
+    options
+  );
+}
+
+private findSelectedMenuItem(itemId: string): StorefrontEditorMenuItem | null {
+  return this.selectedMenuComponent()?.props.items.find((item) => item.id === itemId) ?? null;
+}
+
+private isManagedPageAlreadyInSelectedMenu(pageId: string): boolean {
+  const href = this.normalizeHrefValue(this.buildManagedPageHref(pageId));
+  return this.selectedMenuComponent()?.props.items.some((item) => this.normalizeHrefValue(item.href) === href) ?? false;
+}
+
+private createEditorScopedId(prefix: string): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+private normalizeHrefValue(value: string | null | undefined): string {
+  const normalized = (value ?? '').trim();
+  if (!normalized) {
+    return '';
+  }
+
+  return normalized.replace(/\/+$/, '') || '/';
 }
 
 private updateSelectedProductFeedProps(
@@ -10268,10 +11317,9 @@ private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['sha
       return null;
     }
 
-    const rect = container.getBoundingClientRect();
     return {
-      width: rect.width,
-      height: rect.height,
+      width: container.clientWidth || container.offsetWidth,
+      height: container.clientHeight || container.offsetHeight,
     };
   }
 
@@ -11050,15 +12098,16 @@ isSectionAttachTarget(sectionId: string): boolean {
     }
 
     const next = createStorefrontEditorComponentNode(componentType);
-    const rect = container.getBoundingClientRect();
     const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
     const fittedFrame = this.fitDroppedComponentFrameToSection(container, this.getComponentFrame(next));
-    const x = clientX - rect.left - fittedFrame.width / 2;
-    const y = clientY - rect.top - fittedFrame.height / 2;
+    const point = this.getLogicalPointWithinElement(container, clientX, clientY);
+    const dimensions = this.getLogicalElementDimensions(container);
+    const x = point.x - fittedFrame.width / 2;
+    const y = point.y - fittedFrame.height / 2;
 
     return {
       ...fittedFrame,
-      x: Math.max(0, Math.min(x, Math.max(0, rect.width - fittedFrame.width))),
+      x: Math.max(0, Math.min(x, Math.max(0, dimensions.width - fittedFrame.width))),
       y: Math.max(0, Math.min(y, Math.max(0, previewVisibleHeight - fittedFrame.height))),
     };
   }
@@ -11067,9 +12116,8 @@ isSectionAttachTarget(sectionId: string): boolean {
     container: HTMLElement,
     frame: StorefrontEditorComponentNode['frame']
   ): StorefrontEditorComponentNode['frame'] {
-    const rect = container.getBoundingClientRect();
     const inset = 20;
-    const maxWidth = Math.max(48, rect.width - inset * 2);
+    const maxWidth = Math.max(48, (container.clientWidth || container.offsetWidth) - inset * 2);
     const scale = Math.min(1, maxWidth / frame.width);
 
     return {
@@ -11095,7 +12143,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     );
     const currentHeight =
       container instanceof HTMLElement
-        ? Math.max(container.getBoundingClientRect().height, container.scrollHeight)
+        ? Math.max(container.clientHeight || container.offsetHeight, container.scrollHeight)
         : 0;
     const frame = this.getComponentFrame(component);
     const componentBottom = frame.y + frame.height + 24;
@@ -11117,15 +12165,18 @@ isSectionAttachTarget(sectionId: string): boolean {
       return null;
     }
 
-    const rect = container.getBoundingClientRect();
-    const cellBounds = this.getSectionLayoutCellBounds(section, rect.width, rect.height);
+    const dimensions = this.getLogicalElementDimensions(container);
+    const cellBounds = this.getSectionLayoutCellBounds(section, dimensions.width, dimensions.height);
     if (!cellBounds.length) {
       return null;
     }
 
     const targetCell =
       typeof clientX === 'number' && typeof clientY === 'number'
-        ? this.getSectionLayoutCellAtLocalPoint(cellBounds, clientX - rect.left, clientY - rect.top)
+        ? (() => {
+            const point = this.getLogicalPointWithinElement(container, clientX, clientY);
+            return this.getSectionLayoutCellAtLocalPoint(cellBounds, point.x, point.y);
+          })()
         : this.getNextSectionLayoutInsertionCell(section, cellBounds);
     if (!targetCell) {
       return null;
@@ -11176,13 +12227,12 @@ isSectionAttachTarget(sectionId: string): boolean {
   private getPreviewVisibleHeightForSection(container: HTMLElement): number {
     const previewCanvas = container.closest('.storefront-editor__preview-canvas');
     if (!(previewCanvas instanceof HTMLElement)) {
-      return container.getBoundingClientRect().height;
+      return container.clientHeight || container.offsetHeight;
     }
 
-    const previewRect = previewCanvas.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const containerTopWithinPreview = containerRect.top - previewRect.top;
-    return Math.max(containerRect.height, previewCanvas.scrollHeight - containerTopWithinPreview);
+    const containerTopWithinPreview = container.offsetTop;
+    const containerHeight = container.clientHeight || container.offsetHeight;
+    return Math.max(containerHeight, previewCanvas.scrollHeight - containerTopWithinPreview);
   }
 
   private updateAddElementsComponentDrag(event: MouseEvent): void {
@@ -11368,7 +12418,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     const minHeight = this.getMinimumSectionResizeHeight(this.activeSectionResize.sectionId);
     const nextHeight = Math.max(
       minHeight,
-      Math.round(this.activeSectionResize.startHeight + (event.clientY - this.activeSectionResize.startY))
+      Math.round(this.activeSectionResize.startHeight + this.toLogicalPreviewDistance(event.clientY - this.activeSectionResize.startY))
     );
     const dimensions = this.getSectionContentDimensions(this.activeSectionResize.sectionId);
     this.applyStorefrontMutation((storefront) => ({
@@ -11403,8 +12453,8 @@ isSectionAttachTarget(sectionId: string): boolean {
 
     const state = this.activeSectionLayoutResize;
     const deltaPx = state.axis === 'column'
-      ? event.clientX - state.startClientX
-      : event.clientY - state.startClientY;
+      ? this.toLogicalPreviewDistance(event.clientX - state.startClientX)
+      : this.toLogicalPreviewDistance(event.clientY - state.startClientY);
     const deltaPercent = (deltaPx / Math.max(1, state.availableSize)) * 100;
     const nextSizes = [...state.startSizes];
     const minimumTrackPercent = (72 / Math.max(1, state.availableSize)) * 100;
@@ -11986,8 +13036,16 @@ isSectionAttachTarget(sectionId: string): boolean {
     if (!stage) {
       this.hasPreviewStageScrollbar.set(false);
       this.previewStageScrollbarWidth.set(0);
+      this.previewStageScrollCompensation.set(0);
       return;
     }
+
+    const canvas = stage.querySelector('.storefront-editor__preview-canvas') as HTMLElement | null;
+    const zoom = Math.max(this.previewZoomScale(), 0.01);
+    const compensation = canvas
+      ? Math.max(0, Math.round(canvas.scrollHeight * Math.max(0, zoom - 1)))
+      : 0;
+    this.previewStageScrollCompensation.set(compensation);
 
     const hasScrollbar = stage.scrollHeight > stage.clientHeight + 1;
     this.hasPreviewStageScrollbar.set(hasScrollbar);
