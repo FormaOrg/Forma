@@ -4929,7 +4929,6 @@
   border-bottom: 0;
   border-radius: 20px 20px 0 0;
   background: #fafafa;
-  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .storefront-editor__preview-toolbar-left,
@@ -8331,9 +8330,9 @@
   box-sizing: border-box;
   width: fit-content;
   min-width: 0;
-  min-height: max(0px, calc(((100vh - 174px) / var(--storefront-editor-preview-zoom)) - var(--storefront-editor-preview-toolbar-height)));
-  height: max(0px, calc(((100vh - 174px) / var(--storefront-editor-preview-zoom)) - var(--storefront-editor-preview-toolbar-height)));
-  max-height: max(0px, calc(((100vh - 174px) / var(--storefront-editor-preview-zoom)) - var(--storefront-editor-preview-toolbar-height)));
+  min-height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
+  height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
+  max-height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
   overflow-x: clip;
   overflow-y: auto;
   margin-top: -1px;

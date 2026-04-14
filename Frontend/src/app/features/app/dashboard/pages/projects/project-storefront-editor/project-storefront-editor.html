@@ -26,13 +26,11 @@
       <div class="storefront-editor__preview-workspace">
         <section
           class="storefront-editor__preview-shell"
-          [style.zoom]="previewZoomScale()"
-          [style.--storefront-editor-preview-zoom]="previewZoomScale()"
         >
           <div class="storefront-editor__preview-toolbar">
             <div
               class="storefront-editor__preview-toolbar-frame storefront-editor__preview-toolbar-frame--skeleton"
-              [style.width.px]="previewStageWidth()"
+              [style.width.px]="previewDisplayWidth()"
             >
               <div class="storefront-editor__preview-toolbar-left">
                 <span class="storefront-editor__skeleton storefront-editor__skeleton--page-trigger"></span>
@@ -47,7 +45,15 @@
           </div>
 
           <div class="storefront-editor__preview-body">
-            <div class="storefront-editor__preview-stage" [style.width.px]="previewStageWidth()">
+            <div
+            class="storefront-editor__preview-stage"
+            [style.width.px]="previewStageWidth()"
+            [style.minHeight.px]="previewStageLogicalHeight()"
+            [style.height.px]="previewStageLogicalHeight()"
+            [style.maxHeight.px]="previewStageLogicalHeight()"
+            [style.zoom]="previewZoomScale()"
+            [style.--storefront-editor-preview-zoom]="previewZoomScale()"
+          >
               <div
                 class="storefront-editor__preview-canvas storefront-editor__preview-canvas--skeleton"
                 [style.width.px]="previewFrameWidth()"
@@ -5665,13 +5671,11 @@
       <div class="storefront-editor__preview-workspace">
         <section
           class="storefront-editor__preview-shell"
-          [style.zoom]="previewZoomScale()"
-          [style.--storefront-editor-preview-zoom]="previewZoomScale()"
         >
           <div class="storefront-editor__preview-toolbar">
                 <div
                 class="storefront-editor__preview-toolbar-frame"
-                [style.width.px]="previewStageWidth()"
+                [style.width.px]="previewDisplayWidth()"
               >
             <div class="storefront-editor__preview-toolbar-left">
               @if (!isCompactPreviewChrome()) {
@@ -5701,7 +5705,7 @@
             </div>
       
             <div class="storefront-editor__preview-toolbar-center">
-              @if (!isNarrowPreviewChrome()) {
+              @if (!isNarrowPreviewChrome() && !hideMobileDomainChrome()) {
                 <div class="storefront-editor__domain-pill">
                   @if (isCompactPreviewChrome()) {
                     <button type="button" class="storefront-editor__domain-link">Connect Domain</button>
@@ -5755,9 +5759,14 @@
             class="storefront-editor__preview-body"
           >
             <div
-              class="storefront-editor__preview-stage"
-              [style.width.px]="previewStageWidth()"
-              [style.paddingBottom.px]="previewStageScrollCompensation()"
+            class="storefront-editor__preview-stage"
+            [style.width.px]="previewStageWidth()"
+            [style.minHeight.px]="previewStageLogicalHeight()"
+            [style.height.px]="previewStageLogicalHeight()"
+            [style.maxHeight.px]="previewStageLogicalHeight()"
+            [style.paddingBottom.px]="previewStageScrollCompensation()"
+            [style.zoom]="previewZoomScale()"
+              [style.--storefront-editor-preview-zoom]="previewZoomScale()"
               (scroll)="syncSelectedSectionRailPosition()"
             >
               <div
