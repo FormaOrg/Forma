@@ -1,14 +1,17 @@
 import { CommonModule, NgStyle } from '@angular/common';
-import { Component, HostListener, computed, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
+import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
+import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { AppIcon } from '../../../shared/app/icons/app-icon';
 import {
   StorefrontEditorCartNode,
   StorefrontEditorComponentNode,
+  StorefrontEditorSearchNode,
 } from '../../app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component.model';
 import { StorefrontEditorComponentHostComponent } from '../../app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component';
 
@@ -21,6 +24,8 @@ import { StorefrontEditorComponentHostComponent } from '../../app/dashboard/page
 })
 export class StorefrontPublicHeaderComponent {
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly publicStorefrontService = inject(PublicStorefrontService);
   private readonly storeCartService = inject(StoreCartService);
 
   readonly storefront = input<PublicStorefrontHome | null>(null);
@@ -28,6 +33,9 @@ export class StorefrontPublicHeaderComponent {
   readonly isEditorPreview = input(false);
 
   readonly isCartDrawerOpen = signal(false);
+  readonly isSearchOpen = signal(false);
+  readonly searchQuery = signal('');
+  readonly searchableProducts = signal<PublicStorefrontProduct[]>([]);
   readonly resolveComponentLinkHref = (value: string): string => this.resolveLinkHref(value);
 
   readonly headerSection = computed<StorefrontHomepageSection | null>(() => {
@@ -54,15 +62,82 @@ export class StorefrontPublicHeaderComponent {
     const component = this.headerComponents().find((entry) => entry.type === 'cart');
     return component?.type === 'cart' ? component : null;
   });
+  readonly searchComponent = computed<StorefrontEditorSearchNode | null>(() => {
+    const component = this.headerComponents().find((entry) => entry.type === 'search');
+    return component?.type === 'search' ? component : null;
+  });
+  readonly searchOverlayLabel = computed(() => this.searchComponent()?.props.label || 'Search');
+  readonly searchOverlayPlaceholder = computed(() => this.searchComponent()?.props.placeholder || 'Search products');
 
   readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
   readonly cartItems = computed(() => this.storeCartService.itemsFor(this.projectId()));
   readonly cartSubtotal = computed(() => this.storeCartService.subtotalFor(this.projectId()));
   readonly cartOpenMode = computed(() => this.cartComponent()?.props.openMode ?? 'side');
+  readonly normalizedSearchQuery = computed(() => this.searchQuery().trim().toLowerCase());
+  readonly matchedProducts = computed(() => {
+    const query = this.normalizedSearchQuery();
+    if (!query) {
+      return [] as PublicStorefrontProduct[];
+    }
+
+    return this.searchableProducts()
+      .filter((product) => this.productMatchesQuery(product, query))
+      .slice(0, 6);
+  });
+  readonly searchSuggestions = computed(() => {
+    const query = this.normalizedSearchQuery();
+    if (!query) {
+      return [] as string[];
+    }
+
+    const seen = new Set<string>();
+    const suggestions: string[] = [];
+    for (const product of this.searchableProducts()) {
+      const tokens = [
+        ...product.name.split(/[^a-zA-Z0-9]+/),
+        ...(product.category ? product.category.split(/[^a-zA-Z0-9]+/) : []),
+        ...product.tags.flatMap((tag) => tag.split(/[^a-zA-Z0-9]+/)),
+      ];
+
+      for (const token of tokens) {
+        const normalized = token.trim().toLowerCase();
+        if (!normalized || normalized.length < 2 || !normalized.includes(query) || seen.has(normalized)) {
+          continue;
+        }
+
+        seen.add(normalized);
+        suggestions.push(token.trim());
+        if (suggestions.length >= 5) {
+          return suggestions;
+        }
+      }
+    }
+
+    return suggestions;
+  });
+
+  constructor() {
+    effect(() => {
+      const projectId = this.projectId();
+      if (!projectId) {
+        this.searchableProducts.set([]);
+        return;
+      }
+
+      this.publicStorefrontService
+        .getProducts(projectId, { preview: this.isEditorPreview() })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (products) => this.searchableProducts.set(products),
+          error: () => this.searchableProducts.set([]),
+        });
+    });
+  }
 
   @HostListener('window:keydown.escape')
   handleEscape(): void {
     this.isCartDrawerOpen.set(false);
+    this.isSearchOpen.set(false);
   }
 
   componentStyle(component: StorefrontEditorComponentNode): Record<string, string> {
@@ -90,6 +165,32 @@ export class StorefrontPublicHeaderComponent {
     }
 
     this.isCartDrawerOpen.set(true);
+  }
+
+  openSearchOverlay(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isSearchOpen.set(true);
+  }
+
+  closeSearchOverlay(): void {
+    this.isSearchOpen.set(false);
+    this.searchQuery.set('');
+  }
+
+  updateSearchQuery(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  applySuggestion(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  openProductFromSearch(productId: number): void {
+    this.closeSearchOverlay();
+    void this.router.navigate(['/store', this.projectId(), 'products', productId], {
+      queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
+    });
   }
 
   closeCartDrawer(): void {
@@ -144,6 +245,18 @@ export class StorefrontPublicHeaderComponent {
     }
 
     return `${url}${url.includes('?') ? '&' : '?'}preview=editor`;
+  }
+
+  private productMatchesQuery(product: PublicStorefrontProduct, query: string): boolean {
+    const haystacks = [
+      product.name,
+      product.description ?? '',
+      product.category ?? '',
+      product.sku ?? '',
+      ...product.tags,
+    ];
+
+    return haystacks.some((value) => value.toLowerCase().includes(query));
   }
 
   private readSectionComponents(section: StorefrontHomepageSection): StorefrontEditorComponentNode[] {

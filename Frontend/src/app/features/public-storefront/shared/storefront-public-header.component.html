@@ -39,6 +39,24 @@
                 />
               </button>
             }
+            @case ('search') {
+              <button
+                type="button"
+                class="storefront-public-header__component storefront-public-header__component--interactive storefront-public-header__component--search"
+                [ngStyle]="componentStyle(component)"
+                (click)="openSearchOverlay($event)"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </button>
+            }
             @default {
               <div class="storefront-public-header__component" [ngStyle]="componentStyle(component)">
                 <app-storefront-editor-component-host
@@ -69,6 +87,109 @@
       </nav>
     </div>
   </header>
+}
+
+@if (isSearchOpen()) {
+  <section class="storefront-public-header__search-overlay" aria-label="Search products">
+    <button
+      type="button"
+      class="storefront-public-header__search-backdrop"
+      (click)="closeSearchOverlay()"
+      aria-label="Close search"
+    ></button>
+    <div class="storefront-public-header__search-bar-shell" (click)="closeSearchOverlay()">
+      <div class="storefront-public-header__search-panel" (click)="$event.stopPropagation()">
+        <div class="storefront-public-header__search-input-row">
+          <div class="storefront-public-header__search-dropdown-anchor">
+            <label class="storefront-public-header__search-input-shell">
+              <span>{{ searchOverlayLabel() }}</span>
+              <input
+                type="text"
+                [value]="searchQuery()"
+                (input)="updateSearchQuery(($any($event.target)).value)"
+                [placeholder]="searchOverlayPlaceholder()"
+                autocomplete="off"
+                autofocus
+              />
+              @if (searchQuery()) {
+                <button
+                  type="button"
+                  class="storefront-public-header__search-clear"
+                  (click)="updateSearchQuery('')"
+                  aria-label="Clear search"
+                >
+                  <app-icon name="x" [size]="12"></app-icon>
+                </button>
+              }
+              <span class="storefront-public-header__search-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                  <circle cx="11" cy="11" r="6.25" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+              </span>
+            </label>
+
+            @if (searchQuery()) {
+              <div class="storefront-public-header__search-results-shell">
+                <div class="storefront-public-header__search-results">
+                  <div class="storefront-public-header__search-column">
+                    <span class="storefront-public-header__search-column-label">Suggestions</span>
+                    <div class="storefront-public-header__search-suggestions">
+                      @for (suggestion of searchSuggestions(); track suggestion) {
+                        <button type="button" class="storefront-public-header__search-suggestion" (click)="applySuggestion(suggestion)">
+                          {{ suggestion }}
+                        </button>
+                      }
+                      @if (!searchSuggestions().length) {
+                        <span class="storefront-public-header__search-empty">Keep typing to refine the match.</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="storefront-public-header__search-column">
+                    <span class="storefront-public-header__search-column-label">Products</span>
+                    <div class="storefront-public-header__search-products">
+                      @for (product of matchedProducts(); track product.id) {
+                        <button type="button" class="storefront-public-header__search-product" (click)="openProductFromSearch(product.id)">
+                          <span class="storefront-public-header__search-product-media">
+                            @if (product.imageUrl) {
+                              <img [src]="product.imageUrl" [alt]="product.name" />
+                            } @else {
+                              <span>{{ product.name.slice(0, 1) }}</span>
+                            }
+                          </span>
+                          <span class="storefront-public-header__search-product-copy">
+                            <strong>{{ product.name }}</strong>
+                            @if (product.category) {
+                              <span>{{ product.category }}</span>
+                            }
+                          </span>
+                        </button>
+                      }
+                      @if (!matchedProducts().length) {
+                        <span class="storefront-public-header__search-empty">No products match “{{ searchQuery() }}”.</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="storefront-public-header__search-submit" (click)="applySuggestion(searchQuery())">
+                  <span>Search for “{{ searchQuery() }}”</span>
+                  <span class="storefront-public-header__search-submit-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="icon icon-arrow" viewBox="0 0 14 10" width="14" height="10">
+                      <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"></path>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            }
+          </div>
+          <button type="button" class="storefront-public-header__search-close storefront-public-header__search-close--panel" (click)="closeSearchOverlay()" aria-label="Close search">
+            <app-icon name="x" [size]="18"></app-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 }
 
 @if (isCartDrawerOpen()) {

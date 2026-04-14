@@ -192,6 +192,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['menu', 'navigation', 'nav', 'header', 'footer', 'links'],
   },
   {
+    id: 'search',
+    title: 'Search',
+    category: 'Graphics',
+    subcategoryIds: ['all', 'icons', 'decorative'],
+    componentType: 'search',
+    description: 'Search trigger for storefront headers and product discovery.',
+    preview: 'icon',
+    keywords: ['search', 'magnifier', 'catalog', 'product search', 'header'],
+  },
+  {
     id: 'container',
     title: 'Container',
     category: 'Graphics',

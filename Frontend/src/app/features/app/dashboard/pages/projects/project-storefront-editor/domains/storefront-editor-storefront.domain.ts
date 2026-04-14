@@ -12,6 +12,7 @@ import {
   StorefrontEditorCartNode,
   StorefrontEditorComponentNode,
   StorefrontEditorContainerNode,
+  StorefrontEditorSearchNode,
   StorefrontEditorTextNode,
 } from '../components/storefront-editor-component.model';
 
@@ -158,7 +159,7 @@ function buildHeaderCartComponent(parentContainerId: string): StorefrontEditorCa
     parentContainerId,
     zIndex: 2,
     frame: {
-      x: 1050,
+      x: 1080,
       y: 24,
       width: 72,
       height: 48,
@@ -177,6 +178,26 @@ function buildHeaderCartComponent(parentContainerId: string): StorefrontEditorCa
   };
 }
 
+function buildHeaderSearchComponent(parentContainerId: string): StorefrontEditorSearchNode {
+  const search = createStorefrontEditorComponentNode('search') as StorefrontEditorSearchNode;
+  return {
+    ...search,
+    name: 'Search',
+    parentContainerId,
+    zIndex: 2,
+    frame: {
+      x: 1028,
+      y: 24,
+      width: 40,
+      height: 48,
+    },
+    props: {
+      ...search.props,
+      iconColor: '#111827',
+    },
+  };
+}
+
 function ensureHeaderCartComponent(
   components: StorefrontEditorComponentNode[],
   storeName: string
@@ -185,16 +206,12 @@ function ensureHeaderCartComponent(
     return buildDefaultHeaderComponents(storeName);
   }
 
-  if (components.some((component) => component.type === 'cart')) {
-    return components;
-  }
-
   const headerContainer = components.find((component) => component.type === 'container');
   if (!headerContainer || headerContainer.type !== 'container') {
     return buildDefaultHeaderComponents(storeName);
   }
 
-  return components.map((component) => {
+  const normalized = components.map((component) => {
     if (
       component.type === 'button'
       && component.props.label === 'Browse products'
@@ -213,8 +230,32 @@ function ensureHeaderCartComponent(
       };
     }
 
+    if (
+      component.type === 'cart'
+      && component.frame.x === 1050
+      && component.frame.y === 24
+      && component.frame.width === 72
+      && component.frame.height === 48
+    ) {
+      return {
+        ...component,
+        frame: {
+          ...component.frame,
+          x: 1080,
+        },
+      };
+    }
+
     return component;
-  }).concat(buildHeaderCartComponent(headerContainer.id));
+  });
+
+  const withSearch = normalized.some((component) => component.type === 'search')
+    ? normalized
+    : normalized.concat(buildHeaderSearchComponent(headerContainer.id));
+
+  return withSearch.some((component) => component.type === 'cart')
+    ? withSearch
+    : withSearch.concat(buildHeaderCartComponent(headerContainer.id));
 }
 
 function buildDefaultHeaderComponents(storeName: string): StorefrontEditorComponentNode[] {
@@ -228,6 +269,7 @@ function buildDefaultHeaderComponents(storeName: string): StorefrontEditorCompon
     buildHeaderNavButtonComponent('Featured', '#featured', { x: 560, y: 28, width: 104, height: 40 }, container.id),
     buildHeaderNavButtonComponent('Contact', '#contact', { x: 674, y: 28, width: 94, height: 40 }, container.id),
     buildHeaderPrimaryActionComponent(container.id),
+    buildHeaderSearchComponent(container.id),
     buildHeaderCartComponent(container.id),
   ];
 }

@@ -10,6 +10,7 @@ import { StorefrontEditorBlockParagraphComponent } from './blocks/storefront-edi
 import { StorefrontEditorBlockImageComponent } from './blocks/storefront-editor-block-image.component';
 import { StorefrontEditorBlockButtonComponent } from './blocks/storefront-editor-block-button.component';
 import { StorefrontEditorBlockMenuComponent } from './blocks/storefront-editor-block-menu.component';
+import { StorefrontEditorBlockSearchComponent } from './blocks/storefront-editor-block-search.component';
 import { StorefrontEditorBlockCartComponent } from './blocks/storefront-editor-block-cart.component';
 import { StorefrontEditorBlockIconComponent } from './blocks/storefront-editor-block-icon.component';
 import { StorefrontEditorBlockSpacerComponent } from './blocks/storefront-editor-block-spacer.component';
@@ -32,6 +33,7 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
     StorefrontEditorBlockImageComponent,
     StorefrontEditorBlockButtonComponent,
     StorefrontEditorBlockMenuComponent,
+    StorefrontEditorBlockSearchComponent,
     StorefrontEditorBlockCartComponent,
     StorefrontEditorBlockIconComponent,
     StorefrontEditorBlockSpacerComponent,
@@ -82,6 +84,9 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
           [interactiveLinks]="interactiveLinks()"
           [linkHrefResolver]="linkHrefResolver()"
         />
+      }
+      @case ('search') {
+        <app-storefront-editor-block-search [node]="$any(node())" />
       }
       @case ('cart') {
         <app-storefront-editor-block-cart [node]="$any(node())" [count]="cartCount()" />

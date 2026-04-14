@@ -54,6 +54,7 @@ import {
   StorefrontEditorMenuNode,
   StorefrontEditorParagraphNode,
   StorefrontEditorProductFeedNode,
+  StorefrontEditorSearchNode,
   StorefrontEditorTextNode,
   StorefrontEditorTextStylePreset,
   buildStorefrontEditorImageSourceMetadata,
@@ -140,6 +141,7 @@ type ButtonToolbarMenu =
 type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
 type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
 type CartToolbarMenu = 'edit-text' | 'settings' | null;
+type SearchToolbarMenu = 'edit-text' | 'settings' | null;
 type MenuItemReorderState = {
   itemId: string;
   rowTop: number;
@@ -770,13 +772,17 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'menu' ? this.resolveResponsiveComponentNode(component) : null;
   });
-  readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
-    const component = this.selectedComponent();
-    return component?.type === 'cart' ? component : null;
-  });
-  readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
-    const component = this.selectedComponent();
-    return component?.type === 'container' ? component : null;
+readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'cart' ? component : null;
+});
+readonly selectedSearchComponent = computed<StorefrontEditorSearchNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'search' ? this.resolveResponsiveComponentNode(component) : null;
+});
+readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'container' ? component : null;
   });
   readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
     const component = this.selectedComponent();
@@ -800,12 +806,15 @@ readonly isParagraphToolbarVisible = computed(
   readonly isMenuToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedMenuComponent() !== null
   );
-  readonly isCartToolbarVisible = computed(
-    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartComponent() !== null
-  );
-  readonly isProductFeedToolbarVisible = computed(
-    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
-  );
+readonly isCartToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartComponent() !== null
+);
+readonly isSearchToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedSearchComponent() !== null
+);
+readonly isProductFeedToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
+);
   readonly canShowGroupAction = computed(
     () => this.selectedComponentIds().length >= 2 && !this.selectedComponentGroupId()
   );
@@ -890,9 +899,10 @@ readonly activeTextToolbarMenu = signal<
   readonly activeMenuItemReorder = signal<MenuItemReorderState | null>(null);
   readonly isMenuAddPagesPopupOpen = signal(false);
   readonly selectedMenuPageIds = signal<string[]>([]);
-  readonly activeCartToolbarMenu = signal<CartToolbarMenu>(null);
-  readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
-  readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
+readonly activeCartToolbarMenu = signal<CartToolbarMenu>(null);
+readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
+readonly activeSearchToolbarMenu = signal<SearchToolbarMenu>(null);
+readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
   readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
@@ -900,9 +910,11 @@ readonly activeTextToolbarMenu = signal<
   readonly buttonCustomPickerHue = signal(228);
   readonly buttonCustomPickerSaturation = signal(72);
   readonly buttonCustomPickerBrightness = signal(96);
-  readonly buttonEditTextValue = signal('');
-  readonly cartEditTextValue = signal('');
-  readonly buttonLinkValue = signal('');
+readonly buttonEditTextValue = signal('');
+readonly cartEditTextValue = signal('');
+readonly searchEditLabelValue = signal('');
+readonly searchEditPlaceholderValue = signal('');
+readonly buttonLinkValue = signal('');
   readonly productFeedTextColorValue = signal('#202124');
   readonly brandParagraphColors = computed(() => {
     const defaults = ['#ffffff', '#edf4fb', '#bcd1e7', '#091b2f', '#082237', '#2f6f10', '#b7d58b', '#d8e0e8', '#c1ccd8', 'transparent'];
@@ -1897,6 +1909,16 @@ effect(() => {
 });
 
 effect(() => {
+  if (!this.selectedSearchComponent()) {
+    this.activeSearchToolbarMenu.set(null);
+    return;
+  }
+
+  this.searchEditLabelValue.set(this.selectedSearchComponent()!.props.label);
+  this.searchEditPlaceholderValue.set(this.selectedSearchComponent()!.props.placeholder);
+});
+
+effect(() => {
   if (!this.selectedProductFeedComponent()) {
     this.activeProductFeedToolbarMenu.set(null);
     this.activeProductFeedSettingsSection.set('category');
@@ -1993,15 +2015,21 @@ effect(() => {
     return;
   }
 
-  if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
-    event.preventDefault();
-    this.activeCartToolbarMenu.set(null);
-    return;
-  }
+if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
+  event.preventDefault();
+  this.activeCartToolbarMenu.set(null);
+  return;
+}
 
-  if (event.key === 'Escape' && this.activeImageToolbarMenu()) {
-    event.preventDefault();
-    this.activeImageToolbarMenu.set(null);
+if (event.key === 'Escape' && this.activeSearchToolbarMenu()) {
+  event.preventDefault();
+  this.activeSearchToolbarMenu.set(null);
+  return;
+}
+
+if (event.key === 'Escape' && this.activeImageToolbarMenu()) {
+  event.preventDefault();
+  this.activeImageToolbarMenu.set(null);
     this.isImageSettingsLinkPopupOpen.set(false);
     this.isImageBorderColorPickerOpen.set(false);
     this.isImageBorderStylePickerOpen.set(false);
@@ -4676,10 +4704,11 @@ finishEditingComponentText(): void {
   this.activeMenuItemActionsId.set(null);
   this.activeMenuItemLinkId.set(null);
   this.renamingMenuItemId.set(null);
-  this.isMenuAddPagesPopupOpen.set(false);
-  this.activeCartToolbarMenu.set(null);
-  this.closeButtonTextDropdownMenu();
-  this.activeProductFeedToolbarMenu.set(null);
+this.isMenuAddPagesPopupOpen.set(false);
+this.activeCartToolbarMenu.set(null);
+this.activeSearchToolbarMenu.set(null);
+this.closeButtonTextDropdownMenu();
+this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
     this.closeAddElementsLibraryModal();
     this.closePagesPanel();
@@ -6989,9 +7018,9 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.menuItemDropTargetId.set(null);
   }
 
-  toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
-    const next = this.activeCartToolbarMenu() === menu ? null : menu;
-    this.activeCartToolbarMenu.set(next);
+toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
+  const next = this.activeCartToolbarMenu() === menu ? null : menu;
+  this.activeCartToolbarMenu.set(next);
 
     if (next === 'edit-text') {
       this.cartEditTextValue.set(this.selectedCartComponent()?.props.label ?? 'Cart');
@@ -6999,12 +7028,22 @@ private syncImageBorderColorPickerFromHex(color: string): void {
 
     if (next === 'settings') {
       this.activeCartSettingsSection.set('cart-icon');
-    }
   }
+}
 
-  setActiveCartSettingsSection(section: CartSettingsSection): void {
-    this.activeCartSettingsSection.set(section);
+toggleSearchToolbarMenu(menu: Exclude<SearchToolbarMenu, null>): void {
+  const next = this.activeSearchToolbarMenu() === menu ? null : menu;
+  this.activeSearchToolbarMenu.set(next);
+
+  if (next === 'edit-text') {
+    this.searchEditLabelValue.set(this.selectedSearchComponent()?.props.label ?? 'Search');
+    this.searchEditPlaceholderValue.set(this.selectedSearchComponent()?.props.placeholder ?? 'Search products');
   }
+}
+
+setActiveCartSettingsSection(section: CartSettingsSection): void {
+  this.activeCartSettingsSection.set(section);
+}
 
   toggleButtonTextDropdownMenu(menu: Exclude<ButtonTextDropdownMenu, null>): void {
     const next = this.activeButtonTextDropdownMenu() === menu ? null : menu;
@@ -7203,13 +7242,32 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.updateSelectedCartProps({ badgeBackgroundColor: normalized });
   }
 
-  updateSelectedCartOpenMode(value: 'side' | 'page'): void {
-    this.updateSelectedCartProps({ openMode: value });
+updateSelectedCartOpenMode(value: 'side' | 'page'): void {
+  this.updateSelectedCartProps({ openMode: value });
+}
+
+updateSelectedSearchLabelValue(value: string): void {
+  this.searchEditLabelValue.set(value);
+  this.updateSelectedSearchProps({ label: value || 'Search' });
+}
+
+updateSelectedSearchPlaceholderValue(value: string): void {
+  this.searchEditPlaceholderValue.set(value);
+  this.updateSelectedSearchProps({ placeholder: value || 'Search products' });
+}
+
+updateSelectedSearchIconColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') {
+    return;
   }
 
-  updateSelectedButtonLinkValue(value: string): void {
-    this.buttonLinkValue.set(value);
-    this.updateSelectedButtonProps({ href: value });
+  this.updateSelectedSearchProps({ iconColor: normalized });
+}
+
+updateSelectedButtonLinkValue(value: string): void {
+  this.buttonLinkValue.set(value);
+  this.updateSelectedButtonProps({ href: value });
   }
 
   updateSelectedButtonTextPreset(value: StorefrontEditorButtonNode['props']['textPreset']): void {
@@ -10774,6 +10832,24 @@ private updateSelectedCartProps(
             ...patch,
           },
         }
+      : current,
+    options
+  );
+}
+
+private updateSelectedSearchProps(
+  patch: Partial<StorefrontEditorSearchNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedSearchComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'search'
+      ? this.writeComponentProps(current, patch)
       : current,
     options
   );
