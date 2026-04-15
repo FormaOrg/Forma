@@ -178,6 +178,41 @@ function buildHeaderCartComponent(parentContainerId: string): StorefrontEditorCa
   };
 }
 
+function buildHeaderAccountComponent(parentContainerId: string): StorefrontEditorButtonNode {
+  const button = createStorefrontEditorComponentNode('button') as StorefrontEditorButtonNode;
+  return {
+    ...button,
+    name: 'Account',
+    parentContainerId,
+    zIndex: 2,
+    frame: {
+      x: 992,
+      y: 28,
+      width: 40,
+      height: 40,
+    },
+    props: {
+      ...button.props,
+      label: 'Account',
+      href: '/account',
+      variant: 'secondary',
+      showText: false,
+      showIcon: true,
+      iconName: 'user',
+      iconPosition: 'left',
+      customIconSrc: null,
+      textColor: '#0f172a',
+      backgroundColor: '#ffffff',
+      borderColor: 'rgba(15, 23, 42, 0.28)',
+      borderWidth: 1,
+      borderStyle: 'solid',
+      radius: 999,
+      shadow: 'none',
+      padding: 10,
+    },
+  };
+}
+
 function buildHeaderSearchComponent(parentContainerId: string): StorefrontEditorSearchNode {
   const search = createStorefrontEditorComponentNode('search') as StorefrontEditorSearchNode;
   return {
@@ -208,7 +243,7 @@ function ensureHeaderCartComponent(
 
   const headerContainer = components.find((component) => component.type === 'container');
   if (!headerContainer || headerContainer.type !== 'container') {
-    return buildDefaultHeaderComponents(storeName);
+    return components;
   }
 
   const normalized = components.map((component) => {
@@ -249,13 +284,38 @@ function ensureHeaderCartComponent(
     return component;
   });
 
+  const shouldUpgradeLegacyHeader =
+    normalized.some(
+      (component) =>
+        component.type === 'button'
+        && component.props.label === 'Browse products'
+        && component.frame.x === 948
+        && component.frame.y === 24
+        && component.frame.width === 164
+        && component.frame.height === 48
+    )
+    || normalized.some(
+      (component) =>
+        component.type === 'cart'
+        && component.frame.x === 1050
+        && component.frame.y === 24
+        && component.frame.width === 72
+        && component.frame.height === 48
+    );
+
   const withSearch = normalized.some((component) => component.type === 'search')
     ? normalized
     : normalized.concat(buildHeaderSearchComponent(headerContainer.id));
 
-  return withSearch.some((component) => component.type === 'cart')
+  const withAccount = withSearch.some(
+    (component) => component.type === 'button' && component.props.href === '/account'
+  )
     ? withSearch
-    : withSearch.concat(buildHeaderCartComponent(headerContainer.id));
+    : withSearch.concat(buildHeaderAccountComponent(headerContainer.id));
+
+  return withAccount.some((component) => component.type === 'cart')
+    ? withAccount
+    : withAccount.concat(buildHeaderCartComponent(headerContainer.id));
 }
 
 function buildDefaultHeaderComponents(storeName: string): StorefrontEditorComponentNode[] {
@@ -269,6 +329,7 @@ function buildDefaultHeaderComponents(storeName: string): StorefrontEditorCompon
     buildHeaderNavButtonComponent('Featured', '#featured', { x: 560, y: 28, width: 104, height: 40 }, container.id),
     buildHeaderNavButtonComponent('Contact', '#contact', { x: 674, y: 28, width: 94, height: 40 }, container.id),
     buildHeaderPrimaryActionComponent(container.id),
+    buildHeaderAccountComponent(container.id),
     buildHeaderSearchComponent(container.id),
     buildHeaderCartComponent(container.id),
   ];

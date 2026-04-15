@@ -1300,6 +1300,7 @@ readonly brandSectionBorderColors = [
     'package',
     'wand',
     'eye',
+    'user',
   ];
   readonly cartIconStyleOptions: ReadonlyArray<{ id: StorefrontEditorCartIconStyle; label: string }> = [
     { id: 'bag-filled', label: 'Bag filled' },
@@ -5006,8 +5007,6 @@ private openSectionOptionsAt(sectionId: string, x: number, y: number): void {
   }
 
 syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
-  this.updatePreviewStageScrollbarState();
-
   const selectedSectionId = this.selectedSectionId();
   if (!selectedSectionId && !sectionElement) {
     this.isSelectedSectionRailVisible.set(false);
@@ -12418,6 +12417,31 @@ private buildLibraryComponentForSection(
     if (frameOverride || this.viewport() !== 'desktop') {
       Object.assign(nextComponent, this.writeComponentFrame(nextComponent, initialFrame));
     }
+
+    if (item.id === 'account-icon' && nextComponent.type === 'button') {
+      nextComponent.name = 'Account';
+      nextComponent.props = {
+        ...nextComponent.props,
+        label: 'Account',
+        href: '/account',
+        variant: 'secondary',
+        showText: false,
+        showIcon: true,
+        iconName: 'user',
+        iconPosition: 'left',
+        customIconSrc: null,
+        textColor: '#0f172a',
+        backgroundColor: '#ffffff',
+        borderColor: 'rgba(15, 23, 42, 0.28)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        radius: 999,
+        padding: 10,
+      };
+
+      const accountFrame = { x: initialFrame.x, y: initialFrame.y, width: 40, height: 40 };
+      Object.assign(nextComponent, this.writeComponentFrame(nextComponent, accountFrame));
+    }
   return nextComponent;
 }
 
@@ -13405,21 +13429,23 @@ isSectionAttachTarget(sectionId: string): boolean {
       return;
     }
 
-    const workspace = document.querySelector('.storefront-editor__preview-workspace') as HTMLElement | null;
+    // Keep stage height CSS-driven; mutating it while scrolling causes jumpy behavior at high zoom.
+    this.previewStageLogicalHeight.set(null);
+
     const zoom = Math.max(this.previewZoomScale(), 0.01);
-    if (workspace) {
-      const workspaceRect = workspace.getBoundingClientRect();
-      const stageRect = stage.getBoundingClientRect();
-      const availableVisualHeight = Math.max(0, workspaceRect.bottom - stageRect.top);
-      this.previewStageLogicalHeight.set(Math.max(0, Math.round(availableVisualHeight / zoom)));
-    } else {
-      this.previewStageLogicalHeight.set(null);
-    }
 
     const canvas = stage.querySelector('.storefront-editor__preview-canvas') as HTMLElement | null;
+    const maxCompensation = 96;
+    const compensationScale = 0.25;
     const compensation = canvas
       ? zoom > 1.2
-        ? Math.max(0, Math.round(canvas.getBoundingClientRect().height - canvas.offsetHeight))
+        ? Math.max(
+            0,
+            Math.min(
+              maxCompensation,
+              Math.round((canvas.getBoundingClientRect().height - canvas.offsetHeight) * compensationScale)
+            )
+          )
         : 0
       : 0;
     this.previewStageScrollCompensation.set(compensation);
