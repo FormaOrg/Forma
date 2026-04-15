@@ -26,6 +26,7 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'social-links'
   | 'faq'
   | 'contact-form'
+  | 'testimonials'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -86,6 +87,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
     { id: 'running-text', label: 'Running text' },
     { id: 'faq', label: 'FAQ' },
     { id: 'forms', label: 'Forms' },
+    { id: 'testimonials', label: 'Testimonials' },
   ],
   Image: [
     { id: 'all', label: 'All' },
@@ -162,6 +164,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     description: 'Polished inquiry form with message fields, consent, and a built-in success state.',
     preview: 'contact-form',
     keywords: ['form', 'contact', 'message', 'email', 'support', 'lead'],
+  },
+  {
+    id: 'testimonials',
+    title: 'Testimonials',
+    category: 'Text',
+    subcategoryIds: ['all', 'testimonials', 'text-combos'],
+    componentType: 'testimonials',
+    description: 'Customer reviews with star ratings, quotes, and reviewer names.',
+    preview: 'testimonials',
+    keywords: ['testimonials', 'reviews', 'stars', 'rating', 'social proof', 'customers'],
   },
   {
     id: 'image',

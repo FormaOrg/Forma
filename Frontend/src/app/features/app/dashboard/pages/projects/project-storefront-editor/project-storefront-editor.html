@@ -1249,6 +1249,23 @@
                         <em>Send message</em>
                       </span>
                     }
+                    @case ('testimonials') {
+                      <span class="storefront-editor__add-elements-demo-testimonials">
+                        <span class="storefront-editor__add-elements-demo-testimonials__stars">★★★★★</span>
+                        <span class="storefront-editor__add-elements-demo-testimonials__cards">
+                          <span>
+                            <small>★★★★★</small>
+                            <em>"Great product!"</em>
+                            <b>— Sarah M.</b>
+                          </span>
+                          <span>
+                            <small>★★★★★</small>
+                            <em>"Love it!"</em>
+                            <b>— James T.</b>
+                          </span>
+                        </span>
+                      </span>
+                    }
                     @case ('container') {
                       <span class="storefront-editor__add-elements-demo-container">
                         <span></span>
@@ -1874,8 +1891,8 @@
     </button>
     <div
       class="storefront-editor__context-toolbar-shell"
-    [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible()"
-    [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible())"
+    [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible()"
+    [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible())"
       (mousedown)="preserveRichTextEditing($event)"
     >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
@@ -3900,6 +3917,50 @@
           </div>
         }
 
+        @if (isTestimonialsToolbarVisible() && selectedTestimonialsComponent(); as testimonials) {
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__testimonials-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeTestimonialsToolbarMenu() === 'settings' && activeTestimonialsSettingsSection() === 'layout'"
+              (click)="toggleTestimonialsToolbarMenu('settings'); setTestimonialsSettingsSection('layout')"
+            >
+              <span>{{ testimonials.props.layout === 'stack' ? 'Stack' : 'Grid' }}</span>
+              <app-icon name="chevron-down" [size]="14"></app-icon>
+            </button>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeTestimonialsToolbarMenu() === 'settings' && activeTestimonialsSettingsSection() === 'reviews'"
+              (click)="toggleTestimonialsToolbarMenu('settings'); setTestimonialsSettingsSection('reviews')"
+            >
+              <span>{{ testimonials.props.items.length }} Reviews</span>
+            </button>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeTestimonialsToolbarMenu() === 'settings' && activeTestimonialsSettingsSection() === 'style'"
+              (click)="toggleTestimonialsToolbarMenu('settings'); setTestimonialsSettingsSection('style')"
+              aria-label="Style"
+            >
+              <!-- Paint bucket icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M16.56 8.94 7.62 0 6.21 1.41l2.38 2.38-5.15 5.15a1.49 1.49 0 0 0 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10 10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"></path>
+                <path fill-opacity=".36" d="M0 20h24v4H0z"></path>
+              </svg>
+            </button>
+          </div>
+        }
+
         @if (isCartToolbarVisible() && selectedCartComponent(); as cart) {
           <div
             class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__cart-toolbar"
@@ -5549,6 +5610,141 @@
                   }
                 </div>
               </div>
+            </div>
+          </aside>
+        }
+      }
+
+      @if (selectedTestimonialsComponent(); as testimonials) {
+        @if (activeTestimonialsToolbarMenu() === 'settings') {
+          <aside class="storefront-editor__cart-toolbar-side-panel storefront-editor__button-toolbar-side-panel storefront-editor__testimonials-settings-panel">
+            <div class="storefront-editor__button-toolbar-panel-header">
+              <h3>Testimonials</h3>
+              <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleTestimonialsToolbarMenu('settings')">
+                <app-icon name="x" [size]="14"></app-icon>
+              </button>
+            </div>
+
+            <nav class="storefront-editor__product-feed-settings-nav">
+              <button type="button" class="storefront-editor__product-feed-settings-nav-item" [class.storefront-editor__product-feed-settings-nav-item--active]="activeTestimonialsSettingsSection() === 'style'" (click)="setTestimonialsSettingsSection('style')">Style</button>
+              <button type="button" class="storefront-editor__product-feed-settings-nav-item" [class.storefront-editor__product-feed-settings-nav-item--active]="activeTestimonialsSettingsSection() === 'reviews'" (click)="setTestimonialsSettingsSection('reviews')">Reviews</button>
+              <button type="button" class="storefront-editor__product-feed-settings-nav-item" [class.storefront-editor__product-feed-settings-nav-item--active]="activeTestimonialsSettingsSection() === 'layout'" (click)="setTestimonialsSettingsSection('layout')">Layout</button>
+            </nav>
+
+            <div class="storefront-editor__product-feed-settings-content">
+
+              @if (activeTestimonialsSettingsSection() === 'style') {
+                <div class="storefront-editor__button-toolbar-side-section">
+                  <label class="storefront-editor__button-toolbar-field">
+                    <span>Star &amp; accent color</span>
+                    <span class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--wide">
+                      <input type="color" [value]="testimonials.props.accentColor" (input)="updateTestimonialsAccentColor($any($event.target).value)" />
+                    </span>
+                  </label>
+                  <label class="storefront-editor__button-toolbar-field">
+                    <span>Card background</span>
+                    <span class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--wide">
+                      <input type="color" [value]="testimonials.props.cardBackground" (input)="updateTestimonialsCardBackground($any($event.target).value)" />
+                    </span>
+                  </label>
+                  <label class="storefront-editor__button-toolbar-field">
+                    <span>Text color</span>
+                    <span class="storefront-editor__button-toolbar-color-input storefront-editor__button-toolbar-color-input--wide">
+                      <input type="color" [value]="testimonials.props.textColor" (input)="updateTestimonialsTextColor($any($event.target).value)" />
+                    </span>
+                  </label>
+                </div>
+              }
+
+              @if (activeTestimonialsSettingsSection() === 'reviews') {
+                <div class="storefront-editor__testimonials-reviews-list">
+                  @for (item of testimonials.props.items; track item.name; let index = $index) {
+                    <div class="storefront-editor__testimonials-review-item">
+                      <div class="storefront-editor__testimonials-review-header">
+                        <span class="storefront-editor__testimonials-review-index">#{{ index + 1 }}</span>
+                        <div class="storefront-editor__testimonials-review-stars">
+                          @for (s of [1,2,3,4,5]; track s) {
+                            <button
+                              type="button"
+                              class="storefront-editor__testimonials-star-btn"
+                              [class.storefront-editor__testimonials-star-btn--active]="s <= item.rating"
+                              (click)="setTestimonialRating(index, s)"
+                              [attr.aria-label]="s + ' stars'"
+                            >★</button>
+                          }
+                        </div>
+                        <button
+                          type="button"
+                          class="storefront-editor__testimonials-remove-btn"
+                          (click)="removeTestimonialItem(index)"
+                          [disabled]="testimonials.props.items.length <= 1"
+                          aria-label="Remove review"
+                        >
+                          <app-icon name="x" [size]="12"></app-icon>
+                        </button>
+                      </div>
+                      <label class="storefront-editor__button-toolbar-field storefront-editor__testimonials-review-field">
+                        <span>Quote</span>
+                        <textarea
+                          class="storefront-editor__testimonials-review-textarea"
+                          [value]="item.text"
+                          (input)="updateTestimonialItem(index, { text: $any($event.target).value })"
+                          rows="3"
+                        ></textarea>
+                      </label>
+                      <label class="storefront-editor__button-toolbar-field storefront-editor__testimonials-review-field">
+                        <span>Name</span>
+                        <input type="text" [value]="item.name" (input)="updateTestimonialItem(index, { name: $any($event.target).value })" />
+                      </label>
+                      <label class="storefront-editor__button-toolbar-field storefront-editor__testimonials-review-field">
+                        <span>Role / label</span>
+                        <input type="text" [value]="item.role" (input)="updateTestimonialItem(index, { role: $any($event.target).value })" />
+                      </label>
+                    </div>
+                  }
+                  <button type="button" class="storefront-editor__testimonials-add-btn" (click)="addTestimonialItem()">
+                    + Add review
+                  </button>
+                </div>
+              }
+
+              @if (activeTestimonialsSettingsSection() === 'layout') {
+                <div class="storefront-editor__button-toolbar-side-section">
+                  <label class="storefront-editor__button-toolbar-field">
+                    <span>Title</span>
+                    <input type="text" [value]="testimonials.props.title" (input)="updateTestimonialsTitle($any($event.target).value)" />
+                  </label>
+
+                  <div class="storefront-editor__button-toolbar-field">
+                    <span>Card layout</span>
+                    <div class="storefront-editor__testimonials-layout-toggle">
+                      <button
+                        type="button"
+                        class="storefront-editor__testimonials-layout-option"
+                        [class.storefront-editor__testimonials-layout-option--active]="testimonials.props.layout === 'grid'"
+                        (click)="updateTestimonialsLayout('grid')"
+                      >
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                          <rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/>
+                        </svg>
+                        Grid
+                      </button>
+                      <button
+                        type="button"
+                        class="storefront-editor__testimonials-layout-option"
+                        [class.storefront-editor__testimonials-layout-option--active]="testimonials.props.layout === 'stack'"
+                        (click)="updateTestimonialsLayout('stack')"
+                      >
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                          <rect x="2" y="2" width="16" height="5" rx="2"/><rect x="2" y="9" width="16" height="5" rx="2"/><rect x="2" y="16" width="16" height="2" rx="1"/>
+                        </svg>
+                        Stack
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+
             </div>
           </aside>
         }
