@@ -16,7 +16,21 @@ Write-Host "Starting Forma backend services from $composeFile..." -ForegroundCol
 docker compose -f $composeFile up --build -d
 
 if ($LASTEXITCODE -ne 0) {
-    throw "Docker Compose failed to start the services."
+    Write-Warning "Docker Compose failed to start the services. Falling back to local startup."
+    $localStartScript = Join-Path $repoRoot "start-backend-local.ps1"
+    if (-not (Test-Path $localStartScript)) {
+        throw "Docker Compose failed to start the services, and $localStartScript was not found."
+    }
+
+    try {
+        & $localStartScript
+    } catch {
+        throw "Local backend startup also failed: $($_.Exception.Message)"
+    }
+
+    Write-Host ""
+    Write-Host "Docker startup failed, but local backend fallback is running." -ForegroundColor Yellow
+    return
 }
 
 Write-Host ""

@@ -2,14 +2,14 @@
   <section class="project-home">
     <section class="project-home__hero project-home__panel">
       <div>
-        <p class="project-home__eyebrow">Project workspace</p>
-        <h1 class="project-home__title">Welcome, <span>{{ ownerName }}</span>.</h1>
+        <p class="project-home__eyebrow">{{ 'project.placeholder.workspace' | t }}</p>
+        <h1 class="project-home__title">{{ 'project.placeholder.welcome' | t }}, <span>{{ ownerName }}</span>.</h1>
       </div>
 
-      <a class="project-home__hero-action" [routerLink]="['/app/projects', projectId(), 'editor']">Edit Site</a>
+      <a class="project-home__hero-action" [routerLink]="['/app/projects', projectId(), 'editor']">{{ 'project.placeholder.actions.editSite' | t }}</a>
     </section>
 
-    <section class="project-home__status project-home__panel" aria-label="Project status">
+    <section class="project-home__status project-home__panel" [attr.aria-label]="'project.placeholder.status' | t">
       @for (item of projectStatusItems; track item.label) {
         <span class="project-home__status-pill" [class.project-home__status-pill--accent]="item.accent">
           {{ item.label }}
@@ -20,10 +20,10 @@
     <section class="project-home__panel">
       <div class="project-home__section-head">
         <div>
-          <h2 class="project-home__section-title">Analytics</h2>
-          <p class="project-home__section-copy">Your key stats will appear here once your site is published.</p>
+          <h2 class="project-home__section-title">{{ 'project.placeholder.analytics.title' | t }}</h2>
+          <p class="project-home__section-copy">{{ 'project.placeholder.analytics.subtitle' | t }}</p>
         </div>
-        <a class="project-home__section-link" [routerLink]="['/app/projects', projectId(), 'analytics']">View analytics</a>
+        <a class="project-home__section-link" [routerLink]="['/app/projects', projectId(), 'analytics']">{{ 'project.placeholder.actions.viewAnalytics' | t }}</a>
       </div>
 
       <div class="project-home__stats-grid">
@@ -41,8 +41,8 @@
       <article class="project-home__panel project-home__panel--activity">
         <div class="project-home__section-head">
           <div>
-            <h2 class="project-home__section-title">Recent activity</h2>
-            <p class="project-home__section-copy">Your latest workspace updates and launch tasks.</p>
+            <h2 class="project-home__section-title">{{ 'project.home.activity.recent' | t }}</h2>
+            <p class="project-home__section-copy">{{ 'project.placeholder.activity.subtitle' | t }}</p>
           </div>
         </div>
 
@@ -76,10 +76,10 @@
       <aside class="project-home__panel project-home__panel--suggested">
         <div class="project-home__section-head">
           <div>
-            <h2 class="project-home__section-title">Suggested for you</h2>
-            <p class="project-home__section-copy">Small actions to keep the launch moving.</p>
+            <h2 class="project-home__section-title">{{ 'project.placeholder.suggested.title' | t }}</h2>
+            <p class="project-home__section-copy">{{ 'project.placeholder.suggested.subtitle' | t }}</p>
           </div>
-          <a class="project-home__section-link" [routerLink]="['/app/projects', projectId(), 'settings']">View all</a>
+          <a class="project-home__section-link" [routerLink]="['/app/projects', projectId(), 'settings']">{{ 'project.placeholder.actions.viewAll' | t }}</a>
         </div>
 
         <div class="project-home__suggested-list">
@@ -106,17 +106,17 @@
         <div class="project-setup__panel-copy">
           <span class="project-setup__eyebrow">Project workspace</span>
           <h1 class="project-setup__title">{{ workspaceConfig().setupTitle }}</h1>
-          <div class="project-setup__meta" aria-label="Project setup summary">
-            <span class="project-setup__meta-pill">Project #{{ projectId() }}</span>
+          <div class="project-setup__meta" [attr.aria-label]="'project.placeholder.setup.summary' | t">
+            <span class="project-setup__meta-pill">{{ 'project.placeholder.project' | t }} #{{ projectId() }}</span>
             @if (nextSetupStep()) {
-              <span class="project-setup__meta-pill">Next: {{ nextSetupStep() }}</span>
+              <span class="project-setup__meta-pill">{{ 'project.sidebar.next' | t }}: {{ nextSetupStep() }}</span>
             }
           </div>
         </div>
 
         <div class="project-setup__progress">
           <div class="project-setup__progress-summary">
-            <span class="project-setup__progress-label">Completed tasks</span>
+            <span class="project-setup__progress-label">{{ 'project.placeholder.setup.completedTasks' | t }}</span>
             <strong>{{ completedSetupItems() }}/{{ setupItems().length }}</strong>
           </div>
           <div class="project-setup__progress-bar" aria-hidden="true">
@@ -137,7 +137,7 @@
                 <span class="project-setup__task-dot" aria-hidden="true"></span>
                 <h3 class="project-setup__task-title" [class.project-setup__task-title--done]="item.status === 'done'">{{ item.title }}</h3>
                 @if (item.status === 'active') {
-                  <span class="project-setup__task-status">In progress</span>
+                  <span class="project-setup__task-status">{{ 'project.placeholder.setup.inProgress' | t }}</span>
                 }
               </div>
               <p class="project-setup__task-description" [class.project-setup__task-description--done]="item.status === 'done'">
@@ -159,10 +159,10 @@
 } @else {
   <section class="project-placeholder">
     <div class="project-placeholder__card">
-      <span class="project-placeholder__eyebrow">Project workspace</span>
+      <span class="project-placeholder__eyebrow">{{ 'project.placeholder.workspace' | t }}</span>
       <h1 class="project-placeholder__title">{{ title() }}</h1>
       <p class="project-placeholder__copy">
-        Project <strong>#{{ projectId() }}</strong> is using the {{ workspaceConfig().typeLabel.toLowerCase() }} workspace.
+        {{ 'project.placeholder.project' | t }} <strong>#{{ projectId() }}</strong> {{ 'project.placeholder.usingWorkspace' | t }} {{ workspaceConfig().typeLabel.toLowerCase() }} {{ 'project.placeholder.workspace' | t }}.
         {{ workspaceConfig().placeholderDescription }}
       </p>
     </div>

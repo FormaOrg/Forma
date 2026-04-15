@@ -5,6 +5,25 @@ $backendRoot = Join-Path $repoRoot "Backend"
 $runRoot = Join-Path $repoRoot ".run"
 $pidRoot = Join-Path $runRoot "pids"
 $logRoot = Join-Path $runRoot "logs"
+$sharedEnvFile = Join-Path $backendRoot "service-utilisateurs/.env"
+
+if (Test-Path $sharedEnvFile) {
+    Get-Content $sharedEnvFile | ForEach-Object {
+        $line = $_.Trim()
+        if (-not $line -or $line.StartsWith("#")) {
+            return
+        }
+
+        $separatorIndex = $line.IndexOf("=")
+        if ($separatorIndex -lt 1) {
+            return
+        }
+
+        $name = $line.Substring(0, $separatorIndex).Trim()
+        $value = $line.Substring($separatorIndex + 1).Trim().Trim('"')
+        [Environment]::SetEnvironmentVariable($name, $value, "Process")
+    }
+}
 
 $services = @(
     @{ Name = "service-utilisateurs"; Port = 8081 },

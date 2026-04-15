@@ -126,11 +126,11 @@
   } @else {
     <app-greeting-section class="home-page__hero" [userName]="userName"></app-greeting-section>
 
-    <section class="home-page__stats" aria-label="Workspace metrics">
+    <section class="home-page__stats" [attr.aria-label]="'dashboard.home.stats.aria' | t">
       <app-data-card
         class="home-page__panel"
         [icon]="globeIcon"
-        [title]="'Sites created'"
+        [title]="'dashboard.home.stats.sitesCreated.title' | t"
         [value]="sitesCreatedValue"
         [description]="sitesCreatedDescription"
       ></app-data-card>
@@ -138,7 +138,7 @@
       <app-data-card
         class="home-page__panel"
         [icon]="checkIcon"
-        [title]="'Published Sites'"
+        [title]="'dashboard.home.stats.published.title' | t"
         [value]="publishedSitesValue"
         [description]="publishedSitesDescription"
       ></app-data-card>
@@ -146,7 +146,7 @@
       <app-data-card
         class="home-page__panel"
         [icon]="draftIcon"
-        [title]="'Draft Sites'"
+        [title]="'dashboard.home.stats.drafts.title' | t"
         [value]="draftSitesValue"
         [description]="draftSitesDescription"
       ></app-data-card>
@@ -154,7 +154,7 @@
       <app-data-card
         class="home-page__panel"
         [icon]="clockIcon"
-        [title]="'Last Activity'"
+        [title]="'dashboard.home.stats.lastActivity.title' | t"
         [value]="lastActivityValue"
         [description]="lastActivityDescription"
       ></app-data-card>
@@ -173,8 +173,8 @@
         <section class="home-quick-actions home-page__panel" aria-labelledby="home-quick-actions-title">
           <div class="home-quick-actions__header">
             <div>
-              <p class="home-quick-actions__eyebrow">Quick actions</p>
-              <h2 id="home-quick-actions-title" class="home-quick-actions__title">Pick up where you left off</h2>
+              <p class="home-quick-actions__eyebrow">{{ 'dashboard.home.quickActions.eyebrow' | t }}</p>
+              <h2 id="home-quick-actions-title" class="home-quick-actions__title">{{ 'dashboard.home.quickActions.title' | t }}</h2>
             </div>
           </div>
 
@@ -187,8 +187,8 @@
                 </svg>
               </span>
               <span class="home-quick-actions__body">
-                <span class="home-quick-actions__label">Create a project</span>
-                <span class="home-quick-actions__hint">Start from scratch and keep building.</span>
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.create.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.create.hint' | t }}</span>
               </span>
             </a>
 
@@ -200,8 +200,8 @@
                 </svg>
               </span>
               <span class="home-quick-actions__body">
-                <span class="home-quick-actions__label">Browse templates</span>
-                <span class="home-quick-actions__hint">Reuse a proven layout and move faster.</span>
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.templates.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.templates.hint' | t }}</span>
               </span>
             </a>
 
@@ -213,8 +213,8 @@
                 </svg>
               </span>
               <span class="home-quick-actions__body">
-                <span class="home-quick-actions__label">Update profile</span>
-                <span class="home-quick-actions__hint">Complete your setup and keep your workspace ready.</span>
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.profile.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.profile.hint' | t }}</span>
               </span>
             </a>
           </div>

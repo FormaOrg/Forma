@@ -2,9 +2,9 @@
   <section class="templates-hero">
     <div class="templates-hero__content">
       <div class="templates-hero__text">
-        <h1 class="templates-hero__title">Templates</h1>
+        <h1 class="templates-hero__title">{{ 'dashboard.templates.title' | t }}</h1>
         <p class="templates-hero__subtitle">
-          Browse polished starting points for portfolios, stores, landing pages, and editorial builds without leaving your dashboard flow.
+          {{ 'dashboard.templates.subtitle' | t }}
         </p>
       </div>
 
@@ -15,7 +15,7 @@
             <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
           </svg>
         </span>
-        <span class="templates-hero__cta-text">Create blank project</span>
+        <span class="templates-hero__cta-text">{{ 'dashboard.templates.actions.createBlankProject' | t }}</span>
       </a>
     </div>
   </section>
@@ -23,23 +23,23 @@
   <div class="templates-page__stats">
     <app-data-card
       [icon]="layersIcon"
-      [title]="'Available templates'"
+      [title]="'dashboard.templates.stats.available.title' | t"
       [value]="isLoading() ? '...' : totalTemplates().toString()"
-      [description]="isLoading() ? 'Syncing your catalog' : 'Ready to use in your workspace'"
+      [description]="isLoading() ? ('dashboard.templates.stats.available.loading' | t) : ('dashboard.templates.stats.available.ready' | t)"
     ></app-data-card>
 
     <app-data-card
       [icon]="sparkIcon"
-      [title]="'Featured picks'"
+      [title]="'dashboard.templates.stats.featured.title' | t"
       [value]="isLoading() ? '...' : featuredTemplates().toString()"
-      [description]="isLoading() ? 'Curating highlights' : 'Recommended starting points'"
+      [description]="isLoading() ? ('dashboard.templates.stats.featured.loading' | t) : ('dashboard.templates.stats.featured.ready' | t)"
     ></app-data-card>
 
     <app-data-card
       [icon]="bookIcon"
-      [title]="'Categories'"
+      [title]="'dashboard.templates.stats.categories.title' | t"
       [value]="isLoading() ? '...' : categoryCount().toString()"
-      [description]="isLoading() ? 'Grouping layouts' : 'Portfolio, blog, ecommerce, and more'"
+      [description]="isLoading() ? ('dashboard.templates.stats.categories.loading' | t) : ('dashboard.templates.stats.categories.ready' | t)"
     ></app-data-card>
   </div>
 
@@ -54,7 +54,7 @@
       <input
         type="search"
         class="templates-toolbar__search-input"
-        placeholder="Search templates"
+        [placeholder]="'dashboard.templates.search.placeholder' | t"
         [ngModel]="searchTerm()"
         (ngModelChange)="updateSearchTerm($event)"
       />
@@ -73,7 +73,7 @@
         [class.templates-toolbar__scope-button--active]="activeScope() === 'all'"
         (click)="updateScope('all')"
       >
-        All templates
+        {{ 'dashboard.templates.scope.all' | t }}
       </button>
       <button
         type="button"
@@ -81,7 +81,7 @@
         [class.templates-toolbar__scope-button--active]="activeScope() === 'my'"
         (click)="updateScope('my')"
       >
-        My templates
+        {{ 'dashboard.templates.scope.my' | t }}
       </button>
     </div>
 
@@ -91,7 +91,7 @@
       (click)="$event.stopPropagation()"
     >
       <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleCategoryDropdown()">
-        <span class="templates-toolbar__dropdown-label">Category</span>
+        <span class="templates-toolbar__dropdown-label">{{ 'dashboard.templates.category.label' | t }}</span>
         <span class="templates-toolbar__dropdown-value">{{ activeCategoryLabel() }}</span>
         <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
           <svg viewBox="0 0 20 20" fill="none">
@@ -109,7 +109,7 @@
               [class.is-selected]="activeCategory() === category"
               (click)="updateCategory(category)"
             >
-              {{ category === 'all' ? 'All categories' : category }}
+              {{ category === 'all' ? ('dashboard.templates.category.all' | t) : category }}
             </button>
           }
         </div>
@@ -122,8 +122,8 @@
       (click)="$event.stopPropagation()"
     >
       <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleSortDropdown()">
-        <span class="templates-toolbar__dropdown-label">Sort</span>
-        <span class="templates-toolbar__dropdown-value">{{ activeSortLabel() }}</span>
+        <span class="templates-toolbar__dropdown-label">{{ 'dashboard.templates.sort.label' | t }}</span>
+        <span class="templates-toolbar__dropdown-value">{{ activeSortLabel() | t }}</span>
         <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
           <svg viewBox="0 0 20 20" fill="none">
             <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -133,10 +133,10 @@
 
       @if (sortDropdownOpen()) {
         <div class="templates-toolbar__dropdown-menu">
-          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'featured'" (click)="updateSort('featured')">Featured</button>
-          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'popular'" (click)="updateSort('popular')">Most used</button>
-          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'newest'" (click)="updateSort('newest')">Newest</button>
-          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'name'" (click)="updateSort('name')">Name</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'featured'" (click)="updateSort('featured')">{{ 'dashboard.templates.sort.featured' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'popular'" (click)="updateSort('popular')">{{ 'dashboard.templates.sort.mostUsed' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'newest'" (click)="updateSort('newest')">{{ 'dashboard.templates.sort.newest' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'name'" (click)="updateSort('name')">{{ 'dashboard.templates.sort.name' | t }}</button>
         </div>
       }
     </div>
@@ -178,9 +178,9 @@
             />
           </svg>
         </div>
-        <h2 class="templates-empty__title">We could not load templates</h2>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.errors.title' | t }}</h2>
         <p class="templates-empty__text">{{ errorMessage() }}</p>
-        <button type="button" class="templates-empty__action" (click)="loadTemplates()">Try again</button>
+        <button type="button" class="templates-empty__action" (click)="loadTemplates()">{{ 'dashboard.templates.actions.tryAgain' | t }}</button>
       </div>
     } @else if (!totalTemplates()) {
       <div class="templates-empty">
@@ -191,9 +191,9 @@
             <path d="M8 13.5H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2 class="templates-empty__title">No templates available yet</h2>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.noneTitle' | t }}</h2>
         <p class="templates-empty__text">
-          Your template catalog is still empty. As soon as templates are published from the backend, they will appear here automatically.
+          {{ 'dashboard.templates.empty.noneText' | t }}
         </p>
       </div>
     } @else if (activeScope() === 'my' && !filteredTemplates().length) {
@@ -204,11 +204,11 @@
             <path d="M9.5 11.5L11.2 13.2L14.8 9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <h2 class="templates-empty__title">No saved templates yet</h2>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.savedNoneTitle' | t }}</h2>
         <p class="templates-empty__text">
-          When your account starts returning saved or custom templates from the backend, they will show up here for quick reuse.
+          {{ 'dashboard.templates.empty.savedNoneText' | t }}
         </p>
-        <button type="button" class="templates-empty__action" (click)="updateScope('all')">Browse all templates</button>
+        <button type="button" class="templates-empty__action" (click)="updateScope('all')">{{ 'dashboard.templates.actions.browseAll' | t }}</button>
       </div>
     } @else if (!filteredTemplates().length) {
       <div class="templates-empty">
@@ -218,11 +218,11 @@
             <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </div>
-        <h2 class="templates-empty__title">No matching templates</h2>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.noMatchTitle' | t }}</h2>
         <p class="templates-empty__text">
-          Try a different name, switch categories, or clear your filters to see more options.
+          {{ 'dashboard.templates.empty.noMatchText' | t }}
         </p>
-        <button type="button" class="templates-empty__action" (click)="clearFilters()">Clear filters</button>
+        <button type="button" class="templates-empty__action" (click)="clearFilters()">{{ 'dashboard.templates.actions.clearFilters' | t }}</button>
       </div>
     } @else {
       <div class="templates-grid">

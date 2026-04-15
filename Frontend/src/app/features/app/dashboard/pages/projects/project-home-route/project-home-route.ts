@@ -9,6 +9,8 @@ import {
   getProjectWorkspaceConfig,
   normalizeProjectWorkspaceType,
 } from '../../../../../../shared/app/project-workspace/project-workspace.config';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 type ProjectHomeMetricTone = 'violet' | 'blue' | 'mint' | 'amber';
 type ProjectHomeMetricIcon =
@@ -31,13 +33,14 @@ interface ProjectHomeMetricCard {
 @Component({
   selector: 'app-project-home-route',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-home-route.html',
 })
 export class ProjectHomeRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectHomeService = inject(ProjectHomeService);
+  private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -55,7 +58,7 @@ export class ProjectHomeRoute {
     () => normalizeProjectWorkspaceType(this.page()?.projectType) === 'PORTFOLIO'
   );
   readonly heroEyebrow = computed(() =>
-    this.isPortfolioWorkspace() ? 'Portfolio workspace' : 'Project workspace'
+    this.isPortfolioWorkspace() ? this.i18n.t('project.home.hero.portfolioEyebrow') : this.i18n.t('project.home.hero.projectEyebrow')
   );
   readonly heroTitle = computed(() => {
     const page = this.page();
@@ -64,10 +67,10 @@ export class ProjectHomeRoute {
     }
 
     if (this.isPortfolioWorkspace()) {
-      return `${page.projectName} is taking shape as a polished portfolio.`;
+      return `${page.projectName} ${this.i18n.t('project.home.hero.portfolioTitleSuffix')}`;
     }
 
-    return `Welcome back, ${page.ownerName}.`;
+    return `${this.i18n.t('project.home.hero.welcomeBack')}, ${page.ownerName}.`;
   });
   readonly heroSubtitle = computed(() => {
     const page = this.page();
@@ -76,7 +79,7 @@ export class ProjectHomeRoute {
     }
 
     if (this.isPortfolioWorkspace()) {
-      return 'Keep your page structure, inquiry flow, and launch state aligned as you shape a stronger first impression.';
+      return this.i18n.t('project.home.hero.portfolioSubtitle');
     }
 
     return this.workspaceConfig().homeSubtitle;
@@ -89,7 +92,7 @@ export class ProjectHomeRoute {
 
     if (this.isPortfolioWorkspace()) {
       return {
-        label: 'Review pages',
+        label: this.i18n.t('project.home.actions.reviewPages'),
         route: ['/app/projects', page.projectId, 'pages'],
       };
     }
@@ -101,17 +104,17 @@ export class ProjectHomeRoute {
     };
   });
   readonly activityHeading = computed(() =>
-    this.isPortfolioWorkspace() ? 'Portfolio pulse' : 'Recent activity'
+    this.isPortfolioWorkspace() ? this.i18n.t('project.home.activity.portfolioPulse') : this.i18n.t('project.home.activity.recent')
   );
   readonly activityDescription = computed(() =>
     this.isPortfolioWorkspace()
-      ? 'Recent motion across page structure, inquiry flow, and launch readiness.'
+      ? this.i18n.t('project.home.activity.portfolioDescription')
       : this.workspaceConfig().activityDescription
   );
   readonly suggestedDescription = computed(() =>
     this.isPortfolioWorkspace()
-      ? 'Recommended focus areas based on your current pages, inquiry flow, and launch state.'
-      : 'Actions derived from the current persisted state of this project.'
+      ? this.i18n.t('project.home.suggested.portfolioDescription')
+      : this.i18n.t('project.home.suggested.defaultDescription')
   );
   readonly displayMetricCards = computed(() => this.buildDefaultMetricCards(this.metrics()));
   readonly displayActivities = computed(() => this.activities());
@@ -136,7 +139,7 @@ export class ProjectHomeRoute {
   loadHomePage(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.home.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -151,7 +154,7 @@ export class ProjectHomeRoute {
         next: (page) => this.page.set(page),
         error: () => {
           this.page.set(null);
-          this.errorMessage.set('Unable to load this project workspace right now.');
+          this.errorMessage.set(this.i18n.t('project.home.errors.load'));
         },
       });
   }
@@ -164,7 +167,7 @@ export class ProjectHomeRoute {
 
     const minutes = Math.round((parsed - Date.now()) / 60000);
     const absoluteMinutes = Math.abs(minutes);
-    const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    const formatter = new Intl.RelativeTimeFormat(this.i18n.lang(), { numeric: 'auto' });
 
     if (absoluteMinutes < 60) {
       return formatter.format(minutes, 'minute');

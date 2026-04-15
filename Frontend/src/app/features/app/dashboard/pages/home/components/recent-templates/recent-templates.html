@@ -1,11 +1,11 @@
 <section class="recent-templates">
   <header class="recent-templates__header">
     <div class="recent-templates__intro">
-      <h2 class="recent-templates__title">Templates</h2>
-      <p class="recent-templates__subtitle">Jump back into a layout you have used recently.</p>
+      <h2 class="recent-templates__title">{{ 'dashboard.home.recentTemplates.title' | t }}</h2>
+      <p class="recent-templates__subtitle">{{ 'dashboard.home.recentTemplates.subtitle' | t }}</p>
     </div>
 
-    <a routerLink="/app/templates" class="recent-templates__link">Browse</a>
+    <a routerLink="/app/templates" class="recent-templates__link">{{ 'dashboard.home.recentTemplates.browse' | t }}</a>
   </header>
 
   @if (templates.length) {
@@ -56,11 +56,11 @@
           />
         </svg>
       </div>
-      <h3 class="recent-templates__empty-title">No templates available yet</h3>
+      <h3 class="recent-templates__empty-title">{{ 'dashboard.home.recentTemplates.emptyTitle' | t }}</h3>
       <p class="recent-templates__empty-text">
-        Explore the template library and your recently used layouts will be surfaced here.
+        {{ 'dashboard.home.recentTemplates.emptyText' | t }}
       </p>
-      <a routerLink="/app/templates" class="recent-templates__empty-action">Browse templates</a>
+      <a routerLink="/app/templates" class="recent-templates__empty-action">{{ 'dashboard.home.recentTemplates.browse' | t }}</a>
     </div>
   }
 </section>

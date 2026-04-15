@@ -6,6 +6,7 @@ import { ThemeService } from '../../../core/services/theme.service';
 import { ProjectService } from '../../../core/services/project.service';
 import { ProjectWorkspaceContextService } from '../../../core/services/project-workspace-context.service';
 import { ProjectType } from '../../../core/models/project.model';
+import { TranslatePipe } from '../../../features/landing-page/i18n/translate.pipe';
 import type { SidebarItem, SidebarSection } from '../dashboard-nav.types';
 import {
   getCompletedProjectSetupItems,
@@ -19,7 +20,7 @@ type ProjectSidebarItem = SidebarItem & { path: string };
 @Component({
   selector: 'app-project-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, AppIcon],
+  imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './project-sidebar.html',
 })
 export class ProjectSidebar implements OnChanges {
@@ -43,7 +44,13 @@ export class ProjectSidebar implements OnChanges {
   readonly isWorkspaceComplete = computed(
     () => this.workspaceProgress().completed >= this.workspaceProgress().total
   );
-  readonly workspaceTitle = computed(() => `${this.workspaceConfig().typeLabel} workspace`);
+  readonly workspaceTitleKey = computed(() => {
+    const value = this.workspaceConfig().typeLabel.toLowerCase();
+    if (value === 'ecommerce') return 'project.sidebar.workspace.ecommerce';
+    if (value === 'portfolio') return 'project.sidebar.workspace.portfolio';
+    if (value === 'blog') return 'project.sidebar.workspace.blog';
+    return 'project.sidebar.workspace.project';
+  });
   readonly sections = computed<Array<SidebarSection & { items: ProjectSidebarItem[] }>>(() =>
     this.workspaceConfig().sections.map((section) => ({
       ...section,
@@ -102,6 +109,32 @@ export class ProjectSidebar implements OnChanges {
 
   projectRoute(path: string): string[] {
     return path ? ['/app/projects', this.projectId, path] : this.projectBaseRoute();
+  }
+
+  sidebarLabelKey(label: string): string {
+    const value = label.trim().toLowerCase();
+
+    const map: Record<string, string> = {
+      'back to projects': 'project.sidebar.backToProjects',
+      editor: 'project.sidebar.editor',
+      settings: 'project.sidebar.settings',
+      setup: 'project.sidebar.setup',
+      workspace: 'project.sidebar.workspace',
+      audience: 'project.sidebar.audience',
+      insights: 'project.sidebar.insights',
+      home: 'project.sidebar.home',
+      sales: 'project.sidebar.sales',
+      catalog: 'project.sidebar.catalog',
+      customers: 'project.sidebar.customers',
+      analytics: 'project.sidebar.analytics',
+      pages: 'project.sidebar.pages',
+      inquiries: 'project.sidebar.inquiries',
+      posts: 'project.sidebar.posts',
+      categories: 'project.sidebar.categories',
+      subscribers: 'project.sidebar.subscribers',
+    };
+
+    return map[value] ?? label;
   }
 
   private loadProjectType(): void {

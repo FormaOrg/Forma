@@ -7,6 +7,8 @@ import { DashboardTemplateItem } from '../../../../../core/models/dashboard.mode
 import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
 import { ProjectService } from '../../../../../core/services/project.service';
 import { ToastService } from '../../../../../core/services/toast.service';
+import { I18nService } from '../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../landing-page/i18n/translate.pipe';
 import { DataCard } from '../home/components/data-card/data-card';
 import { TemplateCard } from './components/template-card/template-card';
 
@@ -16,13 +18,14 @@ type TemplateSort = 'featured' | 'popular' | 'newest' | 'name';
 @Component({
   selector: 'app-templates',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DataCard, TemplateCard],
+  imports: [CommonModule, FormsModule, RouterLink, DataCard, TemplateCard, TranslatePipe],
   templateUrl: './templates.html',
 })
 export class Templates implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);
   private readonly projectService = inject(ProjectService);
   private readonly toastService = inject(ToastService);
+  private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
@@ -68,17 +71,17 @@ export class Templates implements OnInit {
   readonly totalTemplates = computed(() => this.templates().length);
   readonly featuredTemplates = computed(() => this.templates().filter((template) => template.isFeatured).length);
   readonly categoryCount = computed(() => Math.max(0, this.categories().length - 1));
-  readonly activeCategoryLabel = computed(() => this.activeCategory() === 'all' ? 'All categories' : this.activeCategory());
+  readonly activeCategoryLabel = computed(() => this.activeCategory() === 'all' ? this.i18n.t('dashboard.templates.category.all') : this.activeCategory());
   readonly activeSortLabel = computed(() => {
     switch (this.activeSort()) {
       case 'popular':
-        return 'Most used';
+        return 'dashboard.templates.sort.mostUsed';
       case 'newest':
-        return 'Newest';
+        return 'dashboard.templates.sort.newest';
       case 'name':
-        return 'Name';
+        return 'dashboard.templates.sort.name';
       default:
-        return 'Featured';
+        return 'dashboard.templates.sort.featured';
     }
   });
 
@@ -198,11 +201,11 @@ export class Templates implements OnInit {
         next: () => {
           this.dashboardDataService.invalidateProjectsOverviewCache();
           this.dashboardDataService.invalidateTemplatesOverviewCache();
-          this.toastService.success(`${template.name} is ready in your projects.`);
+          this.toastService.success(`${template.name} ${this.i18n.t('dashboard.templates.toast.readySuffix')}`);
           void this.router.navigate(['/app/projects']);
         },
         error: () => {
-          this.toastService.error('We could not create a project from that template. Please try again.');
+          this.toastService.error(this.i18n.t('dashboard.templates.toast.createError'));
         },
       });
   }
@@ -237,10 +240,10 @@ export class Templates implements OnInit {
     const status = this.readErrorStatus(error);
 
     if (status === 0) {
-      return 'Please check your connection and try again.';
+      return this.i18n.t('dashboard.templates.errors.connection');
     }
 
-    return 'Something went wrong while loading templates. Please try again.';
+    return this.i18n.t('dashboard.templates.errors.load');
   }
 
   private readErrorStatus(error: unknown): number | undefined {

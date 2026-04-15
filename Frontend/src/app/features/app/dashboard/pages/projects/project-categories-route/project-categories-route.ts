@@ -6,6 +6,8 @@ import { finalize, map } from 'rxjs';
 
 import { Project } from '../../../../../../core/models/project.model';
 import { ProjectService } from '../../../../../../core/services/project.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 type CategoryState = 'healthy' | 'expanding' | 'light';
 
@@ -26,13 +28,14 @@ interface BlogCategoryItem {
 @Component({
   selector: 'app-project-categories-route',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-categories-route.html',
   styleUrl: './project-categories-route.css',
 })
 export class ProjectCategoriesRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
+  private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -53,55 +56,55 @@ export class ProjectCategoriesRoute {
     return [
       {
         id: 'strategy',
-        name: 'Strategy',
-        description: `${project.name} uses this pillar for positioning, editorial point of view, and practical thinking pieces.`,
-        pillarLabel: 'Core pillar',
+        name: this.i18n.t('project.categories.mock.strategy.name'),
+        description: `${project.name} ${this.i18n.t('project.categories.mock.strategy.descriptionSuffix')}`,
+        pillarLabel: this.i18n.t('project.categories.mock.pillar.core'),
         postCount: 8,
         draftCount: 2,
-        shareLabel: '34% of all traffic',
+        shareLabel: this.i18n.t('project.categories.mock.share.34'),
         state: 'healthy',
-        stateLabel: 'Healthy',
-        cadenceLabel: 'Weekly',
-        nextAngle: 'Publish a follow-up on content planning cycles.',
+        stateLabel: this.i18n.t('project.categories.state.healthy'),
+        cadenceLabel: this.i18n.t('project.categories.mock.cadence.weekly'),
+        nextAngle: this.i18n.t('project.categories.mock.nextAngle.strategy'),
       },
       {
         id: 'operations',
-        name: 'Operations',
-        description: 'Document the systems, workflows, and behind-the-scenes mechanics that support the brand.',
-        pillarLabel: 'Support pillar',
+        name: this.i18n.t('project.categories.mock.operations.name'),
+        description: this.i18n.t('project.categories.mock.operations.description'),
+        pillarLabel: this.i18n.t('project.categories.mock.pillar.support'),
         postCount: 5,
         draftCount: 1,
-        shareLabel: '22% of all traffic',
+        shareLabel: this.i18n.t('project.categories.mock.share.22'),
         state: 'expanding',
-        stateLabel: 'Expanding',
-        cadenceLabel: 'Twice a month',
-        nextAngle: 'Turn the content review checklist into a tactical article.',
+        stateLabel: this.i18n.t('project.categories.state.expanding'),
+        cadenceLabel: this.i18n.t('project.categories.mock.cadence.twiceMonth'),
+        nextAngle: this.i18n.t('project.categories.mock.nextAngle.operations'),
       },
       {
         id: 'design',
-        name: 'Design',
-        description: 'Use design-led stories to connect structure, usability, and taste with outcomes.',
-        pillarLabel: 'Visual pillar',
+        name: this.i18n.t('project.categories.mock.design.name'),
+        description: this.i18n.t('project.categories.mock.design.description'),
+        pillarLabel: this.i18n.t('project.categories.mock.pillar.visual'),
         postCount: 4,
         draftCount: 2,
-        shareLabel: '18% of all traffic',
+        shareLabel: this.i18n.t('project.categories.mock.share.18'),
         state: 'expanding',
-        stateLabel: 'Expanding',
-        cadenceLabel: 'Twice a month',
-        nextAngle: 'Package a post around component systems for editorial teams.',
+        stateLabel: this.i18n.t('project.categories.state.expanding'),
+        cadenceLabel: this.i18n.t('project.categories.mock.cadence.twiceMonth'),
+        nextAngle: this.i18n.t('project.categories.mock.nextAngle.design'),
       },
       {
         id: 'growth',
-        name: 'Growth',
-        description: 'Cover audience signals, subscriber health, and what helps the archive compound over time.',
-        pillarLabel: 'Audience pillar',
+        name: this.i18n.t('project.categories.mock.growth.name'),
+        description: this.i18n.t('project.categories.mock.growth.description'),
+        pillarLabel: this.i18n.t('project.categories.mock.pillar.audience'),
         postCount: 3,
         draftCount: 1,
-        shareLabel: '11% of all traffic',
+        shareLabel: this.i18n.t('project.categories.mock.share.11'),
         state: 'light',
-        stateLabel: 'Light coverage',
-        cadenceLabel: 'Monthly',
-        nextAngle: 'Write a piece on retention signals beyond open rate.',
+        stateLabel: this.i18n.t('project.categories.state.light'),
+        cadenceLabel: this.i18n.t('project.categories.mock.cadence.monthly'),
+        nextAngle: this.i18n.t('project.categories.mock.nextAngle.growth'),
       },
     ];
   });
@@ -119,7 +122,7 @@ export class ProjectCategoriesRoute {
   loadProject(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.categories.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -137,7 +140,7 @@ export class ProjectCategoriesRoute {
         },
         error: () => {
           this.project.set(null);
-          this.errorMessage.set('Unable to load blog categories right now.');
+          this.errorMessage.set(this.i18n.t('project.categories.errors.load'));
         },
       });
   }

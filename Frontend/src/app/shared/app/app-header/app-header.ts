@@ -518,10 +518,7 @@ export class AppHeader {
     }
 
     this.dashboardDataService.getBillingOverview({ useCache: false })
-      .pipe(
-        catchError(() => of(null)),
-        takeUntilDestroyed()
-      )
+      .pipe(catchError(() => of(null)))
       .subscribe((billing) => {
         this.profile = {
           ...this.profile,

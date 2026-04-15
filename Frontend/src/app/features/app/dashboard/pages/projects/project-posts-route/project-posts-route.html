@@ -7,38 +7,38 @@
     </section>
   } @else if (errorMessage()) {
     <section class="project-posts__state project-posts__state--error" role="alert">
-      <h1>We couldn't load your blog posts</h1>
+      <h1>{{ 'project.posts.errors.title' | t }}</h1>
       <p>{{ errorMessage() }}</p>
-      <button type="button" (click)="loadProject()">Try again</button>
+      <button type="button" (click)="loadProject()">{{ 'project.posts.actions.tryAgain' | t }}</button>
     </section>
   } @else if (project(); as project) {
     <section class="project-posts__hero project-posts__panel">
       <div>
-        <p class="project-posts__eyebrow">Publishing calendar</p>
-        <h1 class="project-posts__title">Keep every article moving with intention.</h1>
+        <p class="project-posts__eyebrow">{{ 'project.posts.eyebrow' | t }}</p>
+        <h1 class="project-posts__title">{{ 'project.posts.title' | t }}</h1>
         <p class="project-posts__subtitle">
-          {{ project.name }} now has a dedicated editorial workspace for active drafts, scheduled pieces, and the posts already carrying your point of view.
+          {{ project.name }} {{ 'project.posts.subtitle' | t }}
         </p>
       </div>
 
-      <a class="project-posts__hero-action" [routerLink]="['/app/projects', project.id, 'editor']">Open editor</a>
+      <a class="project-posts__hero-action" [routerLink]="['/app/projects', project.id, 'editor']">{{ 'project.posts.actions.openEditor' | t }}</a>
     </section>
 
     <section class="project-posts__summary-grid">
       <article class="project-posts__summary-card project-posts__panel">
-        <span class="project-posts__summary-label">Published</span>
+        <span class="project-posts__summary-label">{{ 'project.posts.status.published' | t }}</span>
         <strong class="project-posts__summary-value">{{ publishedCount() }}</strong>
-        <span class="project-posts__summary-note">Live in your archive right now</span>
+        <span class="project-posts__summary-note">{{ 'project.posts.summary.publishedNote' | t }}</span>
       </article>
       <article class="project-posts__summary-card project-posts__panel">
-        <span class="project-posts__summary-label">Scheduled</span>
+        <span class="project-posts__summary-label">{{ 'project.posts.status.scheduled' | t }}</span>
         <strong class="project-posts__summary-value">{{ scheduledCount() }}</strong>
-        <span class="project-posts__summary-note">Ready for the next send</span>
+        <span class="project-posts__summary-note">{{ 'project.posts.summary.scheduledNote' | t }}</span>
       </article>
       <article class="project-posts__summary-card project-posts__panel">
-        <span class="project-posts__summary-label">Drafts</span>
+        <span class="project-posts__summary-label">{{ 'project.posts.status.draft' | t }}</span>
         <strong class="project-posts__summary-value">{{ draftCount() }}</strong>
-        <span class="project-posts__summary-note">Still in writing or review</span>
+        <span class="project-posts__summary-note">{{ 'project.posts.summary.draftNote' | t }}</span>
       </article>
     </section>
 
@@ -46,24 +46,24 @@
       <article class="project-posts__panel">
         <div class="project-posts__section-head">
           <div>
-            <p class="project-posts__section-kicker">Posts</p>
-            <h2>Editorial pipeline</h2>
+            <p class="project-posts__section-kicker">{{ 'project.posts.sections.postsKicker' | t }}</p>
+            <h2>{{ 'project.posts.sections.pipelineTitle' | t }}</h2>
           </div>
-          <span class="project-posts__section-badge">{{ filteredPosts().length }} visible</span>
+          <span class="project-posts__section-badge">{{ filteredPosts().length }} {{ 'project.posts.common.visible' | t }}</span>
         </div>
 
         <div class="project-posts__toolbar">
           <label class="project-posts__search">
-            <span>Search</span>
+            <span>{{ 'project.posts.search.label' | t }}</span>
             <input
               type="search"
               [value]="searchValue()"
               (input)="updateSearch(($any($event.target).value ?? '').toString())"
-              placeholder="Search titles, categories, or summaries"
+              [placeholder]="'project.posts.search.placeholder' | t"
             />
           </label>
 
-          <div class="project-posts__filters" aria-label="Post status filters">
+          <div class="project-posts__filters" [attr.aria-label]="'project.posts.filters.aria' | t">
             @for (status of ['ALL', 'published', 'scheduled', 'draft']; track status) {
               <button
                 type="button"
@@ -71,7 +71,7 @@
                 [class.project-posts__filter--active]="selectedStatus() === status"
                 (click)="setStatus($any(status))"
               >
-                {{ status === 'ALL' ? 'All' : status }}
+                {{ status === 'ALL' ? ('project.posts.filters.all' | t) : ('project.posts.status.' + status | t) }}
               </button>
             }
           </div>
@@ -112,7 +112,7 @@
         @if (selectedPost(); as selectedPost) {
           <div class="project-posts__section-head">
             <div>
-              <p class="project-posts__section-kicker">Selected post</p>
+              <p class="project-posts__section-kicker">{{ 'project.posts.sections.selectedPost' | t }}</p>
               <h2>{{ selectedPost.title }}</h2>
             </div>
             <span class="project-posts__section-badge project-posts__section-badge--accent">
@@ -125,34 +125,34 @@
 
             <div class="project-posts__detail-grid">
               <div>
-                <span>Status</span>
+                <span>{{ 'project.posts.details.status' | t }}</span>
                 <strong>{{ selectedPost.statusLabel }}</strong>
               </div>
               <div>
-                <span>Updated</span>
+                <span>{{ 'project.posts.details.updated' | t }}</span>
                 <strong>{{ selectedPost.updatedLabel }}</strong>
               </div>
               <div>
-                <span>SEO title</span>
+                <span>{{ 'project.posts.details.seoTitle' | t }}</span>
                 <strong>{{ selectedPost.seoTitle }}</strong>
               </div>
               <div>
-                <span>Distribution</span>
+                <span>{{ 'project.posts.details.distribution' | t }}</span>
                 <strong>{{ selectedPost.distributionLabel }}</strong>
               </div>
             </div>
 
             <div class="project-posts__checklist">
-              <h3>Next publishing checks</h3>
+              <h3>{{ 'project.posts.checklist.title' | t }}</h3>
               <ul>
-                <li>Review the headline and opening paragraph for clarity.</li>
-                <li>Make sure the category and CTA fit the intent of the piece.</li>
-                <li>Confirm the article is ready for homepage and newsletter placement.</li>
+                <li>{{ 'project.posts.checklist.item1' | t }}</li>
+                <li>{{ 'project.posts.checklist.item2' | t }}</li>
+                <li>{{ 'project.posts.checklist.item3' | t }}</li>
               </ul>
             </div>
 
             <a class="project-posts__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
-              Edit this post
+              {{ 'project.posts.actions.editPost' | t }}
             </a>
           </div>
         }

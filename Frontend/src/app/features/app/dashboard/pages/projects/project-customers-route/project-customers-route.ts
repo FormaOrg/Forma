@@ -12,11 +12,13 @@ import {
 } from '../../../../../../core/models/project-customers.model';
 import { ProjectCustomersService } from '../../../../../../core/services/project-customers.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 @Component({
   selector: 'app-project-customers-route',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './project-customers-route.html',
 })
 export class ProjectCustomersRoute {
@@ -26,6 +28,7 @@ export class ProjectCustomersRoute {
   private readonly formBuilder = inject(FormBuilder);
   private readonly projectCustomersService = inject(ProjectCustomersService);
   private readonly toastService = inject(ToastService);
+  private readonly i18n = inject(I18nService);
 
   private searchTimeout?: number;
   private editorCloseTimeout?: number;
@@ -58,10 +61,16 @@ export class ProjectCustomersRoute {
   readonly summary = computed(() => this.page()?.summary ?? null);
   readonly customers = computed(() => this.page()?.customers ?? []);
   readonly zones = computed(() => this.page()?.zones ?? []);
-  readonly editorTitle = computed(() => this.editingCustomer() ? 'Edit customer' : 'Add customer');
+  readonly editorTitle = computed(() =>
+    this.editingCustomer()
+      ? this.i18n.t('project.customers.editor.editTitle')
+      : this.i18n.t('project.customers.editor.addTitle')
+  );
   readonly visibleCustomersLabel = computed(() => {
     const count = this.customers().length;
-    return `${count} customer${count === 1 ? '' : 's'}`;
+    return count === 1
+      ? `${count} ${this.i18n.t('project.customers.common.customer')}`
+      : `${count} ${this.i18n.t('project.customers.common.customers')}`;
   });
   readonly hasFilters = computed(() => this.searchValue().trim().length > 0 || this.selectedZone() !== 'ALL');
   readonly totalRevenue = computed(() =>
@@ -95,7 +104,7 @@ export class ProjectCustomersRoute {
       counts.set(zone, (counts.get(zone) ?? 0) + 1);
     }
 
-    let topZone = 'No zones yet';
+    let topZone = this.i18n.t('project.customers.common.noZonesYet');
     let topCount = 0;
     for (const [zone, count] of counts.entries()) {
       if (count > topCount) {
@@ -114,7 +123,7 @@ export class ProjectCustomersRoute {
   loadCustomers(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.customers.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -131,7 +140,7 @@ export class ProjectCustomersRoute {
         next: (page) => this.page.set(page),
         error: () => {
           this.page.set(null);
-          this.errorMessage.set('Unable to load customers right now.');
+          this.errorMessage.set(this.i18n.t('project.customers.errors.load'));
         },
       });
   }
@@ -212,13 +221,17 @@ export class ProjectCustomersRoute {
       .pipe(finalize(() => this.isSaving.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.toastService.success(editingCustomer ? 'Customer updated.' : 'Customer created.');
+          this.toastService.success(
+            editingCustomer
+              ? this.i18n.t('project.customers.success.updated')
+              : this.i18n.t('project.customers.success.created')
+          );
           window.clearTimeout(this.editorCloseTimeout);
           this.isEditorOpen.set(false);
           this.isEditorClosing.set(false);
           this.loadCustomers();
         },
-        error: () => this.toastService.error('Unable to save this customer right now.'),
+        error: () => this.toastService.error(this.i18n.t('project.customers.errors.save')),
       });
   }
 
@@ -233,15 +246,15 @@ export class ProjectCustomersRoute {
       .pipe(finalize(() => this.isDeleting.set(null)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.toastService.success(`Deleted ${customer.fullName}.`);
+          this.toastService.success(this.i18n.t('project.customers.success.deleted'));
           this.loadCustomers();
         },
-        error: () => this.toastService.error('Unable to delete this customer right now.'),
+        error: () => this.toastService.error(this.i18n.t('project.customers.errors.delete')),
       });
   }
 
   formatMoney(value: number): string {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
@@ -249,7 +262,7 @@ export class ProjectCustomersRoute {
 
   formatDate(value: string | null): string {
     if (!value) {
-      return 'No orders yet';
+      return this.i18n.t('project.customers.common.noOrdersYet');
     }
 
     const date = new Date(value);
@@ -257,7 +270,7 @@ export class ProjectCustomersRoute {
       return value;
     }
 
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -265,7 +278,7 @@ export class ProjectCustomersRoute {
   }
 
   formatCompactMoney(value: number): string {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', {
       notation: 'compact',
       maximumFractionDigits: value >= 1000 ? 1 : 0,
     }).format(value);

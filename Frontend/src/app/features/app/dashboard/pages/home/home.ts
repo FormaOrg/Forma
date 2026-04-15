@@ -1,11 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, of, timeout } from 'rxjs';
 import { BillingOverview, DashboardProjectItem, DashboardTemplateItem } from '../../../../../core/models/dashboard.model';
 import { User } from '../../../../../core/models/user.model';
 import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
 import { UserService } from '../../../../../core/services/user.service';
 import { PRICING_PLANS } from '../../../../pricing/pricing-plans';
+import { I18nService } from '../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../landing-page/i18n/translate.pipe';
 import { GreetingSection } from './components/greeting-section/greeting-section';
 import { DataCard } from "./components/data-card/data-card";
 import { RecentProjects } from "./components/recent-projects/recent-projects";
@@ -17,23 +19,24 @@ import { HomeActivityItem, HomeRecentProject, HomeRecentTemplateItem, HomeSetupS
 
 @Component({
   selector: 'app-home',
-  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates, RouterLink],
+  imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates, RouterLink, TranslatePipe],
   templateUrl: './home.html',
 })
 export class Home implements OnInit {
   private readonly userService = inject(UserService);
   private readonly dashboardDataService = inject(DashboardDataService);
+  private readonly i18n = inject(I18nService);
 
   isLoadingHome = true;
-  userName = 'there';
+  userName = this.i18n.t('dashboard.home.common.there');
   sitesCreatedValue = '0';
-  sitesCreatedDescription = 'No projects yet';
+  sitesCreatedDescription = this.i18n.t('dashboard.home.stats.sitesCreated.empty');
   publishedSitesValue = '0';
-  publishedSitesDescription = 'Nothing published yet';
+  publishedSitesDescription = this.i18n.t('dashboard.home.stats.published.empty');
   draftSitesValue = '0';
-  draftSitesDescription = 'No drafts right now';
-  lastActivityValue = 'No activity';
-  lastActivityDescription = 'Create your first project';
+  draftSitesDescription = this.i18n.t('dashboard.home.stats.drafts.empty');
+  lastActivityValue = this.i18n.t('dashboard.home.activity.noneTitle');
+  lastActivityDescription = this.i18n.t('dashboard.home.activity.noneDescription');
 
   recentProjects: HomeRecentProject[] = [];
   recentTemplates: HomeRecentTemplateItem[] = [];
@@ -41,8 +44,8 @@ export class Home implements OnInit {
   setupSteps: HomeSetupStep[] = [];
   setupPercent = 0;
 
-  planLabel = 'Free';
-  renewsLabel = 'No active plan';
+  planLabel = this.i18n.t('dashboard.home.billing.free');
+  renewsLabel = this.i18n.t('dashboard.home.billing.noPlan');
   accountBadges: string[] = [];
 
   globeIcon = `
@@ -78,10 +81,22 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     forkJoin({
-      user: this.userService.getMe().pipe(catchError(() => of(null))),
-      projects: this.dashboardDataService.getProjectsOverview({ useCache: false }).pipe(catchError(() => of([]))),
-      templates: this.dashboardDataService.getTemplatesOverview({ useCache: false }).pipe(catchError(() => of([]))),
-      billing: this.dashboardDataService.getBillingOverview({ useCache: false }).pipe(catchError(() => of(null))),
+      user: this.userService.getMe().pipe(
+        timeout(2500),
+        catchError(() => of(null))
+      ),
+      projects: this.dashboardDataService.getProjectsOverview({ useCache: false }).pipe(
+        timeout(2500),
+        catchError(() => of([]))
+      ),
+      templates: this.dashboardDataService.getTemplatesOverview({ useCache: false }).pipe(
+        timeout(2500),
+        catchError(() => of([]))
+      ),
+      billing: this.dashboardDataService.getBillingOverview({ useCache: false }).pipe(
+        timeout(2500),
+        catchError(() => of(null))
+      ),
     }).subscribe(({ user, projects, templates, billing }) => {
       this.userName = this.toDisplayName(user);
       this.recentProjects = this.toRecentProjects(projects);
@@ -104,24 +119,24 @@ export class Home implements OnInit {
     this.sitesCreatedValue = String(projects.length);
     this.sitesCreatedDescription =
       createdThisMonth > 0
-        ? `+${createdThisMonth} this month`
+        ? `+${createdThisMonth} ${this.i18n.t('dashboard.home.stats.sitesCreated.thisMonth')}`
         : projects.length > 0
-          ? 'No new projects this month'
-          : 'Create your first project';
+          ? this.i18n.t('dashboard.home.stats.sitesCreated.noNewThisMonth')
+          : this.i18n.t('dashboard.home.stats.sitesCreated.empty');
 
     this.publishedSitesValue = String(publishedCount);
     this.publishedSitesDescription =
       projects.length > 0
-        ? `${Math.round((publishedCount / projects.length) * 100)}% of total`
-        : 'Nothing published yet';
+        ? `${Math.round((publishedCount / projects.length) * 100)}% ${this.i18n.t('dashboard.home.stats.published.ofTotal')}`
+        : this.i18n.t('dashboard.home.stats.published.empty');
 
     this.draftSitesValue = String(draftCount);
     this.draftSitesDescription =
       draftCount > 0
         ? draftCount === 1
-          ? '1 project ready to publish'
-          : `${draftCount} projects ready to publish`
-        : 'No drafts right now';
+          ? this.i18n.t('dashboard.home.stats.drafts.oneReady')
+          : `${draftCount} ${this.i18n.t('dashboard.home.stats.drafts.manyReady')}`
+        : this.i18n.t('dashboard.home.stats.drafts.empty');
 
     if (activities.length > 0) {
       this.lastActivityValue = activities[0].time;
@@ -129,8 +144,8 @@ export class Home implements OnInit {
       return;
     }
 
-    this.lastActivityValue = 'No activity';
-    this.lastActivityDescription = 'Create your first project';
+    this.lastActivityValue = this.i18n.t('dashboard.home.activity.noneTitle');
+    this.lastActivityDescription = this.i18n.t('dashboard.home.activity.noneDescription');
   }
 
   private applyBillingSnapshot(billing: BillingOverview | null): void {
@@ -138,18 +153,18 @@ export class Home implements OnInit {
     const status = billing?.subscription.status ?? 'inactive';
 
     if (!planName || status === 'inactive' || status === 'canceled') {
-      this.planLabel = 'Free';
-      this.renewsLabel = 'No active plan';
+      this.planLabel = this.i18n.t('dashboard.home.billing.free');
+      this.renewsLabel = this.i18n.t('dashboard.home.billing.noPlan');
       this.accountBadges = [];
       return;
     }
 
     this.planLabel = planName;
     this.renewsLabel = billing?.subscription.renewalDateLabel
-      ? `Renews ${billing.subscription.renewalDateLabel}`
+      ? `${this.i18n.t('dashboard.home.billing.renews')} ${billing.subscription.renewalDateLabel}`
       : billing?.subscription.nextChargeLabel
-        ? `Next charge ${billing.subscription.nextChargeLabel}`
-        : 'Plan active';
+        ? `${this.i18n.t('dashboard.home.billing.nextCharge')} ${billing.subscription.nextChargeLabel}`
+        : this.i18n.t('dashboard.home.billing.planActive');
 
     const plan = PRICING_PLANS.find((entry) => entry.name.toLowerCase() === planName.toLowerCase());
     this.accountBadges = plan?.features.slice(0, 2) ?? [];
@@ -157,11 +172,11 @@ export class Home implements OnInit {
 
   private toDisplayName(user: User | null): string {
     if (!user) {
-      return 'there';
+      return this.i18n.t('dashboard.home.common.there');
     }
 
     const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-    return fullName || user.username?.trim() || user.email.split('@')[0] || 'there';
+    return fullName || user.username?.trim() || user.email.split('@')[0] || this.i18n.t('dashboard.home.common.there');
   }
 
   private toRecentProjects(projects: DashboardProjectItem[]): HomeRecentProject[] {
@@ -195,7 +210,7 @@ export class Home implements OnInit {
       .flatMap((project) => {
         const activities: Array<{ title: string; type: HomeActivityItem['type']; timestamp: number }> = [
           {
-            title: `Created ${project.name}`,
+            title: `${this.i18n.t('dashboard.home.activity.created')} ${project.name}`,
             type: 'created',
             timestamp: project.createdAt,
           },
@@ -203,13 +218,13 @@ export class Home implements OnInit {
 
         if (project.status === 'published') {
           activities.push({
-            title: `Published ${project.name}`,
+            title: `${this.i18n.t('dashboard.home.activity.published')} ${project.name}`,
             type: 'published',
             timestamp: project.lastEditedAt,
           });
         } else if (project.lastEditedAt - project.createdAt > 60000) {
           activities.push({
-            title: `Edited ${project.name}`,
+            title: `${this.i18n.t('dashboard.home.activity.edited')} ${project.name}`,
             type: 'edited',
             timestamp: project.lastEditedAt,
           });
@@ -239,10 +254,10 @@ export class Home implements OnInit {
     const hasPublishedProject = projects.some((project) => project.status === 'published');
 
     return [
-      { id: 'profile', label: 'Complete your profile', done: profileDone },
-      { id: 'google', label: 'Connect a social login', done: Boolean(user?.googleConnected) },
-      { id: 'first-project', label: 'Create your first project', done: hasProjects },
-      { id: 'publish', label: 'Publish a site', done: hasPublishedProject },
+      { id: 'profile', label: this.i18n.t('dashboard.home.setup.profile'), done: profileDone },
+      { id: 'google', label: this.i18n.t('dashboard.home.setup.socialLogin'), done: Boolean(user?.googleConnected) },
+      { id: 'first-project', label: this.i18n.t('dashboard.home.setup.firstProject'), done: hasProjects },
+      { id: 'publish', label: this.i18n.t('dashboard.home.setup.publishSite'), done: hasPublishedProject },
     ];
   }
 
@@ -265,7 +280,7 @@ export class Home implements OnInit {
   private formatRelativeTime(timestamp: number): string {
     const diffInMinutes = Math.round((timestamp - Date.now()) / 60000);
     const absoluteMinutes = Math.abs(diffInMinutes);
-    const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    const formatter = new Intl.RelativeTimeFormat(this.i18n.lang(), { numeric: 'auto' });
 
     if (absoluteMinutes < 60) {
       return formatter.format(diffInMinutes, 'minute');

@@ -6,6 +6,7 @@ import {
   StorefrontHomepageDocument,
   StorefrontHomepageSection,
 } from '../../../../../../../core/models/project-storefront.model';
+import { createStorefrontEditorComponentNode } from '../components/storefront-editor-component.model';
 import { ensureStableStorefrontSections } from './storefront-editor-storefront.domain';
 
 type BuildDefaultHomepageDocument = (storeName: string) => ProjectStorefront['draftHomepage'];
@@ -20,6 +21,14 @@ type ManagedPageHelpers = {
   normalizeSection: NormalizeSection;
 };
 
+const REQUIRED_MANAGED_PAGES = [
+  { id: 'home', name: 'Home', kind: 'home' as const, designId: null as string | null },
+  { id: 'products', name: 'Products', kind: 'designed' as const, designId: null as string | null },
+  { id: 'product-details', name: 'Product Details', kind: 'designed' as const, designId: null as string | null },
+  { id: 'cart', name: 'Cart', kind: 'designed' as const, designId: null as string | null },
+  { id: 'checkout', name: 'Checkout', kind: 'designed' as const, designId: null as string | null },
+] as const;
+
 export function cloneStorefrontHomepageDocument(
   document: StorefrontHomepageDocument
 ): StorefrontHomepageDocument {
@@ -30,17 +39,20 @@ export function buildDefaultManagedPages(
   homeDraftDocument: StorefrontHomepageDocument | undefined,
   buildDefaultHomepageDocument: BuildDefaultHomepageDocument
 ): StorefrontEditorManagedPage[] {
-  return [
-    {
-      id: 'home',
-      name: 'Home',
-      kind: 'home',
-      designId: null,
-      draftDocument: cloneStorefrontHomepageDocument(
-        homeDraftDocument ?? buildDefaultHomepageDocument('Storefront')
-      ),
-    },
-  ];
+  return REQUIRED_MANAGED_PAGES.map((page) => ({
+    id: page.id,
+    name: page.name,
+    kind: page.kind,
+    designId: page.designId,
+    draftDocument:
+      page.id === 'home'
+        ? cloneStorefrontHomepageDocument(homeDraftDocument ?? buildDefaultHomepageDocument('Storefront'))
+        : buildDefaultManagedPageDocument(page.name, page.kind, page.designId, {
+            fallbackStoreName: 'Storefront',
+            buildDefaultHomepageDocument,
+            normalizeSection: (section) => section as StorefrontHomepageSection,
+          }),
+  }));
 }
 
 export function buildDefaultManagedPageDocument(
@@ -49,6 +61,42 @@ export function buildDefaultManagedPageDocument(
   designId: string | null,
   helpers: ManagedPageHelpers
 ): StorefrontHomepageDocument {
+  if (safeManagedPageId(pageName) === 'product-details') {
+    return buildManagedDocumentWithSingleComponent(
+      pageName,
+      kind,
+      designId,
+      helpers,
+      'product-details',
+      'Product Details',
+      640
+    );
+  }
+
+  if (safeManagedPageId(pageName) === 'cart') {
+    return buildManagedDocumentWithSingleComponent(
+      pageName,
+      kind,
+      designId,
+      helpers,
+      'cart-content',
+      'Cart',
+      640
+    );
+  }
+
+  if (safeManagedPageId(pageName) === 'checkout') {
+    return buildManagedDocumentWithSingleComponent(
+      pageName,
+      kind,
+      designId,
+      helpers,
+      'contact-form',
+      'Checkout',
+      700
+    );
+  }
+
   const storeName = helpers.fallbackStoreName;
   const document = helpers.buildDefaultHomepageDocument(storeName);
   const safePageName = pageName.trim() || 'New page';
@@ -85,6 +133,84 @@ export function buildDefaultManagedPageDocument(
   });
 
   return cloneStorefrontHomepageDocument(document);
+}
+
+function safeManagedPageId(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function buildManagedDocumentWithSingleComponent(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers,
+  componentType: 'product-details' | 'cart-content' | 'contact-form',
+  sectionLabel: string,
+  sectionHeight: number
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+
+  const block = createStorefrontEditorComponentNode(componentType);
+  block.frame = { x: 36, y: 36, width: componentType === 'cart-content' ? 1100 : 1080, height: sectionHeight - 72 };
+
+  if (componentType === 'product-details') {
+    block.responsiveFrames = {
+      tablet: { x: 24, y: 24, width: 720, height: sectionHeight - 48 },
+      mobile: { x: 16, y: 16, width: 328, height: sectionHeight - 32 },
+    };
+  }
+
+  if (componentType === 'cart-content') {
+    block.responsiveFrames = {
+      tablet: { x: 20, y: 24, width: 728, height: sectionHeight - 48 },
+      mobile: { x: 12, y: 16, width: 336, height: sectionHeight - 32 },
+    };
+  }
+
+  if (componentType === 'contact-form') {
+    block.frame = { x: 320, y: 64, width: 560, height: 520 };
+    block.name = 'Checkout form';
+  }
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: `${safeManagedPageId(pageName)}-content`,
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: sectionLabel,
+      editorBlankSection: false,
+      editorHeight: sectionHeight,
+      editorTabletHeight: sectionHeight,
+      editorMobileHeight: componentType === 'cart-content' ? 980 : componentType === 'product-details' ? 920 : 820,
+      editorComponents: [block],
+      editorBackgroundColor: '#ffffff',
+      editorBorderWidth: 0,
+      editorBorderStyle: 'none',
+      editorBorderColor: 'transparent',
+      editorRadius: 0,
+      editorShadow: 'none',
+      editorOpacity: 100,
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) => cloneStorefrontHomepageDocument({
+      ...base,
+      sections: [section],
+    }).sections[0]),
+  };
 }
 
 export function normalizeManagedPageDocument(
@@ -163,6 +289,21 @@ export function normalizeManagedPages(
 
   if (!normalized.length) {
     return buildDefaultManagedPages(normalizedHomeDraft, helpers.buildDefaultHomepageDocument);
+  }
+
+  for (const required of REQUIRED_MANAGED_PAGES) {
+    if (!normalized.some((page) => page.id === required.id)) {
+      normalized.push({
+        id: required.id,
+        name: required.name,
+        kind: required.kind,
+        designId: required.designId,
+        draftDocument:
+          required.id === 'home'
+            ? cloneStorefrontHomepageDocument(normalizedHomeDraft)
+            : buildDefaultManagedPageDocument(required.name, required.kind, required.designId, helpers),
+      });
+    }
   }
 
   const explicitHomeIndex = normalized.findIndex((page) => page.kind === 'home');

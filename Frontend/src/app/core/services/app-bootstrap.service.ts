@@ -7,7 +7,6 @@ import type { AuthUser } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AppBootstrapService {
   readonly isLoading = signal(false);
-  private readonly debugLoaderDelayMs = 3000;
 
   private initializedUserId: number | null = null;
   private initPromise: Promise<void> | null = null;
@@ -38,18 +37,10 @@ export class AppBootstrapService {
 
     this.isLoading.set(true);
 
-    const startedAt = Date.now();
-
     this.initPromise = firstValueFrom(this.profileService.getMyProfile())
       .then(async (profile) => {
         await this.authService.updateStoredUser(profile as AuthUser);
         this.initializedUserId = profile.id;
-
-        const elapsedMs = Date.now() - startedAt;
-        const remainingDelayMs = Math.max(0, this.debugLoaderDelayMs - elapsedMs);
-        if (remainingDelayMs > 0) {
-          await this.wait(remainingDelayMs);
-        }
       })
       .catch((error) => {
         console.error('Failed to bootstrap app settings', error);
@@ -61,12 +52,6 @@ export class AppBootstrapService {
       });
 
     await this.initPromise;
-  }
-
-  private wait(durationMs: number): Promise<void> {
-    return new Promise((resolve) => {
-      window.setTimeout(resolve, durationMs);
-    });
   }
 
   reset(): void {

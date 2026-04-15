@@ -6,6 +6,8 @@ import { finalize, map } from 'rxjs';
 
 import { Project } from '../../../../../../core/models/project.model';
 import { ProjectService } from '../../../../../../core/services/project.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 type SubscriberStatus = 'new' | 'engaged' | 'vip' | 'paused';
 
@@ -25,12 +27,13 @@ interface BlogSubscriberItem {
 @Component({
   selector: 'app-project-subscribers-route',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-subscribers-route.html',
 })
 export class ProjectSubscribersRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
+  private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -54,48 +57,48 @@ export class ProjectSubscribersRoute {
         name: 'Lina Rahal',
         email: 'lina@northnote.co',
         status: 'vip',
-        statusLabel: 'VIP reader',
-        sourceLabel: 'Homepage form',
-        tagLabel: 'Editorial strategy',
-        joinedLabel: 'Joined this month',
-        openRateLabel: '82% open rate',
-        lastTouchLabel: 'Replied yesterday',
+        statusLabel: this.i18n.t('project.subscribers.status.vip'),
+        sourceLabel: this.i18n.t('project.subscribers.mock.source.homepageForm'),
+        tagLabel: this.i18n.t('project.subscribers.mock.tag.editorialStrategy'),
+        joinedLabel: this.i18n.t('project.subscribers.mock.joined.thisMonth'),
+        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.82'),
+        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.repliedYesterday'),
       },
       {
         id: 2,
         name: 'Youssef Karray',
         email: 'youssef@letters.studio',
         status: 'engaged',
-        statusLabel: 'Engaged',
-        sourceLabel: 'Lead magnet',
-        tagLabel: 'Content ops',
-        joinedLabel: 'Joined 3 weeks ago',
-        openRateLabel: '61% open rate',
-        lastTouchLabel: 'Clicked Monday issue',
+        statusLabel: this.i18n.t('project.subscribers.status.engaged'),
+        sourceLabel: this.i18n.t('project.subscribers.mock.source.leadMagnet'),
+        tagLabel: this.i18n.t('project.subscribers.mock.tag.contentOps'),
+        joinedLabel: this.i18n.t('project.subscribers.mock.joined.threeWeeksAgo'),
+        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.61'),
+        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.clickedMonday'),
       },
       {
         id: 3,
         name: 'Meriem B.',
         email: 'meriem@craftmemo.com',
         status: 'new',
-        statusLabel: 'New',
-        sourceLabel: 'Article inline form',
-        tagLabel: 'Design systems',
-        joinedLabel: 'Joined today',
-        openRateLabel: 'Awaiting first send',
-        lastTouchLabel: 'No activity yet',
+        statusLabel: this.i18n.t('project.subscribers.status.new'),
+        sourceLabel: this.i18n.t('project.subscribers.mock.source.inlineForm'),
+        tagLabel: this.i18n.t('project.subscribers.mock.tag.designSystems'),
+        joinedLabel: this.i18n.t('project.subscribers.mock.joined.today'),
+        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.awaitingFirstSend'),
+        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.noneYet'),
       },
       {
         id: 4,
         name: 'Sami Ferchichi',
         email: 'sami@archive.school',
         status: 'paused',
-        statusLabel: 'Paused',
-        sourceLabel: 'Import',
-        tagLabel: 'Growth',
-        joinedLabel: 'Joined 2 months ago',
-        openRateLabel: '12% open rate',
-        lastTouchLabel: 'Needs re-engagement',
+        statusLabel: this.i18n.t('project.subscribers.status.paused'),
+        sourceLabel: this.i18n.t('project.subscribers.mock.source.import'),
+        tagLabel: this.i18n.t('project.subscribers.mock.tag.growth'),
+        joinedLabel: this.i18n.t('project.subscribers.mock.joined.twoMonthsAgo'),
+        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.12'),
+        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.needsReengagement'),
       },
     ];
   });
@@ -133,7 +136,7 @@ export class ProjectSubscribersRoute {
   loadProject(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.subscribers.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -151,7 +154,7 @@ export class ProjectSubscribersRoute {
         },
         error: () => {
           this.project.set(null);
-          this.errorMessage.set('Unable to load subscribers right now.');
+          this.errorMessage.set(this.i18n.t('project.subscribers.errors.load'));
         },
       });
   }

@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { DashboardProjectItem } from '../../../../../core/models/dashboard.model';
 import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
+import { I18nService } from '../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../landing-page/i18n/translate.pipe';
 import { DataCard } from '../home/components/data-card/data-card';
 import { ProjectCard, ProjectStatus } from './components/project-card/project-card';
 
@@ -15,11 +17,12 @@ type ProjectView = 'cards' | 'rows';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DataCard, ProjectCard],
+  imports: [CommonModule, FormsModule, RouterLink, DataCard, ProjectCard, TranslatePipe],
   templateUrl: './projects.live.html',
 })
 export class Projects implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);
+  private readonly i18n = inject(I18nService);
 
   readonly globeIcon = `
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -62,23 +65,23 @@ export class Projects implements OnInit {
   readonly activeFilterLabel = computed(() => {
     switch (this.activeFilter()) {
       case 'published':
-        return 'Published';
+        return 'dashboard.projects.filters.published';
       case 'draft':
-        return 'Draft';
+        return 'dashboard.projects.filters.draft';
       case 'archived':
-        return 'Archived';
+        return 'dashboard.projects.filters.archived';
       default:
-        return 'All projects';
+        return 'dashboard.projects.filters.all';
     }
   });
   readonly activeSortLabel = computed(() => {
     switch (this.activeSort()) {
       case 'name':
-        return 'Name';
+        return 'dashboard.projects.sort.name';
       case 'recently-created':
-        return 'Recently created';
+        return 'dashboard.projects.sort.recentlyCreated';
       default:
-        return 'Last edited';
+        return 'dashboard.projects.sort.lastEdited';
     }
   });
 
@@ -154,10 +157,10 @@ export class Projects implements OnInit {
     const status = this.readErrorStatus(error);
 
     if (status === 0) {
-      return 'Please check your connection and try again.';
+      return this.i18n.t('dashboard.projects.errors.connection');
     }
 
-    return 'Something went wrong while loading your projects. Please try again.';
+    return this.i18n.t('dashboard.projects.errors.load');
   }
 
   private readErrorStatus(error: unknown): number | undefined {

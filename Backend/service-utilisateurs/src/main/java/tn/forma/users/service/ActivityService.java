@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.beans.factory.annotation.Value;
 import tn.forma.users.websocket.ActivityRealtimeService;
 
 import java.net.URI;
@@ -26,7 +27,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +47,13 @@ public class ActivityService {
             .connectTimeout(Duration.ofSeconds(2))
             .build();
     private final ConcurrentHashMap<String, String> locationCache = new ConcurrentHashMap<>();
+        private final Set<String> locationLookupsInProgress = ConcurrentHashMap.newKeySet();
     private static final Pattern JSON_STRING_FIELD_PATTERN = Pattern.compile("\"%s\"\\s*:\\s*\"([^\"]*)\"");
+        private static final String UNKNOWN_LOCATION = "Unknown location";
+        private static final String LOCAL_NETWORK = "Local network";
+
+        @Value("${activity.geolocation.enabled:true}")
+        private boolean geolocationEnabled;
 
     @Transactional
     public String createAuthenticatedSession(User user, boolean rememberMe) {
@@ -300,14 +309,42 @@ public class ActivityService {
     private String resolveLocation(String ipAddress) {
         String normalized = ipAddress == null ? "" : ipAddress.trim();
         if (normalized.isBlank() || "Unknown".equalsIgnoreCase(normalized)) {
-            return "Unknown location";
+            return UNKNOWN_LOCATION;
         }
 
         if (isLocalOrPrivateIp(normalized)) {
-            return "Local network";
+            return LOCAL_NETWORK;
         }
 
-        return locationCache.computeIfAbsent(normalized, this::lookupLocation);
+        String cachedLocation = locationCache.get(normalized);
+        if (cachedLocation != null && !cachedLocation.isBlank()) {
+            return cachedLocation;
+        }
+
+        locationCache.putIfAbsent(normalized, UNKNOWN_LOCATION);
+
+        if (geolocationEnabled) {
+            triggerLocationLookupAsync(normalized);
+        }
+
+        return UNKNOWN_LOCATION;
+    }
+
+    private void triggerLocationLookupAsync(String ipAddress) {
+        if (!locationLookupsInProgress.add(ipAddress)) {
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                String resolvedLocation = lookupLocation(ipAddress);
+                if (!UNKNOWN_LOCATION.equalsIgnoreCase(resolvedLocation)) {
+                    locationCache.put(ipAddress, resolvedLocation);
+                }
+            } finally {
+                locationLookupsInProgress.remove(ipAddress);
+            }
+        });
     }
 
     private String detectDeviceType(String userAgent) {
@@ -376,13 +413,13 @@ public class ActivityService {
 
             HttpResponse<String> response = geoHttpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                return "Unknown location";
+                return UNKNOWN_LOCATION;
             }
 
             String body = response.body();
             String status = extractJsonField(body, "status");
             if (!"success".equalsIgnoreCase(status)) {
-                return "Unknown location";
+                return UNKNOWN_LOCATION;
             }
 
             String city = extractJsonField(body, "city");
@@ -396,10 +433,10 @@ public class ActivityService {
                 return country;
             }
 
-            return "Unknown location";
+            return UNKNOWN_LOCATION;
         } catch (Exception exception) {
             log.debug("Failed to resolve geolocation for IP {}", ipAddress, exception);
-            return "Unknown location";
+            return UNKNOWN_LOCATION;
         }
     }
 

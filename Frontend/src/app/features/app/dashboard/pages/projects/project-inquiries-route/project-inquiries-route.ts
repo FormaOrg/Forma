@@ -9,22 +9,25 @@ import {
   PortfolioInquiryStatus,
 } from '../../../../../../core/models/portfolio-inquiries.model';
 import { PortfolioInquiriesService } from '../../../../../../core/services/portfolio-inquiries.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 @Component({
   selector: 'app-project-inquiries-route',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-inquiries-route.html',
   styleUrl: './project-inquiries-route.css',
 })
 export class ProjectInquiriesRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly portfolioInquiriesService = inject(PortfolioInquiriesService);
+  private readonly i18n = inject(I18nService);
 
   readonly statusOptions: ReadonlyArray<{ value: PortfolioInquiryStatus; label: string }> = [
-    { value: 'new', label: 'New' },
-    { value: 'replied', label: 'Replied' },
-    { value: 'scheduled', label: 'Call scheduled' },
+    { value: 'new', label: 'project.inquiries.status.new' },
+    { value: 'replied', label: 'project.inquiries.status.replied' },
+    { value: 'scheduled', label: 'project.inquiries.status.scheduled' },
   ];
 
   readonly projectId = toSignal(
@@ -71,7 +74,7 @@ export class ProjectInquiriesRoute {
   loadProject(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.inquiries.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -91,7 +94,7 @@ export class ProjectInquiriesRoute {
         error: () => {
           this.page.set(null);
           this.inquiries.set([]);
-          this.errorMessage.set('Unable to load portfolio inquiries right now.');
+          this.errorMessage.set(this.i18n.t('project.inquiries.errors.load'));
         },
       });
   }
@@ -155,12 +158,12 @@ export class ProjectInquiriesRoute {
 
   formatReceivedLabel(value: string | null | undefined): string {
     if (!value) {
-      return 'Recently';
+      return this.i18n.t('project.inquiries.time.recently');
     }
 
     const parsed = Date.parse(value);
     if (!Number.isFinite(parsed)) {
-      return 'Recently';
+      return this.i18n.t('project.inquiries.time.recently');
     }
 
     const now = Date.now();
@@ -170,14 +173,18 @@ export class ProjectInquiriesRoute {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffMinutes < 60) {
-      return diffMinutes <= 1 ? 'Just now' : `${diffMinutes} minutes ago`;
+      return diffMinutes <= 1
+        ? this.i18n.t('project.inquiries.time.justNow')
+        : `${diffMinutes} ${this.i18n.t('project.inquiries.time.minutesAgo')}`;
     }
     if (diffHours < 24) {
-      return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+      return diffHours === 1
+        ? `1 ${this.i18n.t('project.inquiries.time.hourAgo')}`
+        : `${diffHours} ${this.i18n.t('project.inquiries.time.hoursAgo')}`;
     }
     if (diffDays === 1) {
-      return 'Yesterday';
+      return this.i18n.t('project.inquiries.time.yesterday');
     }
-    return `${diffDays} days ago`;
+    return `${diffDays} ${this.i18n.t('project.inquiries.time.daysAgo')}`;
   }
 }

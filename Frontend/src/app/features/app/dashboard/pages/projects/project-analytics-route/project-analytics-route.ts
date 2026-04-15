@@ -15,16 +15,17 @@ import {
 } from 'chart.js';
 import {
   AnalyticsRangePreset,
-  ProjectAnalyticsMetricFormat,
   ProjectAnalyticsMetricOption,
   ProjectAnalyticsPageResponse
 } from '../../../../../../core/models/project-analytics.model';
 import { ProjectAnalyticsService } from '../../../../../../core/services/project-analytics.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
-const RANGE_OPTIONS: ReadonlyArray<{ label: string; value: AnalyticsRangePreset }> = [
-  { label: '7 days', value: 'LAST_7_DAYS' },
-  { label: '30 days', value: 'LAST_30_DAYS' },
-  { label: '90 days', value: 'LAST_90_DAYS' }
+const RANGE_OPTIONS: ReadonlyArray<{ key: string; value: AnalyticsRangePreset }> = [
+  { key: 'project.analytics.range.7days', value: 'LAST_7_DAYS' },
+  { key: 'project.analytics.range.30days', value: 'LAST_30_DAYS' },
+  { key: 'project.analytics.range.90days', value: 'LAST_90_DAYS' }
 ] as const;
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Filler);
@@ -32,13 +33,14 @@ Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearS
 @Component({
   selector: 'app-project-analytics-route',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './project-analytics-route.html',
 })
 export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly analyticsService = inject(ProjectAnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject(I18nService);
   private trendChart?: Chart;
   private viewReady = false;
   private analyticsRequestToken = 0;
@@ -59,16 +61,16 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   readonly activeMetric = computed(() => this.metricOptions().find((option) => option.key === this.selectedMetric()) ?? this.metricOptions()[0] ?? null);
   readonly heroTitle = computed(() =>
     this.analytics()?.kind === 'PORTFOLIO'
-      ? 'See how your portfolio is pulling people in.'
-      : 'See the signals that actually matter.'
+      ? this.i18n.t('project.analytics.hero.portfolioTitle')
+      : this.i18n.t('project.analytics.hero.ecommerceTitle')
   );
   readonly heroSubtitle = computed(() => {
     const projectId = this.projectId();
     if (this.analytics()?.kind === 'PORTFOLIO') {
-      return `One clean overview for project #${projectId ?? '—'} with the visitor, page, and inquiry signals worth checking first.`;
+      return `${this.i18n.t('project.analytics.hero.portfolioSubtitle.prefix')} #${projectId ?? '—'} ${this.i18n.t('project.analytics.hero.portfolioSubtitle.suffix')}`;
     }
 
-    return `One clean overview for project #${projectId ?? '—'} with the customer, order, revenue, and product signals worth checking first.`;
+    return `${this.i18n.t('project.analytics.hero.ecommerceSubtitle.prefix')} #${projectId ?? '—'} ${this.i18n.t('project.analytics.hero.ecommerceSubtitle.suffix')}`;
   });
 
   ngOnInit(): void {
@@ -111,7 +113,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     const projectId = this.projectId();
     if (!projectId) {
       this.analytics.set(null);
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.analytics.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -145,7 +147,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
           }
           this.analytics.set(null);
           this.isLoading.set(false);
-          this.errorMessage.set('We could not load analytics right now.');
+          this.errorMessage.set(this.i18n.t('project.analytics.errors.load'));
           this.renderTrendChart();
         }
       });
@@ -273,7 +275,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private formatInteger(value: number): string {
-    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', { maximumFractionDigits: 0 }).format(value);
   }
 
   formatPercentDelta(value: number): string {
@@ -281,10 +283,10 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private formatCurrency(value: number): string {
-    return `${new Intl.NumberFormat('en-US', {
+    return `${new Intl.NumberFormat(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', {
       minimumFractionDigits: value % 1 === 0 ? 0 : 2,
       maximumFractionDigits: 2
-    }).format(value)} TND`;
+    }).format(value)} ${this.i18n.t('project.analytics.common.currency')}`;
   }
 
   private formatAxisTick(value: number, metric: ProjectAnalyticsMetricOption): string {
