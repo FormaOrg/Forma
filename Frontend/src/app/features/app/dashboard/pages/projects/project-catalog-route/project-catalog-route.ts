@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { finalize, map } from 'rxjs';
 
@@ -18,6 +25,13 @@ import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 
 type CatalogStatusFilter = 'ALL' | ProjectCatalogStatus;
+
+const trimmedRequired: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const value = control.value;
+  return typeof value === 'string' && value.trim().length === 0
+    ? { required: true }
+    : null;
+};
 
 @Component({
   selector: 'app-project-catalog-route',
@@ -82,7 +96,7 @@ export class ProjectCatalogRoute {
   ];
 
   readonly productForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(140)]],
+    name: ['', [Validators.required, trimmedRequired, Validators.maxLength(140)]],
     description: ['', [Validators.maxLength(2000)]],
     sku: ['', [Validators.maxLength(80)]],
     category: ['', [Validators.maxLength(120)]],
@@ -231,7 +245,7 @@ export class ProjectCatalogRoute {
 
     const payload = this.buildPayload();
     if (!payload) {
-      this.toastService.error('Please review the product price and inventory values.');
+      this.toastService.error('Please review the product name, price, and inventory values.');
       return;
     }
 
@@ -439,9 +453,14 @@ export class ProjectCatalogRoute {
 
   private buildPayload(): CreateProjectCatalogProductRequest | UpdateProjectCatalogProductRequest | null {
     const raw = this.productForm.getRawValue();
+    const name = raw.name.trim();
     const price = Number(raw.price);
     const compareAtPrice = raw.compareAtPrice.trim() ? Number(raw.compareAtPrice) : null;
     const inventoryQuantity = Number(raw.inventoryQuantity);
+
+    if (!name) {
+      return null;
+    }
 
     if (!Number.isFinite(price) || price < 0 || !Number.isInteger(inventoryQuantity) || inventoryQuantity < 0) {
       return null;
@@ -452,7 +471,7 @@ export class ProjectCatalogRoute {
     }
 
     return {
-      name: raw.name.trim(),
+      name,
       description: this.blankToNull(raw.description),
       sku: this.blankToNull(raw.sku),
       category: this.blankToNull(raw.category),
@@ -481,11 +500,28 @@ export class ProjectCatalogRoute {
   private readErrorMessage(error: unknown, fallback: string): string {
     if (typeof error === 'object' && error && 'error' in error) {
       const payload = (error as { error?: unknown }).error;
+      if (typeof payload === 'string' && payload.trim()) {
+        return payload;
+      }
       if (typeof payload === 'object' && payload && 'message' in payload) {
         const message = (payload as { message?: unknown }).message;
         if (typeof message === 'string' && message.trim()) {
           return message;
         }
+      }
+      if (typeof payload === 'object' && payload) {
+        const fieldMessages = Object.values(payload)
+          .filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
+        if (fieldMessages.length > 0) {
+          return fieldMessages.join(' ');
+        }
+      }
+    }
+
+    if (typeof error === 'object' && error && 'message' in error) {
+      const message = (error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
       }
     }
 

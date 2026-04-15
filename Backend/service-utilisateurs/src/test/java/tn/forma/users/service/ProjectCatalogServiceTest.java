@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tn.forma.users.dto.CreateProjectProductRequest;
 import tn.forma.users.dto.ProjectCatalogPageDto;
 import tn.forma.users.dto.UpdateProjectProductRequest;
@@ -39,6 +40,9 @@ class ProjectCatalogServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
     private ProjectCatalogService projectCatalogService;
@@ -132,7 +136,7 @@ class ProjectCatalogServiceTest {
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
-        when(projectProductRepository.save(any(ProjectProduct.class))).thenReturn(savedProduct);
+        when(projectProductRepository.saveAndFlush(any(ProjectProduct.class))).thenReturn(savedProduct);
 
         var created = projectCatalogService.createProduct(user.getEmail(), project.getId(), createRequest);
 

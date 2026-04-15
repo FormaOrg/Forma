@@ -1,6 +1,8 @@
 package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.forma.users.dto.CreateProjectProductRequest;
@@ -35,6 +37,7 @@ public class ProjectCatalogService {
     private final ProjectProductRepository projectProductRepository;
     private final ProjectOrderRepository projectOrderRepository;
     private final UserRepository userRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     public ProjectCatalogPageDto getCatalogPage(
             String email,
@@ -79,24 +82,20 @@ public class ProjectCatalogService {
     @Transactional
     public ProjectCatalogProductDto createProduct(String email, Long projectId, CreateProjectProductRequest request) {
         Project project = getOwnedProject(email, projectId);
+        ProjectProduct product = buildProduct(project, request);
 
-        ProjectProduct product = ProjectProduct.builder()
-                .project(project)
-                .name(request.getName().trim())
-                .description(blankToNull(request.getDescription()))
-                .sku(blankToNull(request.getSku()))
-                .category(blankToNull(request.getCategory()))
-                .productType(request.getProductType())
-                .status(request.getStatus())
-                .price(request.getPrice())
-                .compareAtPrice(normalizePrice(request.getCompareAtPrice()))
-                .inventoryQuantity(request.getInventoryQuantity())
-                .imageUrl(blankToNull(request.getImageUrl()))
-                .tagsCsv(toTagsCsv(request.getTags()))
-                .active(request.getStatus() == ProjectProductStatus.ACTIVE)
-                .build();
+        syncProjectProductSequence();
 
-        return mapToDto(projectProductRepository.save(product));
+        try {
+            return mapToDto(projectProductRepository.saveAndFlush(product));
+        } catch (DataIntegrityViolationException exception) {
+            if (!isProjectProductPrimaryKeyConflict(exception)) {
+                throw exception;
+            }
+
+            syncProjectProductSequence();
+            return mapToDto(projectProductRepository.saveAndFlush(buildProduct(project, request)));
+        }
     }
 
     @Transactional
@@ -303,6 +302,52 @@ public class ProjectCatalogService {
     private ProjectProduct getOwnedProduct(Long projectId, Long productId) {
         return projectProductRepository.findByIdAndProjectId(productId, projectId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
+    private ProjectProduct buildProduct(Project project, CreateProjectProductRequest request) {
+        return ProjectProduct.builder()
+                .project(project)
+                .name(request.getName().trim())
+                .description(blankToNull(request.getDescription()))
+                .sku(blankToNull(request.getSku()))
+                .category(blankToNull(request.getCategory()))
+                .productType(request.getProductType())
+                .status(request.getStatus())
+                .price(request.getPrice())
+                .compareAtPrice(normalizePrice(request.getCompareAtPrice()))
+                .inventoryQuantity(request.getInventoryQuantity())
+                .imageUrl(blankToNull(request.getImageUrl()))
+                .tagsCsv(toTagsCsv(request.getTags()))
+                .active(request.getStatus() == ProjectProductStatus.ACTIVE)
+                .build();
+    }
+
+    private void syncProjectProductSequence() {
+        if (jdbcTemplate == null) {
+            return;
+        }
+
+        jdbcTemplate.execute("""
+                SELECT setval(
+                    pg_get_serial_sequence('project_products', 'id'),
+                    COALESCE((SELECT MAX(id) FROM project_products), 1),
+                    (SELECT COUNT(*) > 0 FROM project_products)
+                );
+                """);
+    }
+
+    private boolean isProjectProductPrimaryKeyConflict(DataIntegrityViolationException exception) {
+        Throwable current = exception;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null
+                    && message.contains("project_products_pkey")
+                    && message.contains("duplicate key value")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private BigDecimal normalizePrice(BigDecimal price) {
