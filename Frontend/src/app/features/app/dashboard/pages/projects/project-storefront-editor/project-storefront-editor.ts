@@ -13453,23 +13453,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     // Keep stage height CSS-driven; mutating it while scrolling causes jumpy behavior at high zoom.
     this.previewStageLogicalHeight.set(null);
 
-    const zoom = Math.max(this.previewZoomScale(), 0.01);
-
-    const canvas = stage.querySelector('.storefront-editor__preview-canvas') as HTMLElement | null;
-    const maxCompensation = 96;
-    const compensationScale = 0.25;
-    const compensation = canvas
-      ? zoom > 1.2
-        ? Math.max(
-            0,
-            Math.min(
-              maxCompensation,
-              Math.round((canvas.getBoundingClientRect().height - canvas.offsetHeight) * compensationScale)
-            )
-          )
-        : 0
-      : 0;
-    this.previewStageScrollCompensation.set(compensation);
+    this.previewStageScrollCompensation.set(0);
 
     const hasScrollbar = stage.scrollHeight > stage.clientHeight + 1;
     this.hasPreviewStageScrollbar.set(hasScrollbar);
