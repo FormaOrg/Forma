@@ -57,6 +57,24 @@ public class ProjectCustomer {
     @Column(name = "zone_label", length = 120)
     private String zoneLabel;
 
+    @Size(max = 120)
+    @Column(name = "account_password_hash", length = 120)
+    private String accountPasswordHash;
+
+    @Column(name = "account_enabled", nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private boolean accountEnabled = false;
+
+    @Size(max = 128)
+    @Column(name = "account_session_hash", length = 128)
+    private String accountSessionHash;
+
+    @Column(name = "account_session_expires_at")
+    private LocalDateTime accountSessionExpiresAt;
+
+    @Column(name = "account_last_login_at")
+    private LocalDateTime accountLastLoginAt;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
