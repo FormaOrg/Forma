@@ -40,12 +40,15 @@ public class GoogleLinkOauthService {
     @Value("${application.google.link-redirect-uri:}")
     private String linkRedirectUri;
 
+    @Value("${application.frontend-url:http://localhost:4200}")
+    private String frontendUrl;
+
     public GoogleLinkConfigResponse getConfig() {
-        if (linkClientId == null || linkClientId.isBlank() || linkRedirectUri == null || linkRedirectUri.isBlank()) {
+        if (linkClientId == null || linkClientId.isBlank()) {
             throw new RuntimeException("Google account linking is not configured");
         }
 
-        return new GoogleLinkConfigResponse(linkClientId, linkRedirectUri);
+        return new GoogleLinkConfigResponse(linkClientId, resolveRedirectUri());
     }
 
     public GoogleIdToken.Payload exchangeCodeForPayload(String code, String redirectUri) {
@@ -137,5 +140,14 @@ public class GoogleLinkOauthService {
         }
 
         return redirectUri.endsWith("/") ? redirectUri.substring(0, redirectUri.length() - 1) : redirectUri;
+    }
+
+    private String resolveRedirectUri() {
+        if (linkRedirectUri != null && !linkRedirectUri.isBlank()) {
+            return linkRedirectUri;
+        }
+
+        String normalizedFrontendUrl = normalizeRedirectUri(frontendUrl);
+        return normalizedFrontendUrl + "/google-oauth-popup.html";
     }
 }
