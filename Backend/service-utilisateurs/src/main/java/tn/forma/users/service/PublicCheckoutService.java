@@ -42,6 +42,7 @@ public class PublicCheckoutService {
     private final ProjectProductRepository projectProductRepository;
     private final ProjectCustomerRepository projectCustomerRepository;
     private final ProjectOrderRepository projectOrderRepository;
+    private final PublicStorefrontAccountService publicStorefrontAccountService;
 
     @Transactional
     public PublicCheckoutResponse checkout(Long projectId, PublicCheckoutRequest request) {
@@ -128,6 +129,19 @@ public class PublicCheckoutService {
     }
 
     private ProjectCustomer findOrCreateCustomer(Project project, PublicCheckoutRequest request) {
+        Optional<ProjectCustomer> authenticatedCustomer = publicStorefrontAccountService
+                .resolveAuthenticatedCustomer(project.getId(), request.getCustomerSessionToken());
+
+        if (authenticatedCustomer.isPresent()) {
+            ProjectCustomer customer = authenticatedCustomer.get();
+            customer.setFirstName(requireValue(request.getFirstName(), "First name is required"));
+            customer.setLastName(requireValue(request.getLastName(), "Last name is required"));
+            customer.setPhone(requireValue(request.getPhone(), "Phone is required"));
+            customer.setEmail(blankToNull(request.getEmail()));
+            customer.setAddress(requireValue(request.getAddress(), "Address is required"));
+            return projectCustomerRepository.save(customer);
+        }
+
         String email = blankToNull(request.getEmail());
         String phone = requireValue(request.getPhone(), "Phone is required");
 

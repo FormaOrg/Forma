@@ -26,6 +26,9 @@ public interface ProjectOrderRepository extends JpaRepository<ProjectOrder, Long
     @EntityGraph(attributePaths = {"customer", "items", "items.product"})
     Optional<ProjectOrder> findByIdAndProjectId(Long id, Long projectId);
 
+        @EntityGraph(attributePaths = {"customer", "items", "items.product"})
+        List<ProjectOrder> findAllByProjectIdAndCustomerIdOrderByPlacedAtDesc(Long projectId, Long customerId);
+
     List<ProjectOrder> findAllByIdInAndProjectId(List<Long> ids, Long projectId);
 
     @Query("""
