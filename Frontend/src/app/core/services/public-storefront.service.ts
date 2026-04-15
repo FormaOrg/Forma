@@ -4,6 +4,9 @@ import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   EditorStorefrontPreviewSnapshot,
+  PublicStorefrontAccountLoginRequest,
+  PublicStorefrontAccountRegisterRequest,
+  PublicStorefrontCustomerAccount,
   PublicCheckoutRequest,
   PublicCheckoutResponse,
   PublicStorefrontHome,
@@ -59,6 +62,30 @@ export class PublicStorefrontService {
 
   checkout(projectId: number, payload: PublicCheckoutRequest): Observable<PublicCheckoutResponse> {
     return this.http.post<PublicCheckoutResponse>(`${this.baseUrl}/${projectId}/checkout`, payload);
+  }
+
+  registerAccount(projectId: number, payload: PublicStorefrontAccountRegisterRequest): Observable<PublicStorefrontCustomerAccount> {
+    return this.http.post<PublicStorefrontCustomerAccount>(`${this.baseUrl}/${projectId}/account/register`, payload);
+  }
+
+  loginAccount(projectId: number, payload: PublicStorefrontAccountLoginRequest): Observable<PublicStorefrontCustomerAccount> {
+    return this.http.post<PublicStorefrontCustomerAccount>(`${this.baseUrl}/${projectId}/account/login`, payload);
+  }
+
+  getAccount(projectId: number, sessionToken: string): Observable<PublicStorefrontCustomerAccount> {
+    return this.http.get<PublicStorefrontCustomerAccount>(`${this.baseUrl}/${projectId}/account`, {
+      headers: {
+        'X-Storefront-Customer-Token': sessionToken,
+      },
+    });
+  }
+
+  logoutAccount(projectId: number, sessionToken: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${projectId}/account/logout`, null, {
+      headers: {
+        'X-Storefront-Customer-Token': sessionToken,
+      },
+    });
   }
 
   saveEditorPreviewSnapshot(projectId: number, snapshot: EditorStorefrontPreviewSnapshot): void {

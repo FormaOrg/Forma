@@ -54,6 +54,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public-storefront/storefront-checkout/storefront-checkout').then((m) => m.StorefrontCheckout)
   },
   {
+    path: 'store/:projectId/account',
+    loadComponent: () => import('./features/public-storefront/storefront-account/storefront-account').then((m) => m.StorefrontAccount)
+  },
+  {
     path: 'store/:projectId/products',
     loadComponent: () => import('./features/public-storefront/storefront-products/storefront-products').then((m) => m.StorefrontProducts)
   },
