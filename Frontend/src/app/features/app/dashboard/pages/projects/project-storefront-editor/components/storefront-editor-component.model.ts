@@ -189,8 +189,17 @@ export interface StorefrontEditorSearchProps {
   placeholder: string;
 }
 
+export type StorefrontEditorAccountIconStyle =
+  | 'person-outline'
+  | 'person-filled'
+  | 'person-circle-outline'
+  | 'person-circle-filled';
+
 export interface StorefrontEditorAccountProps {
   iconColor: string;
+  iconStyle: StorefrontEditorAccountIconStyle;
+  iconSize: number;
+  borderColor: string;
 }
 
 export interface StorefrontEditorIconProps {
@@ -948,6 +957,9 @@ export function createStorefrontEditorComponentNode(
         name: 'Account',
         props: {
           iconColor: '#111827',
+          iconStyle: 'person-outline',
+          iconSize: 24,
+          borderColor: '#111827',
         },
       };
     case 'cart':
