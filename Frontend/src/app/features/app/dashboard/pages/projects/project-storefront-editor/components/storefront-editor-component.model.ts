@@ -15,6 +15,7 @@ export type StorefrontEditorComponentType =
   | 'social-links'
   | 'faq'
   | 'contact-form'
+  | 'testimonials'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -240,6 +241,23 @@ export interface StorefrontEditorContactFormProps {
   successMessage: string;
 }
 
+export interface StorefrontEditorTestimonialItem {
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+  initials: string;
+}
+
+export interface StorefrontEditorTestimonialsProps {
+  title: string;
+  layout: 'grid' | 'stack';
+  accentColor: string;
+  cardBackground: string;
+  textColor: string;
+  items: StorefrontEditorTestimonialItem[];
+}
+
 export interface StorefrontEditorContainerProps {
   layout: 'stack' | 'row' | 'grid';
   gap: number;
@@ -347,6 +365,7 @@ export type StorefrontEditorSpacerNode = StorefrontEditorComponentBase<'spacer',
 export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'social-links', StorefrontEditorSocialLinksProps>;
 export type StorefrontEditorFaqNode = StorefrontEditorComponentBase<'faq', StorefrontEditorFaqProps>;
 export type StorefrontEditorContactFormNode = StorefrontEditorComponentBase<'contact-form', StorefrontEditorContactFormProps>;
+export type StorefrontEditorTestimonialsNode = StorefrontEditorComponentBase<'testimonials', StorefrontEditorTestimonialsProps>;
 export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'container', StorefrontEditorContainerProps>;
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
 export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'product-feed', StorefrontEditorProductFeedProps>;
@@ -369,6 +388,7 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorSocialLinksNode
   | StorefrontEditorFaqNode
   | StorefrontEditorContactFormNode
+  | StorefrontEditorTestimonialsNode
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
   | StorefrontEditorProductFeedNode
@@ -428,6 +448,8 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 430, width: 420, height: 220 };
     case 'contact-form':
       return { x: 32, y: 430, width: 440, height: 520 };
+    case 'testimonials':
+      return { x: 32, y: 32, width: 560, height: 320 };
     case 'container':
       return { x: 32, y: 32, width: 340, height: 220 };
     case 'graphic':
@@ -1041,6 +1063,41 @@ export function createStorefrontEditorComponentNode(
           submitLabel: 'Send message',
           consentLabel: 'I agree to be contacted about my request.',
           successMessage: 'Thanks, your message is ready to send.',
+        },
+      };
+    case 'testimonials':
+      return {
+        ...createStorefrontEditorComponentBase('testimonials'),
+        name: 'Testimonials',
+        props: {
+          title: 'What customers say',
+          layout: 'grid',
+          accentColor: '#f59e0b',
+          cardBackground: '#ffffff',
+          textColor: '#0f172a',
+          items: [
+            {
+              name: 'Sarah M.',
+              role: 'Verified buyer',
+              text: 'Absolutely love this product. The quality exceeded my expectations and shipping was super fast.',
+              rating: 5,
+              initials: 'SM',
+            },
+            {
+              name: 'James T.',
+              role: 'Verified buyer',
+              text: 'Great value for the price. Already recommended it to three friends. Will definitely buy again.',
+              rating: 5,
+              initials: 'JT',
+            },
+            {
+              name: 'Priya L.',
+              role: 'Verified buyer',
+              text: 'Beautiful packaging, fast delivery, and the product is exactly as described. Five stars.',
+              rating: 5,
+              initials: 'PL',
+            },
+          ],
         },
       };
     case 'container':

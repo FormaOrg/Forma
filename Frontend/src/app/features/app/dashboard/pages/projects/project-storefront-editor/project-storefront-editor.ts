@@ -46,6 +46,8 @@ import {
   StorefrontEditorAccountIconStyle,
   StorefrontEditorAccountNode,
   StorefrontEditorCartIconStyle,
+  StorefrontEditorTestimonialItem,
+  StorefrontEditorTestimonialsNode,
   StorefrontEditorCartNode,
   StorefrontEditorCartContentNode,
   StorefrontEditorComponentNode,
@@ -146,6 +148,8 @@ type ButtonToolbarMenu =
 type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
 type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
 type AccountToolbarMenu = 'style' | 'settings' | null;
+type TestimonialsToolbarMenu = 'settings' | null;
+type TestimonialsSettingsSection = 'style' | 'reviews' | 'layout';
 type CartToolbarMenu = 'edit-text' | 'settings' | null;
 type CartContentToolbarMenu = 'edit-text' | 'settings' | null;
 type ProductDetailsToolbarMenu = 'edit-text' | 'settings' | null;
@@ -806,6 +810,10 @@ readonly selectedAccountComponent = computed<StorefrontEditorAccountNode | null>
   const component = this.selectedComponent();
   return component?.type === 'account' ? component : null;
 });
+readonly selectedTestimonialsComponent = computed<StorefrontEditorTestimonialsNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'testimonials' ? component : null;
+});
 readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
   const component = this.selectedComponent();
   return component?.type === 'cart' ? component : null;
@@ -850,6 +858,9 @@ readonly isParagraphToolbarVisible = computed(
   );
 readonly isAccountToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedAccountComponent() !== null
+);
+readonly isTestimonialsToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedTestimonialsComponent() !== null
 );
 readonly isCartToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartComponent() !== null
@@ -960,6 +971,8 @@ readonly activeSearchToolbarMenu = signal<SearchToolbarMenu>(null);
 readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
+  readonly activeTestimonialsToolbarMenu = signal<TestimonialsToolbarMenu>(null);
+  readonly activeTestimonialsSettingsSection = signal<TestimonialsSettingsSection>('style');
   readonly activeButtonColorPickerTab = signal<'brand' | 'custom'>('brand');
   readonly savedButtonColors = signal<string[]>([]);
   readonly buttonCustomPickerHue = signal(228);
@@ -1967,6 +1980,13 @@ effect(() => {
 });
 
 effect(() => {
+  if (!this.selectedTestimonialsComponent()) {
+    this.activeTestimonialsToolbarMenu.set(null);
+    this.activeTestimonialsSettingsSection.set('style');
+  }
+});
+
+effect(() => {
   if (!this.selectedCartComponent()) {
     this.activeCartToolbarMenu.set(null);
     this.activeCartSettingsSection.set('cart-icon');
@@ -2127,6 +2147,12 @@ effect(() => {
 if (event.key === 'Escape' && this.activeAccountToolbarMenu()) {
   event.preventDefault();
   this.activeAccountToolbarMenu.set(null);
+  return;
+}
+
+if (event.key === 'Escape' && this.activeTestimonialsToolbarMenu()) {
+  event.preventDefault();
+  this.activeTestimonialsToolbarMenu.set(null);
   return;
 }
 
@@ -4852,6 +4878,7 @@ finishEditingComponentText(): void {
   this.closeMenuItemLinkEditor();
   this.renamingMenuItemId.set(null);
 this.activeAccountToolbarMenu.set(null);
+this.activeTestimonialsToolbarMenu.set(null);
 this.activeCartToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
 this.closeButtonTextDropdownMenu();
@@ -7166,6 +7193,81 @@ accountIconStyleLabel(style: StorefrontEditorAccountIconStyle | null | undefined
 
 isAccountCircleStyle(style: StorefrontEditorAccountIconStyle | null | undefined): boolean {
   return style === 'person-circle-outline' || style === 'person-circle-filled';
+}
+
+toggleTestimonialsToolbarMenu(menu: Exclude<TestimonialsToolbarMenu, null>): void {
+  this.activeTestimonialsToolbarMenu.set(this.activeTestimonialsToolbarMenu() === menu ? null : menu);
+}
+
+setTestimonialsSettingsSection(section: TestimonialsSettingsSection): void {
+  this.activeTestimonialsSettingsSection.set(section);
+}
+
+updateTestimonialsTitle(value: string): void {
+  this.updateSelectedTestimonialsProps({ title: value });
+}
+
+updateTestimonialsLayout(layout: StorefrontEditorTestimonialsNode['props']['layout']): void {
+  this.updateSelectedTestimonialsProps({ layout });
+}
+
+updateTestimonialsAccentColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') { return; }
+  this.updateSelectedTestimonialsProps({ accentColor: normalized });
+}
+
+updateTestimonialsCardBackground(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') { return; }
+  this.updateSelectedTestimonialsProps({ cardBackground: normalized });
+}
+
+updateTestimonialsTextColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') { return; }
+  this.updateSelectedTestimonialsProps({ textColor: normalized });
+}
+
+updateTestimonialItem(index: number, patch: Partial<StorefrontEditorTestimonialItem>): void {
+  const component = this.selectedTestimonialsComponent();
+  if (!component) { return; }
+  const merged = { ...component.props.items[index], ...patch };
+  if (patch.name !== undefined) {
+    merged.initials = patch.name
+      .split(' ')
+      .filter(Boolean)
+      .map((w) => w[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'C';
+  }
+  const items = component.props.items.map((item, i) => i === index ? merged : item);
+  this.updateSelectedTestimonialsProps({ items });
+}
+
+addTestimonialItem(): void {
+  const component = this.selectedTestimonialsComponent();
+  if (!component) { return; }
+  const newItem: StorefrontEditorTestimonialItem = {
+    name: 'Customer',
+    role: 'Verified buyer',
+    text: 'Great product, highly recommend!',
+    rating: 5,
+    initials: 'C',
+  };
+  this.updateSelectedTestimonialsProps({ items: [...component.props.items, newItem] });
+}
+
+removeTestimonialItem(index: number): void {
+  const component = this.selectedTestimonialsComponent();
+  if (!component || component.props.items.length <= 1) { return; }
+  const items = component.props.items.filter((_, i) => i !== index);
+  this.updateSelectedTestimonialsProps({ items });
+}
+
+setTestimonialRating(index: number, rating: number): void {
+  this.updateTestimonialItem(index, { rating });
 }
 
 toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
@@ -11098,6 +11200,17 @@ private updateSelectedAccountProps(
       ? { ...current, props: { ...current.props, ...patch } }
       : current,
     options
+  );
+}
+
+private updateSelectedTestimonialsProps(patch: Partial<StorefrontEditorTestimonialsNode['props']>): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedTestimonialsComponent();
+  if (!sectionId || !component) { return; }
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'testimonials'
+      ? { ...current, props: { ...current.props, ...patch } }
+      : current
   );
 }
 

@@ -18,6 +18,7 @@ import { StorefrontEditorBlockSpacerComponent } from './blocks/storefront-editor
 import { StorefrontEditorBlockSocialLinksComponent } from './blocks/storefront-editor-block-social-links.component';
 import { StorefrontEditorBlockFaqComponent } from './blocks/storefront-editor-block-faq.component';
 import { StorefrontEditorBlockContactFormComponent } from './blocks/storefront-editor-block-contact-form.component';
+import { StorefrontEditorBlockTestimonialsComponent } from './blocks/storefront-editor-block-testimonials.component';
 import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-editor-block-container.component';
 import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
 import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-editor-block-product-feed.component';
@@ -44,6 +45,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
     StorefrontEditorBlockSocialLinksComponent,
     StorefrontEditorBlockFaqComponent,
     StorefrontEditorBlockContactFormComponent,
+    StorefrontEditorBlockTestimonialsComponent,
     StorefrontEditorBlockContainerComponent,
     StorefrontEditorBlockGraphicComponent,
     StorefrontEditorBlockProductFeedComponent,
@@ -114,6 +116,9 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
       }
       @case ('contact-form') {
         <app-storefront-editor-block-contact-form [node]="$any(node())" />
+      }
+      @case ('testimonials') {
+        <app-storefront-editor-block-testimonials [node]="$any(node())" />
       }
       @case ('container') {
         <app-storefront-editor-block-container [node]="$any(node())" />
