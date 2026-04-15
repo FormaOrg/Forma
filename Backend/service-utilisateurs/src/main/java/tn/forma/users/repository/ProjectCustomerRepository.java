@@ -12,4 +12,6 @@ public interface ProjectCustomerRepository extends JpaRepository<ProjectCustomer
     java.util.Optional<ProjectCustomer> findByIdAndProjectId(Long id, Long projectId);
     java.util.Optional<ProjectCustomer> findFirstByProjectIdAndEmailIgnoreCase(Long projectId, String email);
     java.util.Optional<ProjectCustomer> findFirstByProjectIdAndPhone(Long projectId, String phone);
+    java.util.Optional<ProjectCustomer> findByProjectIdAndEmailIgnoreCase(Long projectId, String email);
+    java.util.Optional<ProjectCustomer> findByProjectIdAndAccountSessionHash(Long projectId, String accountSessionHash);
 }

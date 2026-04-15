@@ -38,6 +38,9 @@ public class PublicCheckoutRequest {
     @Size(max = 1000)
     private String notes;
 
+    @Size(max = 512)
+    private String customerSessionToken;
+
     @Valid
     @NotEmpty
     private List<PublicCheckoutItemRequest> items = new ArrayList<>();
