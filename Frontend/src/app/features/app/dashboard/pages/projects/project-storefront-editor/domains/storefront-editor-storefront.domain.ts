@@ -195,6 +195,7 @@ function buildHeaderAccountComponent(parentContainerId: string): StorefrontEdito
     props: {
       ...account.props,
       iconColor: '#0f172a',
+      borderColor: '#0f172a',
     },
   };
 }

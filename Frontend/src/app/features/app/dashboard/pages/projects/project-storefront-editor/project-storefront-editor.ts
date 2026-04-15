@@ -43,6 +43,8 @@ import {
   filterStorefrontEditorAddElementsLibraryItems,
 } from './components/storefront-editor-component-library';
 import {
+  StorefrontEditorAccountIconStyle,
+  StorefrontEditorAccountNode,
   StorefrontEditorCartIconStyle,
   StorefrontEditorCartNode,
   StorefrontEditorCartContentNode,
@@ -73,6 +75,7 @@ import {
   StorefrontMediaManagerAsset,
 } from './components/media-manager/project-storefront-media-manager';
 import { StorefrontEditorComponentHostComponent } from './components/storefront-editor-component-host.component';
+import { StorefrontEditorBlockAccountComponent } from './components/blocks/storefront-editor-block-account.component';
 import { StorefrontEditorBlockCartComponent } from './components/blocks/storefront-editor-block-cart.component';
 import {
   buildStorefrontMediaManagerAssets,
@@ -142,6 +145,7 @@ type ButtonToolbarMenu =
   | null;
 type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
 type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
+type AccountToolbarMenu = 'style' | 'settings' | null;
 type CartToolbarMenu = 'edit-text' | 'settings' | null;
 type CartContentToolbarMenu = 'edit-text' | 'settings' | null;
 type ProductDetailsToolbarMenu = 'edit-text' | 'settings' | null;
@@ -392,7 +396,7 @@ type SectionLibraryTemplate = {
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockCartComponent],
+  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockAccountComponent, StorefrontEditorBlockCartComponent],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
@@ -729,6 +733,19 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
 
     return this.readSectionComponents(section).find((component) => component.id === componentId) ?? null;
   });
+  readonly selectedComponentDebugLabel = computed<string | null>(() => {
+    const component = this.selectedComponent();
+    if (!component) {
+      return null;
+    }
+
+    const typeLabel = this.componentTypeLabel(component);
+    if (component.type === 'button' && component.props.href === '/account') {
+      return `${typeLabel} (legacy account link)`;
+    }
+
+    return typeLabel;
+  });
   readonly selectedSectionComponents = computed(() => {
     const section = this.selectedSection();
     return section ? this.readSectionComponents(section) : [];
@@ -785,6 +802,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'menu' ? this.resolveResponsiveComponentNode(component) : null;
   });
+readonly selectedAccountComponent = computed<StorefrontEditorAccountNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'account' ? component : null;
+});
 readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
   const component = this.selectedComponent();
   return component?.type === 'cart' ? component : null;
@@ -827,6 +848,9 @@ readonly isParagraphToolbarVisible = computed(
   readonly isMenuToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedMenuComponent() !== null
   );
+readonly isAccountToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedAccountComponent() !== null
+);
 readonly isCartToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartComponent() !== null
 );
@@ -925,6 +949,7 @@ readonly menuItemLinkPopupPosition = signal({ x: 12, y: 12 });
   readonly draggedMenuItemId = signal<string | null>(null);
   readonly menuItemDropTargetId = signal<string | null>(null);
   readonly activeMenuItemReorder = signal<MenuItemReorderState | null>(null);
+readonly activeAccountToolbarMenu = signal<AccountToolbarMenu>(null);
 readonly activeCartToolbarMenu = signal<CartToolbarMenu>(null);
 readonly activeCartContentToolbarMenu = signal<CartContentToolbarMenu>(null);
 readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
@@ -1308,6 +1333,12 @@ readonly brandSectionBorderColors = [
     'wand',
     'eye',
     'user',
+  ];
+readonly accountIconStyleOptions: ReadonlyArray<{ id: StorefrontEditorAccountIconStyle; label: string }> = [
+  { id: 'person-outline', label: 'Outline' },
+  { id: 'person-filled', label: 'Filled' },
+  { id: 'person-circle-outline', label: 'Circle outline' },
+  { id: 'person-circle-filled', label: 'Circle filled' },
   ];
   readonly cartIconStyleOptions: ReadonlyArray<{ id: StorefrontEditorCartIconStyle; label: string }> = [
     { id: 'bag-filled', label: 'Bag filled' },
@@ -1930,6 +1961,12 @@ effect(() => {
 });
 
 effect(() => {
+  if (!this.selectedAccountComponent()) {
+    this.activeAccountToolbarMenu.set(null);
+  }
+});
+
+effect(() => {
   if (!this.selectedCartComponent()) {
     this.activeCartToolbarMenu.set(null);
     this.activeCartSettingsSection.set('cart-icon');
@@ -2086,6 +2123,12 @@ effect(() => {
     this.renamingMenuItemId.set(null);
     return;
   }
+
+if (event.key === 'Escape' && this.activeAccountToolbarMenu()) {
+  event.preventDefault();
+  this.activeAccountToolbarMenu.set(null);
+  return;
+}
 
 if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
   event.preventDefault();
@@ -4808,6 +4851,7 @@ finishEditingComponentText(): void {
   this.activeMenuItemActionsId.set(null);
   this.closeMenuItemLinkEditor();
   this.renamingMenuItemId.set(null);
+this.activeAccountToolbarMenu.set(null);
 this.activeCartToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
 this.closeButtonTextDropdownMenu();
@@ -7112,6 +7156,18 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.menuItemDropTargetId.set(null);
   }
 
+toggleAccountToolbarMenu(menu: Exclude<AccountToolbarMenu, null>): void {
+  this.activeAccountToolbarMenu.set(this.activeAccountToolbarMenu() === menu ? null : menu);
+}
+
+accountIconStyleLabel(style: StorefrontEditorAccountIconStyle | null | undefined): string {
+  return this.accountIconStyleOptions.find((option) => option.id === style)?.label ?? 'Outline';
+}
+
+isAccountCircleStyle(style: StorefrontEditorAccountIconStyle | null | undefined): boolean {
+  return style === 'person-circle-outline' || style === 'person-circle-filled';
+}
+
 toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
   const next = this.activeCartToolbarMenu() === menu ? null : menu;
   this.activeCartToolbarMenu.set(next);
@@ -7329,6 +7385,33 @@ updateSelectedProductDetailsTextValue(key: keyof StorefrontEditorProductDetailsN
 updateSelectedCartContentTextValue(key: keyof StorefrontEditorCartContentNode['props'], value: string): void {
   this.cartContentEditTextValues.update((current) => ({ ...current, [key]: value }));
   this.updateSelectedCartContentProps({ [key]: value } as Partial<StorefrontEditorCartContentNode['props']>);
+}
+
+updateSelectedAccountIconStyle(value: StorefrontEditorAccountIconStyle): void {
+  this.updateSelectedAccountProps({ iconStyle: value });
+}
+
+updateSelectedAccountIconColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountProps({ iconColor: normalized });
+}
+
+updateSelectedAccountBorderColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountProps({ borderColor: normalized });
+}
+
+updateSelectedAccountIconSize(value: string | number): void {
+  const parsed = Math.round(Number(value));
+  if (!Number.isFinite(parsed)) { return; }
+  this.updateSelectedAccountProps({ iconSize: Math.max(16, Math.min(48, parsed)) });
+}
+
+stepSelectedAccountIconSize(delta: number): void {
+  const current = this.selectedAccountComponent()?.props.iconSize ?? 24;
+  this.updateSelectedAccountIconSize(current + delta);
 }
 
 updateSelectedCartIconStyle(value: StorefrontEditorCartIconStyle): void {
@@ -9317,6 +9400,19 @@ imageShadow(component: StorefrontEditorImageNode | null): StorefrontEditorButton
   return value === 'soft' || value === 'medium' || value === 'bottom' || value === 'strong' ? value : 'none';
 }
 
+accountPreviewNode(
+  component: StorefrontEditorAccountNode,
+  iconStyle: StorefrontEditorAccountIconStyle
+): StorefrontEditorAccountNode {
+  return {
+    ...component,
+    props: {
+      ...component.props,
+      iconStyle,
+    },
+  };
+}
+
 cartPreviewNode(
   component: StorefrontEditorCartNode,
   iconStyle: StorefrontEditorCartIconStyle
@@ -10989,6 +11085,22 @@ private updateSelectedMenuProps(
   );
 }
 
+private updateSelectedAccountProps(
+  patch: Partial<StorefrontEditorAccountNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedAccountComponent();
+  if (!sectionId || !component) { return; }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'account'
+      ? { ...current, props: { ...current.props, ...patch } }
+      : current,
+    options
+  );
+}
+
 private updateSelectedCartProps(
  patch: Partial<StorefrontEditorCartNode['props']>,
  options: { transient?: boolean; preview?: boolean } = {}
@@ -12458,6 +12570,9 @@ private buildLibraryComponentForSection(
       nextComponent.props = {
         ...nextComponent.props,
         iconColor: '#0f172a',
+        borderColor: '#0f172a',
+        iconStyle: 'person-outline',
+        iconSize: 24,
       };
 
       const accountFrame = { x: initialFrame.x, y: initialFrame.y, width: 40, height: 40 };
