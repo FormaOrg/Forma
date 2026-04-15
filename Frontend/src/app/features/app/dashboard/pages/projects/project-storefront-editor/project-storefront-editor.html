@@ -22,7 +22,7 @@
       </div>
     </header>
 
-    <div class="storefront-editor__body">
+  <div class="storefront-editor__body">
       <div class="storefront-editor__preview-workspace">
         <section
           class="storefront-editor__preview-shell"
@@ -97,12 +97,13 @@
     type="button"
     class="storefront-editor__overlay"
     [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible() || isAddElementsLibraryModalVisible()"
+    [class.storefront-editor__overlay--library]="isAddElementsLibraryModalVisible()"
     aria-label="Close open panels"
     (click)="closeFloatingUi()"
   ></button>
 }
 
-  <section class="storefront-editor storefront-editor--studio">
+<section class="storefront-editor storefront-editor--studio">
     <header class="storefront-editor__topbar">
       <div class="storefront-editor__topbar-left">
         <div class="storefront-editor__floating-shell">
@@ -1856,7 +1857,7 @@
         </div>
       }
   
-    <div class="storefront-editor__body">
+  <div class="storefront-editor__body">
     <button
       type="button"
       class="storefront-editor__layers-trigger"

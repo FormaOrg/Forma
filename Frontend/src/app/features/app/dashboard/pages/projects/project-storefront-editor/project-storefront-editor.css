@@ -32,6 +32,10 @@
   overflow: hidden;
 }
 
+.storefront-editor__body {
+  transition: filter 180ms ease, opacity 180ms ease;
+}
+
 .storefront-editor__overlay {
   position: fixed;
   inset: 0;
@@ -44,6 +48,11 @@
 .storefront-editor__overlay--dimmed {
   background: rgba(15, 23, 42, 0.24);
   backdrop-filter: blur(10px);
+}
+
+.storefront-editor__overlay--library {
+  background: rgba(15, 23, 42, 0.34);
+  backdrop-filter: blur(12px);
 }
 
 .storefront-editor__skeleton {
@@ -8368,19 +8377,23 @@
   position: relative;
   z-index: 1;
   transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  align-items: stretch;
 }
 
 .storefront-editor__preview-canvas {
   box-sizing: border-box;
   min-height: 720px;
+  height: 100%;
   margin: 0 auto;
   overflow: visible;
   position: relative;
+  flex: 0 0 auto;
   transition:
     width 260ms cubic-bezier(0.22, 1, 0.36, 1),
     max-width 260ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: width;
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .storefront-editor__preview-canvas--mobile {
