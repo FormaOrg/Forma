@@ -214,6 +214,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['cart', 'basket', 'bag', 'checkout', 'store', 'header'],
   },
   {
+    id: 'account-icon',
+    title: 'Account icon',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'featured-products'],
+    componentType: 'button',
+    description: 'Customer account entry button that links to the storefront account page.',
+    preview: 'icon',
+    keywords: ['account', 'profile', 'customer', 'login', 'register', 'user', 'store'],
+  },
+  {
     id: 'container',
     title: 'Container',
     category: 'Graphics',

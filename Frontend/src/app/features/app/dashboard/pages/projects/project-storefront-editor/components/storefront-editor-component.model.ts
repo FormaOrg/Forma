@@ -131,7 +131,7 @@ export interface StorefrontEditorButtonProps {
   padding: number;
   showText: boolean;
   showIcon: boolean;
-  iconName: 'external-link' | 'invite-plus' | 'sparkles' | 'package' | 'wand' | 'eye';
+  iconName: 'external-link' | 'invite-plus' | 'sparkles' | 'package' | 'wand' | 'eye' | 'user';
   customIconSrc: string | null;
   iconMotion: 'static' | 'animated';
   iconPosition: 'left' | 'right';
