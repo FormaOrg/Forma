@@ -20,6 +20,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(activityWebSocketHandler, "/ws/activity")
                 .addInterceptors(jwtWebSocketHandshakeInterceptor)
-                .setAllowedOrigins("http://localhost:4200");
+                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*");
     }
 }

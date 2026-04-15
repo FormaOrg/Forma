@@ -26,12 +26,12 @@
       </svg>
     </div>
 
-    <h2 class="recent-projects__title">Recent Projects</h2>
+    <h2 class="recent-projects__title">{{ 'dashboard.home.recentProjects.title' | t }}</h2>
   </div>
 </div>
 
     <a routerLink="/app/projects" class="recent-projects__view-all">
-      View all
+      {{ 'dashboard.home.recentProjects.viewAll' | t }}
     </a>
   </div>
 
@@ -48,7 +48,7 @@
                 [class.project-row__status--published]="project.status === 'published'"
                 [class.project-row__status--draft]="project.status === 'draft'"
               >
-                {{ project.status === 'published' ? 'Published' : 'Draft' }}
+                {{ project.status === 'published' ? ('dashboard.projects.filters.published' | t) : ('dashboard.projects.filters.draft' | t) }}
               </span>
             </div>
 
@@ -123,11 +123,11 @@
           />
         </svg>
       </div>
-      <h3 class="recent-projects__empty-title">No projects yet</h3>
+      <h3 class="recent-projects__empty-title">{{ 'dashboard.home.recentProjects.emptyTitle' | t }}</h3>
       <p class="recent-projects__empty-text">
-        Start building your first website and your recent work will show up here automatically.
+        {{ 'dashboard.home.recentProjects.emptyText' | t }}
       </p>
-      <a routerLink="/app/create-project" class="recent-projects__empty-action">Create project</a>
+      <a routerLink="/app/create-project" class="recent-projects__empty-action">{{ 'dashboard.projects.actions.createProject' | t }}</a>
     </div>
   }
 </section>

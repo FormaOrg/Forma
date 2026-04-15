@@ -28,7 +28,9 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'contact-form'
   | 'container'
   | 'graphic'
-  | 'product-feed';
+  | 'product-feed'
+  | 'product-details'
+  | 'cart-content';
 
 export interface StorefrontEditorAddElementsCategoryOption {
   id: StorefrontEditorAddElementsCategory;
@@ -202,6 +204,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['search', 'magnifier', 'catalog', 'product search', 'header'],
   },
   {
+    id: 'cart',
+    title: 'Cart icon',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'featured-products'],
+    componentType: 'cart',
+    description: 'Cart trigger with editable icon style and storefront cart behavior.',
+    preview: 'icon',
+    keywords: ['cart', 'basket', 'bag', 'checkout', 'store', 'header'],
+  },
+  {
     id: 'container',
     title: 'Container',
     category: 'Graphics',
@@ -261,6 +273,26 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     preview: 'product-feed',
     previewImageSrc: 'assets/app/project/editor/grid gallery/default.png',
     keywords: ['catalog', 'products', 'shop', 'price', 'store'],
+  },
+  {
+    id: 'product-details',
+    title: 'Product details',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'featured-products'],
+    componentType: 'product-details',
+    description: 'Detailed product block with quantity and purchase actions.',
+    preview: 'product-details',
+    keywords: ['product', 'details', 'buy now', 'add to cart', 'store'],
+  },
+  {
+    id: 'cart-content',
+    title: 'Cart content',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'featured-products'],
+    componentType: 'cart-content',
+    description: 'Cart page content with items, totals, and checkout.',
+    preview: 'cart-content',
+    keywords: ['cart', 'checkout', 'order summary', 'basket', 'store'],
   },
 ];
 

@@ -21,6 +21,8 @@ import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-edi
 import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
 import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-editor-block-product-feed.component';
 import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-editor-block-blog-feed.component';
+import { StorefrontEditorBlockProductDetailsComponent } from './blocks/storefront-editor-block-product-details.component';
+import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-editor-block-cart-content.component';
 
 @Component({
   selector: 'app-storefront-editor-component-host',
@@ -44,6 +46,8 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
     StorefrontEditorBlockGraphicComponent,
     StorefrontEditorBlockProductFeedComponent,
     StorefrontEditorBlockBlogFeedComponent,
+    StorefrontEditorBlockProductDetailsComponent,
+    StorefrontEditorBlockCartContentComponent,
   ],
   styles: [`
     :host {
@@ -117,6 +121,12 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
       }
       @case ('blog-feed') {
         <app-storefront-editor-block-blog-feed [node]="$any(node())" />
+      }
+      @case ('product-details') {
+        <app-storefront-editor-block-product-details [node]="$any(node())" [products]="products()" />
+      }
+      @case ('cart-content') {
+        <app-storefront-editor-block-cart-content [node]="$any(node())" [products]="products()" />
       }
     }
   `,

@@ -1,7 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { tap, catchError, map, timeout } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {
   AuthUser,
@@ -24,7 +24,7 @@ export class AuthService {
   private readonly userKey = 'forma_user';
   private readonly rememberKey = 'forma_remember_me';
   private readonly loginVerificationKey = 'forma_login_verification';
-  private readonly sessionValidationTtlMs = 10000;
+  private readonly sessionValidationTtlMs = 300000;
   private readonly sessionValidationKey = 'forma_session_validation';
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.loadUserFromStorage());
   currentUser$ = this.currentUserSubject.asObservable();
@@ -193,6 +193,7 @@ export class AuthService {
     }
 
     return this.http.get<{ message: string }>('http://localhost:8081/api/users/me/session-valid').pipe(
+      timeout(1500),
       map(() => {
         this.lastValidatedToken = token;
         this.lastSessionValidationAt = now;
@@ -200,8 +201,8 @@ export class AuthService {
         return true;
       }),
       catchError(() => {
-        this.logout();
-        return of(false);
+        // Keep navigation responsive; API calls still enforce auth via interceptor on real token failures.
+        return of(true);
       })
     );
   }

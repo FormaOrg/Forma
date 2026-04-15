@@ -2612,6 +2612,22 @@
   gap: 18px;
 }
 
+.storefront-editor__side-panel-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.storefront-editor__button-toolbar-helper {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .storefront-editor__cart-settings-section,
 .storefront-editor__cart-settings-style-section {
   display: flex;

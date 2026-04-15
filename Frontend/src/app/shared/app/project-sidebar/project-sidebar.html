@@ -24,7 +24,7 @@
         <span class="project-sidebar__icon">
           <app-icon [name]="footerItems[0].icon" [size]="iconSize" />
         </span>
-        <span class="project-sidebar__label">{{ footerItems[0].label }}</span>
+        <span class="project-sidebar__label">{{ sidebarLabelKey(footerItems[0].label) | t }}</span>
         <span class="project-sidebar__row-pad" aria-hidden="true"></span>
       </a>
     </div>
@@ -33,17 +33,17 @@
       class="project-sidebar__workspace-card"
       [class.project-sidebar__workspace-card--collapsed]="collapsed"
       [class.project-sidebar__workspace-card--complete]="isWorkspaceComplete()"
-      aria-label="Project workspace overview"
+      [attr.aria-label]="'project.sidebar.aria.workspaceOverview' | t"
     >
       <div class="project-sidebar__workspace-copy">
-        <p class="project-sidebar__workspace-title">{{ workspaceTitle() }}</p>
+        <p class="project-sidebar__workspace-title">{{ workspaceTitleKey() | t }}</p>
         <p class="project-sidebar__workspace-progress">
-          {{ workspaceProgress().completed }}/{{ workspaceProgress().total }} completed
+          {{ workspaceProgress().completed }}/{{ workspaceProgress().total }} {{ 'project.sidebar.completed' | t }}
         </p>
         @if (isWorkspaceComplete()) {
-          <p class="project-sidebar__workspace-id">Setup complete</p>
+          <p class="project-sidebar__workspace-id">{{ 'project.sidebar.setupComplete' | t }}</p>
         } @else if (workspaceProgress().nextStep) {
-          <p class="project-sidebar__workspace-id">Next: {{ workspaceProgress().nextStep }}</p>
+          <p class="project-sidebar__workspace-id">{{ 'project.sidebar.next' | t }}: {{ workspaceProgress().nextStep }}</p>
         }
       </div>
       <div
@@ -55,14 +55,14 @@
       </div>
     </section>
 
-    <nav class="project-sidebar__nav" aria-label="Project navigation">
+    <nav class="project-sidebar__nav" [attr.aria-label]="'project.sidebar.aria.navigation' | t">
       @for (section of sections(); track trackSectionId($index, section)) {
         @if (!$first) {
           <div class="project-sidebar__separator" aria-hidden="true"></div>
         }
 
         <div class="project-sidebar__section-label">
-          <span class="project-sidebar__section-label-text">{{ section.label }}</span>
+          <span class="project-sidebar__section-label-text">{{ sidebarLabelKey(section.label) | t }}</span>
         </div>
 
         <ul class="project-sidebar__list" role="list">
@@ -78,7 +78,7 @@
                 <span class="project-sidebar__icon">
                   <app-icon [name]="item.icon" [size]="iconSize" />
                 </span>
-                <span class="project-sidebar__label">{{ item.label }}</span>
+                <span class="project-sidebar__label">{{ sidebarLabelKey(item.label) | t }}</span>
                 <span class="project-sidebar__row-pad" aria-hidden="true"></span>
               </a>
             </li>
@@ -100,7 +100,7 @@
       <span class="project-sidebar__icon">
         <app-icon [name]="footerItems[1].icon" [size]="iconSize" />
       </span>
-      <span class="project-sidebar__label">{{ footerItems[1].label }}</span>
+      <span class="project-sidebar__label">{{ sidebarLabelKey(footerItems[1].label) | t }}</span>
       <span class="project-sidebar__row-pad" aria-hidden="true"></span>
     </a>
   </div>

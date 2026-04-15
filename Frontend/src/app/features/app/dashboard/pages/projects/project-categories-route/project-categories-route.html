@@ -7,38 +7,38 @@
     </section>
   } @else if (errorMessage()) {
     <section class="project-categories__state project-categories__state--error" role="alert">
-      <h1>We couldn't load your blog categories</h1>
+      <h1>{{ 'project.categories.errors.title' | t }}</h1>
       <p>{{ errorMessage() }}</p>
-      <button type="button" (click)="loadProject()">Try again</button>
+      <button type="button" (click)="loadProject()">{{ 'project.categories.actions.tryAgain' | t }}</button>
     </section>
   } @else if (project(); as project) {
     <section class="project-categories__hero project-categories__panel">
       <div>
-        <p class="project-categories__eyebrow">Content architecture</p>
-        <h1 class="project-categories__title">Organize the archive around clear pillars.</h1>
+        <p class="project-categories__eyebrow">{{ 'project.categories.eyebrow' | t }}</p>
+        <h1 class="project-categories__title">{{ 'project.categories.title' | t }}</h1>
         <p class="project-categories__subtitle">
-          Use categories to keep {{ project.name }} readable, balanced, and easier to grow without creating a messy archive.
+          {{ 'project.categories.subtitle.prefix' | t }} {{ project.name }} {{ 'project.categories.subtitle.suffix' | t }}
         </p>
       </div>
 
-      <a class="project-categories__hero-action" [routerLink]="['/app/projects', project.id, 'posts']">Review posts</a>
+      <a class="project-categories__hero-action" [routerLink]="['/app/projects', project.id, 'posts']">{{ 'project.categories.actions.reviewPosts' | t }}</a>
     </section>
 
     <section class="project-categories__summary-grid">
       <article class="project-categories__summary-card project-categories__panel">
-        <span class="project-categories__summary-label">Categories</span>
+        <span class="project-categories__summary-label">{{ 'project.categories.summary.categories.label' | t }}</span>
         <strong class="project-categories__summary-value">{{ categories().length }}</strong>
-        <span class="project-categories__summary-note">Active editorial pillars</span>
+        <span class="project-categories__summary-note">{{ 'project.categories.summary.categories.note' | t }}</span>
       </article>
       <article class="project-categories__summary-card project-categories__panel">
-        <span class="project-categories__summary-label">Published posts</span>
+        <span class="project-categories__summary-label">{{ 'project.categories.summary.published.label' | t }}</span>
         <strong class="project-categories__summary-value">{{ totalPosts() }}</strong>
-        <span class="project-categories__summary-note">Already mapped across the archive</span>
+        <span class="project-categories__summary-note">{{ 'project.categories.summary.published.note' | t }}</span>
       </article>
       <article class="project-categories__summary-card project-categories__panel">
-        <span class="project-categories__summary-label">Drafts in taxonomy</span>
+        <span class="project-categories__summary-label">{{ 'project.categories.summary.drafts.label' | t }}</span>
         <strong class="project-categories__summary-value">{{ totalDrafts() }}</strong>
-        <span class="project-categories__summary-note">Waiting for the next publishing cycle</span>
+        <span class="project-categories__summary-note">{{ 'project.categories.summary.drafts.note' | t }}</span>
       </article>
     </section>
 
@@ -46,10 +46,10 @@
       <article class="project-categories__panel">
         <div class="project-categories__section-head">
           <div>
-            <p class="project-categories__section-kicker">Categories</p>
-            <h2>Archive structure</h2>
+            <p class="project-categories__section-kicker">{{ 'project.categories.sections.categories' | t }}</p>
+            <h2>{{ 'project.categories.sections.archiveStructure' | t }}</h2>
           </div>
-          <span class="project-categories__section-badge">{{ categories().length }} pillars</span>
+          <span class="project-categories__section-badge">{{ categories().length }} {{ 'project.categories.common.pillars' | t }}</span>
         </div>
 
         <div class="project-categories__list">
@@ -73,8 +73,8 @@
                 </div>
                 <p>{{ category.description }}</p>
                 <div class="project-categories__meta">
-                  <span>{{ category.postCount }} posts</span>
-                  <span>{{ category.draftCount }} drafts</span>
+                  <span>{{ category.postCount }} {{ 'project.categories.common.posts' | t }}</span>
+                  <span>{{ category.draftCount }} {{ 'project.categories.common.drafts' | t }}</span>
                   <span>{{ category.shareLabel }}</span>
                 </div>
               </div>
@@ -87,7 +87,7 @@
         @if (selectedCategory(); as selectedCategory) {
           <div class="project-categories__section-head">
             <div>
-              <p class="project-categories__section-kicker">Selected category</p>
+              <p class="project-categories__section-kicker">{{ 'project.categories.sections.selected' | t }}</p>
               <h2>{{ selectedCategory.name }}</h2>
             </div>
             <span class="project-categories__section-badge project-categories__section-badge--accent">
@@ -100,34 +100,34 @@
 
             <div class="project-categories__detail-grid">
               <div>
-                <span>Cadence</span>
+                <span>{{ 'project.categories.details.cadence' | t }}</span>
                 <strong>{{ selectedCategory.cadenceLabel }}</strong>
               </div>
               <div>
-                <span>Coverage</span>
+                <span>{{ 'project.categories.details.coverage' | t }}</span>
                 <strong>{{ selectedCategory.shareLabel }}</strong>
               </div>
               <div>
-                <span>Published</span>
+                <span>{{ 'project.categories.summary.published.label' | t }}</span>
                 <strong>{{ selectedCategory.postCount }}</strong>
               </div>
               <div>
-                <span>Drafts</span>
+                <span>{{ 'project.categories.summary.drafts.label' | t }}</span>
                 <strong>{{ selectedCategory.draftCount }}</strong>
               </div>
             </div>
 
             <div class="project-categories__checklist">
-              <h3>Next taxonomy move</h3>
+              <h3>{{ 'project.categories.checklist.title' | t }}</h3>
               <ul>
-                <li>Keep future post ideas aligned with this pillar.</li>
-                <li>Check that article tags and homepage placement support the same theme.</li>
+                <li>{{ 'project.categories.checklist.item1' | t }}</li>
+                <li>{{ 'project.categories.checklist.item2' | t }}</li>
                 <li>{{ selectedCategory.nextAngle }}</li>
               </ul>
             </div>
 
             <a class="project-categories__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
-              Edit category content
+              {{ 'project.categories.actions.editCategoryContent' | t }}
             </a>
           </div>
         }

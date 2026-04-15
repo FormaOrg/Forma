@@ -81,9 +81,9 @@
     </section>
   } @else if (errorMessage()) {
     <section class="project-home-page__state project-home-page__state--error" role="alert">
-      <h1>We couldn't load this workspace</h1>
+      <h1>{{ 'project.home.errors.title' | t }}</h1>
       <p>{{ errorMessage() }}</p>
-      <button type="button" (click)="loadHomePage()">Try again</button>
+      <button type="button" (click)="loadHomePage()">{{ 'project.home.actions.tryAgain' | t }}</button>
     </section>
   } @else if (page(); as page) {
     <section class="project-home-page__hero project-home-page__panel">
@@ -267,7 +267,7 @@
           </div>
         } @else {
           <div class="project-home-page__empty">
-            <h3>No activity yet</h3>
+            <h3>{{ 'project.home.activity.none' | t }}</h3>
             <p>{{ workspaceConfig().emptyActivityDescription }}</p>
           </div>
         }
@@ -276,7 +276,7 @@
       <aside class="project-home-page__panel">
         <div class="project-home-page__section-head">
           <div>
-            <h2>Suggested next steps</h2>
+            <h2>{{ 'project.home.suggested.title' | t }}</h2>
             <p>{{ suggestedDescription() }}</p>
           </div>
         </div>

@@ -14,11 +14,12 @@ import { ProjectService } from '../../../../../../core/services/project.service'
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { ProjectType } from '../../../../../../core/models/project.model';
 import { getProjectWorkspaceConfig } from '../../../../../../shared/app/project-workspace/project-workspace.config';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 @Component({
   selector: 'app-project-route-placeholder',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './project-route-placeholder.html',
 })
 export class ProjectRoutePlaceholder {

@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { BillingInvoiceItem, BillingOverview, BillingUsageMetric } from '../../../../../core/models/dashboard.model';
 import { DashboardDataService } from '../../../../../core/services/dashboard-data.service';
+import { I18nService } from '../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../landing-page/i18n/translate.pipe';
 import { DataCard } from '../home/components/data-card/data-card';
 import {
   BillingMode,
@@ -16,11 +18,12 @@ import {
 @Component({
   selector: 'app-billing',
   standalone: true,
-  imports: [CommonModule, RouterLink, DataCard],
+  imports: [CommonModule, RouterLink, DataCard, TranslatePipe],
   templateUrl: './billing.polished.html',
 })
 export class Billing implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);
+  private readonly i18n = inject(I18nService);
   private readonly maxVisibleInvoices = 4;
 
   readonly billingMode = signal<BillingMode>('yearly');
@@ -80,9 +83,9 @@ export class Billing implements OnInit {
   readonly yearlySummary = computed(() =>
     this.currentPlan()
       ? this.billingMode() === 'yearly'
-        ? `${this.currentPlanPrice() * 12} DT billed yearly`
-        : 'Switch to yearly to save'
-      : 'No billing summary available yet'
+        ? `${this.currentPlanPrice() * 12} DT ${this.i18n.t('dashboard.billing.yearlySummary.billedYearly')}`
+        : this.i18n.t('dashboard.billing.yearlySummary.switch')
+      : this.i18n.t('dashboard.billing.yearlySummary.none')
   );
 
   readonly activeProjects = computed(() => this.overview()?.activeProjectsCount.toString() ?? '0');
@@ -129,18 +132,18 @@ export class Billing implements OnInit {
 
   planActionLabel(plan: PricingPlan): string {
     const currentPlan = this.currentPlan();
-    if (this.isCurrentPlan(plan)) return 'Current Plan';
-    if (!currentPlan) return 'Choose Plan';
-    if (plan.monthlyPrice > currentPlan.monthlyPrice) return 'Upgrade';
-    return 'Downgrade';
+    if (this.isCurrentPlan(plan)) return this.i18n.t('dashboard.billing.plan.current');
+    if (!currentPlan) return this.i18n.t('dashboard.billing.plan.choose');
+    if (plan.monthlyPrice > currentPlan.monthlyPrice) return this.i18n.t('dashboard.billing.plan.upgrade');
+    return this.i18n.t('dashboard.billing.plan.downgrade');
   }
 
   statusLabel(status: 'active' | 'trial' | 'canceled' | 'past-due' | 'inactive'): string {
-    if (status === 'past-due') return 'Past due';
-    if (status === 'trial') return 'Trial';
-    if (status === 'canceled') return 'Canceled';
-    if (status === 'inactive') return 'No active plan';
-    return 'Active';
+    if (status === 'past-due') return this.i18n.t('dashboard.billing.status.pastDue');
+    if (status === 'trial') return this.i18n.t('dashboard.billing.status.trial');
+    if (status === 'canceled') return this.i18n.t('dashboard.billing.status.canceled');
+    if (status === 'inactive') return this.i18n.t('dashboard.billing.status.inactive');
+    return this.i18n.t('dashboard.billing.status.active');
   }
 
   getDisplayedPlanPrice(plan: PricingPlan): number {
@@ -197,10 +200,10 @@ export class Billing implements OnInit {
     const status = this.readErrorStatus(error);
 
     if (status === 0) {
-      return 'Please check your connection and try again.';
+      return this.i18n.t('dashboard.billing.errors.connection');
     }
 
-    return 'Something went wrong while loading your billing details. Please try again.';
+    return this.i18n.t('dashboard.billing.errors.load');
   }
 
   private readErrorStatus(error: unknown): number | undefined {

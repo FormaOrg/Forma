@@ -7,38 +7,38 @@
     </section>
   } @else if (errorMessage()) {
     <section class="project-inquiries__state project-inquiries__state--error" role="alert">
-      <h1>We couldn't load your inquiries</h1>
+      <h1>{{ 'project.inquiries.errors.title' | t }}</h1>
       <p>{{ errorMessage() }}</p>
-      <button type="button" (click)="loadProject()">Try again</button>
+      <button type="button" (click)="loadProject()">{{ 'project.inquiries.actions.tryAgain' | t }}</button>
     </section>
   } @else if (project(); as project) {
     <section class="project-inquiries__hero project-inquiries__panel">
       <div>
-        <p class="project-inquiries__eyebrow">Portfolio inquiries</p>
-        <h1 class="project-inquiries__title">Track inbound leads without leaving the workspace.</h1>
+        <p class="project-inquiries__eyebrow">{{ 'project.inquiries.eyebrow' | t }}</p>
+        <h1 class="project-inquiries__title">{{ 'project.inquiries.title' | t }}</h1>
         <p class="project-inquiries__subtitle">
-          Review the people reaching out through {{ project.projectName }}, keep new opportunities visible, and separate fresh leads from active conversations.
+          {{ 'project.inquiries.subtitle.prefix' | t }} {{ project.projectName }}, {{ 'project.inquiries.subtitle.suffix' | t }}
         </p>
       </div>
 
-      <a class="project-inquiries__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">Open contact page</a>
+      <a class="project-inquiries__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">{{ 'project.inquiries.actions.openContactPage' | t }}</a>
     </section>
 
     <section class="project-inquiries__summary-grid">
       <article class="project-inquiries__summary-card project-inquiries__panel">
-        <span class="project-inquiries__summary-label">Inbox</span>
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.inbox.label' | t }}</span>
         <strong class="project-inquiries__summary-value">{{ inquiries().length }}</strong>
-        <span class="project-inquiries__summary-note">Current inquiry threads</span>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.inbox.note' | t }}</span>
       </article>
       <article class="project-inquiries__summary-card project-inquiries__panel">
-        <span class="project-inquiries__summary-label">New</span>
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.new.label' | t }}</span>
         <strong class="project-inquiries__summary-value">{{ newCount() }}</strong>
-        <span class="project-inquiries__summary-note">Waiting for your first reply</span>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.new.note' | t }}</span>
       </article>
       <article class="project-inquiries__summary-card project-inquiries__panel">
-        <span class="project-inquiries__summary-label">Replied</span>
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.replied.label' | t }}</span>
         <strong class="project-inquiries__summary-value">{{ repliedCount() }}</strong>
-        <span class="project-inquiries__summary-note">Already moving forward</span>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.replied.note' | t }}</span>
       </article>
     </section>
 
@@ -48,7 +48,7 @@
           <label class="project-inquiries__search">
             <input
               type="search"
-              placeholder="Search by name, email, or service"
+              [placeholder]="'project.inquiries.search.placeholder' | t"
               [value]="searchValue()"
               (input)="updateSearch(searchInput.value)"
               #searchInput
@@ -58,7 +58,7 @@
           <div
             class="project-inquiries__filters"
             role="tablist"
-            aria-label="Inquiry status"
+            [attr.aria-label]="'project.inquiries.filters.aria' | t"
             [attr.data-status]="selectedStatus()"
           >
             <span class="project-inquiries__filters-pill" aria-hidden="true"></span>
@@ -68,7 +68,7 @@
               [class.project-inquiries__filter--active]="selectedStatus() === 'ALL'"
               (click)="setStatus('ALL')"
             >
-              All
+              {{ 'project.inquiries.filters.all' | t }}
             </button>
             <button
               type="button"
@@ -76,7 +76,7 @@
               [class.project-inquiries__filter--active]="selectedStatus() === 'new'"
               (click)="setStatus('new')"
             >
-              New
+              {{ 'project.inquiries.status.new' | t }}
             </button>
             <button
               type="button"
@@ -84,7 +84,7 @@
               [class.project-inquiries__filter--active]="selectedStatus() === 'replied'"
               (click)="setStatus('replied')"
             >
-              Replied
+              {{ 'project.inquiries.status.replied' | t }}
             </button>
             <button
               type="button"
@@ -92,7 +92,7 @@
               [class.project-inquiries__filter--active]="selectedStatus() === 'scheduled'"
               (click)="setStatus('scheduled')"
             >
-              Scheduled
+              {{ 'project.inquiries.status.scheduled' | t }}
             </button>
           </div>
         </div>
@@ -120,16 +120,16 @@
               </div>
 
               <div class="project-inquiries__row-meta">
-                <span>{{ item.serviceLabel || 'General inquiry' }}</span>
-                <span>{{ item.budgetLabel || 'Budget not shared' }}</span>
+                <span>{{ item.serviceLabel || ('project.inquiries.common.generalInquiry' | t) }}</span>
+                <span>{{ item.budgetLabel || ('project.inquiries.common.budgetNotShared' | t) }}</span>
                 <span>{{ formatReceivedLabel(item.createdAt) }}</span>
               </div>
             </button>
           } @empty {
             <div class="project-inquiries__empty">
-              <h2>{{ inquiries().length ? 'No matching inquiries' : 'No inquiries yet' }}</h2>
+              <h2>{{ inquiries().length ? ('project.inquiries.empty.noMatchTitle' | t) : ('project.inquiries.empty.noneTitle' | t) }}</h2>
               <p>
-                {{ inquiries().length ? 'Try a different search or switch the status filter.' : 'New portfolio inquiries will appear here once they are saved to the workspace.' }}
+                {{ inquiries().length ? ('project.inquiries.empty.noMatchText' | t) : ('project.inquiries.empty.noneText' | t) }}
               </p>
             </div>
           }
@@ -150,7 +150,7 @@
               (click)="$event.stopPropagation()"
             >
               <button type="button" class="project-inquiries__dropdown-trigger" (click)="toggleStatusDropdown()">
-                <span class="project-inquiries__dropdown-label">Status</span>
+                <span class="project-inquiries__dropdown-label">{{ 'project.inquiries.dropdown.status' | t }}</span>
                 <span class="project-inquiries__dropdown-value">{{ selectedInquiry.statusLabel }}</span>
                 <span class="project-inquiries__dropdown-caret" aria-hidden="true">
                   <svg viewBox="0 0 20 20" fill="none">
@@ -169,7 +169,7 @@
                       [disabled]="isUpdatingStatus()"
                       (click)="updateInquiryStatus(selectedInquiry.id, option.value)"
                     >
-                      {{ option.label }}
+                      {{ option.label | t }}
                     </button>
                   }
                 </div>
@@ -180,34 +180,34 @@
           <div class="project-inquiries__detail-card">
             <div class="project-inquiries__detail-grid">
               <div>
-                <span>Email</span>
+                <span>{{ 'project.inquiries.details.email' | t }}</span>
                 <strong>{{ selectedInquiry.email }}</strong>
               </div>
               <div>
-                <span>Service</span>
-                <strong>{{ selectedInquiry.serviceLabel || 'General inquiry' }}</strong>
+                <span>{{ 'project.inquiries.details.service' | t }}</span>
+                <strong>{{ selectedInquiry.serviceLabel || ('project.inquiries.common.generalInquiry' | t) }}</strong>
               </div>
               <div>
-                <span>Budget</span>
-                <strong>{{ selectedInquiry.budgetLabel || 'Budget not shared' }}</strong>
+                <span>{{ 'project.inquiries.details.budget' | t }}</span>
+                <strong>{{ selectedInquiry.budgetLabel || ('project.inquiries.common.budgetNotShared' | t) }}</strong>
               </div>
               <div>
-                <span>Source</span>
-                <strong>{{ selectedInquiry.sourceLabel || 'Unknown source' }}</strong>
+                <span>{{ 'project.inquiries.details.source' | t }}</span>
+                <strong>{{ selectedInquiry.sourceLabel || ('project.inquiries.common.unknownSource' | t) }}</strong>
               </div>
             </div>
 
             <div class="project-inquiries__message">
-              <span>Message</span>
-              <p>{{ selectedInquiry.message || 'No message was included with this inquiry.' }}</p>
+              <span>{{ 'project.inquiries.details.message' | t }}</span>
+              <p>{{ selectedInquiry.message || ('project.inquiries.common.noMessage' | t) }}</p>
             </div>
 
             <div class="project-inquiries__detail-actions">
               <a [href]="'mailto:' + selectedInquiry.email" class="project-inquiries__detail-action">
-                Reply by email
+                {{ 'project.inquiries.actions.replyByEmail' | t }}
               </a>
               <a [routerLink]="['/app/projects', project.projectId, 'editor']" class="project-inquiries__detail-action project-inquiries__detail-action--ghost">
-                Review contact page
+                {{ 'project.inquiries.actions.reviewContactPage' | t }}
               </a>
             </div>
           </div>

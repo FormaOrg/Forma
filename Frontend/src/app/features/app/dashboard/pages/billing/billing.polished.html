@@ -2,17 +2,17 @@
   <section class="billing-hero">
     <div class="billing-hero__content">
       <div class="billing-hero__text">
-        <h1 class="billing-hero__title">Billing</h1>
+        <h1 class="billing-hero__title">{{ 'dashboard.billing.title' | t }}</h1>
         <p class="billing-hero__subtitle">
-          Manage your subscription, payment details, invoices, and plan limits from one clear billing workspace.
+          {{ 'dashboard.billing.subtitle' | t }}
         </p>
       </div>
 
       <div class="billing-hero__summary">
-        <span class="billing-hero__label">Current subscription</span>
-        <strong class="billing-hero__plan">{{ currentSubscription().planName ? currentSubscription().planName + ' Plan' : 'No active plan' }}</strong>
+        <span class="billing-hero__label">{{ 'dashboard.billing.currentSubscription' | t }}</span>
+        <strong class="billing-hero__plan">{{ currentSubscription().planName ? currentSubscription().planName + ' Plan' : ('dashboard.billing.status.inactive' | t) }}</strong>
         <span class="billing-hero__meta">
-          {{ currentSubscription().billingCycleLabel ?? 'Billing details will appear here soon' }}
+          {{ currentSubscription().billingCycleLabel ?? ('dashboard.billing.meta.pending' | t) }}
           -
           {{ statusLabel(currentSubscription().status) }}
         </span>
@@ -23,31 +23,31 @@
   <div class="billing-page__stats">
     <app-data-card
       [icon]="walletIcon"
-      [title]="'Current spend'"
-      [value]="isLoading() ? '...' : overview()?.currentSpendLabel ?? 'No active plan'"
+      [title]="'dashboard.billing.stats.currentSpend.title' | t"
+      [value]="isLoading() ? '...' : overview()?.currentSpendLabel ?? ('dashboard.billing.status.inactive' | t)"
       [description]="
         isLoading()
-          ? 'Loading billing summary'
+          ? ('dashboard.billing.stats.currentSpend.loading' | t)
           : currentPlan()
             ? billingMode() === 'yearly'
-              ? 'Per month equivalent on yearly billing'
-              : 'Current monthly rate'
-            : 'Upgrade when you are ready to unlock paid billing'
+              ? ('dashboard.billing.stats.currentSpend.yearly' | t)
+              : ('dashboard.billing.stats.currentSpend.monthly' | t)
+            : ('dashboard.billing.stats.currentSpend.noPlan' | t)
       "
     ></app-data-card>
 
     <app-data-card
       [icon]="receiptIcon"
-      [title]="'Invoices paid'"
+      [title]="'dashboard.billing.stats.invoicesPaid.title' | t"
       [value]="isLoading() ? '...' : invoicesPaid()"
-      [description]="isLoading() ? 'Checking billing history' : 'Successful payments in recent billing history'"
+      [description]="isLoading() ? ('dashboard.billing.stats.invoicesPaid.loading' | t) : ('dashboard.billing.stats.invoicesPaid.ready' | t)"
     ></app-data-card>
 
     <app-data-card
       [icon]="shieldIcon"
-      [title]="'Active projects'"
+      [title]="'dashboard.billing.stats.activeProjects.title' | t"
       [value]="isLoading() ? '...' : activeProjects()"
-      [description]="isLoading() ? 'Checking account usage' : 'Projects currently connected to your account'"
+      [description]="isLoading() ? ('dashboard.billing.stats.activeProjects.loading' | t) : ('dashboard.billing.stats.activeProjects.ready' | t)"
     ></app-data-card>
   </div>
 
@@ -76,9 +76,9 @@
             />
           </svg>
         </div>
-        <h2 class="billing-empty__title">Something went wrong while loading billing</h2>
+        <h2 class="billing-empty__title">{{ 'dashboard.billing.errors.title' | t }}</h2>
         <p class="billing-empty__text">{{ errorMessage() }}</p>
-        <button type="button" class="billing-btn billing-btn--primary" (click)="loadBilling()">Try again</button>
+        <button type="button" class="billing-btn billing-btn--primary" (click)="loadBilling()">{{ 'dashboard.billing.actions.tryAgain' | t }}</button>
       </div>
     </section>
   } @else {
@@ -86,8 +86,8 @@
       <section class="billing-section billing-section--plan">
         <div class="billing-section__header">
           <div>
-            <h2 class="billing-section__title">Current plan</h2>
-            <p class="billing-section__subtitle">A quick view of your active subscription and next renewal.</p>
+            <h2 class="billing-section__title">{{ 'dashboard.billing.planSection.title' | t }}</h2>
+            <p class="billing-section__subtitle">{{ 'dashboard.billing.planSection.subtitle' | t }}</p>
           </div>
           <span
             class="billing-status"
@@ -103,8 +103,8 @@
             <div class="current-plan-card__top">
               <div class="current-plan-card__intro">
                 <div class="current-plan-card__eyebrow-row">
-                  <p class="current-plan-card__eyebrow">Plan</p>
-                  <span class="current-plan-card__chip">{{ currentSubscription().billingCycleLabel ?? 'Subscription' }}</span>
+                  <p class="current-plan-card__eyebrow">{{ 'dashboard.billing.plan' | t }}</p>
+                  <span class="current-plan-card__chip">{{ currentSubscription().billingCycleLabel ?? ('dashboard.billing.subscription' | t) }}</span>
                 </div>
                 <h3 class="current-plan-card__name">{{ selectedPlan.name }}</h3>
                 <p class="current-plan-card__description">
@@ -126,27 +126,27 @@
             <div class="current-plan-card__price-card">
               <div class="current-plan-card__price-row">
                 <span class="current-plan-card__price">{{ currentPlanPrice() }} DT</span>
-                <span class="current-plan-card__period">/ month</span>
+                <span class="current-plan-card__period">{{ 'dashboard.billing.perMonth' | t }}</span>
               </div>
               <p class="current-plan-card__price-note">{{ yearlySummary() }}</p>
             </div>
 
             <div class="current-plan-card__details">
               <div class="current-plan-card__detail">
-                <span>Billing cycle</span>
-                <strong>{{ currentSubscription().billingCycleLabel ?? 'Not available yet' }}</strong>
+                <span>{{ 'dashboard.billing.fields.billingCycle' | t }}</span>
+                <strong>{{ currentSubscription().billingCycleLabel ?? ('dashboard.billing.fields.notAvailable' | t) }}</strong>
               </div>
               <div class="current-plan-card__detail">
-                <span>Renewal date</span>
-                <strong>{{ currentSubscription().renewalDateLabel ?? 'Not available yet' }}</strong>
+                <span>{{ 'dashboard.billing.fields.renewalDate' | t }}</span>
+                <strong>{{ currentSubscription().renewalDateLabel ?? ('dashboard.billing.fields.notAvailable' | t) }}</strong>
               </div>
               <div class="current-plan-card__detail">
-                <span>Next charge</span>
-                <strong>{{ currentSubscription().nextChargeLabel ?? 'Not available yet' }}</strong>
+                <span>{{ 'dashboard.billing.fields.nextCharge' | t }}</span>
+                <strong>{{ currentSubscription().nextChargeLabel ?? ('dashboard.billing.fields.notAvailable' | t) }}</strong>
               </div>
               <div class="current-plan-card__detail">
-                <span>Billing summary</span>
-                <strong>{{ currentSubscription().promoNotice ? 'Discount active' : 'Standard billing' }}</strong>
+                <span>{{ 'dashboard.billing.fields.summary' | t }}</span>
+                <strong>{{ currentSubscription().promoNotice ? ('dashboard.billing.fields.discountActive' | t) : ('dashboard.billing.fields.standard' | t) }}</strong>
               </div>
             </div>
 
@@ -157,8 +157,8 @@
             }
 
             <div class="current-plan-card__actions">
-              <a class="billing-btn billing-btn--primary" routerLink="/pricing">Change Plan</a>
-              <button type="button" class="billing-btn billing-btn--secondary">Manage Plan</button>
+              <a class="billing-btn billing-btn--primary" routerLink="/pricing">{{ 'dashboard.billing.actions.changePlan' | t }}</a>
+              <button type="button" class="billing-btn billing-btn--secondary">{{ 'dashboard.billing.actions.managePlan' | t }}</button>
             </div>
           </article>
         } @else {
@@ -173,11 +173,11 @@
                 <path d="M16 13H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
               </svg>
             </div>
-            <h3 class="billing-empty__title">No active plan yet</h3>
+            <h3 class="billing-empty__title">{{ 'dashboard.billing.empty.noPlanTitle' | t }}</h3>
             <p class="billing-empty__text">
-              Choose a plan when you're ready and your subscription details will appear here.
+              {{ 'dashboard.billing.empty.noPlanText' | t }}
             </p>
-            <a class="billing-btn billing-btn--primary" routerLink="/pricing">Explore plans</a>
+            <a class="billing-btn billing-btn--primary" routerLink="/pricing">{{ 'dashboard.billing.actions.explorePlans' | t }}</a>
           </div>
         }
       </section>

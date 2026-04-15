@@ -1,7 +1,7 @@
 <section class="project-analytics">
   <section class="project-analytics__hero project-analytics__panel">
     <div class="project-analytics__hero-copy">
-      <p class="project-analytics__eyebrow">Analytics overview</p>
+      <p class="project-analytics__eyebrow">{{ 'project.analytics.eyebrow' | t }}</p>
       <h1 class="project-analytics__title">{{ heroTitle() }}</h1>
       <p class="project-analytics__subtitle">
         {{ heroSubtitle() }}
@@ -9,7 +9,7 @@
     </div>
 
     <div class="project-analytics__hero-actions">
-      <div class="project-analytics__range-switch" [attr.data-range]="selectedRange()" aria-label="Analytics range">
+      <div class="project-analytics__range-switch" [attr.data-range]="selectedRange()" [attr.aria-label]="'project.analytics.range.aria' | t">
         <span class="project-analytics__range-pill" aria-hidden="true"></span>
         @for (option of rangeOptions; track option.value) {
           <button
@@ -18,7 +18,7 @@
             [class.project-analytics__range-button--active]="selectedRange() === option.value"
             (click)="setRange(option.value)"
           >
-            {{ option.label }}
+            {{ option.key | t }}
           </button>
         }
       </div>
@@ -91,7 +91,7 @@
         <div class="project-analytics__summary-body">
           <span class="project-analytics__summary-label">{{ card.label }}</span>
           <strong class="project-analytics__summary-value">{{ card.formattedValue }}</strong>
-          <span class="project-analytics__summary-change">{{ formatPercentDelta(card.changePercent) }} vs previous period</span>
+          <span class="project-analytics__summary-change">{{ formatPercentDelta(card.changePercent) }} {{ 'project.analytics.common.vsPrevious' | t }}</span>
         </div>
       </article>
     }
@@ -106,7 +106,7 @@
         </div>
 
         <div class="project-analytics__section-actions">
-          <div class="project-analytics__metric-switch" [attr.data-metric]="selectedMetric()" aria-label="Metric selector">
+          <div class="project-analytics__metric-switch" [attr.data-metric]="selectedMetric()" [attr.aria-label]="'project.analytics.metric.aria' | t">
             <span class="project-analytics__metric-pill" aria-hidden="true"></span>
             @for (option of metricOptions(); track option.key) {
               <button
@@ -126,7 +126,7 @@
               <path d="M6.75 7.75L10 11L13.25 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M4 14.5H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
-            <span>Export report</span>
+            <span>{{ 'project.analytics.actions.exportReport' | t }}</span>
           </button>
         </div>
       </div>
@@ -191,12 +191,12 @@
         } @else {
           <article class="project-analytics__rank-card">
             <div>
-              <h3>No data leaders yet</h3>
-              <p>{{ analytics()?.primaryListHeading?.title }} will appear here once tracked data starts landing.</p>
+              <h3>{{ 'project.analytics.empty.noDataLeaders' | t }}</h3>
+              <p>{{ analytics()?.primaryListHeading?.title }} {{ 'project.analytics.empty.primaryHint' | t }}</p>
             </div>
             <div class="project-analytics__rank-side">
               <strong>0</strong>
-              <span>Nothing to compare yet</span>
+              <span>{{ 'project.analytics.empty.nothingCompare' | t }}</span>
             </div>
           </article>
         }
@@ -228,12 +228,12 @@
         } @else {
           <article class="project-analytics__rank-card">
             <div>
-              <h3>No second signal yet</h3>
-              <p>{{ analytics()?.secondaryListHeading?.title }} will populate when more tracked activity is available.</p>
+              <h3>{{ 'project.analytics.empty.noSecondSignal' | t }}</h3>
+              <p>{{ analytics()?.secondaryListHeading?.title }} {{ 'project.analytics.empty.secondaryHint' | t }}</p>
             </div>
             <div class="project-analytics__rank-side">
               <strong>0</strong>
-              <span>Nothing to compare yet</span>
+              <span>{{ 'project.analytics.empty.nothingCompare' | t }}</span>
             </div>
           </article>
         }
@@ -292,8 +292,8 @@
               <circle cx="12" cy="15.7" r="1" fill="currentColor"/>
             </svg>
           </div>
-          <h3>Analytics will appear as data lands</h3>
-          <p>Once this project starts collecting tracked activity, this page will turn it into readable insights.</p>
+          <h3>{{ 'project.analytics.empty.insightsTitle' | t }}</h3>
+          <p>{{ 'project.analytics.empty.insightsText' | t }}</p>
         </article>
       }
     </div>

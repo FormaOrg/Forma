@@ -17,6 +17,8 @@ export type StorefrontEditorComponentType =
   | 'container'
   | 'graphic'
   | 'product-feed'
+  | 'product-details'
+  | 'cart-content'
   | 'blog-feed';
 
 export type StorefrontEditorTextAlign = 'left' | 'center' | 'right' | 'justify';
@@ -270,6 +272,36 @@ export interface StorefrontEditorBlogFeedProps {
   limit: number;
 }
 
+export interface StorefrontEditorProductDetailsProps {
+  quantityLabel: string;
+  addToCartLabel: string;
+  buyNowLabel: string;
+  skuLabel: string;
+  inStockLabel: string;
+  outOfStockLabel: string;
+  showCategory: boolean;
+  showDescription: boolean;
+  showFacts: boolean;
+  showTags: boolean;
+  showCompareAtPrice: boolean;
+}
+
+export interface StorefrontEditorCartContentProps {
+  cartTitle: string;
+  summaryTitle: string;
+  subtotalLabel: string;
+  totalLabel: string;
+  promoPlaceholder: string;
+  applyLabel: string;
+  checkoutLabel: string;
+  emptyTitle: string;
+  emptyDescription: string;
+  emptyButtonLabel: string;
+  showImages: boolean;
+  showMeta: boolean;
+  showPromoCode: boolean;
+}
+
 export interface StorefrontEditorComponentBase<TType extends StorefrontEditorComponentType, TProps> {
   id: string;
   type: TType;
@@ -304,6 +336,8 @@ export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'conta
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
 export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'product-feed', StorefrontEditorProductFeedProps>;
 export type StorefrontEditorBlogFeedNode = StorefrontEditorComponentBase<'blog-feed', StorefrontEditorBlogFeedProps>;
+export type StorefrontEditorProductDetailsNode = StorefrontEditorComponentBase<'product-details', StorefrontEditorProductDetailsProps>;
+export type StorefrontEditorCartContentNode = StorefrontEditorComponentBase<'cart-content', StorefrontEditorCartContentProps>;
 
 export type StorefrontEditorComponentNode =
   | StorefrontEditorTextNode
@@ -322,6 +356,8 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
   | StorefrontEditorProductFeedNode
+  | StorefrontEditorProductDetailsNode
+  | StorefrontEditorCartContentNode
   | StorefrontEditorBlogFeedNode;
 
 export interface StorefrontEditorSectionSlot {
@@ -382,6 +418,10 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 32, width: 560, height: 300 };
     case 'blog-feed':
       return { x: 32, y: 32, width: 360, height: 180 };
+    case 'product-details':
+      return { x: 32, y: 32, width: 860, height: 520 };
+    case 'cart-content':
+      return { x: 32, y: 32, width: 920, height: 520 };
   }
 }
 
@@ -1016,6 +1056,44 @@ export function createStorefrontEditorComponentNode(
         props: {
           title: 'Latest posts',
           limit: 3,
+        },
+      };
+    case 'product-details':
+      return {
+        ...createStorefrontEditorComponentBase('product-details'),
+        name: 'Product details',
+        props: {
+          quantityLabel: 'Quantity',
+          addToCartLabel: 'Add to Cart',
+          buyNowLabel: 'Buy it now',
+          skuLabel: 'SKU',
+          inStockLabel: 'In stock',
+          outOfStockLabel: 'Out of stock',
+          showCategory: true,
+          showDescription: true,
+          showFacts: true,
+          showTags: true,
+          showCompareAtPrice: true,
+        },
+      };
+    case 'cart-content':
+      return {
+        ...createStorefrontEditorComponentBase('cart-content'),
+        name: 'Cart content',
+        props: {
+          cartTitle: 'YOUR CART',
+          summaryTitle: 'Order Summary',
+          subtotalLabel: 'Subtotal',
+          totalLabel: 'Total',
+          promoPlaceholder: 'Add promo code',
+          applyLabel: 'Apply',
+          checkoutLabel: 'Go to Checkout',
+          emptyTitle: 'Your cart is empty',
+          emptyDescription: 'Add products to the cart to see them here.',
+          emptyButtonLabel: 'Continue shopping',
+          showImages: true,
+          showMeta: true,
+          showPromoCode: true,
         },
       };
   }

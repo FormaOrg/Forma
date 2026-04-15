@@ -45,6 +45,7 @@ import {
 import {
   StorefrontEditorCartIconStyle,
   StorefrontEditorCartNode,
+  StorefrontEditorCartContentNode,
   StorefrontEditorComponentNode,
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
@@ -54,6 +55,7 @@ import {
   StorefrontEditorMenuNode,
   StorefrontEditorParagraphNode,
   StorefrontEditorProductFeedNode,
+  StorefrontEditorProductDetailsNode,
   StorefrontEditorSearchNode,
   StorefrontEditorTextNode,
   StorefrontEditorTextStylePreset,
@@ -141,6 +143,8 @@ type ButtonToolbarMenu =
 type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
 type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
 type CartToolbarMenu = 'edit-text' | 'settings' | null;
+type CartContentToolbarMenu = 'edit-text' | 'settings' | null;
+type ProductDetailsToolbarMenu = 'edit-text' | 'settings' | null;
 type SearchToolbarMenu = 'edit-text' | 'settings' | null;
 type MenuItemReorderState = {
   itemId: string;
@@ -152,6 +156,8 @@ type MenuItemReorderState = {
   currentTranslateY: number;
 };
 type CartSettingsSection = 'cart-icon' | 'settings';
+type CartContentSettingsSection = 'layout' | 'empty';
+type ProductDetailsSettingsSection = 'content' | 'visibility';
 type ButtonTextDropdownMenu = 'preset' | 'font-family' | 'font-weight' | 'font-size' | 'line-height' | 'letter-spacing' | null;
 type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
 type ContainerToolbarMenu = 'designs' | 'background' | 'borders' | 'corners' | 'shadow' | 'opacity' | null;
@@ -784,10 +790,18 @@ readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | n
   const component = this.selectedComponent();
   return component?.type === 'container' ? component : null;
   });
-  readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
-    const component = this.selectedComponent();
-    return component?.type === 'product-feed' ? component : null;
-  });
+readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'product-feed' ? component : null;
+});
+readonly selectedProductDetailsComponent = computed<StorefrontEditorProductDetailsNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'product-details' ? component : null;
+});
+readonly selectedCartContentComponent = computed<StorefrontEditorCartContentNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'cart-content' ? component : null;
+});
   readonly isSectionToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedSection() !== null && !this.hasComponentSelection()
   );
@@ -814,6 +828,12 @@ readonly isSearchToolbarVisible = computed(
 );
 readonly isProductFeedToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
+);
+readonly isProductDetailsToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductDetailsComponent() !== null
+);
+readonly isCartContentToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartContentComponent() !== null
 );
   readonly canShowGroupAction = computed(
     () => this.selectedComponentIds().length >= 2 && !this.selectedComponentGroupId()
@@ -887,8 +907,9 @@ readonly activeTextToolbarMenu = signal<
   readonly activeMenuFormatDropdown = signal<MenuFormatDropdown>(null);
   readonly activeMenuItemActionsId = signal<string | null>(null);
   readonly menuItemActionsPopupPosition = signal({ x: 12, y: 12 });
-  readonly activeMenuItemLinkId = signal<string | null>(null);
-  readonly menuItemLinkPopupPosition = signal({ x: 12, y: 12 });
+readonly activeMenuItemLinkId = signal<string | null>(null);
+readonly pendingNewMenuItemId = signal<string | null>(null);
+readonly menuItemLinkPopupPosition = signal({ x: 12, y: 12 });
   readonly menuLinkValue = signal('');
   readonly menuLinkPageId = signal<string>('home');
   readonly menuLinkOpenMode = signal<'current' | 'new'>('current');
@@ -897,10 +918,12 @@ readonly activeTextToolbarMenu = signal<
   readonly draggedMenuItemId = signal<string | null>(null);
   readonly menuItemDropTargetId = signal<string | null>(null);
   readonly activeMenuItemReorder = signal<MenuItemReorderState | null>(null);
-  readonly isMenuAddPagesPopupOpen = signal(false);
-  readonly selectedMenuPageIds = signal<string[]>([]);
 readonly activeCartToolbarMenu = signal<CartToolbarMenu>(null);
+readonly activeCartContentToolbarMenu = signal<CartContentToolbarMenu>(null);
 readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
+readonly activeCartContentSettingsSection = signal<CartContentSettingsSection>('layout');
+readonly activeProductDetailsToolbarMenu = signal<ProductDetailsToolbarMenu>(null);
+readonly activeProductDetailsSettingsSection = signal<ProductDetailsSettingsSection>('content');
 readonly activeSearchToolbarMenu = signal<SearchToolbarMenu>(null);
 readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
@@ -912,6 +935,8 @@ readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly buttonCustomPickerBrightness = signal(96);
 readonly buttonEditTextValue = signal('');
 readonly cartEditTextValue = signal('');
+readonly cartContentEditTextValues = signal<Record<string, string>>({});
+readonly productDetailsEditTextValues = signal<Record<string, string>>({});
 readonly searchEditLabelValue = signal('');
 readonly searchEditPlaceholderValue = signal('');
 readonly buttonLinkValue = signal('');
@@ -1879,10 +1904,8 @@ effect(() => {
   if (!component) {
     this.activeMenuToolbarMenu.set(null);
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(null);
-    this.selectedMenuPageIds.set([]);
-    this.isMenuAddPagesPopupOpen.set(false);
     return;
   }
 
@@ -1916,6 +1939,48 @@ effect(() => {
 
   this.searchEditLabelValue.set(this.selectedSearchComponent()!.props.label);
   this.searchEditPlaceholderValue.set(this.selectedSearchComponent()!.props.placeholder);
+});
+
+effect(() => {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) {
+    this.activeProductDetailsToolbarMenu.set(null);
+    this.activeProductDetailsSettingsSection.set('content');
+    this.productDetailsEditTextValues.set({});
+    return;
+  }
+
+  this.productDetailsEditTextValues.set({
+    quantityLabel: component.props.quantityLabel,
+    addToCartLabel: component.props.addToCartLabel,
+    buyNowLabel: component.props.buyNowLabel,
+    skuLabel: component.props.skuLabel,
+    inStockLabel: component.props.inStockLabel,
+    outOfStockLabel: component.props.outOfStockLabel,
+  });
+});
+
+effect(() => {
+  const component = this.selectedCartContentComponent();
+  if (!component) {
+    this.activeCartContentToolbarMenu.set(null);
+    this.activeCartContentSettingsSection.set('layout');
+    this.cartContentEditTextValues.set({});
+    return;
+  }
+
+  this.cartContentEditTextValues.set({
+    cartTitle: component.props.cartTitle,
+    summaryTitle: component.props.summaryTitle,
+    subtotalLabel: component.props.subtotalLabel,
+    totalLabel: component.props.totalLabel,
+    promoPlaceholder: component.props.promoPlaceholder,
+    applyLabel: component.props.applyLabel,
+    checkoutLabel: component.props.checkoutLabel,
+    emptyTitle: component.props.emptyTitle,
+    emptyDescription: component.props.emptyDescription,
+    emptyButtonLabel: component.props.emptyButtonLabel,
+  });
 });
 
 effect(() => {
@@ -2009,15 +2074,26 @@ effect(() => {
     event.preventDefault();
     this.activeMenuToolbarMenu.set(null);
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(null);
-    this.isMenuAddPagesPopupOpen.set(false);
     return;
   }
 
 if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
   event.preventDefault();
   this.activeCartToolbarMenu.set(null);
+  return;
+}
+
+if (event.key === 'Escape' && this.activeCartContentToolbarMenu()) {
+  event.preventDefault();
+  this.activeCartContentToolbarMenu.set(null);
+  return;
+}
+
+if (event.key === 'Escape' && this.activeProductDetailsToolbarMenu()) {
+  event.preventDefault();
+  this.activeProductDetailsToolbarMenu.set(null);
   return;
 }
 
@@ -2219,9 +2295,8 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
    this.activeButtonToolbarMenu.set(null);
    this.activeMenuToolbarMenu.set(null);
    this.activeMenuItemActionsId.set(null);
-   this.activeMenuItemLinkId.set(null);
+   this.closeMenuItemLinkEditor();
    this.renamingMenuItemId.set(null);
-   this.isMenuAddPagesPopupOpen.set(false);
    this.activeProductFeedToolbarMenu.set(null);
    this.closeComponentContextMenu();
    return;
@@ -2375,14 +2450,13 @@ if (this.activeButtonToolbarMenu()) {
 if (this.activeMenuToolbarMenu()) {
   if (
     !target.closest(
-      '.storefront-editor__context-toolbar-shell, .storefront-editor__menu-toolbar-side-panel, .storefront-editor__menu-add-pages-popup, .storefront-editor__menu-item-actions-popup, .storefront-editor__menu-item-link-popup'
+      '.storefront-editor__context-toolbar-shell, .storefront-editor__menu-toolbar-side-panel, .storefront-editor__menu-item-actions-popup, .storefront-editor__menu-item-link-popup'
     )
   ) {
     this.activeMenuToolbarMenu.set(null);
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(null);
-    this.isMenuAddPagesPopupOpen.set(false);
   }
 }
 
@@ -2395,13 +2469,7 @@ if (this.activeMenuFormatDropdown()) {
 if (this.activeMenuItemActionsId() || this.activeMenuItemLinkId()) {
   if (!target.closest('.storefront-editor__menu-manage-item, .storefront-editor__menu-item-actions-popup, .storefront-editor__menu-item-link-popup')) {
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
-  }
-}
-
-if (this.isMenuAddPagesPopupOpen()) {
-  if (!target.closest('.storefront-editor__menu-add-pages-popup, .storefront-editor__menu-toolbar-add-item')) {
-    this.closeMenuAddPagesPopup();
+    this.closeMenuItemLinkEditor();
   }
 }
 
@@ -4702,9 +4770,8 @@ finishEditingComponentText(): void {
   this.activeButtonToolbarMenu.set(null);
   this.activeMenuToolbarMenu.set(null);
   this.activeMenuItemActionsId.set(null);
-  this.activeMenuItemLinkId.set(null);
+  this.closeMenuItemLinkEditor();
   this.renamingMenuItemId.set(null);
-this.isMenuAddPagesPopupOpen.set(false);
 this.activeCartToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
 this.closeButtonTextDropdownMenu();
@@ -6515,10 +6582,8 @@ private syncImageBorderColorPickerFromHex(color: string): void {
 
     if (next !== 'manage') {
       this.activeMenuItemActionsId.set(null);
-      this.activeMenuItemLinkId.set(null);
+      this.closeMenuItemLinkEditor();
       this.renamingMenuItemId.set(null);
-      this.isMenuAddPagesPopupOpen.set(false);
-      this.selectedMenuPageIds.set([]);
       this.clearMenuItemReorderState();
     }
   }
@@ -6668,7 +6733,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     event.preventDefault();
     event.stopPropagation();
     const target = event.currentTarget;
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(null);
     const nextId = this.activeMenuItemActionsId() === itemId ? null : itemId;
     this.activeMenuItemActionsId.set(nextId);
@@ -6686,7 +6751,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     }
 
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(itemId);
     this.renamingMenuItemValue.set(item.label);
   }
@@ -6778,7 +6843,24 @@ private syncImageBorderColorPickerFromHex(color: string): void {
       href: this.buildManagedPageHref(this.menuLinkPageId()),
       openInNewTab: this.menuLinkOpenMode() === 'new',
     }));
+    this.pendingNewMenuItemId.set(null);
+    this.closeMenuItemLinkEditor();
+  }
+
+  closeMenuItemLinkEditor(): void {
+    const pendingId = this.pendingNewMenuItemId();
+    if (pendingId) {
+      const item = this.findSelectedMenuItem(pendingId);
+      if (item && !item.href?.trim()) {
+        this.updateSelectedMenuItems((items) => items.filter((entry) => entry.id !== pendingId));
+      }
+      this.pendingNewMenuItemId.set(null);
+    }
+
     this.activeMenuItemLinkId.set(null);
+    this.menuLinkPageId.set('');
+    this.menuLinkOpenMode.set('current');
+    this.menuLinkValue.set('');
   }
 
   removeSelectedMenuItemLink(itemId: string | null = this.activeMenuItemLinkId()): void {
@@ -6793,7 +6875,11 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     }));
     this.menuLinkPageId.set('');
     this.menuLinkOpenMode.set('current');
-    this.activeMenuItemLinkId.set(null);
+    if (this.pendingNewMenuItemId() === itemId) {
+      this.removeSelectedMenuItem(itemId);
+      this.pendingNewMenuItemId.set(null);
+    }
+    this.closeMenuItemLinkEditor();
     this.activeMenuItemActionsId.set(null);
   }
 
@@ -6805,7 +6891,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
       this.activeMenuItemActionsId.set(null);
     }
     if (this.activeMenuItemLinkId() === itemId) {
-      this.activeMenuItemLinkId.set(null);
+      this.closeMenuItemLinkEditor();
     }
     if (this.renamingMenuItemId() === itemId) {
       this.renamingMenuItemId.set(null);
@@ -6833,57 +6919,31 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.activeMenuItemActionsId.set(null);
   }
 
-  openMenuAddPagesPopup(): void {
-    this.isMenuAddPagesPopupOpen.set(true);
+  addMenuItem(event?: MouseEvent): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const newItemId = this.createEditorScopedId('menu-item');
+    this.updateSelectedMenuItems((items) => [
+      ...items,
+      {
+        id: newItemId,
+        label: 'New item',
+        href: '',
+        openInNewTab: false,
+      },
+    ]);
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.pendingNewMenuItemId.set(newItemId);
     this.renamingMenuItemId.set(null);
-    this.selectedMenuPageIds.set([]);
-  }
-
-  closeMenuAddPagesPopup(): void {
-    this.isMenuAddPagesPopupOpen.set(false);
-    this.selectedMenuPageIds.set([]);
-  }
-
-  toggleMenuAddPageSelection(pageId: string): void {
-    if (this.isManagedPageAlreadyInSelectedMenu(pageId)) {
-      return;
-    }
-
-    this.selectedMenuPageIds.update((current) =>
-      current.includes(pageId)
-        ? current.filter((id) => id !== pageId)
-        : [...current, pageId]
-    );
-  }
-
-  addSelectedPagesToMenu(): void {
-    const pageIds = this.selectedMenuPageIds();
-    if (!pageIds.length) {
-      return;
-    }
-
-    this.updateSelectedMenuItems((items) => {
-      const additions = pageIds
-        .map((pageId) => this.managedPages().find((page) => page.id === pageId))
-        .filter((page): page is StorefrontEditorManagedPage => Boolean(page))
-        .filter((page) => !items.some((item) => this.normalizeHrefValue(item.href) === this.normalizeHrefValue(this.buildManagedPageHref(page.id))))
-        .map((page) => ({
-          id: this.createEditorScopedId('menu-item'),
-          label: page.name,
-          href: this.buildManagedPageHref(page.id),
-          openInNewTab: false,
-        }));
-
-      return additions.length ? [...items, ...additions] : items;
+    const target = event?.currentTarget;
+    setTimeout(() => {
+      if (target instanceof HTMLElement) {
+        this.openMenuItemLinkEditor(newItemId);
+        this.positionMenuItemLinkPopup(target.getBoundingClientRect());
+      } else {
+        this.openMenuItemLinkEditor(newItemId);
+      }
     });
-
-    this.closeMenuAddPagesPopup();
-  }
-
-  menuPageAlreadyAdded(pageId: string): boolean {
-    return this.isManagedPageAlreadyInSelectedMenu(pageId);
   }
 
   startMenuItemReorder(itemId: string, event: MouseEvent): void {
@@ -6903,7 +6963,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     const rowRect = itemElement.getBoundingClientRect();
     const listRect = listElement.getBoundingClientRect();
     this.activeMenuItemActionsId.set(null);
-    this.activeMenuItemLinkId.set(null);
+    this.closeMenuItemLinkEditor();
     this.renamingMenuItemId.set(null);
     this.draggedMenuItemId.set(itemId);
     this.menuItemDropTargetId.set(itemId);
@@ -7031,6 +7091,22 @@ toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
   }
 }
 
+toggleProductDetailsToolbarMenu(menu: Exclude<ProductDetailsToolbarMenu, null>): void {
+  const next = this.activeProductDetailsToolbarMenu() === menu ? null : menu;
+  this.activeProductDetailsToolbarMenu.set(next);
+  if (next === 'settings') {
+    this.activeProductDetailsSettingsSection.set('content');
+  }
+}
+
+toggleCartContentToolbarMenu(menu: Exclude<CartContentToolbarMenu, null>): void {
+  const next = this.activeCartContentToolbarMenu() === menu ? null : menu;
+  this.activeCartContentToolbarMenu.set(next);
+  if (next === 'settings') {
+    this.activeCartContentSettingsSection.set('layout');
+  }
+}
+
 toggleSearchToolbarMenu(menu: Exclude<SearchToolbarMenu, null>): void {
   const next = this.activeSearchToolbarMenu() === menu ? null : menu;
   this.activeSearchToolbarMenu.set(next);
@@ -7043,6 +7119,14 @@ toggleSearchToolbarMenu(menu: Exclude<SearchToolbarMenu, null>): void {
 
 setActiveCartSettingsSection(section: CartSettingsSection): void {
   this.activeCartSettingsSection.set(section);
+}
+
+setActiveProductDetailsSettingsSection(section: ProductDetailsSettingsSection): void {
+  this.activeProductDetailsSettingsSection.set(section);
+}
+
+setActiveCartContentSettingsSection(section: CartContentSettingsSection): void {
+  this.activeCartContentSettingsSection.set(section);
 }
 
   toggleButtonTextDropdownMenu(menu: Exclude<ButtonTextDropdownMenu, null>): void {
@@ -7198,14 +7282,72 @@ setActiveCartSettingsSection(section: CartSettingsSection): void {
     this.updateSelectedButtonProps({ label: value });
   }
 
-  updateSelectedCartTextValue(value: string): void {
-    this.cartEditTextValue.set(value);
-    this.updateSelectedCartProps({ label: value });
-  }
+updateSelectedCartTextValue(value: string): void {
+  this.cartEditTextValue.set(value);
+  this.updateSelectedCartProps({ label: value });
+}
 
-  updateSelectedCartIconStyle(value: StorefrontEditorCartIconStyle): void {
-    this.updateSelectedCartProps({ iconStyle: value });
-  }
+updateSelectedProductDetailsTextValue(key: keyof StorefrontEditorProductDetailsNode['props'], value: string): void {
+  this.productDetailsEditTextValues.update((current) => ({ ...current, [key]: value }));
+  this.updateSelectedProductDetailsProps({ [key]: value } as Partial<StorefrontEditorProductDetailsNode['props']>);
+}
+
+updateSelectedCartContentTextValue(key: keyof StorefrontEditorCartContentNode['props'], value: string): void {
+  this.cartContentEditTextValues.update((current) => ({ ...current, [key]: value }));
+  this.updateSelectedCartContentProps({ [key]: value } as Partial<StorefrontEditorCartContentNode['props']>);
+}
+
+updateSelectedCartIconStyle(value: StorefrontEditorCartIconStyle): void {
+  this.updateSelectedCartProps({ iconStyle: value });
+}
+
+toggleSelectedProductDetailsShowCategory(): void {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) { return; }
+  this.updateSelectedProductDetailsProps({ showCategory: !component.props.showCategory });
+}
+
+toggleSelectedProductDetailsShowDescription(): void {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) { return; }
+  this.updateSelectedProductDetailsProps({ showDescription: !component.props.showDescription });
+}
+
+toggleSelectedProductDetailsShowFacts(): void {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) { return; }
+  this.updateSelectedProductDetailsProps({ showFacts: !component.props.showFacts });
+}
+
+toggleSelectedProductDetailsShowTags(): void {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) { return; }
+  this.updateSelectedProductDetailsProps({ showTags: !component.props.showTags });
+}
+
+toggleSelectedProductDetailsShowComparePrice(): void {
+  const component = this.selectedProductDetailsComponent();
+  if (!component) { return; }
+  this.updateSelectedProductDetailsProps({ showCompareAtPrice: !component.props.showCompareAtPrice });
+}
+
+toggleSelectedCartContentShowImages(): void {
+  const component = this.selectedCartContentComponent();
+  if (!component) { return; }
+  this.updateSelectedCartContentProps({ showImages: !component.props.showImages });
+}
+
+toggleSelectedCartContentShowMeta(): void {
+  const component = this.selectedCartContentComponent();
+  if (!component) { return; }
+  this.updateSelectedCartContentProps({ showMeta: !component.props.showMeta });
+}
+
+toggleSelectedCartContentShowPromoCode(): void {
+  const component = this.selectedCartContentComponent();
+  if (!component) { return; }
+  this.updateSelectedCartContentProps({ showPromoCode: !component.props.showPromoCode });
+}
 
   updateSelectedCartLabelFontFamily(value: string): void {
     this.updateSelectedCartProps({ labelFontFamily: value });
@@ -10814,8 +10956,8 @@ private updateSelectedMenuProps(
 }
 
 private updateSelectedCartProps(
-  patch: Partial<StorefrontEditorCartNode['props']>,
-  options: { transient?: boolean; preview?: boolean } = {}
+ patch: Partial<StorefrontEditorCartNode['props']>,
+ options: { transient?: boolean; preview?: boolean } = {}
 ): void {
   const sectionId = this.selectedSectionId();
   const component = this.selectedCartComponent();
@@ -10833,8 +10975,42 @@ private updateSelectedCartProps(
           },
         }
       : current,
-    options
-  );
+ options
+ );
+}
+
+private updateSelectedProductDetailsProps(
+ patch: Partial<StorefrontEditorProductDetailsNode['props']>,
+ options: { transient?: boolean; preview?: boolean } = {}
+): void {
+ const sectionId = this.selectedSectionId();
+ const component = this.selectedProductDetailsComponent();
+ if (!sectionId || !component) {
+   return;
+ }
+
+ this.updateComponentNode(sectionId, component.id, (current) =>
+   current.type === 'product-details'
+     ? this.writeComponentProps(current, patch)
+     : current
+ , options);
+}
+
+private updateSelectedCartContentProps(
+ patch: Partial<StorefrontEditorCartContentNode['props']>,
+ options: { transient?: boolean; preview?: boolean } = {}
+): void {
+ const sectionId = this.selectedSectionId();
+ const component = this.selectedCartContentComponent();
+ if (!sectionId || !component) {
+   return;
+ }
+
+ this.updateComponentNode(sectionId, component.id, (current) =>
+   current.type === 'cart-content'
+     ? this.writeComponentProps(current, patch)
+     : current
+ , options);
 }
 
 private updateSelectedSearchProps(

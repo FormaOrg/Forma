@@ -6,6 +6,8 @@ import { finalize, map } from 'rxjs';
 
 import { Project } from '../../../../../../core/models/project.model';
 import { ProjectService } from '../../../../../../core/services/project.service';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
 type BlogPostStatus = 'published' | 'scheduled' | 'draft';
 
@@ -27,12 +29,13 @@ interface BlogPostItem {
 @Component({
   selector: 'app-project-posts-route',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-posts-route.html',
 })
 export class ProjectPostsRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
+  private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -57,59 +60,59 @@ export class ProjectPostsRoute {
     return [
       {
         id: 'launch-story',
-        title: 'How to launch a sharper editorial voice in 30 days',
-        excerpt: `A practical publishing plan inspired by the positioning behind ${project.name}.`,
+        title: this.i18n.t('project.posts.mock.launch.title'),
+        excerpt: `${this.i18n.t('project.posts.mock.launch.excerptPrefix')} ${project.name}.`,
         status: 'published',
-        statusLabel: 'Published',
-        categoryLabel: 'Strategy',
-        readTimeLabel: '6 min read',
-        viewsLabel: '1.8k views',
+        statusLabel: this.i18n.t('project.posts.status.published'),
+        categoryLabel: this.i18n.t('project.posts.mock.category.strategy'),
+        readTimeLabel: this.i18n.t('project.posts.mock.read6'),
+        viewsLabel: this.i18n.t('project.posts.mock.views18k'),
         updatedLabel,
-        hook: 'Turn your blog into a consistent point of view instead of a list of updates.',
-        seoTitle: 'Launch a sharper editorial voice in 30 days',
-        distributionLabel: 'Newsletter and homepage feature',
+        hook: this.i18n.t('project.posts.mock.launch.hook'),
+        seoTitle: this.i18n.t('project.posts.mock.launch.seoTitle'),
+        distributionLabel: this.i18n.t('project.posts.mock.launch.distribution'),
       },
       {
         id: 'workflow-stack',
-        title: 'The content workflow stack our team actually sticks to',
-        excerpt: 'The templates, review rules, and publishing cadence that keep content shipping each week.',
+        title: this.i18n.t('project.posts.mock.workflow.title'),
+        excerpt: this.i18n.t('project.posts.mock.workflow.excerpt'),
         status: 'scheduled',
-        statusLabel: 'Scheduled',
-        categoryLabel: 'Operations',
-        readTimeLabel: '4 min read',
-        viewsLabel: 'Queued for Tuesday',
+        statusLabel: this.i18n.t('project.posts.status.scheduled'),
+        categoryLabel: this.i18n.t('project.posts.mock.category.operations'),
+        readTimeLabel: this.i18n.t('project.posts.mock.read4'),
+        viewsLabel: this.i18n.t('project.posts.mock.queuedTuesday'),
         updatedLabel,
-        hook: 'A practical view of the writing pipeline from outline to publish.',
-        seoTitle: 'The content workflow stack teams actually stick to',
-        distributionLabel: 'Scheduled for email and social',
+        hook: this.i18n.t('project.posts.mock.workflow.hook'),
+        seoTitle: this.i18n.t('project.posts.mock.workflow.seoTitle'),
+        distributionLabel: this.i18n.t('project.posts.mock.workflow.distribution'),
       },
       {
         id: 'design-systems',
-        title: 'Design systems that help writers move faster',
-        excerpt: 'Why reusable blocks and content patterns matter just as much as visual consistency.',
+        title: this.i18n.t('project.posts.mock.design.title'),
+        excerpt: this.i18n.t('project.posts.mock.design.excerpt'),
         status: 'draft',
-        statusLabel: 'Draft',
-        categoryLabel: 'Design',
-        readTimeLabel: '7 min read',
-        viewsLabel: 'Draft in review',
+        statusLabel: this.i18n.t('project.posts.status.draft'),
+        categoryLabel: this.i18n.t('project.posts.mock.category.design'),
+        readTimeLabel: this.i18n.t('project.posts.mock.read7'),
+        viewsLabel: this.i18n.t('project.posts.mock.draftReview'),
         updatedLabel,
-        hook: 'Better structure means less friction when writers need to publish quickly.',
-        seoTitle: 'Design systems that help writers publish faster',
-        distributionLabel: 'Internal review only',
+        hook: this.i18n.t('project.posts.mock.design.hook'),
+        seoTitle: this.i18n.t('project.posts.mock.design.seoTitle'),
+        distributionLabel: this.i18n.t('project.posts.mock.design.distribution'),
       },
       {
         id: 'audience-signals',
-        title: 'What early subscriber signals are worth paying attention to',
-        excerpt: 'A short guide to judging traction before your list is large.',
+        title: this.i18n.t('project.posts.mock.audience.title'),
+        excerpt: this.i18n.t('project.posts.mock.audience.excerpt'),
         status: 'published',
-        statusLabel: 'Published',
-        categoryLabel: 'Growth',
-        readTimeLabel: '5 min read',
-        viewsLabel: '940 views',
+        statusLabel: this.i18n.t('project.posts.status.published'),
+        categoryLabel: this.i18n.t('project.posts.mock.category.growth'),
+        readTimeLabel: this.i18n.t('project.posts.mock.read5'),
+        viewsLabel: this.i18n.t('project.posts.mock.views940'),
         updatedLabel,
-        hook: 'Use replies, saves, and repeat opens to find what readers actually want more of.',
-        seoTitle: 'Which early subscriber signals actually matter',
-        distributionLabel: 'Newsletter and archive',
+        hook: this.i18n.t('project.posts.mock.audience.hook'),
+        seoTitle: this.i18n.t('project.posts.mock.audience.seoTitle'),
+        distributionLabel: this.i18n.t('project.posts.mock.audience.distribution'),
       },
     ];
   });
@@ -143,7 +146,7 @@ export class ProjectPostsRoute {
   loadProject(): void {
     const projectId = this.projectId();
     if (!projectId) {
-      this.errorMessage.set('Project not found.');
+      this.errorMessage.set(this.i18n.t('project.posts.errors.notFound'));
       this.isLoading.set(false);
       return;
     }
@@ -161,7 +164,7 @@ export class ProjectPostsRoute {
         },
         error: () => {
           this.project.set(null);
-          this.errorMessage.set('Unable to load blog posts right now.');
+          this.errorMessage.set(this.i18n.t('project.posts.errors.load'));
         },
       });
   }
@@ -183,10 +186,10 @@ export class ProjectPostsRoute {
   private formatDate(value: string): string {
     const parsed = Date.parse(value);
     if (!Number.isFinite(parsed)) {
-      return 'Recently updated';
+      return this.i18n.t('project.posts.time.recentlyUpdated');
     }
 
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.i18n.lang() === 'fr' ? 'fr-FR' : 'en-US', {
       month: 'short',
       day: 'numeric',
     }).format(parsed);

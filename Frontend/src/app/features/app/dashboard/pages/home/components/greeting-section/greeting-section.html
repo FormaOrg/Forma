@@ -1,11 +1,11 @@
 <section class="greeting-section">
   <div class="greeting-section__content">
     <div class="greeting-section__text">
-      <p class="greeting-section__eyebrow">Workspace overview</p>
+      <p class="greeting-section__eyebrow">{{ 'dashboard.home.greeting.eyebrow' | t }}</p>
       <h1 class="greeting-section__title">
-        Welcome Back <span>{{ userName }}</span>
+        {{ 'dashboard.home.greeting.welcome' | t }} <span>{{ userName }}</span>
       </h1>
-      <p class="greeting-section__subtitle">Everything important is in one place so you can keep building without losing momentum.</p>
+      <p class="greeting-section__subtitle">{{ 'dashboard.home.greeting.subtitle' | t }}</p>
     </div>
 
     <div class="greeting-section__actions">
@@ -42,7 +42,7 @@
         </svg>
         </span>
 
-        <span>Import site</span>
+        <span>{{ 'dashboard.home.greeting.importSite' | t }}</span>
       </button>
 
       <a class="greeting-btn greeting-btn--create-animated" routerLink="/app/create-project">
@@ -68,7 +68,7 @@
           </svg>
         </span>
 
-        <span class="greeting-btn__text">New Site</span>
+        <span class="greeting-btn__text">{{ 'dashboard.home.greeting.newSite' | t }}</span>
       </a>
     </div>
   </div>
