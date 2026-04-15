@@ -10,7 +10,8 @@ public class SchemaConstraintConfiguration {
 
     @Bean
     ApplicationRunner projectOrderItemsProductConstraintRunner(JdbcTemplate jdbcTemplate) {
-        return args -> jdbcTemplate.execute("""
+        return args -> {
+            jdbcTemplate.execute("""
                 DO $$
                 BEGIN
                     ALTER TABLE project_order_items
@@ -27,5 +28,14 @@ public class SchemaConstraintConfiguration {
                         ON DELETE CASCADE;
                 END $$;
                 """);
+
+            jdbcTemplate.execute("""
+                SELECT setval(
+                    pg_get_serial_sequence('project_products', 'id'),
+                    COALESCE((SELECT MAX(id) FROM project_products), 1),
+                    (SELECT COUNT(*) > 0 FROM project_products)
+                );
+                """);
+        };
     }
 }
