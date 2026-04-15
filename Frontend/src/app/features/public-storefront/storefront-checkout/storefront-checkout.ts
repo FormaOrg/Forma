@@ -7,6 +7,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
+import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
@@ -24,6 +25,7 @@ export class StorefrontCheckout {
   private readonly formBuilder = inject(FormBuilder);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
   private readonly storeCartService = inject(StoreCartService);
+  private readonly storefrontCustomerSessionService = inject(StorefrontCustomerSessionService);
   private readonly toastService = inject(ToastService);
 
   readonly projectParamMap = toSignal(this.route.paramMap, {
@@ -73,6 +75,7 @@ export class StorefrontCheckout {
         next: (storefront) => {
           this.storefront.set(storefront);
           this.isLoading.set(false);
+          this.prefillFromAccountSession();
         },
         error: () => {
           this.storefront.set(null);
@@ -89,6 +92,7 @@ export class StorefrontCheckout {
     }
 
     const raw = this.checkoutForm.getRawValue();
+    const customerSessionToken = this.storefrontCustomerSessionService.getSessionToken(this.projectId());
 
     this.isSubmitting.set(true);
     this.publicStorefrontService
@@ -99,6 +103,7 @@ export class StorefrontCheckout {
         email: (raw.email ?? '').trim() || null,
         address: (raw.address ?? '').trim(),
         notes: (raw.notes ?? '').trim() || null,
+        customerSessionToken,
         items: this.items().map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -123,6 +128,33 @@ export class StorefrontCheckout {
         },
         complete: () => {
           this.isSubmitting.set(false);
+        },
+      });
+  }
+
+  private prefillFromAccountSession(): void {
+    const projectId = this.projectId();
+    const token = this.storefrontCustomerSessionService.getSessionToken(projectId);
+    if (!token) {
+      return;
+    }
+
+    this.publicStorefrontService
+      .getAccount(projectId, token)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (account) => {
+          this.storefrontCustomerSessionService.setSessionToken(projectId, account.sessionToken);
+          this.checkoutForm.patchValue({
+            firstName: account.customer.firstName ?? '',
+            lastName: account.customer.lastName ?? '',
+            phone: account.customer.phone ?? '',
+            email: account.customer.email ?? '',
+            address: account.customer.address ?? '',
+          });
+        },
+        error: () => {
+          this.storefrontCustomerSessionService.clearSession(projectId);
         },
       });
   }

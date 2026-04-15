@@ -1,0 +1,131 @@
+@if (isLoading()) {
+  <section class="storefront-account__state">
+    <p>Loading account...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-account__state storefront-account__state--error">
+    <h1>Account unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else {
+  <div class="storefront-account">
+    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+
+    <main class="storefront-account__layout">
+      @if (account(); as userAccount) {
+        <section class="storefront-account__panel storefront-account__panel--profile">
+          <div class="storefront-account__panel-head">
+            <div>
+              <span>Customer account</span>
+              <h1>{{ userAccount.customer.fullName }}</h1>
+            </div>
+            <button type="button" (click)="logout()">Sign out</button>
+          </div>
+
+          <div class="storefront-account__details">
+            <article>
+              <span>Email</span>
+              <strong>{{ userAccount.customer.email }}</strong>
+            </article>
+            <article>
+              <span>Phone</span>
+              <strong>{{ userAccount.customer.phone || 'Not provided' }}</strong>
+            </article>
+            <article>
+              <span>Address</span>
+              <strong>{{ userAccount.customer.address || 'Not provided' }}</strong>
+            </article>
+          </div>
+
+          <div class="storefront-account__orders">
+            <div class="storefront-account__orders-head">
+              <h2>Your orders</h2>
+              <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Continue shopping</a>
+            </div>
+
+            @if (sortedOrders().length) {
+              <div class="storefront-account__order-list">
+                @for (order of sortedOrders(); track order.orderId) {
+                  <article class="storefront-account__order-card">
+                    <div>
+                      <span>{{ order.orderNumber }}</span>
+                      <strong>{{ order.total | currency:'TND':'symbol':'1.0-2' }}</strong>
+                    </div>
+                    <p>
+                      {{ order.placedAt ? (order.placedAt | date:'medium') : 'Unknown date' }}
+                      · {{ order.paymentStatus || 'UNKNOWN' }}
+                      · {{ order.fulfillmentStatus || 'UNKNOWN' }}
+                    </p>
+                  </article>
+                }
+              </div>
+            } @else {
+              <p class="storefront-account__empty">No orders yet. Your future orders will appear here and in the dashboard sales page.</p>
+            }
+          </div>
+        </section>
+      } @else {
+        <section class="storefront-account__panel storefront-account__panel--auth">
+          <div class="storefront-account__panel-head">
+            <div>
+              <span>Customer account</span>
+              <h1>Sign in to your storefront account</h1>
+            </div>
+            <button type="button" (click)="goToStorefront()">Back to store</button>
+          </div>
+
+          <div class="storefront-account__tabs">
+            <button type="button" [class.storefront-account__tab--active]="activeTab() === 'login'" (click)="setActiveTab('login')">Login</button>
+            <button type="button" [class.storefront-account__tab--active]="activeTab() === 'register'" (click)="setActiveTab('register')">Create account</button>
+          </div>
+
+          @if (activeTab() === 'login') {
+            <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="storefront-account__form">
+              <label>
+                <span>Email</span>
+                <input type="email" formControlName="email" />
+              </label>
+              <label>
+                <span>Password</span>
+                <input type="password" formControlName="password" />
+              </label>
+              <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Signing in...' : 'Sign in' }}</button>
+            </form>
+          } @else {
+            <form [formGroup]="registerForm" (ngSubmit)="submitRegister()" class="storefront-account__form">
+              <div class="storefront-account__grid">
+                <label>
+                  <span>First name</span>
+                  <input type="text" formControlName="firstName" />
+                </label>
+                <label>
+                  <span>Last name</span>
+                  <input type="text" formControlName="lastName" />
+                </label>
+              </div>
+
+              <label>
+                <span>Email</span>
+                <input type="email" formControlName="email" />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input type="text" formControlName="phone" />
+              </label>
+              <label>
+                <span>Address</span>
+                <input type="text" formControlName="address" />
+              </label>
+              <label>
+                <span>Password</span>
+                <input type="password" formControlName="password" />
+              </label>
+
+              <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Creating account...' : 'Create account' }}</button>
+            </form>
+          }
+        </section>
+      }
+    </main>
+  </div>
+}

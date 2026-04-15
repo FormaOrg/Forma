@@ -51,6 +51,7 @@ export interface PublicCheckoutRequest {
   email?: string | null;
   address: string;
   notes?: string | null;
+  customerSessionToken?: string | null;
   items: PublicCheckoutItemRequest[];
 }
 
@@ -59,4 +60,45 @@ export interface PublicCheckoutResponse {
   orderNumber: string;
   total: number;
   currencyCode: string;
+}
+
+export interface PublicStorefrontAccountRegisterRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+  password: string;
+}
+
+export interface PublicStorefrontAccountLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface PublicStorefrontCustomerProfile {
+  customerId: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  createdAt: string | null;
+}
+
+export interface PublicStorefrontCustomerOrder {
+  orderId: number;
+  orderNumber: string;
+  placedAt: string | null;
+  paymentStatus: string | null;
+  fulfillmentStatus: string | null;
+  total: number;
+}
+
+export interface PublicStorefrontCustomerAccount {
+  sessionToken: string;
+  expiresAt: string | null;
+  customer: PublicStorefrontCustomerProfile;
+  orders: PublicStorefrontCustomerOrder[];
 }

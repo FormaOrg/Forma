@@ -7,6 +7,7 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
+import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { AppIcon } from '../../../shared/app/icons/app-icon';
 import {
   StorefrontEditorCartNode,
@@ -27,6 +28,7 @@ export class StorefrontPublicHeaderComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
   private readonly storeCartService = inject(StoreCartService);
+  private readonly storefrontCustomerSessionService = inject(StorefrontCustomerSessionService);
 
   readonly storefront = input<PublicStorefrontHome | null>(null);
   readonly projectId = input.required<number>();
@@ -68,6 +70,7 @@ export class StorefrontPublicHeaderComponent {
   });
   readonly searchOverlayLabel = computed(() => this.searchComponent()?.props.label || 'Search');
   readonly searchOverlayPlaceholder = computed(() => this.searchComponent()?.props.placeholder || 'Search products');
+  readonly hasCustomerSession = computed(() => !!this.storefrontCustomerSessionService.getSessionToken(this.projectId()));
 
   readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
   readonly cartItems = computed(() => this.storeCartService.itemsFor(this.projectId()));
@@ -195,6 +198,17 @@ export class StorefrontPublicHeaderComponent {
 
   closeCartDrawer(): void {
     this.isCartDrawerOpen.set(false);
+  }
+
+  goToAccount(event?: MouseEvent): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    void this.router.navigate(['/store', this.projectId(), 'account'], {
+      queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
+    });
   }
 
   increaseQuantity(productId: number, quantity: number): void {

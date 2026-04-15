@@ -72,6 +72,17 @@
             }
           }
         }
+
+        <button
+          type="button"
+          class="storefront-public-header__account-trigger"
+          [class.storefront-public-header__account-trigger--active]="hasCustomerSession()"
+          (click)="goToAccount($event)"
+          aria-label="Account"
+          title="Account"
+        >
+          <app-icon name="user" [size]="18"></app-icon>
+        </button>
       </div>
     </div>
   </header>
@@ -83,6 +94,7 @@
       <nav class="storefront-public-header__fallback-nav" aria-label="Store navigation">
         <a [attr.href]="resolveLinkHref('/')">Home</a>
         <a [attr.href]="resolveLinkHref('/products')">Products</a>
+        <button type="button" (click)="goToAccount($event)">Account</button>
         <button type="button" (click)="openCartFromIcon($event)">Cart ({{ cartCount() }})</button>
       </nav>
     </div>
