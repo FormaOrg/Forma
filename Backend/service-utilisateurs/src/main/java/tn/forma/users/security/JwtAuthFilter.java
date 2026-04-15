@@ -24,6 +24,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final ActivityService activityService;
     private final UserDetailsServiceImpl userDetailsService;
 
+    private boolean isPublicEndpoint(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.startsWith("/api/public/")
+                || uri.startsWith("/api/auth/")
+                || uri.startsWith("/uploads/")
+                || uri.startsWith("/ws/");
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -64,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     activityService.touchSession(sessionId);
-                } else if (!activityService.isSessionActive(sessionId)) {
+                } else if (!activityService.isSessionActive(sessionId) && !isPublicEndpoint(request)) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session has been signed out");
                     return;
                 }

@@ -200,9 +200,14 @@ export class AuthService {
         this.cacheSessionValidation(token, now);
         return true;
       }),
-      catchError(() => {
-        // Keep navigation responsive; API calls still enforce auth via interceptor on real token failures.
-        return of(true);
+      catchError((error) => {
+        if (error?.status === 0) {
+          // If backend is temporarily unreachable, avoid forcing an immediate sign-out.
+          return of(true);
+        }
+
+        // For auth failures (or any non-network errors), fail closed so guards redirect to login.
+        return of(false);
       })
     );
   }

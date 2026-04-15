@@ -49,6 +49,8 @@ class PublicCheckoutServiceTest {
     private ProjectCustomerRepository projectCustomerRepository;
     @Mock
     private ProjectOrderRepository projectOrderRepository;
+    @Mock
+    private PublicStorefrontAccountService publicStorefrontAccountService;
 
     @Test
     void checkoutCreatesCustomerAndOrderUsingPublishedStorefront() {
@@ -73,6 +75,8 @@ class PublicCheckoutServiceTest {
 
         when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
         when(projectStorefrontRepository.findByProjectId(project.getId())).thenReturn(Optional.of(storefront));
+        when(publicStorefrontAccountService.resolveAuthenticatedCustomer(project.getId(), null))
+                .thenReturn(Optional.empty());
         when(projectCustomerRepository.findFirstByProjectIdAndEmailIgnoreCase(project.getId(), "shopper@example.com"))
                 .thenReturn(Optional.empty());
         when(projectCustomerRepository.findFirstByProjectIdAndPhone(project.getId(), "+21611111111"))
@@ -94,7 +98,8 @@ class PublicCheckoutServiceTest {
                 projectStorefrontRepository,
                 projectProductRepository,
                 projectCustomerRepository,
-                projectOrderRepository
+                projectOrderRepository,
+                publicStorefrontAccountService
         );
 
         PublicCheckoutRequest request = new PublicCheckoutRequest();
@@ -144,3 +149,4 @@ class PublicCheckoutServiceTest {
                 .build();
     }
 }
+
