@@ -101,6 +101,10 @@
   appearance: none;
 }
 
+.storefront-public-header__component--account {
+  appearance: none;
+}
+
 .storefront-public-header__search-overlay {
   position: fixed;
   inset: 0;

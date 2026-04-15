@@ -485,8 +485,15 @@ private readonly authService = inject(AuthService);
         }>;
       }
     | null = null;
-private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
-private activeSelectionDrag:
+  private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
+  private pendingComponentDragPointer:
+    | {
+        clientX: number;
+        clientY: number;
+      }
+    | null = null;
+  private activeComponentDragFrame: number | null = null;
+  private activeSelectionDrag:
     | {
         sectionId: string;
         startX: number;
@@ -2630,12 +2637,35 @@ if (this.activeProductFeedToolbarMenu()) {
     }
 
     event.preventDefault();
+    this.pendingComponentDragPointer = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    };
+    if (this.activeComponentDragFrame !== null) {
+      return;
+    }
+
+    this.activeComponentDragFrame = window.requestAnimationFrame(() => {
+      this.activeComponentDragFrame = null;
+      const pointer = this.pendingComponentDragPointer;
+      this.pendingComponentDragPointer = null;
+      if (!pointer || !this.activeComponentDrag) {
+        return;
+      }
+      this.updateDraggedComponentsPosition(pointer.clientX, pointer.clientY);
+    });
+  }
+
+  private updateDraggedComponentsPosition(clientX: number, clientY: number): void {
+    if (!this.activeComponentDrag) {
+      return;
+    }
 
     const bounds = this.getDraggedComponentsBounds(this.activeComponentDrag.components);
     const scale = this.getPreviewInteractionScale();
     const draggedRect = {
-      left: event.clientX - this.activeComponentDrag.pointerOffsetX,
-      top: event.clientY - this.activeComponentDrag.pointerOffsetY,
+      left: clientX - this.activeComponentDrag.pointerOffsetX,
+      top: clientY - this.activeComponentDrag.pointerOffsetY,
       width: bounds.width * scale,
       height: bounds.height * scale,
     };
@@ -2677,8 +2707,8 @@ if (this.activeProductFeedToolbarMenu()) {
 
     const rect = container.getBoundingClientRect();
     const containerDimensions = this.getLogicalElementDimensions(container);
-    const anchorX = this.toLogicalPreviewDistance(event.clientX - rect.left - this.activeComponentDrag.pointerOffsetX);
-    const anchorY = this.toLogicalPreviewDistance(event.clientY - rect.top - this.activeComponentDrag.pointerOffsetY);
+    const anchorX = this.toLogicalPreviewDistance(clientX - rect.left - this.activeComponentDrag.pointerOffsetX);
+    const anchorY = this.toLogicalPreviewDistance(clientY - rect.top - this.activeComponentDrag.pointerOffsetY);
     const previewVisibleHeight = this.getPreviewVisibleHeightForSection(container);
     const minAnchorX = -bounds.width + 20;
     const maxAnchorX = containerDimensions.width - 20;
@@ -2780,6 +2810,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
   const dragUndoSnapshot = this.activeComponentDragUndoSnapshot;
   if (this.activeComponentDrag) {
+    if (this.activeComponentDragFrame !== null) {
+      window.cancelAnimationFrame(this.activeComponentDragFrame);
+      this.activeComponentDragFrame = null;
+    }
+    this.pendingComponentDragPointer = null;
     this.finalizeDraggedComponentsLayoutSnap();
     const draggedComponentIds = this.activeComponentDrag.components.map((component) => component.componentId);
     const draggedAttachRootIds = this.getContainerAttachRootComponentIds(
@@ -12418,25 +12453,11 @@ private buildLibraryComponentForSection(
       Object.assign(nextComponent, this.writeComponentFrame(nextComponent, initialFrame));
     }
 
-    if (item.id === 'account-icon' && nextComponent.type === 'button') {
+    if (item.id === 'account-icon' && nextComponent.type === 'account') {
       nextComponent.name = 'Account';
       nextComponent.props = {
         ...nextComponent.props,
-        label: 'Account',
-        href: '/account',
-        variant: 'secondary',
-        showText: false,
-        showIcon: true,
-        iconName: 'user',
-        iconPosition: 'left',
-        customIconSrc: null,
-        textColor: '#0f172a',
-        backgroundColor: '#ffffff',
-        borderColor: 'rgba(15, 23, 42, 0.28)',
-        borderWidth: 1,
-        borderStyle: 'solid',
-        radius: 999,
-        padding: 10,
+        iconColor: '#0f172a',
       };
 
       const accountFrame = { x: initialFrame.x, y: initialFrame.y, width: 40, height: 40 };

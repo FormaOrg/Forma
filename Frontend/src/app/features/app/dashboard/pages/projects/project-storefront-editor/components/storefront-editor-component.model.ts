@@ -8,6 +8,7 @@ export type StorefrontEditorComponentType =
   | 'button'
   | 'menu'
   | 'search'
+  | 'account'
   | 'cart'
   | 'icon'
   | 'spacer'
@@ -188,6 +189,10 @@ export interface StorefrontEditorSearchProps {
   placeholder: string;
 }
 
+export interface StorefrontEditorAccountProps {
+  iconColor: string;
+}
+
 export interface StorefrontEditorIconProps {
   iconName: 'sparkles' | 'package' | 'wand' | 'eye' | 'external-link';
   color: string;
@@ -326,6 +331,7 @@ export type StorefrontEditorImageNode = StorefrontEditorComponentBase<'image', S
 export type StorefrontEditorButtonNode = StorefrontEditorComponentBase<'button', StorefrontEditorButtonProps>;
 export type StorefrontEditorMenuNode = StorefrontEditorComponentBase<'menu', StorefrontEditorMenuProps>;
 export type StorefrontEditorSearchNode = StorefrontEditorComponentBase<'search', StorefrontEditorSearchProps>;
+export type StorefrontEditorAccountNode = StorefrontEditorComponentBase<'account', StorefrontEditorAccountProps>;
 export type StorefrontEditorCartNode = StorefrontEditorComponentBase<'cart', StorefrontEditorCartProps>;
 export type StorefrontEditorIconNode = StorefrontEditorComponentBase<'icon', StorefrontEditorIconProps>;
 export type StorefrontEditorSpacerNode = StorefrontEditorComponentBase<'spacer', StorefrontEditorSpacerProps>;
@@ -347,6 +353,7 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorButtonNode
   | StorefrontEditorMenuNode
   | StorefrontEditorSearchNode
+  | StorefrontEditorAccountNode
   | StorefrontEditorCartNode
   | StorefrontEditorIconNode
   | StorefrontEditorSpacerNode
@@ -398,6 +405,8 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 236, width: 320, height: 48 };
     case 'search':
       return { x: 364, y: 236, width: 48, height: 48 };
+    case 'account':
+      return { x: 420, y: 236, width: 40, height: 48 };
     case 'cart':
       return { x: 220, y: 236, width: 132, height: 48 };
     case 'icon':
@@ -931,6 +940,14 @@ export function createStorefrontEditorComponentNode(
           iconColor: '#111827',
           label: 'Search',
           placeholder: 'Search products',
+        },
+      };
+    case 'account':
+      return {
+        ...createStorefrontEditorComponentBase('account'),
+        name: 'Account',
+        props: {
+          iconColor: '#111827',
         },
       };
     case 'cart':

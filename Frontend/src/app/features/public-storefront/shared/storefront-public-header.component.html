@@ -57,6 +57,27 @@
                 />
               </button>
             }
+            @case ('account') {
+              <button
+                type="button"
+                class="storefront-public-header__component storefront-public-header__component--interactive storefront-public-header__component--account"
+                [class.storefront-public-header__component--account-active]="hasCustomerSession()"
+                [ngStyle]="componentStyle(component)"
+                (click)="goToAccount($event)"
+                aria-label="Account"
+                title="Account"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </button>
+            }
             @default {
               <div class="storefront-public-header__component" [ngStyle]="componentStyle(component)">
                 <app-storefront-editor-component-host
@@ -73,16 +94,18 @@
           }
         }
 
-        <button
-          type="button"
-          class="storefront-public-header__account-trigger"
-          [class.storefront-public-header__account-trigger--active]="hasCustomerSession()"
-          (click)="goToAccount($event)"
-          aria-label="Account"
-          title="Account"
-        >
-          <app-icon name="user" [size]="18"></app-icon>
-        </button>
+        @if (!hasEditorAccountComponent()) {
+          <button
+            type="button"
+            class="storefront-public-header__account-trigger"
+            [class.storefront-public-header__account-trigger--active]="hasCustomerSession()"
+            (click)="goToAccount($event)"
+            aria-label="Account"
+            title="Account"
+          >
+            <app-icon name="user" [size]="18"></app-icon>
+          </button>
+        }
       </div>
     </div>
   </header>

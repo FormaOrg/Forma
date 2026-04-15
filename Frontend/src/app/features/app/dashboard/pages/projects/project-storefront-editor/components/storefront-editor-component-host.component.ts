@@ -11,6 +11,7 @@ import { StorefrontEditorBlockImageComponent } from './blocks/storefront-editor-
 import { StorefrontEditorBlockButtonComponent } from './blocks/storefront-editor-block-button.component';
 import { StorefrontEditorBlockMenuComponent } from './blocks/storefront-editor-block-menu.component';
 import { StorefrontEditorBlockSearchComponent } from './blocks/storefront-editor-block-search.component';
+import { StorefrontEditorBlockAccountComponent } from './blocks/storefront-editor-block-account.component';
 import { StorefrontEditorBlockCartComponent } from './blocks/storefront-editor-block-cart.component';
 import { StorefrontEditorBlockIconComponent } from './blocks/storefront-editor-block-icon.component';
 import { StorefrontEditorBlockSpacerComponent } from './blocks/storefront-editor-block-spacer.component';
@@ -36,6 +37,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
     StorefrontEditorBlockButtonComponent,
     StorefrontEditorBlockMenuComponent,
     StorefrontEditorBlockSearchComponent,
+    StorefrontEditorBlockAccountComponent,
     StorefrontEditorBlockCartComponent,
     StorefrontEditorBlockIconComponent,
     StorefrontEditorBlockSpacerComponent,
@@ -91,6 +93,9 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
       }
       @case ('search') {
         <app-storefront-editor-block-search [node]="$any(node())" />
+      }
+      @case ('account') {
+        <app-storefront-editor-block-account [node]="$any(node())" />
       }
       @case ('cart') {
         <app-storefront-editor-block-cart [node]="$any(node())" [count]="cartCount()" />
