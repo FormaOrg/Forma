@@ -33,6 +33,38 @@ if ($LASTEXITCODE -ne 0) {
     return
 }
 
+Write-Host "Waiting for containers to stabilize..." -ForegroundColor Cyan
+Start-Sleep -Seconds 12
+
+$containerNames = @(
+    "forma_users",
+    "forma_projects",
+    "forma_commerce",
+    "forma_analytics",
+    "forma_billing"
+)
+
+$runningContainers = @()
+foreach ($containerName in $containerNames) {
+    $isRunning = docker inspect -f "{{.State.Running}}" $containerName 2>$null
+    if ($LASTEXITCODE -eq 0 -and "$isRunning".Trim() -eq "true") {
+        $runningContainers += $containerName
+    }
+}
+
+if ($runningContainers.Count -ne $containerNames.Count) {
+    Write-Warning "One or more Docker containers exited during startup."
+    Write-Host ""
+    Write-Host "Container status:" -ForegroundColor Yellow
+    docker compose -f $composeFile ps
+    Write-Host ""
+    Write-Host "Recent logs from failed services:" -ForegroundColor Yellow
+    docker compose -f $composeFile logs --tail 40
+    Write-Host ""
+    Write-Warning "Docker backend startup did not complete successfully."
+    return
+}
+
 Write-Host ""
 Write-Host "Backend services are starting." -ForegroundColor Green
 Write-Host "Users:      http://localhost:8081"

@@ -4,6 +4,9 @@ services:
     container_name: forma_users
     env_file:
       - ./service-utilisateurs/.env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8081:8081"
     environment:
@@ -17,6 +20,9 @@ services:
     container_name: forma_projects
     env_file:
       - ./service-utilisateurs/.env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8082:8082"
     environment:
@@ -30,6 +36,9 @@ services:
     container_name: forma_commerce
     env_file:
       - ./service-utilisateurs/.env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8083:8083"
     environment:
@@ -41,6 +50,9 @@ services:
     container_name: forma_analytics
     env_file:
       - ./service-utilisateurs/.env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8084:8084"
     environment:
@@ -52,6 +64,9 @@ services:
     container_name: forma_billing
     env_file:
       - ./service-utilisateurs/.env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8085:8085"
     environment:
