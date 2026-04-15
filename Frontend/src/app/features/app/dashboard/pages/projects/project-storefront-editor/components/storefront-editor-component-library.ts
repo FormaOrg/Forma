@@ -218,7 +218,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     title: 'Account icon',
     category: 'Forma Store',
     subcategoryIds: ['all', 'featured-products'],
-    componentType: 'button',
+    componentType: 'account',
     description: 'Customer account entry button that links to the storefront account page.',
     preview: 'icon',
     keywords: ['account', 'profile', 'customer', 'login', 'register', 'user', 'store'],

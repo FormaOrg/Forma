@@ -10,6 +10,9 @@ import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { AppIcon } from '../../../shared/app/icons/app-icon';
 import {
+  createStorefrontEditorComponentNode,
+  StorefrontEditorAccountNode,
+  StorefrontEditorButtonNode,
   StorefrontEditorCartNode,
   StorefrontEditorComponentNode,
   StorefrontEditorSearchNode,
@@ -68,9 +71,14 @@ export class StorefrontPublicHeaderComponent {
     const component = this.headerComponents().find((entry) => entry.type === 'search');
     return component?.type === 'search' ? component : null;
   });
+  readonly accountComponent = computed<StorefrontEditorAccountNode | null>(() => {
+    const component = this.headerComponents().find((entry) => entry.type === 'account');
+    return component?.type === 'account' ? component : null;
+  });
   readonly searchOverlayLabel = computed(() => this.searchComponent()?.props.label || 'Search');
   readonly searchOverlayPlaceholder = computed(() => this.searchComponent()?.props.placeholder || 'Search products');
   readonly hasCustomerSession = computed(() => !!this.storefrontCustomerSessionService.getSessionToken(this.projectId()));
+  readonly hasEditorAccountComponent = computed(() => !!this.accountComponent());
 
   readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
   readonly cartItems = computed(() => this.storeCartService.itemsFor(this.projectId()));
@@ -275,6 +283,44 @@ export class StorefrontPublicHeaderComponent {
 
   private readSectionComponents(section: StorefrontHomepageSection): StorefrontEditorComponentNode[] {
     const raw = (section.props as Record<string, unknown>)['editorComponents'];
-    return Array.isArray(raw) ? (raw as StorefrontEditorComponentNode[]) : [];
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return (JSON.parse(JSON.stringify(raw)) as StorefrontEditorComponentNode[]).map((component) =>
+      this.normalizePreviewComponent(component)
+    );
+  }
+
+  private normalizePreviewComponent(component: StorefrontEditorComponentNode): StorefrontEditorComponentNode {
+    if (component.type === 'button' && component.props.href === '/account') {
+      const account = createStorefrontEditorComponentNode('account') as StorefrontEditorAccountNode;
+      const button = component as StorefrontEditorButtonNode;
+
+      return {
+        ...account,
+        id: component.id,
+        name: component.name || 'Account',
+        isLocked: component.isLocked,
+        isVisible: component.isVisible,
+        zIndex: component.zIndex,
+        parentContainerId: component.parentContainerId,
+        groupId: component.groupId,
+        rotation: component.rotation,
+        frame: {
+          ...component.frame,
+          width: 40,
+          height: 40,
+        },
+        responsiveFrames: component.responsiveFrames,
+        props: {
+          ...account.props,
+          iconColor: button.props.textColor || '#111827',
+        },
+        children: [],
+      };
+    }
+
+    return component;
   }
 }

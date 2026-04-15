@@ -91,6 +91,20 @@ export class StorefrontCheckout {
       return;
     }
 
+    if (this.isEditorPreview()) {
+      const previewTotal = this.subtotal();
+      this.storeCartService.clear(this.projectId());
+      void this.router.navigate(['/store', this.projectId(), 'checkout', 'success'], {
+        queryParams: {
+          preview: 'editor',
+          orderNumber: `PREVIEW-${Date.now().toString().slice(-6)}`,
+          total: previewTotal,
+          currency: 'TND',
+        },
+      });
+      return;
+    }
+
     const raw = this.checkoutForm.getRawValue();
     const customerSessionToken = this.storefrontCustomerSessionService.getSessionToken(this.projectId());
 

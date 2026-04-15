@@ -8,6 +8,7 @@ import {
 import {
   buildStorefrontEditorTextProps,
   createStorefrontEditorComponentNode,
+  StorefrontEditorAccountNode,
   StorefrontEditorButtonNode,
   StorefrontEditorCartNode,
   StorefrontEditorComponentNode,
@@ -178,10 +179,10 @@ function buildHeaderCartComponent(parentContainerId: string): StorefrontEditorCa
   };
 }
 
-function buildHeaderAccountComponent(parentContainerId: string): StorefrontEditorButtonNode {
-  const button = createStorefrontEditorComponentNode('button') as StorefrontEditorButtonNode;
+function buildHeaderAccountComponent(parentContainerId: string): StorefrontEditorAccountNode {
+  const account = createStorefrontEditorComponentNode('account') as StorefrontEditorAccountNode;
   return {
-    ...button,
+    ...account,
     name: 'Account',
     parentContainerId,
     zIndex: 2,
@@ -192,23 +193,8 @@ function buildHeaderAccountComponent(parentContainerId: string): StorefrontEdito
       height: 40,
     },
     props: {
-      ...button.props,
-      label: 'Account',
-      href: '/account',
-      variant: 'secondary',
-      showText: false,
-      showIcon: true,
-      iconName: 'user',
-      iconPosition: 'left',
-      customIconSrc: null,
-      textColor: '#0f172a',
-      backgroundColor: '#ffffff',
-      borderColor: 'rgba(15, 23, 42, 0.28)',
-      borderWidth: 1,
-      borderStyle: 'solid',
-      radius: 999,
-      shadow: 'none',
-      padding: 10,
+      ...account.props,
+      iconColor: '#0f172a',
     },
   };
 }
@@ -247,6 +233,25 @@ function ensureHeaderCartComponent(
   }
 
   const normalized = components.map((component) => {
+    if (component.type === 'button' && component.props.href === '/account') {
+      return {
+        ...buildHeaderAccountComponent(component.parentContainerId ?? headerContainer.id),
+        id: component.id,
+        parentContainerId: component.parentContainerId ?? headerContainer.id,
+        zIndex: component.zIndex,
+        isLocked: component.isLocked,
+        isVisible: component.isVisible,
+        rotation: component.rotation,
+        frame: {
+          ...component.frame,
+          width: 40,
+          height: 40,
+        },
+        responsiveFrames: component.responsiveFrames,
+        responsiveProps: undefined,
+      };
+    }
+
     if (
       component.type === 'button'
       && component.props.label === 'Browse products'
@@ -308,7 +313,7 @@ function ensureHeaderCartComponent(
     : normalized.concat(buildHeaderSearchComponent(headerContainer.id));
 
   const withAccount = withSearch.some(
-    (component) => component.type === 'button' && component.props.href === '/account'
+    (component) => component.type === 'account'
   )
     ? withSearch
     : withSearch.concat(buildHeaderAccountComponent(headerContainer.id));
