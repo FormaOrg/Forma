@@ -176,6 +176,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     keywords: ['testimonials', 'reviews', 'stars', 'rating', 'social proof', 'customers'],
   },
   {
+    id: 'checkout-form',
+    title: 'Checkout form',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'featured-products'],
+    componentType: 'checkout-form',
+    description: 'Checkout details form with customer fields and order submit action.',
+    preview: 'contact-form',
+    keywords: ['checkout', 'form', 'order', 'address', 'customer', 'store'],
+  },
+  {
     id: 'image',
     title: 'Image',
     category: 'Image',

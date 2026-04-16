@@ -18,12 +18,7 @@ export class StorefrontCustomerSessionService {
     }
 
     const fromStorage = localStorage.getItem(this.getKey(projectId));
-    if (fromStorage) {
-      this.sessions.update((current) => ({ ...current, [projectId]: fromStorage }));
-      return fromStorage;
-    }
-
-    return null;
+    return fromStorage || null;
   }
 
   setSessionToken(projectId: number, token: string): void {
