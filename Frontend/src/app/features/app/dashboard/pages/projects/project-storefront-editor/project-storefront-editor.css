@@ -5366,8 +5366,9 @@
 .storefront-editor__preview-shell {
   --storefront-editor-preview-zoom: 1;
   --storefront-editor-preview-toolbar-height: 58px;
-  width: 100%;
-  max-width: 100%;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
   margin: 16px auto 0;
   display: flex;
   flex-direction: column;
@@ -5559,7 +5560,8 @@
   display: grid;
   grid-template-columns: max-content;
   gap: 0;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   align-items: start;
   justify-content: center;
   justify-items: center;
@@ -8864,7 +8866,7 @@
   min-height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
   height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
   max-height: max(0px, calc((100vh - 142px - var(--storefront-editor-preview-toolbar-height)) / var(--storefront-editor-preview-zoom)));
-  overflow-x: clip;
+  overflow-x: visible;
   overflow-y: auto;
   margin-top: -1px;
   margin-inline: auto;
