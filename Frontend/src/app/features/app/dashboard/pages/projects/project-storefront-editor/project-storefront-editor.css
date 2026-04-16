@@ -51,8 +51,8 @@
 }
 
 .storefront-editor__overlay--library {
-  background: rgba(15, 23, 42, 0.34);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.32);
+  backdrop-filter: blur(4px);
 }
 
 .storefront-editor__skeleton {
@@ -6955,17 +6955,19 @@
 
 .storefront-editor__add-elements-browser {
   position: fixed;
-  inset: 84px 16px 16px;
-  z-index: 1120;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
+  inset: 0;
+  z-index: 1600;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: rgba(15, 23, 42, 0.32);
+  backdrop-filter: blur(4px);
   pointer-events: auto;
 }
 
 .storefront-editor__add-elements-browser-shell {
-  width: min(1520px, 100%);
-  min-height: 0;
+  width: min(1520px, calc(100vw - 64px));
+  height: min(890px, calc(100vh - 64px));
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.96);

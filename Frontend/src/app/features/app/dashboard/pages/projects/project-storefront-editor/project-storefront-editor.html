@@ -96,8 +96,7 @@
   <button
     type="button"
     class="storefront-editor__overlay"
-    [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible() || isAddElementsLibraryModalVisible()"
-    [class.storefront-editor__overlay--library]="isAddElementsLibraryModalVisible()"
+    [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible()"
     aria-label="Close open panels"
     (click)="closeFloatingUi()"
   ></button>
@@ -1307,9 +1306,9 @@
         <div
           class="storefront-editor__add-elements-browser"
           [class.storefront-editor__add-elements-browser--closing]="isAddElementsLibraryModalClosing()"
-          (click)="$event.stopPropagation()"
+          (click)="closeAddElementsLibraryModal()"
         >
-          <div class="storefront-editor__add-elements-browser-shell">
+          <div class="storefront-editor__add-elements-browser-shell" (click)="$event.stopPropagation()">
           <aside class="storefront-editor__add-elements-browser-sidebar">
             <div class="storefront-editor__add-elements-browser-brand">
               <div>
@@ -6694,15 +6693,6 @@
             </div>
       
             <div class="storefront-editor__preview-toolbar-center">
-              @if (selectedComponentDebugLabel(); as selectedComponentLabel) {
-                <span
-                  class="storefront-editor__preview-selection-indicator"
-                  [class.storefront-editor__preview-selection-indicator--legacy]="selectedComponentLabel.includes('legacy')"
-                  [attr.title]="selectedComponentLabel.includes('legacy') ? 'This selected item is still a button linked to /account, not a real account component.' : selectedComponentLabel"
-                >
-                  {{ selectedComponentLabel }}
-                </span>
-              }
               @if (!isNarrowPreviewChrome() && !hideMobileDomainChrome()) {
                 <div class="storefront-editor__domain-pill">
                   @if (isCompactPreviewChrome()) {
