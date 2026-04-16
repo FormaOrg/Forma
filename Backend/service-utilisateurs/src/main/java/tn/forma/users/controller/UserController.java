@@ -204,6 +204,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @GetMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDto>> getUsersByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.getUsersByIds(ids));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {

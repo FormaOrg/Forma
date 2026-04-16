@@ -462,6 +462,17 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+
+        return userRepository.findAllById(ids)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
