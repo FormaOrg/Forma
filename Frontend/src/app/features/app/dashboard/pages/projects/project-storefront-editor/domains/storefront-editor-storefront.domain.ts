@@ -1566,6 +1566,29 @@ export function ensureStableStorefrontSections(
   ];
 }
 
+function isLegacyGeneratedHomepageDocument(
+  homepage: ProjectStorefront['draftHomepage'] | ProjectStorefront['publishedHomepage'] | null | undefined
+): homepage is NonNullable<ProjectStorefront['draftHomepage']> {
+  if (!homepage || typeof homepage !== 'object' || !Array.isArray(homepage.sections)) {
+    return false;
+  }
+
+  const sectionIds = homepage.sections.map((section) => section.id);
+  const sectionTypes = homepage.sections.map((section) => section.type);
+
+  return (
+    sectionIds.length === 4 &&
+    sectionIds[0] === 'announcement-1' &&
+    sectionIds[1] === 'hero-1' &&
+    sectionIds[2] === 'featured-products-1' &&
+    sectionIds[3] === 'footer-1' &&
+    sectionTypes[0] === 'announcement-bar' &&
+    sectionTypes[1] === 'hero' &&
+    sectionTypes[2] === 'featured-products' &&
+    sectionTypes[3] === 'footer'
+  );
+}
+
 export function normalizeStorefrontData(
   storefront: ProjectStorefront,
   options: StorefrontNormalizationOptions
@@ -1576,6 +1599,14 @@ export function normalizeStorefrontData(
   snapshot.storeName = fallbackStoreName;
   snapshot.themeKey = snapshot.themeKey?.trim() || 'commerce-minimal';
   snapshot.activePageKey = 'home';
+
+  if (isLegacyGeneratedHomepageDocument(snapshot.draftHomepage)) {
+    snapshot.draftHomepage = buildDefaultStorefrontHomepageDocument(fallbackStoreName);
+  }
+
+  if (isLegacyGeneratedHomepageDocument(snapshot.publishedHomepage)) {
+    snapshot.publishedHomepage = buildDefaultStorefrontHomepageDocument(fallbackStoreName);
+  }
 
   const draftHomepage = snapshot.draftHomepage;
   const normalizedHomepage =
