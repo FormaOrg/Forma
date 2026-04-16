@@ -204,20 +204,26 @@ export interface StorefrontEditorAccountProps {
   borderColor: string;
 }
 
+export type StorefrontEditorBuiltInIconName =
+  | 'sparkles'
+  | 'package'
+  | 'wand'
+  | 'eye'
+  | 'external-link'
+  | 'rocket'
+  | 'shield'
+  | 'users'
+  | 'bar-chart'
+  | 'help-circle'
+  | 'pen'
+  | 'dollar-sign';
+
 export interface StorefrontEditorIconProps {
-  iconName:
-    | 'sparkles'
-    | 'package'
-    | 'wand'
-    | 'eye'
-    | 'external-link'
-    | 'rocket'
-    | 'shield'
-    | 'users'
-    | 'bar-chart'
-    | 'help-circle'
-    | 'pen'
-    | 'dollar-sign';
+  iconName: StorefrontEditorBuiltInIconName | string;
+  iconSource?: 'builtin' | 'library';
+  iconLibraryId?: string | null;
+  iconLibrarySlug?: string | null;
+  iconLibraryUrl?: string | null;
   iconSize: number;
   color: string;
   backgroundColor: string;
@@ -1042,7 +1048,11 @@ export function createStorefrontEditorComponentNode(
         ...createStorefrontEditorComponentBase('icon'),
         name: 'Icon',
         props: {
+          iconSource: 'builtin',
           iconName: 'sparkles',
+          iconLibraryId: null,
+          iconLibrarySlug: null,
+          iconLibraryUrl: null,
           iconSize: 30,
           color: '#355cff',
           backgroundColor: 'transparent',

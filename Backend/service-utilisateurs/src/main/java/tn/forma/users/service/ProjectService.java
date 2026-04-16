@@ -43,6 +43,11 @@ public class ProjectService {
         return mapToDto(getOwnedProject(email, projectId));
     }
 
+    @Transactional(readOnly = true)
+    public void ensureProjectOwnership(String email, Long projectId) {
+        getOwnedProject(email, projectId);
+    }
+
     @Transactional
     public ProjectDto createProject(String email, CreateProjectRequest request) {
         User user = getUserByEmail(email);

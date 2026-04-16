@@ -5617,20 +5617,34 @@
                     </label>
 
                     <div class="storefront-editor__icon-results">
-                      @for (option of filteredIconComponentChoices(); track option.id) {
-                        <button
-                          type="button"
-                          class="storefront-editor__icon-result-item"
-                          [class.storefront-editor__icon-result-item--active]="icon.props.iconName === option.id"
-                          (click)="updateSelectedIconName(option.id)"
-                          [attr.aria-label]="option.label"
-                          [title]="option.label"
-                        >
-                          <app-icon [name]="option.id" [size]="22" [style.color]="icon.props.color"></app-icon>
-                        </button>
-                      } @empty {
-                        <p class="storefront-editor__product-feed-settings-kicker">No icons match your search.</p>
+                      @if (isIconLibraryLoading()) {
+                        <p class="storefront-editor__product-feed-settings-kicker">Loading icons...</p>
+                      } @else {
+                        @for (option of iconLibraryResults(); track option.id) {
+                          <button
+                            type="button"
+                            class="storefront-editor__icon-result-item"
+                            [class.storefront-editor__icon-result-item--active]="isIconLibraryItemSelected(icon, option)"
+                            (click)="selectIconLibraryItem(option)"
+                            [attr.aria-label]="option.name || option.slug"
+                            [title]="option.name || option.slug"
+                          >
+                            <img
+                              [src]="option.publicUrl"
+                              [alt]="option.name || option.slug"
+                              width="22"
+                              height="22"
+                            />
+                          </button>
+                        } @empty {
+                          <p class="storefront-editor__product-feed-settings-kicker">No icons match your search.</p>
+                        }
                       }
+                    </div>
+                    <div class="storefront-editor__icon-settings-section">
+                      <p class="storefront-editor__product-feed-settings-kicker">
+                        Built-in icons already on the canvas keep working. New picks now come from your icon library.
+                      </p>
                     </div>
                   </div>
                 }
@@ -6651,7 +6665,11 @@
         }
       }
 
-    <button type="button" class="storefront-editor__add-button" (click)="toggleAddElementsPanel()">
+    <button
+      type="button"
+      class="storefront-editor__add-button"
+      (click)="toggleAddElementsPanel()"
+    >
         <span class="storefront-editor__add-button-plus" aria-hidden="true">+</span>
         <span>Add</span>
       </button>
@@ -7227,11 +7245,12 @@
             </div>
             @if (selectedSectionId(); as selectedSectionId) {
               @if (isSelectedSectionRailVisible() && !hasComponentSelection()) {
-                <div
-                  class="storefront-editor__preview-floating-rail"
-                  [style.top.px]="hoveredSectionRailTop()"
-                  (click)="$event.stopPropagation()"
-                >
+              <div
+                class="storefront-editor__preview-floating-rail"
+                [style.left.px]="hoveredSectionRailLeft()"
+                [style.top.px]="hoveredSectionRailTop()"
+                (click)="$event.stopPropagation()"
+              >
                   @if (!isStableSectionId(selectedSectionId)) {
                     <div class="storefront-editor__preview-section-rail-control">
                       <button

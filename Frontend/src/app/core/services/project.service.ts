@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { ProjectIconLibraryItem } from '../models/project-icon-library.model';
 import {
   Project,
   CreateProjectRequest,
@@ -132,6 +133,22 @@ export class ProjectService {
     return this.http.get<Media[]>(`${this.baseUrl}/${projectId}/media`).pipe(
       catchError(this.handleError)
     );
+  }
+
+  searchProjectIcons(
+    projectId: number,
+    query: string,
+    limit = 24
+  ): Observable<ProjectIconLibraryItem[]> {
+    return this.http.get<ProjectIconLibraryItem[]>(
+      `${this.baseUrl}/${projectId}/icons/search`,
+      {
+        params: {
+          q: query,
+          limit,
+        },
+      }
+    ).pipe(catchError(this.handleError));
   }
 
   deleteMedia(projectId: number, mediaId: number): Observable<void> {

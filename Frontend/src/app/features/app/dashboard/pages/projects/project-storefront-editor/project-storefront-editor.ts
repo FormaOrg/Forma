@@ -6,6 +6,7 @@ import { catchError, finalize, forkJoin, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { ProjectCatalogProduct } from '../../../../../../core/models/project-catalog.model';
+import { ProjectIconLibraryItem } from '../../../../../../core/models/project-icon-library.model';
 import {
   ProjectStorefront,
   StorefrontHomepageDocument,
@@ -486,10 +487,11 @@ private readonly authService = inject(AuthService);
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
   });
 
-  private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
-  private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
-  private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
-  private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
+private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
+private iconLibrarySearchRequestId = 0;
+private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private managePagesCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private sectionLibraryCloseTimer: ReturnType<typeof setTimeout> | null = null;
   private pageDesignPickerCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -715,9 +717,10 @@ readonly canScrollPageDesignTabsRight = signal(false);
   readonly editingPageNameValue = signal('');
   readonly isEditingComponentText = signal(false);
   readonly editingComponentTextId = signal<string | null>(null);
-  readonly editingComponentTextValue = signal('');
+readonly editingComponentTextValue = signal('');
 readonly hoveredSectionId = signal<string | null>(null);
 readonly hoveredSectionRailTop = signal(0);
+readonly hoveredSectionRailLeft = signal(-34);
 readonly isSelectedSectionRailVisible = signal(false);
 readonly hasPreviewStageScrollbar = signal(false);
 readonly previewStageScrollbarWidth = signal(0);
@@ -930,11 +933,13 @@ readonly activeTextToolbarMenu = signal<
   readonly savedParagraphColors = signal<string[]>([]);
   readonly customPickerHue = signal(206);
   readonly customPickerSaturation = signal(74);
-  readonly customPickerBrightness = signal(22);
-  readonly textFontSearch = signal('');
-  readonly buttonTextFontSearch = signal('');
-  readonly iconComponentSearch = signal('');
-  readonly textLinkPageId = signal<string>('home');
+readonly customPickerBrightness = signal(22);
+readonly textFontSearch = signal('');
+readonly buttonTextFontSearch = signal('');
+readonly iconComponentSearch = signal('');
+readonly iconLibraryResults = signal<ProjectIconLibraryItem[]>([]);
+readonly isIconLibraryLoading = signal(false);
+readonly textLinkPageId = signal<string>('home');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
   readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
   readonly imageLinkPageId = signal<string>('home');
@@ -1396,36 +1401,6 @@ readonly brandSectionBorderColors = [
   readonly buttonFontFamilies = this.paragraphFontFamilies;
   readonly buttonFontSizes = this.paragraphFontSizes;
   readonly buttonFontWeights: ReadonlyArray<StorefrontEditorButtonNode['props']['fontWeight']> = [400, 500, 600, 700];
-  readonly iconComponentChoices: ReadonlyArray<{
-    id: StorefrontEditorIconNode['props']['iconName'];
-    label: string;
-    description: string;
-  }> = [
-    { id: 'sparkles', label: 'Sparkles', description: 'Highlights, launches, and featured details.' },
-    { id: 'package', label: 'Package', description: 'Shipping, delivery, and product bundles.' },
-    { id: 'wand', label: 'Wand', description: 'Magic touches, upgrades, and customization.' },
-    { id: 'eye', label: 'Eye', description: 'Visibility, preview, and watch features.' },
-    { id: 'external-link', label: 'Arrow', description: 'Directional callouts and linked actions.' },
-    { id: 'rocket', label: 'Rocket', description: 'Fast growth, speed, and launch messaging.' },
-    { id: 'shield', label: 'Shield', description: 'Protection, trust, and guarantees.' },
-    { id: 'users', label: 'Users', description: 'Communities, teams, and customer groups.' },
-    { id: 'bar-chart', label: 'Chart', description: 'Stats, analytics, and reporting.' },
-    { id: 'help-circle', label: 'Help', description: 'Support, FAQs, and guidance.' },
-    { id: 'pen', label: 'Pen', description: 'Editing, writing, and form details.' },
-    { id: 'dollar-sign', label: 'Dollar', description: 'Pricing, offers, and payment notes.' },
-  ];
-  readonly filteredIconComponentChoices = computed(() => {
-    const query = this.iconComponentSearch().trim().toLowerCase();
-    if (!query) {
-      return this.iconComponentChoices;
-    }
-
-    return this.iconComponentChoices.filter((option) =>
-      option.label.toLowerCase().includes(query) ||
-      option.id.toLowerCase().includes(query) ||
-      option.description.toLowerCase().includes(query)
-    );
-  });
   readonly buttonIconChoices: ReadonlyArray<StorefrontEditorButtonNode['props']['iconName']> = [
     'external-link',
     'invite-plus',
@@ -1866,15 +1841,16 @@ readonly previewFrameWidth = computed(() => this.previewViewportWidth());
 readonly previewStageWidth = computed(() => this.previewViewportWidth() + 4 + this.previewStageScrollbarWidth());
 readonly previewDisplayWidth = computed(() => Math.round(this.previewStageWidth() * this.previewZoomScale()));
 readonly isCompactPreviewChrome = computed(() => this.viewport() === 'mobile' || this.previewDisplayWidth() <= 780);
-  readonly isNarrowPreviewChrome = computed(() => this.viewport() !== 'mobile' && this.previewDisplayWidth() <= 620);
-  readonly isUltraNarrowPreviewChrome = computed(() => this.previewDisplayWidth() <= 460);
-  readonly hideMobileDomainChrome = computed(() => this.viewport() === 'mobile' && this.previewDisplayWidth() <= 460);
-  readonly availableSectionTypes: StorefrontSectionType[] = [
+readonly isNarrowPreviewChrome = computed(() => this.viewport() !== 'mobile' && this.previewDisplayWidth() <= 620);
+readonly isUltraNarrowPreviewChrome = computed(() => this.previewDisplayWidth() <= 460);
+readonly hideMobileDomainChrome = computed(() => this.viewport() === 'mobile' && this.previewDisplayWidth() <= 460);
+readonly availableSectionTypes: StorefrontSectionType[] = [
     'announcement-bar',
     'hero',
     'featured-products',
     'contact',
   ];
+
   readonly sectionLibraryCategories: SectionLibraryCategory[] = STOREFRONT_EDITOR_SECTION_LIBRARY_CATEGORIES;
   readonly sectionLibraryTemplates: SectionLibraryTemplate[] = STOREFRONT_EDITOR_SECTION_LIBRARY_TEMPLATES;
   readonly visibleSectionLibraryTemplates = computed(() =>
@@ -2046,6 +2022,8 @@ effect(() => {
     this.activeIconToolbarMenu.set(null);
     this.activeIconSettingsSection.set('icon');
     this.iconComponentSearch.set('');
+    this.iconLibraryResults.set([]);
+    this.isIconLibraryLoading.set(false);
     return;
   }
 });
@@ -5357,6 +5335,8 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     Math.max(28, unclampedTop),
     Math.max(28, previewStageRect.height - 28)
   );
+  const railLeft = Math.round(previewStageRect.left - previewBodyRect.left - 34);
+  this.hoveredSectionRailLeft.set(railLeft);
   this.hoveredSectionRailTop.set(clampedTop);
 }
 
@@ -7391,15 +7371,16 @@ private syncImageBorderColorPickerFromHex(color: string): void {
   }
 
 toggleIconToolbarMenu(menu: Exclude<IconToolbarMenu, null>): void {
-  const next = this.activeIconToolbarMenu() === menu ? null : menu;
-  this.activeIconToolbarMenu.set(next);
-  if (next === 'settings' && !this.selectedIconComponent()) {
-    this.activeIconToolbarMenu.set(null);
-    return;
-  }
-  if (next === 'settings') {
-    this.activeIconSettingsSection.set('icon');
-  }
+const next = this.activeIconToolbarMenu() === menu ? null : menu;
+this.activeIconToolbarMenu.set(next);
+if (next === 'settings' && !this.selectedIconComponent()) {
+  this.activeIconToolbarMenu.set(null);
+  return;
+}
+if (next === 'settings') {
+  this.activeIconSettingsSection.set('icon');
+  this.loadIconLibraryResults();
+}
 }
 
 setIconSettingsSection(section: IconSettingsSection): void {
@@ -7407,7 +7388,8 @@ setIconSettingsSection(section: IconSettingsSection): void {
 }
 
 updateIconComponentSearch(value: string): void {
-  this.iconComponentSearch.set(value);
+this.iconComponentSearch.set(value);
+this.loadIconLibraryResults();
 }
 
 toggleAccountToolbarMenu(menu: Exclude<AccountToolbarMenu, null>): void {
@@ -8260,9 +8242,25 @@ updateSelectedButtonShadow(value: StorefrontEditorButtonNode['props']['shadow'])
     this.updateSelectedButtonProps({ padding: Math.max(6, Math.min(40, Math.round(parsed))) });
   }
 
-  updateSelectedIconName(value: StorefrontEditorIconNode['props']['iconName']): void {
-    this.updateSelectedIconProps({ iconName: value });
-  }
+updateSelectedIconName(value: StorefrontEditorIconNode['props']['iconName']): void {
+  this.updateSelectedIconProps({
+    iconSource: 'builtin',
+    iconName: value,
+    iconLibraryId: null,
+    iconLibrarySlug: null,
+    iconLibraryUrl: null,
+  });
+}
+
+selectIconLibraryItem(item: ProjectIconLibraryItem): void {
+  this.updateSelectedIconProps({
+    iconSource: 'library',
+    iconName: item.slug || item.name || 'sparkles',
+    iconLibraryId: item.id,
+    iconLibrarySlug: item.slug,
+    iconLibraryUrl: item.publicUrl,
+  });
+}
 
   updateSelectedIconSize(value: string | number): void {
     const parsed = Number(value);
@@ -11943,6 +11941,54 @@ private updateSelectedIconProps(
       ? this.writeComponentProps(current, patch)
       : current,
     options
+  );
+}
+
+private loadIconLibraryResults(): void {
+  const projectId = this.projectId();
+  const component = this.selectedIconComponent();
+  const searchRequestId = ++this.iconLibrarySearchRequestId;
+
+  if (!projectId || !component) {
+    this.iconLibraryResults.set([]);
+    this.isIconLibraryLoading.set(false);
+    return;
+  }
+
+  this.isIconLibraryLoading.set(true);
+  this.projectService
+    .searchProjectIcons(projectId, this.iconComponentSearch().trim(), 24)
+    .pipe(
+      finalize(() => {
+        if (searchRequestId === this.iconLibrarySearchRequestId) {
+          this.isIconLibraryLoading.set(false);
+        }
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe({
+      next: (results) => {
+        if (searchRequestId !== this.iconLibrarySearchRequestId) {
+          return;
+        }
+        this.iconLibraryResults.set(results);
+      },
+      error: () => {
+        if (searchRequestId !== this.iconLibrarySearchRequestId) {
+          return;
+        }
+        this.iconLibraryResults.set([]);
+      },
+    });
+}
+
+isIconLibraryItemSelected(
+  icon: StorefrontEditorIconNode,
+  item: ProjectIconLibraryItem
+): boolean {
+  return (
+    (icon.props.iconLibraryId != null && icon.props.iconLibraryId === item.id) ||
+    (icon.props.iconLibraryUrl != null && icon.props.iconLibraryUrl === item.publicUrl)
   );
 }
 
