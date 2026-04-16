@@ -54,6 +54,7 @@ import {
   StorefrontEditorComponentType,
   StorefrontEditorButtonNode,
   StorefrontEditorContainerNode,
+  StorefrontEditorIconNode,
   StorefrontEditorImageNode,
   StorefrontEditorMenuItem,
   StorefrontEditorMenuNode,
@@ -148,6 +149,8 @@ type ButtonToolbarMenu =
   | null;
 type MenuToolbarMenu = 'manage' | 'format' | 'text' | 'borders' | 'corners' | 'spacing' | null;
 type MenuFormatDropdown = 'display-mode' | 'orientation' | null;
+type IconToolbarMenu = 'settings' | null;
+type IconSettingsSection = 'icon' | 'settings';
 type AccountToolbarMenu = 'style' | 'settings' | null;
 type TestimonialsToolbarMenu = 'settings' | null;
 type TestimonialsSettingsSection = 'style' | 'reviews' | 'layout';
@@ -826,6 +829,10 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
     const component = this.selectedComponent();
     return component?.type === 'button' ? component : null;
   });
+  readonly selectedIconComponent = computed<StorefrontEditorIconNode | null>(() => {
+    const component = this.selectedComponent();
+    return component?.type === 'icon' ? component : null;
+  });
   readonly selectedMenuComponent = computed<StorefrontEditorMenuNode | null>(() => {
     const component = this.selectedComponent();
     return component?.type === 'menu' ? this.resolveResponsiveComponentNode(component) : null;
@@ -881,6 +888,9 @@ readonly isParagraphToolbarVisible = computed(
   readonly isButtonToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedButtonComponent() !== null
   );
+  readonly isIconToolbarVisible = computed(
+    () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedIconComponent() !== null
+  );
   readonly isMenuToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedMenuComponent() !== null
   );
@@ -923,6 +933,7 @@ readonly activeTextToolbarMenu = signal<
   readonly customPickerBrightness = signal(22);
   readonly textFontSearch = signal('');
   readonly buttonTextFontSearch = signal('');
+  readonly iconComponentSearch = signal('');
   readonly textLinkPageId = signal<string>('home');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
   readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
@@ -976,6 +987,8 @@ readonly activeTextToolbarMenu = signal<
   readonly activeSectionBorderColorTab = signal<'brand' | 'custom'>('brand');
   readonly isSectionBorderStylePickerOpen = signal(false);
   readonly activeButtonToolbarMenu = signal<ButtonToolbarMenu>(null);
+  readonly activeIconToolbarMenu = signal<IconToolbarMenu>(null);
+  readonly activeIconSettingsSection = signal<IconSettingsSection>('icon');
   readonly activeMenuToolbarMenu = signal<MenuToolbarMenu>(null);
   readonly activeMenuFormatDropdown = signal<MenuFormatDropdown>(null);
   readonly activeMenuItemActionsId = signal<string | null>(null);
@@ -1383,6 +1396,36 @@ readonly brandSectionBorderColors = [
   readonly buttonFontFamilies = this.paragraphFontFamilies;
   readonly buttonFontSizes = this.paragraphFontSizes;
   readonly buttonFontWeights: ReadonlyArray<StorefrontEditorButtonNode['props']['fontWeight']> = [400, 500, 600, 700];
+  readonly iconComponentChoices: ReadonlyArray<{
+    id: StorefrontEditorIconNode['props']['iconName'];
+    label: string;
+    description: string;
+  }> = [
+    { id: 'sparkles', label: 'Sparkles', description: 'Highlights, launches, and featured details.' },
+    { id: 'package', label: 'Package', description: 'Shipping, delivery, and product bundles.' },
+    { id: 'wand', label: 'Wand', description: 'Magic touches, upgrades, and customization.' },
+    { id: 'eye', label: 'Eye', description: 'Visibility, preview, and watch features.' },
+    { id: 'external-link', label: 'Arrow', description: 'Directional callouts and linked actions.' },
+    { id: 'rocket', label: 'Rocket', description: 'Fast growth, speed, and launch messaging.' },
+    { id: 'shield', label: 'Shield', description: 'Protection, trust, and guarantees.' },
+    { id: 'users', label: 'Users', description: 'Communities, teams, and customer groups.' },
+    { id: 'bar-chart', label: 'Chart', description: 'Stats, analytics, and reporting.' },
+    { id: 'help-circle', label: 'Help', description: 'Support, FAQs, and guidance.' },
+    { id: 'pen', label: 'Pen', description: 'Editing, writing, and form details.' },
+    { id: 'dollar-sign', label: 'Dollar', description: 'Pricing, offers, and payment notes.' },
+  ];
+  readonly filteredIconComponentChoices = computed(() => {
+    const query = this.iconComponentSearch().trim().toLowerCase();
+    if (!query) {
+      return this.iconComponentChoices;
+    }
+
+    return this.iconComponentChoices.filter((option) =>
+      option.label.toLowerCase().includes(query) ||
+      option.id.toLowerCase().includes(query) ||
+      option.description.toLowerCase().includes(query)
+    );
+  });
   readonly buttonIconChoices: ReadonlyArray<StorefrontEditorButtonNode['props']['iconName']> = [
     'external-link',
     'invite-plus',
@@ -1997,6 +2040,17 @@ effect(() => {
 });
 
 effect(() => {
+  const component = this.selectedIconComponent();
+
+  if (!component) {
+    this.activeIconToolbarMenu.set(null);
+    this.activeIconSettingsSection.set('icon');
+    this.iconComponentSearch.set('');
+    return;
+  }
+});
+
+effect(() => {
   const component = this.selectedMenuComponent();
   if (!component) {
     this.activeMenuToolbarMenu.set(null);
@@ -2216,6 +2270,12 @@ effect(() => {
     this.renamingMenuItemId.set(null);
     return;
   }
+
+if (event.key === 'Escape' && this.activeIconToolbarMenu()) {
+  event.preventDefault();
+  this.activeIconToolbarMenu.set(null);
+  return;
+}
 
 if (event.key === 'Escape' && this.activeAccountToolbarMenu()) {
   event.preventDefault();
@@ -5026,6 +5086,7 @@ this.activeAccountToolbarMenu.set(null);
 this.activeTestimonialsToolbarMenu.set(null);
 this.activeCartToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
+this.activeIconToolbarMenu.set(null);
 this.closeActiveSocialLinksToolbarMenu();
 this.closeButtonTextDropdownMenu();
 this.activeProductFeedToolbarMenu.set(null);
@@ -7329,6 +7390,26 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.menuItemDropTargetId.set(null);
   }
 
+toggleIconToolbarMenu(menu: Exclude<IconToolbarMenu, null>): void {
+  const next = this.activeIconToolbarMenu() === menu ? null : menu;
+  this.activeIconToolbarMenu.set(next);
+  if (next === 'settings' && !this.selectedIconComponent()) {
+    this.activeIconToolbarMenu.set(null);
+    return;
+  }
+  if (next === 'settings') {
+    this.activeIconSettingsSection.set('icon');
+  }
+}
+
+setIconSettingsSection(section: IconSettingsSection): void {
+  this.activeIconSettingsSection.set(section);
+}
+
+updateIconComponentSearch(value: string): void {
+  this.iconComponentSearch.set(value);
+}
+
 toggleAccountToolbarMenu(menu: Exclude<AccountToolbarMenu, null>): void {
   this.activeAccountToolbarMenu.set(this.activeAccountToolbarMenu() === menu ? null : menu);
 }
@@ -8177,6 +8258,64 @@ updateSelectedButtonShadow(value: StorefrontEditorButtonNode['props']['shadow'])
     }
 
     this.updateSelectedButtonProps({ padding: Math.max(6, Math.min(40, Math.round(parsed))) });
+  }
+
+  updateSelectedIconName(value: StorefrontEditorIconNode['props']['iconName']): void {
+    this.updateSelectedIconProps({ iconName: value });
+  }
+
+  updateSelectedIconSize(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedIconProps({ iconSize: Math.max(12, Math.min(96, Math.round(parsed))) });
+  }
+
+  updateSelectedIconColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedIconProps({ color: normalized });
+  }
+
+  updateSelectedIconBackgroundColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized) {
+      return;
+    }
+
+    this.updateSelectedIconProps({ backgroundColor: normalized });
+  }
+
+  updateSelectedIconBorderColor(value: string): void {
+    const normalized = this.normalizeHexColor(value);
+    if (!normalized || normalized === 'transparent') {
+      return;
+    }
+
+    this.updateSelectedIconProps({ borderColor: normalized });
+  }
+
+  updateSelectedIconBorderWidth(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedIconProps({ borderWidth: Math.max(0, Math.min(12, Math.round(parsed))) });
+  }
+
+  updateSelectedIconRadius(value: string | number): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.updateSelectedIconProps({ radius: Math.max(0, Math.min(999, Math.round(parsed))) });
   }
 
   toggleSelectedButtonShowText(): void {
@@ -11784,6 +11923,24 @@ private updateSelectedAccountProps(
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'account'
       ? { ...current, props: { ...current.props, ...patch } }
+      : current,
+    options
+  );
+}
+
+private updateSelectedIconProps(
+  patch: Partial<StorefrontEditorIconNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedIconComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'icon'
+      ? this.writeComponentProps(current, patch)
       : current,
     options
   );

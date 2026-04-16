@@ -205,9 +205,24 @@ export interface StorefrontEditorAccountProps {
 }
 
 export interface StorefrontEditorIconProps {
-  iconName: 'sparkles' | 'package' | 'wand' | 'eye' | 'external-link';
+  iconName:
+    | 'sparkles'
+    | 'package'
+    | 'wand'
+    | 'eye'
+    | 'external-link'
+    | 'rocket'
+    | 'shield'
+    | 'users'
+    | 'bar-chart'
+    | 'help-circle'
+    | 'pen'
+    | 'dollar-sign';
+  iconSize: number;
   color: string;
   backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
   radius: number;
 }
 
@@ -1028,8 +1043,11 @@ export function createStorefrontEditorComponentNode(
         name: 'Icon',
         props: {
           iconName: 'sparkles',
+          iconSize: 30,
           color: '#355cff',
-          backgroundColor: 'rgba(53, 92, 255, 0.08)',
+          backgroundColor: 'transparent',
+          borderColor: 'rgba(53, 92, 255, 0.16)',
+          borderWidth: 0,
           radius: 20,
         },
       };

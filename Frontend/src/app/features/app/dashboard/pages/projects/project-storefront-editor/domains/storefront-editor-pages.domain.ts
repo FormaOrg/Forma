@@ -29,6 +29,14 @@ const REQUIRED_MANAGED_PAGES = [
   { id: 'checkout', name: 'Checkout', kind: 'designed' as const, designId: null as string | null },
 ] as const;
 
+const DESIGNED_DEFAULT_HOMEPAGE_SECTION_IDS = [
+  'header-9kf8srka',
+  'hero-8mu7cyew',
+  'hero-7onit1yv',
+  'hero-on8pwsdy',
+  'footer-1',
+] as const;
+
 export function cloneStorefrontHomepageDocument(
   document: StorefrontHomepageDocument
 ): StorefrontHomepageDocument {
@@ -61,6 +69,10 @@ export function buildDefaultManagedPageDocument(
   designId: string | null,
   helpers: ManagedPageHelpers
 ): StorefrontHomepageDocument {
+  if (safeManagedPageId(pageName) === 'products') {
+    return buildProductsManagedPageDocument(pageName, kind, designId, helpers);
+  }
+
   if (safeManagedPageId(pageName) === 'product-details') {
     return buildManagedDocumentWithSingleComponent(
       pageName,
@@ -137,6 +149,114 @@ export function buildDefaultManagedPageDocument(
 
 function safeManagedPageId(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function isLegacyDefaultHomeStarter(document: StorefrontHomepageDocument | null | undefined): boolean {
+  if (!document || !Array.isArray(document.sections)) {
+    return false;
+  }
+
+  const sectionTypes = document.sections.map((section) => section.type);
+  return (
+    sectionTypes.length === 5 &&
+    sectionTypes[0] === 'header' &&
+    sectionTypes[1] === 'announcement-bar' &&
+    sectionTypes[2] === 'hero' &&
+    sectionTypes[3] === 'featured-products' &&
+    sectionTypes[4] === 'footer'
+  );
+}
+
+function isDesignedDefaultHomepageDocument(document: StorefrontHomepageDocument | null | undefined): boolean {
+  if (!document || !Array.isArray(document.sections)) {
+    return false;
+  }
+
+  const sectionIds = document.sections.map((section) => section.id);
+  return DESIGNED_DEFAULT_HOMEPAGE_SECTION_IDS.every((id) => sectionIds.includes(id));
+}
+
+function buildProductsManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+  const block = createStorefrontEditorComponentNode('product-feed');
+
+  block.name = 'Products grid';
+  block.frame = { x: 88, y: 96, width: 1024, height: 760 };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'products-content',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Products',
+      editorBlankSection: false,
+      editorHeight: 920,
+      editorTabletHeight: 920,
+      editorMobileHeight: 1180,
+      editorBackgroundColor: '#f8fafc',
+      editorBorderWidth: 0,
+      editorBorderStyle: 'none',
+      editorBorderColor: 'transparent',
+      editorRadius: 0,
+      editorShadow: 'none',
+      editorOpacity: 100,
+      editorComponents: [
+        {
+          ...block,
+          props: {
+            ...block.props,
+            title: 'Products',
+            source: 'catalog',
+            category: 'all',
+            limit: 12,
+            columns: 3,
+            designPreset: 'grid-gallery',
+            showBadges: true,
+            showCompareAtPrice: true,
+            showAddToCart: false,
+            showFilters: true,
+            showSort: true,
+            showColorDots: false,
+            quickAddStyle: 'none',
+            textColor: '#202124',
+            badgeTextColor: '#ffffff',
+            badgeBackgroundColor: '#111111',
+            imageRadius: 0,
+          },
+          responsiveFrames: {
+            tablet: { x: 24, y: 88, width: 720, height: 900 },
+            mobile: { x: 16, y: 72, width: 328, height: 1000 },
+          },
+        },
+      ],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
 }
 
 function buildManagedDocumentWithSingleComponent(
@@ -339,6 +459,24 @@ export function normalizeManagedPages(
         ),
       };
     }
+  }
+
+  const homePage = normalized.find((page) => page.id === 'home');
+  const productsPage = normalized.find((page) => page.id === 'products');
+  const shouldMoveDesignedHomepageToHome =
+    homePage &&
+    productsPage &&
+    isLegacyDefaultHomeStarter(homePage.draftDocument) &&
+    isDesignedDefaultHomepageDocument(productsPage.draftDocument);
+
+  if (shouldMoveDesignedHomepageToHome) {
+    homePage.draftDocument = cloneStorefrontHomepageDocument(productsPage.draftDocument!);
+    productsPage.draftDocument = buildDefaultManagedPageDocument(
+      productsPage.name,
+      productsPage.kind,
+      productsPage.designId,
+      helpers
+    );
   }
 
   return normalized;

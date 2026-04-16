@@ -6,6 +6,153 @@ import { StorefrontEditorProductFeedNode } from '../storefront-editor-component.
 
 type ProductFeedBadgeTone = 'dark' | 'light';
 
+const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
+  {
+    id: -1,
+    name: 'Street Bomber Jacket',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-001',
+    category: 'Outerwear',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 189,
+    compareAtPrice: 229,
+    inventoryQuantity: 12,
+    imageUrl: 'https://res.cloudinary.com/dfml64rbi/image/upload/v1776295037/forma/media/file_i1dfym.jpg',
+    tags: ['new', 'streetwear', 'outerwear'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -2,
+    name: 'Minimal Cargo Pants',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-002',
+    category: 'Bottoms',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 124,
+    compareAtPrice: 149,
+    inventoryQuantity: 16,
+    imageUrl: 'https://res.cloudinary.com/dfml64rbi/image/upload/v1776295033/forma/media/file_gg8xy2.jpg',
+    tags: ['best seller', 'utility', 'neutral'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -3,
+    name: 'Graphic Heavy Tee',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-003',
+    category: 'Tops',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 62,
+    compareAtPrice: null,
+    inventoryQuantity: 22,
+    imageUrl: 'https://res.cloudinary.com/dfml64rbi/image/upload/v1776295030/forma/media/file_hseyjz.jpg',
+    tags: ['new arrival', 'graphic', 'cotton'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -4,
+    name: 'Washed Denim Overshirt',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-004',
+    category: 'Layering',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 148,
+    compareAtPrice: 178,
+    inventoryQuantity: 9,
+    imageUrl: 'https://res.cloudinary.com/dfml64rbi/image/upload/v1776296716/forma/media/file_d8vzsd.jpg',
+    tags: ['sale', 'denim', 'layer'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -5,
+    name: 'Signature Everyday Hoodie',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-005',
+    category: 'Essentials',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 96,
+    compareAtPrice: 120,
+    inventoryQuantity: 18,
+    imageUrl: null,
+    tags: ['bestseller', 'essential', 'cozy'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -6,
+    name: 'Runner Cap',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-006',
+    category: 'Accessories',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 36,
+    compareAtPrice: null,
+    inventoryQuantity: 30,
+    imageUrl: null,
+    tags: ['accessory', 'cap', 'new'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -7,
+    name: 'Canvas Crossbody Bag',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-007',
+    category: 'Accessories',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 88,
+    compareAtPrice: 104,
+    inventoryQuantity: 14,
+    imageUrl: null,
+    tags: ['utility', 'bag', 'best seller'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    id: -8,
+    name: 'Panel Sneakers',
+    description: 'Editor preview item shown while the catalog is still empty.',
+    sku: 'MOCK-008',
+    category: 'Footwear',
+    productType: 'PHYSICAL',
+    status: 'ACTIVE',
+    price: 154,
+    compareAtPrice: 182,
+    inventoryQuantity: 11,
+    imageUrl: null,
+    tags: ['footwear', 'new', 'sport'],
+    readyToPublish: true,
+    readinessIssues: [],
+    createdAt: null,
+    updatedAt: null,
+  },
+];
+
 @Component({
   selector: 'app-storefront-editor-block-product-feed',
   standalone: true,
@@ -31,6 +178,12 @@ type ProductFeedBadgeTone = 'dark' | 'light';
               <span>Sort by</span>
               <span class="storefront-editor-block-product-feed__sort-trigger-caret">⌄</span>
             </div>
+          </div>
+        }
+
+        @if (isUsingMockProducts()) {
+          <div class="storefront-editor-block-product-feed__editor-note">
+            Preview products are shown here until this project has real catalog items.
           </div>
         }
 
@@ -181,6 +334,15 @@ type ProductFeedBadgeTone = 'dark' | 'light';
       min-width: 0;
     }
 
+    .storefront-editor-block-product-feed__editor-note {
+      padding: 10px 12px;
+      border: 1px dashed rgba(17, 24, 39, 0.18);
+      background: rgba(248, 250, 252, 0.9);
+      color: rgba(32, 33, 36, 0.72);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
     .storefront-editor-block-product-feed__card {
       min-width: 0;
       display: flex;
@@ -324,11 +486,17 @@ export class StorefrontEditorBlockProductFeedComponent {
   readonly products = input<ProjectCatalogProduct[]>([]);
 
   readonly filterLabels = ['Collection', 'Price', 'Color', 'Size'] as const;
+  readonly isUsingMockProducts = computed(() => this.products().every((product) => product.status === 'ARCHIVED'));
+
+  private readonly availableProducts = computed(() => {
+    const catalog = this.products().filter((product) => product.status !== 'ARCHIVED');
+    return catalog.length ? catalog : MOCK_PRODUCTS;
+  });
 
   readonly visibleProducts = computed(() => {
     const props = this.node().props;
     const category = props.category.trim().toLowerCase();
-    const catalog = this.products().filter((product) => product.status !== 'ARCHIVED');
+    const catalog = this.availableProducts();
     const filtered = category && category !== 'all'
       ? catalog.filter((product) => (product.category ?? '').trim().toLowerCase() === category)
       : catalog;

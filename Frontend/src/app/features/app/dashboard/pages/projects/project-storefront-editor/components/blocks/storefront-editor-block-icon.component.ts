@@ -12,12 +12,12 @@ import { StorefrontEditorIconNode } from '../storefront-editor-component.model';
     <span
       class="storefront-editor-block-icon"
       [style.color]="node().props.color"
-      [style.background]="node().props.backgroundColor"
+      [style.background]="node().props.backgroundColor === 'rgba(53, 92, 255, 0.08)' ? 'transparent' : node().props.backgroundColor"
       [style.border-radius.px]="node().props.radius"
-      [style.box-shadow]="'inset 0 0 0 1px rgba(53, 92, 255, 0.08), 0 10px 24px rgba(15, 23, 42, 0.06)'"
+      [style.border-color]="node().props.borderWidth > 0 ? node().props.borderColor : 'transparent'"
+      [style.border-width.px]="node().props.borderWidth"
     >
-      <span class="storefront-editor-block-icon__glow"></span>
-      <app-icon [name]="node().props.iconName" [size]="30" />
+      <app-icon [name]="node().props.iconName" [size]="node().props.iconSize" />
     </span>
   `,
   styles: [`
@@ -38,17 +38,8 @@ import { StorefrontEditorIconNode } from '../storefront-editor-component.model';
       min-width: 48px;
       min-height: 48px;
       overflow: hidden;
-    }
-
-    .storefront-editor-block-icon__glow {
-      position: absolute;
-      inset: 10% 10% auto auto;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: currentColor;
-      opacity: 0.12;
-      filter: blur(10px);
+      border-style: solid;
+      box-sizing: border-box;
     }
   `],
 })

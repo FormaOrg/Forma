@@ -2608,6 +2608,18 @@
   width: min(470px, calc(100vw - 36px));
 }
 
+.storefront-editor__icon-settings-panel {
+  width: min(470px, calc(100vw - 36px));
+}
+
+.storefront-editor__icon-settings-shell {
+  min-height: 0;
+}
+
+.storefront-editor__icon-toolbar {
+  gap: 10px;
+}
+
 .storefront-editor__cart-settings-shell {
   min-height: 0;
   display: grid;
@@ -2864,6 +2876,57 @@
   font-weight: 600;
   text-align: center;
   line-height: 1.25;
+}
+
+.storefront-editor__icon-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.storefront-editor__icon-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.storefront-editor__icon-result-item {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 140ms ease, transform 140ms ease, opacity 140ms ease;
+}
+
+.storefront-editor__icon-result-item:hover {
+  transform: translateY(-1px);
+  opacity: 0.88;
+}
+
+.storefront-editor__icon-result-item--active {
+  color: #355cff;
+}
+
+.storefront-editor__icon-settings-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.storefront-editor__icon-settings-color-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.storefront-editor__icon-settings-section .storefront-editor__button-toolbar-slider-row {
+  grid-template-columns: 98px;
+  justify-content: start;
 }
 
 /* ── Testimonials panel ── */
