@@ -1,0 +1,290 @@
+<section class="customers-page">
+  <section class="customers-page__hero customers-page__panel">
+    <div class="customers-page__hero-copy">
+      <p class="customers-page__eyebrow">{{ 'project.customers.hero.eyebrow' | t }}</p>
+      <div class="customers-page__title-row">
+        <h1 class="customers-page__title">{{ 'project.customers.hero.title' | t }}</h1>
+      </div>
+      <p class="customers-page__subtitle">
+        {{ 'project.customers.hero.subtitle' | t }}
+      </p>
+    </div>
+
+    <div class="customers-page__hero-actions">
+      <button type="button" class="customers-page__hero-action customers-page__hero-action--secondary" (click)="loadCustomers()">{{ 'project.customers.buttons.refresh' | t }}</button>
+      <button type="button" class="customers-page__hero-action customers-page__hero-action--primary" (click)="openCreateEditor()">{{ 'project.customers.buttons.addCustomer' | t }}</button>
+    </div>
+  </section>
+
+  <section class="customers-page__stats">
+    <article class="customers-page__stat customers-page__panel">
+      <span>{{ 'project.customers.stats.totalCustomers.label' | t }}</span>
+      <strong>{{ summary()?.totalCustomers ?? 0 }}</strong>
+      <small>{{ 'project.customers.stats.totalCustomers.hint' | t }}</small>
+    </article>
+    <article class="customers-page__stat customers-page__panel">
+      <span>{{ 'project.customers.stats.repeatCustomers.label' | t }}</span>
+      <strong>{{ summary()?.repeatCustomers ?? 0 }}</strong>
+      <small>{{ formatPercent(returnRate()) }} {{ 'project.customers.stats.repeatCustomers.hint' | t }}</small>
+    </article>
+    <article class="customers-page__stat customers-page__panel">
+      <span>{{ 'project.customers.stats.totalRevenue.label' | t }}</span>
+      <strong>{{ formatCompactMoney(totalRevenue()) }} TND</strong>
+      <small>{{ formatMoney(averageCustomerValue()) }} {{ 'project.customers.stats.totalRevenue.hint' | t }}</small>
+    </article>
+    <article class="customers-page__stat customers-page__panel">
+      <span>{{ 'project.customers.stats.coverage.label' | t }}</span>
+      <strong>{{ summary()?.activeZones ?? 0 }}</strong>
+      <small>{{ topZone() }} {{ 'project.customers.stats.coverage.hint' | t }}</small>
+    </article>
+  </section>
+
+  <section class="customers-page__workspace">
+    <article class="customers-page__main customers-page__panel">
+      <section class="customers-page__toolbar">
+        <div class="customers-page__section-head">
+          <div>
+              <p class="customers-page__section-label">{{ 'project.customers.toolbar.controls.label' | t }}</p>
+              <h2>{{ 'project.customers.toolbar.controls.title' | t }}</h2>
+            </div>
+            @if (hasFilters()) {
+              <button type="button" class="customers-page__text-action" (click)="searchInput.value=''; updateSearch(''); updateZone('ALL')">
+                {{ 'project.customers.buttons.clearFilters' | t }}
+            </button>
+          }
+        </div>
+
+        <label class="customers-page__search">
+          <span>{{ 'project.customers.toolbar.search.label' | t }}</span>
+          <input type="search" [placeholder]="'project.customers.toolbar.search.placeholder' | t" [value]="searchValue()" (input)="updateSearch(searchInput.value)" #searchInput />
+        </label>
+
+        <label class="customers-page__zone">
+          <span>{{ 'project.customers.toolbar.zone.label' | t }}</span>
+          <select [value]="selectedZone()" (change)="updateZone(zoneSelect.value)" #zoneSelect>
+            <option value="ALL">{{ 'project.customers.toolbar.zone.allZones' | t }}</option>
+            @for (zone of zones(); track zone) {
+              <option [value]="zone">{{ zone }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="customers-page__filter-summary">
+          <span>{{ hasFilters() ? ('project.customers.toolbar.filteredView' | t) : ('project.customers.toolbar.allCustomersVisible' | t) }}</span>
+          <strong>{{ visibleCustomersLabel() }}</strong>
+        </div>
+      </section>
+
+      <div class="customers-page__section-head customers-page__section-head--content">
+        <div>
+          <p class="customers-page__section-label">{{ 'project.customers.list.directory.label' | t }}</p>
+          <h2>{{ 'project.customers.list.directory.title' | t }}</h2>
+        </div>
+        <span class="customers-page__content-note">{{ visibleCustomersLabel() }}</span>
+      </div>
+
+      @if (isLoading()) {
+        <section class="customers-page__state customers-page__state--loading">
+          <div class="customers-page__skeleton"></div>
+          <div class="customers-page__skeleton"></div>
+          <div class="customers-page__skeleton"></div>
+        </section>
+      } @else if (errorMessage()) {
+        <section class="customers-page__state customers-page__state--error" role="alert">
+          <h2>{{ 'project.customers.errors.load.title' | t }}</h2>
+          <p>{{ errorMessage() }}</p>
+          <button type="button" (click)="loadCustomers()">{{ 'project.customers.buttons.tryAgain' | t }}</button>
+        </section>
+      } @else if (!customers().length) {
+        <section class="customers-page__state">
+          <h2>{{ 'project.customers.empty.noCustomers.title' | t }}</h2>
+          <p>{{ 'project.customers.empty.noCustomers.subtitle' | t }}</p>
+          <button type="button" (click)="openCreateEditor()">{{ 'project.customers.buttons.createFirst' | t }}</button>
+        </section>
+      } @else {
+        <section class="customers-page__list">
+          @for (customer of customers(); track trackByCustomer($index, customer)) {
+            <article class="customers-page__card">
+              <div class="customers-page__card-top">
+                <div class="customers-page__avatar">{{ getCustomerInitials(customer) }}</div>
+
+                <div class="customers-page__card-main">
+                  <div class="customers-page__card-head">
+                  <div class="customers-page__card-title-group">
+                      <h3>{{ customer.fullName }}</h3>
+                      <p>{{ customer.email || customer.phone || ('project.customers.card.noContact' | t) }}</p>
+                    </div>
+                  </div>
+
+                  <div class="customers-page__badges">
+                    @if (customer.zoneLabel) {
+                      <span>{{ customer.zoneLabel }}</span>
+                    }
+                    <span>{{ customer.totalOrders }} order{{ customer.totalOrders === 1 ? '' : 's' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <dl class="customers-page__meta">
+                <div>
+                  <dt>{{ 'project.customers.card.email' | t }}</dt>
+                  <dd>{{ customer.email || ('project.customers.card.noEmail' | t) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'project.customers.card.phone' | t }}</dt>
+                  <dd>{{ customer.phone || ('project.customers.card.noPhone' | t) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'project.customers.card.totalSpent' | t }}</dt>
+                  <dd>{{ formatMoney(customer.totalSpent) }} TND</dd>
+                </div>
+                <div>
+                  <dt>{{ 'project.customers.card.lastOrder' | t }}</dt>
+                  <dd>{{ formatDate(customer.lastOrderAt) }}</dd>
+                </div>
+              </dl>
+
+              @if (customer.address) {
+                <p class="customers-page__address">{{ customer.address }}</p>
+              }
+
+              <div class="customers-page__footer">
+                <div class="customers-page__footer-copy">
+                    <span>{{ 'project.customers.card.created' | t }}</span>
+                    <strong>{{ formatDate(customer.createdAt) }}</strong>
+                  </div>
+                  <div class="customers-page__card-actions">
+                    <button type="button" class="customers-page__edit" (click)="openEditEditor(customer)">
+                      <span class="customers-page__action-icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="none">
+                          <path d="M3.5 13.9L3.9 16.1L6.1 16.5L14.8 7.8L12.2 5.2L3.5 13.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                          <path d="M11.4 6L14 8.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        </svg>
+                      </span>
+                      {{ 'project.customers.buttons.edit' | t }}
+                    </button>
+
+                    <button type="button" class="customers-page__danger" [disabled]="isDeleting() === customer.id" (click)="deleteCustomer(customer)">
+                      <span class="customers-page__action-icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="none">
+                          <path d="M5.8 6.2L6.3 15.5H13.7L14.2 6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                          <path d="M4.8 5.2H15.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                          <path d="M8 5.2V3.9H12V5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                      {{ isDeleting() === customer.id ? ('project.customers.states.deleting' | t) : ('project.customers.buttons.delete' | t) }}
+                    </button>
+                  </div>
+                </div>
+            </article>
+          }
+        </section>
+      }
+    </article>
+
+    <aside class="customers-page__sidebar customers-page__panel">
+      <div class="customers-page__section-head">
+        <div>
+          <p class="customers-page__section-label">{{ 'project.customers.sidebar.snapshot.label' | t }}</p>
+          <h2>{{ 'project.customers.sidebar.snapshot.title' | t }}</h2>
+        </div>
+      </div>
+
+      <div class="customers-page__insight-list">
+        <article class="customers-page__insight">
+          <span>{{ 'project.customers.sidebar.recentCustomers.label' | t }}</span>
+          <strong>{{ summary()?.recentCustomers ?? 0 }}</strong>
+          <small>{{ 'project.customers.sidebar.recentCustomers.hint' | t }}</small>
+        </article>
+        <article class="customers-page__insight">
+          <span>{{ 'project.customers.sidebar.averageSpend.label' | t }}</span>
+          <strong>{{ formatMoney(averageCustomerValue()) }} TND</strong>
+          <small>{{ 'project.customers.sidebar.averageSpend.hint' | t }}</small>
+        </article>
+        <article class="customers-page__insight">
+          <span>{{ 'project.customers.sidebar.topZone.label' | t }}</span>
+          <strong>{{ topZone() }}</strong>
+          <small>{{ 'project.customers.sidebar.topZone.hint' | t }}</small>
+        </article>
+      </div>
+    </aside>
+  </section>
+
+  @if (isEditorOpen()) {
+    <section class="customers-page__backdrop" [class.is-closing]="isEditorClosing()" (click)="closeEditor()"></section>
+    <aside class="customers-page__editor customers-page__panel" [class.is-closing]="isEditorClosing()">
+      <header class="customers-page__editor-head">
+        <div class="customers-page__editor-copy">
+          <p class="customers-page__section-label">{{ 'project.customers.editor.eyebrow' | t }}</p>
+          <h2>{{ editorTitle() }}</h2>
+          <p class="customers-page__editor-subtitle">{{ 'project.customers.editor.subtitle' | t }}</p>
+        </div>
+        <button type="button" class="customers-page__hero-action customers-page__hero-action--secondary" (click)="closeEditor()">{{ 'project.customers.buttons.close' | t }}</button>
+      </header>
+
+      <form class="customers-page__form" [formGroup]="customerForm" (ngSubmit)="saveCustomer()">
+        <div class="customers-page__editor-body">
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>{{ 'project.customers.editor.identity.title' | t }}</h3>
+              <p>{{ 'project.customers.editor.identity.subtitle' | t }}</p>
+            </div>
+
+            <div class="customers-page__form-split">
+              <label>
+                <span>{{ 'project.customers.editor.firstName' | t }}</span>
+                <input type="text" formControlName="firstName" placeholder="Sarra" />
+              </label>
+              <label>
+                <span>{{ 'project.customers.editor.lastName' | t }}</span>
+                <input type="text" formControlName="lastName" placeholder="Ben Ali" />
+              </label>
+            </div>
+          </section>
+
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>{{ 'project.customers.editor.contact.title' | t }}</h3>
+              <p>{{ 'project.customers.editor.contact.subtitle' | t }}</p>
+            </div>
+
+            <div class="customers-page__form-split">
+              <label>
+                <span>{{ 'project.customers.editor.email' | t }}</span>
+                <input type="email" formControlName="email" placeholder="sarra@example.com" />
+              </label>
+              <label>
+                <span>{{ 'project.customers.editor.phone' | t }}</span>
+                <input type="text" formControlName="phone" placeholder="+216..." />
+              </label>
+            </div>
+          </section>
+
+          <section class="customers-page__editor-section">
+            <div class="customers-page__editor-section-head">
+              <h3>{{ 'project.customers.editor.location.title' | t }}</h3>
+              <p>{{ 'project.customers.editor.location.subtitle' | t }}</p>
+            </div>
+
+            <label>
+              <span>{{ 'project.customers.editor.address' | t }}</span>
+              <input type="text" formControlName="address" placeholder="Lac 2, Tunis" />
+            </label>
+
+            <label>
+              <span>{{ 'project.customers.editor.zone' | t }}</span>
+              <input type="text" formControlName="zoneLabel" placeholder="Tunis Nord" />
+            </label>
+          </section>
+        </div>
+
+        <footer class="customers-page__editor-footer">
+          <button type="button" class="customers-page__secondary" (click)="closeEditor()">{{ 'project.customers.buttons.cancel' | t }}</button>
+          <button type="submit" class="customers-page__primary" [disabled]="isSaving()">
+            {{ isSaving() ? ('project.customers.states.saving' | t) : editingCustomer() ? ('project.customers.buttons.saveChanges' | t) : ('project.customers.buttons.createCustomer' | t) }}
+          </button>
+        </footer>
+      </form>
+    </aside>
+  }
+</section>

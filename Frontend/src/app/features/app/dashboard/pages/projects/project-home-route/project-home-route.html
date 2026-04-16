@@ -1,0 +1,352 @@
+<section class="project-home-page">
+  @if (isLoading()) {
+    <section class="project-home-page__skeleton-shell" aria-hidden="true">
+      <section class="project-home-page__hero project-home-page__panel">
+        <div class="project-home-page__skeleton-copy">
+          <div class="project-home-page__skeleton project-home-page__skeleton--eyebrow"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--title"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--subtitle"></div>
+          <div class="project-home-page__skeleton project-home-page__skeleton--subtitle project-home-page__skeleton--subtitle-short"></div>
+          <div class="project-home-page__status project-home-page__status--hero">
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--pill project-home-page__skeleton--pill-wide"></div>
+          </div>
+        </div>
+        <div class="project-home-page__skeleton project-home-page__skeleton--hero-action"></div>
+      </section>
+
+      <section class="project-home-page__metrics">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <article class="project-home-page__metric project-home-page__panel">
+            <div class="project-home-page__metric-top">
+              <div class="project-home-page__skeleton project-home-page__skeleton--icon"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--metric-label"></div>
+            </div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--metric-value"></div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--metric-helper"></div>
+          </article>
+        }
+      </section>
+
+      <section class="project-home-page__workspace">
+        <article class="project-home-page__panel">
+          <div class="project-home-page__section-head">
+            <div class="project-home-page__skeleton-copy">
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-title"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-copy"></div>
+            </div>
+            <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+          </div>
+
+          <div class="project-home-page__activity-list">
+            @for (item of [1, 2, 3]; track item) {
+              <article class="project-home-page__activity-row">
+                <div class="project-home-page__skeleton project-home-page__skeleton--dot"></div>
+                <div class="project-home-page__activity-body">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-title"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-copy"></div>
+                </div>
+                <div class="project-home-page__activity-side">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--time"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+                </div>
+              </article>
+            }
+          </div>
+        </article>
+
+        <aside class="project-home-page__panel">
+          <div class="project-home-page__section-head">
+            <div class="project-home-page__skeleton-copy">
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-title"></div>
+              <div class="project-home-page__skeleton project-home-page__skeleton--section-copy"></div>
+            </div>
+          </div>
+
+          <div class="project-home-page__suggested-list">
+            @for (item of [1, 2, 3]; track item) {
+              <article class="project-home-page__suggested-card">
+                <div class="project-home-page__skeleton project-home-page__skeleton--suggested-icon"></div>
+                <div class="project-home-page__suggested-body">
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-title"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--activity-copy"></div>
+                  <div class="project-home-page__skeleton project-home-page__skeleton--link"></div>
+                </div>
+              </article>
+            }
+          </div>
+        </aside>
+      </section>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-home-page__state project-home-page__state--error" role="alert">
+      <h1>{{ 'project.home.errors.title' | t }}</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadHomePage()">{{ 'project.home.actions.tryAgain' | t }}</button>
+    </section>
+  } @else if (page(); as page) {
+    <section class="project-home-page__hero project-home-page__panel">
+      <div class="project-home-page__hero-copy">
+        <p class="project-home-page__eyebrow">{{ heroEyebrow() }}</p>
+        <h1 class="project-home-page__title">{{ heroTitle() }}</h1>
+        <p class="project-home-page__subtitle">{{ heroSubtitle() }}</p>
+        <div class="project-home-page__status project-home-page__status--hero">
+          @for (item of statusPills(); track item.label) {
+            <span class="project-home-page__status-pill" [class.project-home-page__status-pill--accent]="item.accent">
+              {{ item.label }}
+            </span>
+          }
+        </div>
+      </div>
+      @if (heroAction(); as heroAction) {
+        <a class="project-home-page__hero-action" [routerLink]="heroAction.route">
+          {{ heroAction.label }}
+        </a>
+      }
+    </section>
+
+    <section class="project-home-page__metrics">
+      @for (metric of displayMetricCards(); track metric.label) {
+        <article class="project-home-page__metric project-home-page__panel" [class]="'project-home-page__metric--tone-' + metric.tone">
+          <div class="project-home-page__metric-top">
+            <span class="project-home-page__metric-icon" aria-hidden="true">
+              @switch (metric.icon) {
+                @case ('pages') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="4" y="5" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="13" y="5" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="4" y="13" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                    <rect x="13" y="13" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                }
+                @case ('audience') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="9" cy="9" r="2.7" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M4.5 18C5.1 15.9 6.95 14.5 9.15 14.5H9.85C12.05 14.5 13.9 15.9 14.5 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <circle cx="16.75" cy="10" r="2.1" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M14.8 18C15.2 16.45 16.5 15.35 18.05 15.35H18.35C19.9 15.35 21.2 16.45 21.6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('launch') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case ('catalog') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2Z" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M2 12H22" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 2C14.5 4.7 16 8.2 16 12C16 15.8 14.5 19.3 12 22C9.5 19.3 8 15.8 8 12C8 8.2 9.5 4.7 12 2Z" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                }
+                @case ('customer') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 12L10.8 14.8L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case ('order') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M7 3H14L19 8V21H7V3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M14 3V8H19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M10 12H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M10 16H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('revenue') {
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+              }
+            </span>
+          </div>
+          <div class="project-home-page__metric-body">
+            <span class="project-home-page__metric-label">{{ metric.label }}</span>
+            <strong class="project-home-page__metric-value">{{ metric.value }}</strong>
+            <span class="project-home-page__metric-helper">{{ metric.helper }}</span>
+          </div>
+        </article>
+      }
+    </section>
+
+    <section class="project-home-page__workspace">
+      <article class="project-home-page__panel">
+        <div class="project-home-page__section-head">
+          <div>
+            <h2>{{ activityHeading() }}</h2>
+            <p>{{ activityDescription() }}</p>
+          </div>
+          <a class="project-home-page__view-all" [routerLink]="['/app/projects', page.projectId, workspaceConfig().activityLinkPath]">
+            {{ workspaceConfig().activityLinkLabel }}
+          </a>
+        </div>
+
+        @if (displayActivities().length) {
+          <div class="project-home-page__activity-list">
+            @for (activity of displayActivities(); track activity.title + activity.occurredAt) {
+              <a class="project-home-page__activity-row" [routerLink]="activity.route">
+                <span
+                  class="project-home-page__activity-icon"
+                  [class.project-home-page__activity-icon--page]="activityTone(activity) === 'page'"
+                  [class.project-home-page__activity-icon--audience]="activityTone(activity) === 'audience'"
+                  [class.project-home-page__activity-icon--launch]="activityTone(activity) === 'launch'"
+                  [class.project-home-page__activity-icon--catalog]="activityTone(activity) === 'catalog'"
+                  [class.project-home-page__activity-icon--customer]="activityTone(activity) === 'customer'"
+                  [class.project-home-page__activity-icon--order]="activityTone(activity) === 'order'"
+                  [class.project-home-page__activity-icon--project]="activityTone(activity) === 'project'"
+                  aria-hidden="true"
+                >
+                  @switch (activityTone(activity)) {
+                    @case ('page') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('audience') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 6.5H19V17.5H5V6.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M7 9L12 12.5L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @case ('launch') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @case ('catalog') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('customer') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M5.5 18.5C6.3 15.9 8.65 14.2 11.45 14.2H12.55C15.35 14.2 17.7 15.9 18.5 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    }
+                    @case ('order') {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7 8.25V6.75C7 4.68 8.68 3 10.75 3H13.25C15.32 3 17 4.68 17 6.75V8.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M5.25 8.25H18.75L17.96 18.64C17.88 19.73 16.97 20.58 15.88 20.58H8.12C7.03 20.58 6.12 19.73 6.04 18.64L5.25 8.25Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      </svg>
+                    }
+                    @default {
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8" />
+                      </svg>
+                    }
+                  }
+                </span>
+                <div class="project-home-page__activity-body">
+                  <div class="project-home-page__activity-title-row">
+                    <h3>{{ activity.title }}</h3>
+                    <span class="project-home-page__activity-title-separator" aria-hidden="true">·</span>
+                    <span class="project-home-page__activity-inline-time">{{ formatOccurredAt(activity.occurredAt) }}</span>
+                  </div>
+                  <p>{{ activity.description }}</p>
+                </div>
+                <div class="project-home-page__activity-side">
+                  <span class="project-home-page__activity-link" aria-hidden="true">
+                    <span class="project-home-page__link-chevron">›</span>
+                  </span>
+                </div>
+              </a>
+            }
+          </div>
+        } @else {
+          <div class="project-home-page__empty">
+            <h3>{{ 'project.home.activity.none' | t }}</h3>
+            <p>{{ workspaceConfig().emptyActivityDescription }}</p>
+          </div>
+        }
+      </article>
+
+      <aside class="project-home-page__panel">
+        <div class="project-home-page__section-head">
+          <div>
+            <h2>{{ 'project.home.suggested.title' | t }}</h2>
+            <p>{{ suggestedDescription() }}</p>
+          </div>
+        </div>
+
+        <div class="project-home-page__suggested-list">
+          @for (action of displayActions(); track action.title) {
+            <article class="project-home-page__suggested-card">
+              <div
+                class="project-home-page__suggested-icon"
+                [class.project-home-page__suggested-icon--page]="suggestedActionTone(action) === 'page'"
+                [class.project-home-page__suggested-icon--audience]="suggestedActionTone(action) === 'audience'"
+                [class.project-home-page__suggested-icon--setup]="suggestedActionTone(action) === 'setup'"
+                [class.project-home-page__suggested-icon--catalog]="suggestedActionTone(action) === 'catalog'"
+                [class.project-home-page__suggested-icon--customer]="suggestedActionTone(action) === 'customer'"
+                [class.project-home-page__suggested-icon--launch]="suggestedActionTone(action) === 'launch'"
+                aria-hidden="true"
+              >
+                @switch (suggestedActionTone(action)) {
+                  @case ('page') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8 14H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('audience') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M5 6.5H19V17.5H5V6.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M7 9L12 12.5L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
+                  @case ('catalog') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 4L19 8V16L12 20L5 16V8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M5 8L12 12L19 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M12 12V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('customer') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M5.5 18.5C6.3 15.9 8.65 14.2 11.45 14.2H12.55C15.35 14.2 17.7 15.9 18.5 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                  @case ('launch') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 4V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8.5 13.5L6 20L12 17L18 20L15.5 13.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M12 4L16 8L12 12L8 8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    </svg>
+                  }
+                  @default {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M12 5V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  }
+                }
+              </div>
+              <div class="project-home-page__suggested-body">
+                <h3>{{ action.title }}</h3>
+                <p>{{ action.description }}</p>
+                <a [routerLink]="action.route">
+                  {{ action.actionLabel }}
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+      </aside>
+    </section>
+  }
+</section>

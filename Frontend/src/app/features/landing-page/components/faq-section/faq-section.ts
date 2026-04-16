@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
-  selector: 'faq-section',
-  imports: [],
+  selector: 'app-landing-page-faq-section',
+  imports: [TranslatePipe],
   templateUrl: './faq-section.html',
   styleUrl: './faq-section.css',
 })
@@ -21,5 +22,5 @@ export class FaqSection {
         clickedItem.classList.add('active');
         clickedItem.querySelector('.chevron')!.classList.add('rotated');
     }
-}
+  }
 }

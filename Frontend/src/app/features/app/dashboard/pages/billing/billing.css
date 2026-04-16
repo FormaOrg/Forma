@@ -1,0 +1,1213 @@
+app-billing {
+  --billing-bg: #eceff3;
+  --billing-border: rgba(215, 217, 223, 0.95);
+  --billing-border-strong: rgba(116, 104, 255, 0.2);
+  --billing-surface-soft: #f5f7fb;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background-color: var(--billing-bg);
+}
+
+app-billing * {
+  box-sizing: border-box;
+}
+
+app-billing .billing-page {
+  max-width: 1400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 42px;
+}
+
+app-billing .billing-hero,
+app-billing .billing-section {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+}
+
+app-billing .billing-hero {
+  padding: 32px 24px;
+}
+
+app-billing .billing-hero__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+app-billing .billing-hero__title {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+app-billing .billing-hero__subtitle {
+  max-width: 620px;
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #7e838d;
+}
+
+app-billing .billing-hero__summary {
+  min-width: 250px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid #ececf2;
+  background: linear-gradient(180deg, #fbfbfd, #f6f7fb);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-billing .billing-hero__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7468ff;
+}
+
+app-billing .billing-hero__plan {
+  font-size: 1.05rem;
+  line-height: 1.1;
+  color: #111111;
+}
+
+app-billing .billing-hero__meta {
+  font-size: 0.84rem;
+  color: #727784;
+}
+
+app-billing .billing-page__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+app-billing .billing-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+app-billing .billing-loading__hero,
+app-billing .billing-loading__panel {
+  border: 1px solid var(--billing-border);
+  border-radius: 22px;
+  background: #fbfbfd;
+  overflow: hidden;
+}
+
+app-billing .billing-loading__hero {
+  min-height: 220px;
+  padding: 22px;
+}
+
+app-billing .billing-loading__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+app-billing .billing-loading__panel {
+  min-height: 210px;
+  padding: 18px;
+}
+
+app-billing .billing-loading__hero::before,
+app-billing .billing-loading__hero::after,
+app-billing .billing-loading__panel::before,
+app-billing .billing-loading__panel::after {
+  content: '';
+  display: block;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #eef1f6 25%, #f8f9fc 38%, #eef1f6 52%);
+  background-size: 200% 100%;
+  animation: billing-shimmer 1.2s linear infinite;
+}
+
+app-billing .billing-loading__hero::before {
+  width: 160px;
+  height: 14px;
+  margin-bottom: 16px;
+}
+
+app-billing .billing-loading__hero::after {
+  width: 100%;
+  height: 138px;
+}
+
+app-billing .billing-loading__panel::before {
+  width: 60%;
+  height: 16px;
+  margin-bottom: 14px;
+}
+
+app-billing .billing-loading__panel::after {
+  width: 100%;
+  height: 128px;
+}
+
+@keyframes billing-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+app-billing .billing-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+app-billing .billing-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-billing .billing-section {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+app-billing .billing-section--plan {
+  height: 100%;
+}
+
+app-billing .billing-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-billing .billing-section__title {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+app-billing .billing-section__subtitle {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #8a8f98;
+}
+
+app-billing .billing-status,
+app-billing .invoice-pill,
+app-billing .plan-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+app-billing .billing-status--active,
+app-billing .invoice-pill,
+app-billing .plan-card__badge--current {
+  background: #dff5e7;
+  color: #4f8f66;
+}
+
+app-billing .invoice-pill--pending {
+  background: #fff1df;
+  color: #ba6b2e;
+}
+
+app-billing .invoice-pill--failed {
+  background: #ffe5e8;
+  color: #c15367;
+}
+
+app-billing .plan-card__badge {
+  background: #eef0ff;
+  color: #7468ff;
+}
+
+app-billing .current-plan-card,
+app-billing .payment-card,
+app-billing .help-card {
+  border: 1px solid #ececf2;
+  border-radius: 20px;
+  background: #fbfbfd;
+  padding: 18px;
+}
+
+app-billing .current-plan-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 18px;
+  padding: 20px;
+}
+
+app-billing .billing-notice p,
+app-billing .help-card__text {
+  margin: 0;
+}
+
+app-billing .current-plan-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+app-billing .current-plan-card__intro {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+app-billing .current-plan-card__eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+app-billing .current-plan-card__eyebrow {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7468ff;
+}
+
+app-billing .current-plan-card__chip {
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(116, 104, 255, 0.1);
+  color: #5d56d6;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+app-billing .current-plan-card__name {
+  margin: 0;
+  font-size: 1.7rem;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #111111;
+}
+
+app-billing .current-plan-card__description {
+  max-width: 560px;
+  margin: 0;
+  color: #6f7480;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+app-billing .current-plan-card__price-card {
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(116, 104, 255, 0.14);
+}
+
+app-billing .current-plan-card__price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+app-billing .current-plan-card__price {
+  font-size: 2.35rem;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #111111;
+}
+
+app-billing .current-plan-card__period {
+  padding-bottom: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #737987;
+}
+
+app-billing .current-plan-card__price-note {
+  margin: 10px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #6d7480;
+}
+
+app-billing .billing-toggle {
+  position: relative;
+  flex-shrink: 0;
+  padding: 4px;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  border: 1px solid #e6e9f2;
+  background: rgba(245, 247, 252, 0.96);
+}
+
+app-billing .billing-toggle__pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: #7566ff;
+  transition: transform 220ms cubic-bezier(0.33, 1, 0.68, 1);
+  pointer-events: none;
+}
+
+app-billing .billing-toggle[data-mode='yearly'] .billing-toggle__pill {
+  transform: translateX(100%);
+}
+
+app-billing .billing-toggle__option {
+  position: relative;
+  z-index: 1;
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 999px;
+  color: #6f7682;
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+app-billing .billing-toggle__option.is-active {
+  color: #ffffff;
+}
+
+app-billing .billing-toggle__note {
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: inherit;
+  opacity: 0.8;
+}
+
+app-billing .current-plan-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+app-billing .current-plan-card__detail {
+  padding: 14px 15px;
+  border-radius: 16px;
+  border: 1px solid #ececf2;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-billing .current-plan-card__detail span {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a8f98;
+}
+
+app-billing .current-plan-card__detail strong {
+  font-size: 0.96rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #1c2230;
+}
+
+app-billing .billing-notice {
+  padding: 14px 15px;
+  border-radius: 16px;
+  border: 1px solid rgba(116, 104, 255, 0.12);
+  background: rgba(116, 104, 255, 0.06);
+}
+
+app-billing .current-plan-card__actions {
+  padding-top: 4px;
+}
+
+app-billing .current-plan-card__actions,
+app-billing .payment-card__actions,
+app-billing .help-card__actions,
+app-billing .plan-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+app-billing .billing-btn {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4d515a;
+  cursor: pointer;
+  transition:
+    opacity 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+app-billing .billing-btn--primary {
+  background: #7468ff;
+  border-color: #7468ff;
+  color: #ffffff;
+}
+
+app-billing .billing-btn--primary:hover {
+  opacity: 0.92;
+}
+
+app-billing .billing-btn--secondary {
+  background: #ffffff;
+  border-color: #e5e5ef;
+  color: #4d515a;
+}
+
+app-billing .billing-btn--secondary:hover,
+app-billing .billing-btn--ghost:hover {
+  background: #f4f5fa;
+  border-color: #dcddea;
+  color: #111111;
+}
+
+app-billing .billing-btn--ghost {
+  background: #f8f8fc;
+  border-color: #e5e5ef;
+}
+
+app-billing .payment-card,
+app-billing .help-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-billing .payment-card__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+app-billing .payment-card__brand {
+  width: 52px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #111111, #4a4f5a);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+app-billing .payment-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111111;
+}
+
+app-billing .payment-card__meta {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #8a8f98;
+}
+
+app-billing .payment-card__line {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+app-billing .usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+app-billing .usage-card {
+  min-height: 186px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid #ececf2;
+  background: #fbfbfd;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-billing .usage-card--warning {
+  border-color: rgba(242, 157, 100, 0.45);
+  background: linear-gradient(180deg, #fffaf4, #fbfbfd);
+}
+
+app-billing .usage-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-billing .usage-card__title {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #111111;
+}
+
+app-billing .usage-card__summary,
+app-billing .usage-card__note {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #7e838d;
+}
+
+app-billing .usage-card__percent {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111111;
+}
+
+app-billing .usage-card__meter {
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: #ececf2;
+  overflow: hidden;
+}
+
+app-billing .usage-card__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7468ff, #9d95ff);
+}
+
+app-billing .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+app-billing .plan-card {
+  min-height: 100%;
+  height: 100%;
+  padding: 20px 18px;
+  border-radius: 20px;
+  border: 1px solid #ececf2;
+  background: #fbfbfd;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+app-billing .plan-card--popular {
+  border-color: rgba(116, 104, 255, 0.2);
+  box-shadow: 0 14px 28px rgba(116, 104, 255, 0.08);
+}
+
+app-billing .plan-card--current {
+  background: linear-gradient(180deg, #f8f7ff, #fbfbfd);
+}
+
+app-billing .plan-card__top {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 182px;
+}
+
+app-billing .plan-card__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+}
+
+app-billing .plan-card__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+app-billing .plan-card__name {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+app-billing .plan-card__description {
+  margin: 0;
+  min-height: 52px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #727784;
+}
+
+app-billing .plan-card__price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+app-billing .plan-card__price {
+  font-size: 2rem;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #111111;
+}
+
+app-billing .plan-card__period {
+  padding-bottom: 3px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #727784;
+}
+
+app-billing .plan-card__features {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  flex: 1;
+  align-content: start;
+  min-height: 208px;
+}
+
+app-billing .plan-card__features li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #23232d;
+}
+
+app-billing .plan-card__actions {
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+app-billing .plan-card__features li::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7468ff;
+}
+
+app-billing .invoice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+app-billing .invoice-row {
+  min-height: 74px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid #ececf2;
+  background: #fbfbfd;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto auto auto;
+  align-items: center;
+  gap: 16px;
+}
+
+app-billing .invoice-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-billing .invoice-row__id {
+  font-size: 0.9rem;
+  color: #111111;
+}
+
+app-billing .invoice-row__date,
+app-billing .invoice-row__amount {
+  font-size: 0.84rem;
+  color: #7e838d;
+}
+
+app-billing .invoice-row__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+app-billing .invoice-download {
+  min-height: 40px;
+  padding: 0 14px 0 42px;
+  border-radius: 14px;
+  border: 1px solid #7468ff;
+  background: #7468ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  position: relative;
+  transition:
+    opacity 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+app-billing .invoice-download:hover {
+  opacity: 0.92;
+}
+
+app-billing .invoice-download__icon-shell {
+  position: absolute;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+
+app-billing .invoice-download:hover .invoice-download__icon-shell {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+app-billing .invoice-download__icon-wrap {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.2s ease-in-out;
+}
+
+app-billing .invoice-download:hover .invoice-download__icon-wrap {
+  transform: scale(1.15);
+}
+
+app-billing .invoice-download__icon-wrap svg {
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+app-billing .invoice-download span {
+  transition: opacity 0.2s ease-in-out;
+}
+
+app-billing .invoice-download:hover span {
+  opacity: 0;
+}
+
+app-billing .billing-section__footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+app-billing .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 16, 28, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+app-billing .modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: min(90vh, 900px);
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(217, 220, 230, 0.9);
+  background: #ffffff;
+  box-shadow: 0 30px 70px rgba(17, 24, 39, 0.22);
+}
+
+app-billing .modal-content.modal-large {
+  max-width: 900px;
+}
+
+app-billing .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #ececf2;
+}
+
+app-billing .modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  color: #111111;
+}
+
+app-billing .modal-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #5f6470;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+app-billing .modal-close:hover {
+  background: var(--billing-surface-soft);
+  color: #111111;
+}
+
+app-billing .modal-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+app-billing .modal-body {
+  max-height: calc(90vh - 76px);
+  overflow-y: auto;
+  padding: 18px 20px 20px;
+}
+
+app-billing .invoice-list--modal {
+  gap: 12px;
+}
+
+@media (max-width: 1100px) {
+  app-billing .billing-page__stats,
+  app-billing .usage-grid,
+  app-billing .plans-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  app-billing .billing-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  app-billing .billing-loading__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  app-billing .billing-hero__content,
+  app-billing .current-plan-card__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  app-billing .billing-hero__summary,
+  app-billing .billing-toggle {
+    width: 100%;
+  }
+
+  app-billing .current-plan-card__details {
+    grid-template-columns: 1fr;
+  }
+
+  app-billing .invoice-row {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  app-billing .plan-card__title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  app-billing .plan-card__badge-row {
+    justify-content: flex-start;
+  }
+
+  app-billing .invoice-row__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  app-billing .invoice-download {
+    width: 100%;
+    justify-content: center;
+  }
+
+  app-billing .modal-overlay {
+    padding: 14px;
+  }
+
+  app-billing .modal-body {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  app-billing .billing-page {
+    padding: 24px 18px;
+  }
+
+  app-billing .billing-page__stats,
+  app-billing .usage-grid,
+  app-billing .plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  app-billing .billing-hero,
+  app-billing .billing-section {
+    padding: 18px;
+  }
+
+  app-billing .billing-hero__title {
+    font-size: 2rem;
+  }
+
+  app-billing .current-plan-card,
+  app-billing .payment-card,
+  app-billing .help-card,
+  app-billing .usage-card,
+  app-billing .plan-card {
+    padding: 16px;
+  }
+
+  app-billing .current-plan-card__actions,
+  app-billing .payment-card__actions,
+  app-billing .help-card__actions,
+  app-billing .plan-card__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  app-billing .billing-btn {
+    width: 100%;
+  }
+}
+
+.theme-dark app-billing {
+  --billing-bg: #0f141d;
+  --home-surface: #171e2a;
+  --home-border: rgba(226, 231, 244, 0.1);
+  --home-accent-soft: rgba(117, 102, 255, 0.18);
+  --billing-border: rgba(226, 231, 244, 0.1);
+  --billing-border-strong: rgba(117, 102, 255, 0.34);
+  --billing-surface-soft: #182131;
+  background: #10141c;
+}
+
+.theme-dark app-billing .billing-hero,
+.theme-dark app-billing .billing-section,
+.theme-dark app-billing .modal-content {
+  background: #171e2a;
+  border-color: var(--billing-border);
+  box-shadow: none;
+}
+
+.theme-dark app-billing .billing-hero__title,
+.theme-dark app-billing .billing-section__title,
+.theme-dark app-billing .current-plan-card__name,
+.theme-dark app-billing .current-plan-card__price,
+.theme-dark app-billing .current-plan-card__detail strong,
+.theme-dark app-billing .payment-card__title,
+.theme-dark app-billing .usage-card__title,
+.theme-dark app-billing .usage-card__percent,
+.theme-dark app-billing .plan-card__name,
+.theme-dark app-billing .plan-card__price,
+.theme-dark app-billing .invoice-row__id,
+.theme-dark app-billing .modal-title {
+  color: #f4f7ff;
+}
+
+.theme-dark app-billing .billing-hero__subtitle,
+.theme-dark app-billing .billing-hero__meta,
+.theme-dark app-billing .billing-section__subtitle,
+.theme-dark app-billing .current-plan-card__description,
+.theme-dark app-billing .current-plan-card__period,
+.theme-dark app-billing .current-plan-card__price-note,
+.theme-dark app-billing .current-plan-card__detail span,
+.theme-dark app-billing .payment-card__meta,
+.theme-dark app-billing .usage-card__summary,
+.theme-dark app-billing .usage-card__note,
+.theme-dark app-billing .plan-card__description,
+.theme-dark app-billing .plan-card__period,
+.theme-dark app-billing .plan-card__features li,
+.theme-dark app-billing .invoice-row__date,
+.theme-dark app-billing .invoice-row__amount,
+.theme-dark app-billing .billing-notice p {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+.theme-dark app-billing .payment-card__line span {
+  color: rgba(226, 231, 244, 0.62);
+}
+
+.theme-dark app-billing .payment-card__line strong {
+  color: #f4f7ff;
+}
+
+.theme-dark app-billing .billing-hero__summary,
+.theme-dark app-billing .current-plan-card,
+.theme-dark app-billing .current-plan-card__price-card,
+.theme-dark app-billing .current-plan-card__detail,
+.theme-dark app-billing .billing-notice,
+.theme-dark app-billing .payment-card,
+.theme-dark app-billing .help-card,
+.theme-dark app-billing .usage-card,
+.theme-dark app-billing .plan-card,
+.theme-dark app-billing .invoice-row {
+  background: #121925;
+  border-color: var(--billing-border);
+  box-shadow: none;
+}
+
+.theme-dark app-billing .billing-section__header,
+.theme-dark app-billing .modal-header {
+  border-bottom-color: var(--billing-border);
+}
+
+.theme-dark app-billing .billing-btn--secondary,
+.theme-dark app-billing .billing-btn--ghost,
+.theme-dark app-billing .billing-toggle,
+.theme-dark app-billing .modal-close {
+  background: #0f1621;
+  border-color: var(--billing-border);
+  color: rgba(226, 231, 244, 0.86);
+}
+
+.theme-dark app-billing .billing-btn--secondary:hover,
+.theme-dark app-billing .billing-btn--ghost:hover,
+.theme-dark app-billing .modal-close:hover {
+  background: var(--billing-surface-soft);
+  border-color: var(--billing-border-strong);
+}
+
+.theme-dark app-billing .billing-toggle__option {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+.theme-dark app-billing .billing-toggle__option.is-active {
+  color: #ffffff;
+}
+
+.theme-dark app-billing .usage-card__meter {
+  background: rgba(226, 231, 244, 0.12);
+}
+
+.theme-dark app-billing .plan-card--current {
+  background: #151d29;
+}
+
+.theme-dark app-billing .current-plan-card__detail,
+.theme-dark app-billing .billing-hero__summary {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+}
+
+.theme-dark app-billing .billing-notice {
+  background: rgba(117, 102, 255, 0.12);
+  border-color: rgba(117, 102, 255, 0.24);
+}
+
+.theme-dark app-billing .invoice-download {
+  box-shadow: none;
+}
+
+.theme-dark app-billing .modal-overlay {
+  background: rgba(5, 8, 14, 0.72);
+}
+
+.theme-dark app-billing .billing-loading__hero,
+.theme-dark app-billing .billing-loading__panel {
+  border-color: rgba(138, 149, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    #171e2a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 12px 28px rgba(5, 9, 16, 0.2);
+}
+
+.theme-dark app-billing .billing-loading__hero::before,
+.theme-dark app-billing .billing-loading__hero::after,
+.theme-dark app-billing .billing-loading__panel::before,
+.theme-dark app-billing .billing-loading__panel::after {
+  background: linear-gradient(90deg, #1b2432 25%, #243043 38%, #1b2432 52%);
+  background-size: 200% 100%;
+}

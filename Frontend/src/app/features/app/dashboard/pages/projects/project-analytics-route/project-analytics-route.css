@@ -1,0 +1,736 @@
+app-project-analytics-route {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+app-project-analytics-route .project-analytics {
+  max-width: 1400px;
+  width: 100%;
+  padding: 28px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-project-analytics-route .project-analytics__panel {
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 22px rgba(17, 17, 17, 0.035);
+}
+
+app-project-analytics-route .project-analytics__hero,
+app-project-analytics-route .project-analytics__section-head,
+app-project-analytics-route .project-analytics__source-top,
+app-project-analytics-route .project-analytics__rank-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+app-project-analytics-route .project-analytics__hero {
+  align-items: center;
+}
+
+app-project-analytics-route .project-analytics__hero-copy {
+  flex: 1;
+  min-width: 0;
+  max-width: 920px;
+}
+
+app-project-analytics-route .project-analytics__eyebrow,
+app-project-analytics-route .project-analytics__section-kicker {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__eyebrow {
+  margin-bottom: 6px;
+}
+
+app-project-analytics-route .project-analytics__title {
+  margin: 0;
+  font-size: 2.35rem;
+  line-height: 0.98;
+  font-weight: 700;
+  color: #111111;
+  max-width: 16ch;
+}
+
+app-project-analytics-route .project-analytics__subtitle,
+app-project-analytics-route .project-analytics__source-row p,
+app-project-analytics-route .project-analytics__rank-card p,
+app-project-analytics-route .project-analytics__insight-card p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.52;
+  color: rgba(11, 11, 18, 0.64);
+}
+
+app-project-analytics-route .project-analytics__subtitle {
+  margin-top: 10px;
+  max-width: 66ch;
+}
+
+app-project-analytics-route .project-analytics__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-self: center;
+}
+
+app-project-analytics-route .project-analytics__range-switch,
+app-project-analytics-route .project-analytics__metric-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f5f7fb;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+app-project-analytics-route .project-analytics__range-switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(max-content, 1fr));
+  align-items: center;
+  white-space: nowrap;
+}
+
+app-project-analytics-route .project-analytics__metric-switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(max-content, 1fr));
+  align-items: center;
+  white-space: nowrap;
+}
+
+app-project-analytics-route .project-analytics__range-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 16px) / 3);
+  border-radius: 999px;
+  background: #7566ff;
+  pointer-events: none;
+  transition: transform 220ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+app-project-analytics-route .project-analytics__metric-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 16px) / 3);
+  border-radius: 999px;
+  background: #7566ff;
+  pointer-events: none;
+  transition: transform 220ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+app-project-analytics-route .project-analytics__range-switch[data-range='LAST_30_DAYS'] .project-analytics__range-pill {
+  transform: translateX(calc(100% + 4px));
+}
+
+app-project-analytics-route .project-analytics__range-switch[data-range='LAST_90_DAYS'] .project-analytics__range-pill {
+  transform: translateX(calc(200% + 8px));
+}
+
+app-project-analytics-route .project-analytics__metric-switch[data-metric='orders'] .project-analytics__metric-pill {
+  transform: translateX(calc(100% + 4px));
+}
+
+app-project-analytics-route .project-analytics__metric-switch[data-metric='revenue'] .project-analytics__metric-pill {
+  transform: translateX(calc(200% + 8px));
+}
+
+app-project-analytics-route .project-analytics__range-button,
+app-project-analytics-route .project-analytics__metric-button,
+app-project-analytics-route .project-analytics__section-action {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+app-project-analytics-route .project-analytics__range-button,
+app-project-analytics-route .project-analytics__metric-button {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(11, 11, 18, 0.64);
+  font-size: 0.77rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+app-project-analytics-route .project-analytics__metric-button--active {
+  background: linear-gradient(135deg, rgba(117, 102, 255, 0.16), rgba(117, 102, 255, 0.08));
+  color: #7566ff;
+  box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.12);
+}
+
+app-project-analytics-route .project-analytics__range-button:hover {
+  color: #111111;
+}
+
+app-project-analytics-route .project-analytics__range-button--active,
+app-project-analytics-route .project-analytics__range-button--active:hover {
+  background: transparent;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+app-project-analytics-route .project-analytics__metric-button:hover {
+  color: #111111;
+}
+
+app-project-analytics-route .project-analytics__metric-button--active,
+app-project-analytics-route .project-analytics__metric-button--active:hover {
+  background: transparent;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+app-project-analytics-route .project-analytics__section-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+app-project-analytics-route .project-analytics__section-action {
+  min-height: 46px;
+  padding: 0 18px 0 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #f8faff);
+  border: 1px solid rgba(117, 102, 255, 0.14);
+  color: #2f3642;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(17, 17, 17, 0.03);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+app-project-analytics-route .project-analytics__section-action svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__section-action:hover {
+  border-color: rgba(117, 102, 255, 0.24);
+  background: linear-gradient(180deg, #ffffff, #f4f5ff);
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__section-action:focus-visible {
+  outline: none;
+  border-color: rgba(117, 102, 255, 0.28);
+  box-shadow:
+    0 0 0 4px rgba(117, 102, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+app-project-analytics-route .project-analytics__summary-grid,
+app-project-analytics-route .project-analytics__lower-grid,
+app-project-analytics-route .project-analytics__insights-grid {
+  display: grid;
+  gap: 14px;
+}
+
+app-project-analytics-route .project-analytics__summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+app-project-analytics-route .project-analytics__summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 18px;
+  border-radius: 24px;
+}
+
+app-project-analytics-route .project-analytics__summary-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+app-project-analytics-route .project-analytics__summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-project-analytics-route .project-analytics__summary-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+app-project-analytics-route .project-analytics__summary-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+app-project-analytics-route .project-analytics__summary-card--violet .project-analytics__summary-icon {
+  background: rgba(117, 102, 255, 0.1);
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__summary-card--blue .project-analytics__summary-icon {
+  background: rgba(103, 192, 255, 0.12);
+  color: #4a9fff;
+}
+
+app-project-analytics-route .project-analytics__summary-card--mint .project-analytics__summary-icon {
+  background: rgba(90, 200, 164, 0.14);
+  color: #28b48e;
+}
+
+app-project-analytics-route .project-analytics__summary-card--amber .project-analytics__summary-icon {
+  background: rgba(255, 182, 86, 0.16);
+  color: #f09a2b;
+}
+
+app-project-analytics-route .project-analytics__summary-label {
+  font-size: 0.92rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: rgba(67, 80, 97, 0.95);
+}
+
+app-project-analytics-route .project-analytics__summary-value {
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #111111;
+}
+
+app-project-analytics-route .project-analytics__summary-change {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #7a818d;
+}
+
+app-project-analytics-route .project-analytics__content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.8fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+app-project-analytics-route .project-analytics__panel--chart,
+app-project-analytics-route .project-analytics__panel--sources,
+app-project-analytics-route .project-analytics__insights {
+  display: flex;
+  flex-direction: column;
+}
+
+app-project-analytics-route .project-analytics__section-head--compact {
+  align-items: center;
+}
+
+app-project-analytics-route .project-analytics__section-title,
+app-project-analytics-route .project-analytics__rank-card h3,
+app-project-analytics-route .project-analytics__insight-card h3 {
+  margin: 0;
+  color: #111111;
+}
+
+app-project-analytics-route .project-analytics__section-title {
+  margin-top: 4px;
+  font-size: 1.22rem;
+  line-height: 1.08;
+  font-weight: 700;
+}
+
+app-project-analytics-route .project-analytics__chart-layout {
+  margin-top: 18px;
+}
+
+app-project-analytics-route .project-analytics__chart-shell {
+  position: relative;
+  min-height: 320px;
+  border-radius: 18px;
+  border: 1px solid rgba(228, 231, 239, 0.95);
+  background: linear-gradient(180deg, #fcfdff, #f7f9fd);
+  overflow: hidden;
+  padding: 12px;
+}
+
+app-project-analytics-route .project-analytics__chart-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+app-project-analytics-route .project-analytics__sources-list,
+app-project-analytics-route .project-analytics__rank-list {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-analytics-route .project-analytics__source-row,
+app-project-analytics-route .project-analytics__rank-card,
+app-project-analytics-route .project-analytics__insight-card {
+  padding: 14px 15px;
+  border-radius: 16px;
+  border: 1px solid rgba(228, 231, 239, 0.95);
+  background: #ffffff;
+}
+
+app-project-analytics-route .project-analytics__source-top strong,
+app-project-analytics-route .project-analytics__rank-card h3,
+app-project-analytics-route .project-analytics__insight-card h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+app-project-analytics-route .project-analytics__source-top span,
+app-project-analytics-route .project-analytics__rank-side span,
+app-project-analytics-route .project-analytics__rank-card p {
+  font-size: 0.76rem;
+}
+
+app-project-analytics-route .project-analytics__source-top span {
+  font-weight: 700;
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__source-track {
+  margin-top: 10px;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #edf1f8;
+}
+
+app-project-analytics-route .project-analytics__source-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8fd7ff, #7566ff 55%, #5ac8a4);
+}
+
+app-project-analytics-route .project-analytics__source-row p {
+  margin-top: 10px;
+}
+
+app-project-analytics-route .project-analytics__lower-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+app-project-analytics-route .project-analytics__rank-card {
+  align-items: center;
+}
+
+app-project-analytics-route .project-analytics__rank-card p {
+  margin: 6px 0 0;
+  color: rgba(11, 11, 18, 0.54);
+}
+
+app-project-analytics-route .project-analytics__rank-side {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+app-project-analytics-route .project-analytics__rank-side strong {
+  font-size: 0.88rem;
+  color: #111111;
+}
+
+app-project-analytics-route .project-analytics__rank-side span {
+  font-weight: 700;
+  color: #7566ff;
+}
+
+app-project-analytics-route .project-analytics__insights-grid {
+  margin-top: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+app-project-analytics-route .project-analytics__insight-card {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background:
+    radial-gradient(circle at top left, rgba(117, 102, 255, 0.12), transparent 42%),
+    #ffffff;
+}
+
+app-project-analytics-route .project-analytics__insight-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(117, 102, 255, 0.16), rgba(117, 102, 255, 0.04)),
+    #f6f8fc;
+}
+
+app-project-analytics-route .project-analytics__insight-icon svg {
+  width: 22px;
+  height: 22px;
+  color: #7566ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__panel,
+.theme-dark app-project-analytics-route .project-analytics__source-row,
+.theme-dark app-project-analytics-route .project-analytics__rank-card,
+.theme-dark app-project-analytics-route .project-analytics__insight-card {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__chart-shell {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: linear-gradient(180deg, #1a2231, #151c29);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__range-switch,
+.theme-dark app-project-analytics-route .project-analytics__metric-switch {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(226, 231, 244, 0.08);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__range-button,
+.theme-dark app-project-analytics-route .project-analytics__metric-button {
+  color: rgba(226, 231, 244, 0.64);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__range-pill {
+  background: #7566ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__range-button:hover {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__range-button--active,
+.theme-dark app-project-analytics-route .project-analytics__range-button--active:hover {
+  color: #ffffff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__metric-button:hover {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__metric-button--active,
+.theme-dark app-project-analytics-route .project-analytics__metric-button--active:hover {
+  color: #ffffff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__section-action {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border-color: rgba(226, 231, 244, 0.1);
+  color: #f4f7ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 20px rgba(6, 10, 18, 0.14);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__section-action svg {
+  color: #9b90ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__section-action:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(117, 102, 255, 0.08));
+  border-color: rgba(117, 102, 255, 0.24);
+  color: #ffffff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__section-action:focus-visible {
+  border-color: rgba(117, 102, 255, 0.3);
+  box-shadow:
+    0 0 0 4px rgba(117, 102, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__title,
+.theme-dark app-project-analytics-route .project-analytics__summary-value,
+.theme-dark app-project-analytics-route .project-analytics__section-title,
+.theme-dark app-project-analytics-route .project-analytics__rank-card h3,
+.theme-dark app-project-analytics-route .project-analytics__rank-side strong,
+.theme-dark app-project-analytics-route .project-analytics__insight-card h3,
+.theme-dark app-project-analytics-route .project-analytics__source-top strong {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__subtitle,
+.theme-dark app-project-analytics-route .project-analytics__summary-label,
+.theme-dark app-project-analytics-route .project-analytics__summary-change,
+.theme-dark app-project-analytics-route .project-analytics__source-row p,
+.theme-dark app-project-analytics-route .project-analytics__rank-card p,
+.theme-dark app-project-analytics-route .project-analytics__insight-card p {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__summary-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    #171e2a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(6, 10, 18, 0.18);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__summary-card--violet .project-analytics__summary-icon {
+  background: rgba(117, 102, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__summary-card--blue .project-analytics__summary-icon {
+  background: rgba(74, 159, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(74, 159, 255, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__summary-card--mint .project-analytics__summary-icon {
+  background: rgba(40, 180, 142, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(40, 180, 142, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__summary-card--amber .project-analytics__summary-icon {
+  background: rgba(240, 154, 43, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(240, 154, 43, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__source-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__source-row,
+.theme-dark app-project-analytics-route .project-analytics__rank-card {
+  background: #1a2231;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-card {
+  background:
+    radial-gradient(circle at top left, rgba(117, 102, 255, 0.16), transparent 42%),
+    #1a2231;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-icon {
+  background: rgba(117, 102, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-icon svg {
+  color: #7566ff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-card:nth-child(2) .project-analytics__insight-icon {
+  background: rgba(74, 159, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(74, 159, 255, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-card:nth-child(2) .project-analytics__insight-icon svg {
+  color: #4a9fff;
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-card:nth-child(3) .project-analytics__insight-icon {
+  background: rgba(40, 180, 142, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(40, 180, 142, 0.12);
+}
+
+.theme-dark app-project-analytics-route .project-analytics__insight-card:nth-child(3) .project-analytics__insight-icon svg {
+  color: #28b48e;
+}
+
+@media (max-width: 1100px) {
+  app-project-analytics-route .project-analytics__summary-grid,
+  app-project-analytics-route .project-analytics__lower-grid,
+  app-project-analytics-route .project-analytics__insights-grid,
+  app-project-analytics-route .project-analytics__content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  app-project-analytics-route .project-analytics {
+    padding: 18px 14px 20px;
+  }
+
+  app-project-analytics-route .project-analytics__hero,
+  app-project-analytics-route .project-analytics__section-head,
+  app-project-analytics-route .project-analytics__rank-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  app-project-analytics-route .project-analytics__hero-actions {
+    justify-content: stretch;
+  }
+
+  app-project-analytics-route .project-analytics__range-switch,
+  app-project-analytics-route .project-analytics__metric-switch {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  app-project-analytics-route .project-analytics__section-actions {
+    align-items: stretch;
+  }
+
+  app-project-analytics-route .project-analytics__section-action {
+    width: 100%;
+  }
+
+  app-project-analytics-route .project-analytics__summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  app-project-analytics-route .project-analytics__title {
+    font-size: 1.95rem;
+    max-width: 13ch;
+  }
+
+  app-project-analytics-route .project-analytics__rank-side {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,141 @@
+<section class="project-pages">
+  @if (isLoading()) {
+    <section class="project-pages__state">
+      <div class="project-pages__skeleton"></div>
+      <div class="project-pages__skeleton"></div>
+      <div class="project-pages__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-pages__state project-pages__state--error" role="alert">
+      <h1>We couldn't load your portfolio pages</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadProject()">Try again</button>
+    </section>
+  } @else if (project(); as project) {
+    <section class="project-pages__hero project-pages__panel">
+      <div>
+        <p class="project-pages__eyebrow">Portfolio structure</p>
+        <h1 class="project-pages__title">Keep your core pages intentional.</h1>
+        <p class="project-pages__subtitle">
+          {{ project.projectName }} now has a focused page map for your portfolio, with a cleaner view of what is published, what needs polish, and what still needs writing.
+        </p>
+      </div>
+
+      <a class="project-pages__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">Open editor</a>
+    </section>
+
+    <section class="project-pages__summary-grid">
+      <article class="project-pages__summary-card project-pages__panel">
+        <span class="project-pages__summary-label">Pages</span>
+        <strong class="project-pages__summary-value">{{ pages().length }}</strong>
+        <span class="project-pages__summary-note">Core portfolio destinations</span>
+      </article>
+      <article class="project-pages__summary-card project-pages__panel">
+        <span class="project-pages__summary-label">Published</span>
+        <strong class="project-pages__summary-value">{{ publishedCount() }}</strong>
+        <span class="project-pages__summary-note">Already ready for visitors</span>
+      </article>
+      <article class="project-pages__summary-card project-pages__panel">
+        <span class="project-pages__summary-label">Sections</span>
+        <strong class="project-pages__summary-value">{{ totalSections() }}</strong>
+        <span class="project-pages__summary-note">Across the current page plan</span>
+      </article>
+    </section>
+
+    <section class="project-pages__layout">
+      <article class="project-pages__panel">
+        <div class="project-pages__section-head">
+          <div>
+            <p class="project-pages__section-kicker">Page map</p>
+            <h2>Current portfolio pages</h2>
+          </div>
+          <span class="project-pages__section-badge">{{ pages().length }} entries</span>
+        </div>
+
+        <div class="project-pages__list">
+          @for (page of pages(); track trackPage($index, page)) {
+            <button
+              type="button"
+              class="project-pages__row"
+              [class.project-pages__row--active]="selectedPageId() === page.id"
+              (click)="selectPage(page.id)"
+            >
+              <div class="project-pages__row-main">
+                <div class="project-pages__row-top">
+                  <strong>{{ page.title }}</strong>
+                  <span
+                    class="project-pages__status"
+                    [class.project-pages__status--published]="page.status === 'published'"
+                    [class.project-pages__status--draft]="page.status === 'draft'"
+                  >
+                    {{ page.statusLabel }}
+                  </span>
+                </div>
+                <p>{{ page.description }}</p>
+                <div class="project-pages__meta">
+                  <span>{{ page.slug }}</span>
+                  <span>{{ page.sectionCount }} sections</span>
+                  <span>{{ page.seoLabel }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </article>
+
+      <aside class="project-pages__panel">
+        @if (selectedPage(); as selectedPage) {
+          <div class="project-pages__section-head">
+            <div>
+              <p class="project-pages__section-kicker">Selected page</p>
+              <h2>{{ selectedPage.title }}</h2>
+            </div>
+            @if (selectedPage.featured) {
+              <span class="project-pages__section-badge project-pages__section-badge--accent">Homepage</span>
+            }
+          </div>
+
+          <div class="project-pages__detail-card">
+            <p>{{ selectedPage.description }}</p>
+
+            <div class="project-pages__detail-grid">
+              <div>
+                <span>Slug</span>
+                <strong>{{ selectedPage.slug }}</strong>
+              </div>
+              <div>
+                <span>Status</span>
+                <strong>{{ selectedPage.statusLabel }}</strong>
+              </div>
+              <div>
+                <span>Sections</span>
+                <strong>{{ selectedPage.sectionCount }}</strong>
+              </div>
+              <div>
+                <span>SEO</span>
+                <strong>{{ selectedPage.seoLabel }}</strong>
+              </div>
+              <div>
+                <span>Updated</span>
+                <strong>{{ formatDate(selectedPage.updatedAt) }}</strong>
+              </div>
+            </div>
+
+            <div class="project-pages__checklist">
+              <h3>What to review next</h3>
+              <ul>
+                <li>Check the headline and supporting copy for clarity.</li>
+                <li>Make sure featured work matches the positioning you want.</li>
+                <li>Review SEO title and description before publishing.</li>
+              </ul>
+            </div>
+
+            <a class="project-pages__detail-action" [routerLink]="['/app/projects', project.projectId, 'editor']">
+              Edit this page
+            </a>
+          </div>
+        }
+      </aside>
+    </section>
+  }
+</section>

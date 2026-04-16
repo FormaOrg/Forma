@@ -1,0 +1,131 @@
+:host {
+  display: block;
+}
+
+.sales-panel {
+  min-height: 100%;
+  padding: 18px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sales-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sales-panel__header > div {
+  min-width: 0;
+}
+
+.sales-panel__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+.sales-panel__title {
+  margin: 0;
+  font-size: 1.34rem;
+  line-height: 1.1;
+  font-weight: 590;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+.sales-panel__subtitle {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #6f7480;
+}
+
+.sales-panel__empty {
+  min-height: 160px;
+  border: 1px dashed rgba(215, 217, 223, 0.95);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #6f7480;
+  font-size: 0.82rem;
+  padding: 18px;
+}
+
+.sales-chart__legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sales-chart__legend-item,
+.sales-chart__tick {
+  margin: 0;
+}
+
+.sales-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.74rem;
+  color: #6f7480;
+}
+
+.sales-chart__legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.sales-chart__legend-dot--revenue {
+  background: #7566ff;
+}
+
+.sales-chart {
+  display: block;
+}
+
+.sales-chart__canvas {
+  position: relative;
+  min-height: 280px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fbfcff;
+  overflow: hidden;
+}
+
+.sales-chart__canvas-element {
+  display: block;
+  width: 100%;
+  height: 256px;
+}
+
+@media (max-width: 768px) {
+  .sales-panel__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sales-chart__canvas {
+    min-height: 296px;
+  }
+
+  .sales-chart__canvas-element {
+    height: 272px;
+  }
+}

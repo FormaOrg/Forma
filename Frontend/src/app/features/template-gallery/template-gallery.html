@@ -1,13 +1,18 @@
 <main>
     <app-header/>
-    <app-hero-section
+    <app-template-hero-section
         [searchQuery]="searchQuery()"
         [activeFilters]="activeFilters()"
+        [typeOptions]="typeOptions()"
+        [industryOptions]="industryOptions()"
         (searchChange)="onSearchChange($event)"
         (filtersChange)="onFiltersChange($event)"
     />
     
     <app-template-grid
+        [templates]="templates()"
+        [isLoading]="isLoading()"
+        [errorMessage]="errorMessage()"
         [searchQuery]="searchQuery()"
         [activeFilters]="activeFilters()"
         (sortChange)="onSortChange($event)"

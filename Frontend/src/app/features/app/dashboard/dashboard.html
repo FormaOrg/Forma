@@ -1,0 +1,65 @@
+@if (appBootstrapService.isLoading()) {
+  <div class="dashboard-boot">
+    <app-bootstrap-loader></app-bootstrap-loader>
+  </div>
+} @else if (isImmersiveRoute) {
+  <div class="dashboard-immersive">
+    <router-outlet></router-outlet>
+  </div>
+} @else {
+  <div
+    class="dashboard-shell"
+    [class.sidebar-collapsed]="sidebarCollapsed"
+    [class.dashboard-shell--settings]="isSettingsRoute"
+    [class.dashboard-shell--project]="isProjectRoute"
+    [class.dashboard-shell--sidebar-motion-ready]="sidebarMotionReady"
+  >
+    <div class="dashboard-sidebar-brand">
+      <div class="dashboard-sidebar-brand__mark" aria-hidden="true">
+        <img [src]="sidebarLogoSrc()" alt="" width="28" height="28" />
+      </div>
+      <span class="dashboard-sidebar-brand__wordmark">Forma</span>
+    </div>
+
+    <div class="dashboard-sidebar-stage">
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--main"
+        [class.is-active]="!isSettingsRoute && !isProjectRoute"
+        [attr.inert]="isSettingsRoute || isProjectRoute ? '' : null"
+      >
+        <app-side-bar [collapsed]="sidebarCollapsed" [showBrand]="false"></app-side-bar>
+      </div>
+
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--project"
+        [class.is-active]="isProjectRoute"
+        [attr.inert]="!isProjectRoute ? '' : null"
+      >
+        <app-project-sidebar
+          [collapsed]="sidebarCollapsed"
+          [showBrand]="false"
+          [projectId]="currentProjectId"
+        ></app-project-sidebar>
+      </div>
+
+      <div
+        class="dashboard-sidebar-layer dashboard-sidebar-layer--settings"
+        [class.is-active]="isSettingsRoute"
+        [attr.inert]="!isSettingsRoute ? '' : null"
+      >
+        <app-settings-sidebar [collapsed]="sidebarCollapsed" [showBrand]="false"></app-settings-sidebar>
+      </div>
+    </div>
+
+    <div class="dashboard-main">
+      <app-app-header
+        [sidebarCollapsed]="sidebarCollapsed"
+        (toggleSidebar)="toggleSidebar()"
+      ></app-app-header>
+
+      <div class="dashboard-content">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+}

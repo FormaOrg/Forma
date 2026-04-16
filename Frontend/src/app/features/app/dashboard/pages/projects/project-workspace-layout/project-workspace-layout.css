@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.project-workspace {
+  width: 100%;
+}
+
+.project-workspace__content {
+  min-width: 0;
+}
+
+:host-context(.theme-dark) {
+  background: #10141c;
+}

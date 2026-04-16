@@ -1,0 +1,62 @@
+<aside
+  class="settings-sidebar"
+  [class.settings-sidebar--collapsed]="collapsed"
+  [class.settings-sidebar--no-transition]="!isInitialized"
+  [class.settings-sidebar--brandless]="!showBrand"
+>
+  @if (showBrand) {
+    <div class="settings-sidebar__brand">
+      <div class="settings-sidebar__mark" aria-hidden="true">
+        <img [src]="logoSrc()" alt="" width="28" height="28" />
+      </div>
+      <span class="settings-sidebar__wordmark">Forma</span>
+    </div>
+  }
+
+  <nav class="settings-sidebar__body" aria-label="Settings">
+    @for (section of sections; track trackSectionId($index, section)) {
+      @if (!$first) {
+        <div class="settings-sidebar__separator" aria-hidden="true"></div>
+      }
+
+      @if (section.label) {
+        <div class="settings-sidebar__section-label">
+          <span class="settings-sidebar__section-label-text">{{ section.label | t }}</span>
+        </div>
+      }
+
+      <ul class="settings-sidebar__list" role="list">
+        @for (item of section.items; track trackItemRoute($index, item)) {
+          <li class="settings-sidebar__item">
+            @if (item.action === 'back') {
+              <button
+                type="button"
+                class="settings-sidebar__row"
+                [class.settings-sidebar__row--collapsed]="collapsed"
+                (click)="onItemClick(item, $event)"
+              >
+                <span class="settings-sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="settings-sidebar__label">{{ item.label | t }}</span>
+              </button>
+            } @else {
+              <a
+                class="settings-sidebar__row"
+                [routerLink]="item.route"
+                routerLinkActive="settings-sidebar__row--active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [class.settings-sidebar__row--collapsed]="collapsed"
+              >
+                <span class="settings-sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="settings-sidebar__label">{{ item.label | t }}</span>
+              </a>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </nav>
+</aside>

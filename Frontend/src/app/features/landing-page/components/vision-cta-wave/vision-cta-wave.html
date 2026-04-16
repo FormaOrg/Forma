@@ -8,11 +8,23 @@
 
     <div class="vision-cta-wave__content">
         <h2 class="vision-cta-wave__title">
-            Your vision. Your goals.
+            {{ 'landing.vision.titleLine1' | t }}
             <br />
-            Your website.
+            {{ 'landing.vision.titleLine2' | t }}
         </h2>
 
-        <a href="#" class="vision-cta-wave__button">Get Started</a>
+        <link-button
+            [bgColor]="'#f4e44a'"
+            [txtColor]="'#111111'"
+            [theme]="'black'"
+            [content]="'landing.cta.getStarted' | t"
+            [routerLink]="'/login'"
+            [width]="'205px'"
+            [height]="'62px'"
+            [fontSize]="'1.15rem'"
+            [fontWeight]="'500'"
+            [txtSlide]="'-15px'"
+            [arrowSlide]="'-15px'"
+        ></link-button>
     </div>
 </section>

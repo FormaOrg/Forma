@@ -1,0 +1,111 @@
+<article
+  class="project-card"
+  [class.project-card--highlighted]="highlighted"
+  [style.--project-accent]="project.accent"
+>
+  <div class="project-card__preview">
+    @if (project.thumbnailUrl) {
+      <img class="project-card__preview-image" [src]="project.thumbnailUrl" [alt]="project.name + ' preview'" />
+      <div class="project-card__preview-overlay">
+        <div class="project-card__preview-window">
+          <span class="project-card__preview-dot"></span>
+          <span class="project-card__preview-dot"></span>
+          <span class="project-card__preview-dot"></span>
+        </div>
+      </div>
+    } @else {
+      <div class="project-card__preview-window">
+        <span class="project-card__preview-dot"></span>
+        <span class="project-card__preview-dot"></span>
+        <span class="project-card__preview-dot"></span>
+      </div>
+
+      <div class="project-card__preview-canvas">
+        <div class="project-card__preview-sidebar"></div>
+        <div class="project-card__preview-layout">
+          <div class="project-card__preview-hero"></div>
+          <div class="project-card__preview-row">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="project-card__preview-footer"></div>
+        </div>
+      </div>
+    }
+
+    @if (highlighted) {
+      <span class="project-card__featured-tag">Recently edited</span>
+    }
+  </div>
+
+  <div class="project-card__body">
+    <div class="project-card__top">
+      <div class="project-card__title-wrap">
+        <span
+          class="project-card__status"
+          [class.project-card__status--published]="project.status === 'published'"
+          [class.project-card__status--draft]="project.status === 'draft'"
+          [class.project-card__status--archived]="project.status === 'archived'"
+        >
+          {{ project.statusLabel }}
+        </span>
+        <h3 class="project-card__title">{{ project.name }}</h3>
+      </div>
+
+      <button type="button" class="project-card__more" aria-label="More actions">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M12 6.75C12.6904 6.75 13.25 6.19036 13.25 5.5C13.25 4.80964 12.6904 4.25 12 4.25C11.3096 4.25 10.75 4.80964 10.75 5.5C10.75 6.19036 11.3096 6.75 12 6.75Z"
+            fill="currentColor"
+          />
+          <path
+            d="M12 13.25C12.6904 13.25 13.25 12.6904 13.25 12C13.25 11.3096 12.6904 10.75 12 10.75C11.3096 10.75 10.75 11.3096 10.75 12C10.75 12.6904 11.3096 13.25 12 13.25Z"
+            fill="currentColor"
+          />
+          <path
+            d="M12 19.75C12.6904 19.75 13.25 19.1904 13.25 18.5C13.25 17.8096 12.6904 17.25 12 17.25C11.3096 17.25 10.75 17.8096 10.75 18.5C10.75 19.1904 11.3096 19.75 12 19.75Z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="project-card__meta">
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Last edited</span>
+        <p class="project-card__edited">{{ project.lastEditedLabel }}</p>
+      </div>
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Domain</span>
+        @if (project.domain) {
+          <p class="project-card__domain">{{ project.domain }}</p>
+        } @else {
+          <p class="project-card__domain project-card__domain--muted">No live domain yet</p>
+        }
+      </div>
+      <div class="project-card__meta-row">
+        <span class="project-card__meta-label">Created</span>
+        <p class="project-card__domain">{{ project.createdLabel }}</p>
+      </div>
+      @if (project.metadata) {
+        <div class="project-card__meta-row">
+          <span class="project-card__meta-label">Details</span>
+          <p class="project-card__domain">{{ project.metadata }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="project-card__actions">
+      <a class="project-card__action project-card__action--primary" [routerLink]="project.route ?? '/app/projects'">Open</a>
+      @if (project.previewUrl) {
+        <a class="project-card__action project-card__action--secondary" [href]="project.previewUrl" target="_blank" rel="noreferrer">
+          Preview
+        </a>
+      } @else {
+        <button type="button" class="project-card__action project-card__action--secondary" disabled>Preview</button>
+      }
+      <button type="button" class="project-card__action project-card__action--ghost">More</button>
+    </div>
+  </div>
+</article>

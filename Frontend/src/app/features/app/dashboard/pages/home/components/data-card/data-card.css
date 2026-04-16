@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.data-card {
+  width: 100%;
+  background: var(--home-surface, #ffffff);
+  border: 1px solid var(--home-border, #d7d7d7);
+  border-radius: var(--home-radius-lg, 24px);
+  padding: 18px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: var(--home-shadow, 0 1px 2px rgba(0, 0, 0, 0.04));
+}
+
+.data-card__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.data-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: rgba(116, 104, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7468ff;
+  flex-shrink: 0;
+  padding: 8px;
+}
+
+.data-card__icon :deep(svg),
+.data-card__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.data-card__title {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--home-text, #435061);
+}
+
+.data-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.data-card__value {
+  margin: 0;
+  font-size: 1.7rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--home-text-strong, #121722);
+}
+
+.data-card__description {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--home-text-muted, #7a818d);
+}
+
+@media (max-width: 768px) {
+  .data-card {
+    min-height: 110px;
+    padding: 16px 18px 14px;
+  }
+
+  .data-card__title {
+    font-size: 1.2rem;
+  }
+
+  .data-card__value {
+    font-size: 1.7rem;
+  }
+
+  .data-card__description {
+    font-size: 0.9rem;
+  }
+}
+
+:host-context(.theme-dark) .data-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    var(--home-surface, #171e2a);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(6, 10, 18, 0.18);
+}
+
+:host-context(.theme-dark) .data-card__icon {
+  background: var(--home-accent-soft, rgba(117, 102, 255, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(117, 102, 255, 0.12);
+}
+
+:host-context(.theme-dark) .data-card__title {
+  color: rgba(226, 231, 244, 0.72);
+}
+
+:host-context(.theme-dark) .data-card__value {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .data-card__description {
+  color: rgba(226, 231, 244, 0.62);
+}

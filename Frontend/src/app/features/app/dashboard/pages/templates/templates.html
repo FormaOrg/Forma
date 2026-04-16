@@ -1,0 +1,239 @@
+<section class="templates-page">
+  <section class="templates-hero">
+    <div class="templates-hero__content">
+      <div class="templates-hero__text">
+        <h1 class="templates-hero__title">{{ 'dashboard.templates.title' | t }}</h1>
+        <p class="templates-hero__subtitle">
+          {{ 'dashboard.templates.subtitle' | t }}
+        </p>
+      </div>
+
+      <a class="templates-hero__cta templates-hero__cta--animated" routerLink="/app/projects">
+        <span class="templates-hero__cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5V19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+            <path d="M5 12H19" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="templates-hero__cta-text">{{ 'dashboard.templates.actions.createBlankProject' | t }}</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="templates-page__stats">
+    <app-data-card
+      [icon]="layersIcon"
+      [title]="'dashboard.templates.stats.available.title' | t"
+      [value]="isLoading() ? '...' : totalTemplates().toString()"
+      [description]="isLoading() ? ('dashboard.templates.stats.available.loading' | t) : ('dashboard.templates.stats.available.ready' | t)"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="sparkIcon"
+      [title]="'dashboard.templates.stats.featured.title' | t"
+      [value]="isLoading() ? '...' : featuredTemplates().toString()"
+      [description]="isLoading() ? ('dashboard.templates.stats.featured.loading' | t) : ('dashboard.templates.stats.featured.ready' | t)"
+    ></app-data-card>
+
+    <app-data-card
+      [icon]="bookIcon"
+      [title]="'dashboard.templates.stats.categories.title' | t"
+      [value]="isLoading() ? '...' : categoryCount().toString()"
+      [description]="isLoading() ? ('dashboard.templates.stats.categories.loading' | t) : ('dashboard.templates.stats.categories.ready' | t)"
+    ></app-data-card>
+  </div>
+
+  <section class="templates-toolbar" (click)="closeDropdowns()">
+    <div class="templates-toolbar__search">
+      <span class="templates-toolbar__search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </span>
+      <input
+        type="search"
+        class="templates-toolbar__search-input"
+        [placeholder]="'dashboard.templates.search.placeholder' | t"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="updateSearchTerm($event)"
+      />
+    </div>
+
+    <div
+      class="templates-toolbar__scope"
+      role="tablist"
+      aria-label="Template scope"
+      [attr.data-scope]="activeScope()"
+    >
+      <span class="templates-toolbar__scope-pill" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="templates-toolbar__scope-button"
+        [class.templates-toolbar__scope-button--active]="activeScope() === 'all'"
+        (click)="updateScope('all')"
+      >
+        {{ 'dashboard.templates.scope.all' | t }}
+      </button>
+      <button
+        type="button"
+        class="templates-toolbar__scope-button"
+        [class.templates-toolbar__scope-button--active]="activeScope() === 'my'"
+        (click)="updateScope('my')"
+      >
+        {{ 'dashboard.templates.scope.my' | t }}
+      </button>
+    </div>
+
+    <div
+      class="templates-toolbar__dropdown templates-toolbar__dropdown--category"
+      [class.is-open]="categoryDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleCategoryDropdown()">
+        <span class="templates-toolbar__dropdown-label">{{ 'dashboard.templates.category.label' | t }}</span>
+        <span class="templates-toolbar__dropdown-value">{{ activeCategoryLabel() }}</span>
+        <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (categoryDropdownOpen()) {
+        <div class="templates-toolbar__dropdown-menu">
+          @for (category of categories(); track category) {
+            <button
+              type="button"
+              class="templates-toolbar__dropdown-item"
+              [class.is-selected]="activeCategory() === category"
+              (click)="updateCategory(category)"
+            >
+              {{ category === 'all' ? ('dashboard.templates.category.all' | t) : category }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div
+      class="templates-toolbar__dropdown templates-toolbar__dropdown--sort"
+      [class.is-open]="sortDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="templates-toolbar__dropdown-trigger" (click)="toggleSortDropdown()">
+        <span class="templates-toolbar__dropdown-label">{{ 'dashboard.templates.sort.label' | t }}</span>
+        <span class="templates-toolbar__dropdown-value">{{ activeSortLabel() | t }}</span>
+        <span class="templates-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (sortDropdownOpen()) {
+        <div class="templates-toolbar__dropdown-menu">
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'featured'" (click)="updateSort('featured')">{{ 'dashboard.templates.sort.featured' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'popular'" (click)="updateSort('popular')">{{ 'dashboard.templates.sort.mostUsed' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'newest'" (click)="updateSort('newest')">{{ 'dashboard.templates.sort.newest' | t }}</button>
+          <button type="button" class="templates-toolbar__dropdown-item" [class.is-selected]="activeSort() === 'name'" (click)="updateSort('name')">{{ 'dashboard.templates.sort.name' | t }}</button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="templates-panel">
+    @if (isLoading()) {
+      <div class="templates-loading" aria-hidden="true">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <article class="templates-loading__card">
+            <div class="templates-loading__preview"></div>
+            <div class="templates-loading__line templates-loading__line--badge"></div>
+            <div class="templates-loading__line templates-loading__line--title"></div>
+            <div class="templates-loading__line"></div>
+            <div class="templates-loading__line templates-loading__line--short"></div>
+            <div class="templates-loading__meta">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="templates-loading__actions">
+              <span></span>
+              <span></span>
+            </div>
+          </article>
+        }
+      </div>
+    } @else if (errorMessage()) {
+      <div class="templates-empty templates-empty--error" role="alert">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+            <path
+              d="M10.2698 4.72956C11.0386 3.3979 12.9614 3.3979 13.7302 4.72956L20.2284 15.9855C20.9972 17.3172 20.0358 18.9812 18.4982 18.9812H5.50184C3.96424 18.9812 3.00284 17.3172 3.77164 15.9855L10.2698 4.72956Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.errors.title' | t }}</h2>
+        <p class="templates-empty__text">{{ errorMessage() }}</p>
+        <button type="button" class="templates-empty__action" (click)="loadTemplates()">{{ 'dashboard.templates.actions.tryAgain' | t }}</button>
+      </div>
+    } @else if (!totalTemplates()) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 7.5C4 6.67157 4.67157 6 5.5 6H18.5C19.3284 6 20 6.67157 20 7.5V16.5C20 17.3284 19.3284 18 18.5 18H5.5C4.67157 18 4 17.3284 4 16.5V7.5Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M8 13.5H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.noneTitle' | t }}</h2>
+        <p class="templates-empty__text">
+          {{ 'dashboard.templates.empty.noneText' | t }}
+        </p>
+      </div>
+    } @else if (activeScope() === 'my' && !filteredTemplates().length) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 5L18 8.5V15.5L12 19L6 15.5V8.5L12 5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9.5 11.5L11.2 13.2L14.8 9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.savedNoneTitle' | t }}</h2>
+        <p class="templates-empty__text">
+          {{ 'dashboard.templates.empty.savedNoneText' | t }}
+        </p>
+        <button type="button" class="templates-empty__action" (click)="updateScope('all')">{{ 'dashboard.templates.actions.browseAll' | t }}</button>
+      </div>
+    } @else if (!filteredTemplates().length) {
+      <div class="templates-empty">
+        <div class="templates-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M16 16L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h2 class="templates-empty__title">{{ 'dashboard.templates.empty.noMatchTitle' | t }}</h2>
+        <p class="templates-empty__text">
+          {{ 'dashboard.templates.empty.noMatchText' | t }}
+        </p>
+        <button type="button" class="templates-empty__action" (click)="clearFilters()">{{ 'dashboard.templates.actions.clearFilters' | t }}</button>
+      </div>
+    } @else {
+      <div class="templates-grid">
+        @for (template of filteredTemplates(); track trackByTemplate($index, template)) {
+          <app-template-card
+            [template]="template"
+            [isCreating]="creatingTemplateId() === template.id"
+            (useTemplate)="useTemplate(template)"
+          ></app-template-card>
+        }
+      </div>
+    }
+  </section>
+</section>

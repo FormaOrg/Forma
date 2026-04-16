@@ -1,0 +1,24 @@
+<section class="support-section">
+  <div class="support-section__inner">
+    <h2 class="support-section__title">
+      You’re never alone—<br />
+      customer support 24/7
+    </h2>
+
+    <div class="support-section__cards">
+      @for (item of items; track item.title) {
+        <article class="support-card">
+          <h3 class="support-card__title">{{ item.title }}</h3>
+          <p class="support-card__desc">{{ item.description }}</p>
+          <a class="support-card__link" [href]="item.linkHref">
+            {{ item.linkLabel }}
+            <span class="support-card__arrow-wrap" aria-hidden="true">
+                <img class="support-card__arrow support-card__arrow--black" src="assets/shared/link-button/arrow-right-black.svg" />
+                <img class="support-card__arrow support-card__arrow--white" src="assets/shared/link-button/arrow-right-white.svg" />
+            </span>
+          </a>
+        </article>
+      }
+    </div>
+  </div>
+</section>

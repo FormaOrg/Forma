@@ -1,15 +1,20 @@
 <section class="templates-showcase">
     <div class="templates-showcase_intro">
         <div class="templates-showcase_intro_left">
-            <p>Launch faster with professionally designed templates ready to customize.</p>
+            <p>{{ 'landing.templates.introLeft' | t }}</p>
         </div>
 
         <div class="templates-showcase_intro_right">
             <p>
-                Our free website builder offers 2000+ website templates, all fully customizable and ready for
-                business.
+                {{ 'landing.templates.introRight' | t }}
             </p>
-            <button>Get Started</button>
+            <link-button
+                [bgColor]="'#7566ff'"
+                [txtColor]="'white'"
+                [theme]="'white'"
+                [content]="'landing.cta.getStarted' | t"
+                [routerLink]="'/login'"
+            ></link-button>
         </div>
     </div>
 
@@ -17,16 +22,16 @@
         @for (template of templates; track template.image) {
             <article class="template_card">
                 <div class="template_card_image_wrap">
-                    <img [src]="template.image" [alt]="template.category" class="template_card_image">
+                    <img [src]="template.image" [alt]="template.categoryKey | t" class="template_card_image">
 
                     <div class="template_card_overlay"></div>
 
-                    <a href="#" class="template_card_view_btn">View</a>
+                    <a href="#" class="template_card_view_btn">{{ 'landing.templates.view' | t }}</a>
                 </div>
                 
                 <div>
                     <a href="#" class="template_card_category_link">
-                        <span>{{ template.category }}</span>
+                        <span>{{ template.categoryKey | t }}</span>
                         <span class="template_card_category_arrow">→</span>
                     </a>
                 </div>

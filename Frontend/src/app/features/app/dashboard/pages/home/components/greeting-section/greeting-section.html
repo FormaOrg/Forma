@@ -1,0 +1,75 @@
+<section class="greeting-section">
+  <div class="greeting-section__content">
+    <div class="greeting-section__text">
+      <p class="greeting-section__eyebrow">{{ 'dashboard.home.greeting.eyebrow' | t }}</p>
+      <h1 class="greeting-section__title">
+        {{ 'dashboard.home.greeting.welcome' | t }} <span>{{ userName }}</span>
+      </h1>
+      <p class="greeting-section__subtitle">{{ 'dashboard.home.greeting.subtitle' | t }}</p>
+    </div>
+
+    <div class="greeting-section__actions">
+      <button class="greeting-btn greeting-btn--import-fancy">
+        <span class="greeting-btn__icon">
+          <svg
+          class="greeting-btn__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 7V5.5C10 4.67157 10.6716 4 11.5 4H18.5C19.3284 4 20 4.67157 20 5.5V18.5C20 19.3284 19.3284 20 18.5 20H11.5C10.6716 20 10 19.3284 10 18.5V17"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M4 12H14"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M11 9L14 12L11 15"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        </span>
+
+        <span>{{ 'dashboard.home.greeting.importSite' | t }}</span>
+      </button>
+
+      <a class="greeting-btn greeting-btn--create-animated" routerLink="/app/create-project">
+        <span class="greeting-btn__icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 5V19"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M5 12H19"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+
+        <span class="greeting-btn__text">{{ 'dashboard.home.greeting.newSite' | t }}</span>
+      </a>
+    </div>
+  </div>
+</section>

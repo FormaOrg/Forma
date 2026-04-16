@@ -1,22 +1,50 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { tap, catchError, map, timeout } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {
   AuthUser,
   AuthResponse,
+  GoogleAuthRequest,
   LoginRequest,
+  LoginVerificationRequest,
   RegisterRequest,
 } from '../models/user.model';
+import { I18nService } from '../../features/landing-page/i18n/i18n.service';
+import { ActivityRealtimeService } from './activity-realtime.service';
+import { ThemeService } from './theme.service';
+import { AppBootstrapService } from './app-bootstrap.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiUrl = 'http://localhost:8081/api/auth';
+  private readonly tokenKey = 'forma_token';
+  private readonly refreshTokenKey = 'forma_refresh_token';
+  private readonly userKey = 'forma_user';
+  private readonly rememberKey = 'forma_remember_me';
+  private readonly loginVerificationKey = 'forma_login_verification';
+  private readonly sessionValidationTtlMs = 300000;
+  private readonly sessionValidationKey = 'forma_session_validation';
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.loadUserFromStorage());
   currentUser$ = this.currentUserSubject.asObservable();
+  private lastValidatedToken: string | null = null;
+  private lastSessionValidationAt = 0;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private injector: Injector,
+    private i18n: I18nService,
+    private activityRealtimeService: ActivityRealtimeService,
+    private themeService: ThemeService
+  ) {
+    this.migrateSessionToLocalStorage();
+    const storedUser = this.currentUserSubject.value;
+    if (storedUser) {
+      void this.applyUserPreferences(storedUser);
+    }
+  }
 
   // ── Public state ───────────────────────────────────────
 
@@ -30,7 +58,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('forma_token');
+    return this.readFromStorages(this.tokenKey);
   }
 
   hasRole(role: string): boolean {
@@ -66,13 +94,46 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => this.storeSession(response)),
+      tap(response => {
+        if (response.accessToken && response.refreshToken && response.user) {
+          this.storeSession(response, credentials.rememberMe);
+        }
+      }),
       catchError(this.handleError)
     );
   }
 
+  googleLogin(payload: GoogleAuthRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/google`, payload).pipe(
+      tap(response => {
+        if (response.accessToken && response.refreshToken && response.user) {
+          this.storeSession(response, payload.rememberMe);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  verifyLoginCode(data: LoginVerificationRequest, rememberMe?: boolean): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login/verify`, data).pipe(
+      tap(response => {
+        if (response.accessToken && response.refreshToken && response.user) {
+          this.storeSession(response, rememberMe);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  resendLoginCode(token: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/login-verification/resend`,
+      { token }
+    ).pipe(catchError(this.handleError));
+  }
+
   refreshToken(): Observable<AuthResponse> {
-    const refreshToken = localStorage.getItem('forma_refresh_token');
+    const refreshToken = this.readFromStorages(this.refreshTokenKey);
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
       tap(response => this.storeSession(response)),
       catchError(this.handleError)
@@ -80,11 +141,15 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('forma_token');
-    localStorage.removeItem('forma_refresh_token');
-    localStorage.removeItem('forma_user');
+    this.activityRealtimeService.disconnect();
+    this.injector.get(AppBootstrapService).reset();
+    this.clearSessionStorage(localStorage);
+    this.clearSessionStorage(sessionStorage);
+    sessionStorage.removeItem(this.loginVerificationKey);
+    this.lastValidatedToken = null;
+    this.lastSessionValidationAt = 0;
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   forgotPassword(email: string): Observable<{ message: string }> {
@@ -101,22 +166,186 @@ export class AuthService {
     ).pipe(catchError(this.handleError));
   }
 
-  // ── Private helpers ────────────────────────────────────
-
-  private storeSession(response: AuthResponse): void {
-    localStorage.setItem('forma_token', response.accessToken);
-    localStorage.setItem('forma_refresh_token', response.refreshToken);
-    localStorage.setItem('forma_user', JSON.stringify(response.user));
-    this.currentUserSubject.next(response.user);
+  applyAuthResponse(response: AuthResponse, rememberMe?: boolean): void {
+    if (response.accessToken && response.refreshToken && response.user) {
+      this.storeSession(response, rememberMe);
+    }
   }
 
-  private loadUserFromStorage(): AuthUser | null {
+  validateCurrentSession(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      return of(false);
+    }
+
+    const now = Date.now();
+    if (this.isSessionValidationCached(token, now)) {
+      this.lastValidatedToken = token;
+      this.lastSessionValidationAt = now;
+      return of(true);
+    }
+
+    if (
+      this.lastValidatedToken === token &&
+      now - this.lastSessionValidationAt < this.sessionValidationTtlMs
+    ) {
+      return of(true);
+    }
+
+    return this.http.get<{ message: string }>('http://localhost:8081/api/users/me/session-valid').pipe(
+      timeout(1500),
+      map(() => {
+        this.lastValidatedToken = token;
+        this.lastSessionValidationAt = now;
+        this.cacheSessionValidation(token, now);
+        return true;
+      }),
+      catchError((error) => {
+        if (error?.status === 0) {
+          // If backend is temporarily unreachable, avoid forcing an immediate sign-out.
+          return of(true);
+        }
+
+        // For auth failures (or any non-network errors), fail closed so guards redirect to login.
+        return of(false);
+      })
+    );
+  }
+
+  savePendingLoginVerification(payload: {
+    token: string;
+    email: string;
+    message?: string;
+    rememberMe: boolean;
+    returnUrl?: string;
+  }): void {
+    localStorage.setItem(this.loginVerificationKey, JSON.stringify(payload));
+    sessionStorage.setItem(this.loginVerificationKey, JSON.stringify(payload));
+  }
+
+  getPendingLoginVerification(): {
+    token: string;
+    email: string;
+    message?: string;
+    rememberMe: boolean;
+    returnUrl?: string;
+  } | null {
     try {
-      const stored = localStorage.getItem('forma_user');
+      const stored = sessionStorage.getItem(this.loginVerificationKey) ?? localStorage.getItem(this.loginVerificationKey);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
     }
+  }
+
+  clearPendingLoginVerification(): void {
+    sessionStorage.removeItem(this.loginVerificationKey);
+    localStorage.removeItem(this.loginVerificationKey);
+  }
+
+  // ── Private helpers ────────────────────────────────────
+
+  private storeSession(response: AuthResponse, rememberMe?: boolean): void {
+    if (!response.accessToken || !response.refreshToken || !response.user) {
+      return;
+    }
+
+    const persistForLongTerm = rememberMe ?? this.isRememberedSession();
+
+    this.clearSessionStorage(sessionStorage);
+    localStorage.setItem(this.tokenKey, response.accessToken);
+    localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+    localStorage.setItem(this.userKey, JSON.stringify(response.user));
+    localStorage.setItem(this.rememberKey, String(persistForLongTerm));
+    this.lastValidatedToken = response.accessToken;
+    this.lastSessionValidationAt = Date.now();
+    this.currentUserSubject.next(response.user);
+    void this.applyUserPreferences(response.user);
+  }
+
+  async updateStoredUser(user: AuthUser): Promise<void> {
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+    await this.applyUserPreferences(user);
+  }
+
+  private async applyUserPreferences(user: AuthUser): Promise<void> {
+    if (user.preferredLanguage === 'en' || user.preferredLanguage === 'fr') {
+      await this.i18n.setLang(user.preferredLanguage);
+    }
+    if (user.preferredTheme === 'light' || user.preferredTheme === 'dark' || user.preferredTheme === 'system') {
+      this.themeService.syncStoredTheme(user.preferredTheme);
+    }
+  }
+
+  private loadUserFromStorage(): AuthUser | null {
+    try {
+      const stored = this.readFromStorages(this.userKey);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private readFromStorages(key: string): string | null {
+    return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+  }
+
+  private cacheSessionValidation(token: string, validatedAt: number): void {
+    localStorage.setItem(this.sessionValidationKey, JSON.stringify({ token, validatedAt }));
+  }
+
+  private isSessionValidationCached(token: string, now: number): boolean {
+    try {
+      const raw = localStorage.getItem(this.sessionValidationKey);
+      if (!raw) {
+        return false;
+      }
+
+      const parsed = JSON.parse(raw) as { token?: string; validatedAt?: number };
+      return parsed.token === token
+        && typeof parsed.validatedAt === 'number'
+        && now - parsed.validatedAt < this.sessionValidationTtlMs;
+    } catch {
+      return false;
+    }
+  }
+
+  private migrateSessionToLocalStorage(): void {
+    const hasLocalToken = !!localStorage.getItem(this.tokenKey);
+    const sessionToken = sessionStorage.getItem(this.tokenKey);
+
+    if (hasLocalToken || !sessionToken) {
+      return;
+    }
+
+    const sessionRefreshToken = sessionStorage.getItem(this.refreshTokenKey);
+    const sessionUser = sessionStorage.getItem(this.userKey);
+    const sessionRemember = sessionStorage.getItem(this.rememberKey);
+
+    localStorage.setItem(this.tokenKey, sessionToken);
+    if (sessionRefreshToken) {
+      localStorage.setItem(this.refreshTokenKey, sessionRefreshToken);
+    }
+    if (sessionUser) {
+      localStorage.setItem(this.userKey, sessionUser);
+    }
+    localStorage.setItem(this.rememberKey, sessionRemember ?? 'true');
+  }
+
+  private clearSessionStorage(storage: Storage): void {
+    storage.removeItem(this.tokenKey);
+    storage.removeItem(this.refreshTokenKey);
+    storage.removeItem(this.userKey);
+    storage.removeItem(this.rememberKey);
+    storage.removeItem(this.sessionValidationKey);
+  }
+
+  private isRememberedSession(): boolean {
+    return (
+      localStorage.getItem(this.rememberKey) === 'true' ||
+      sessionStorage.getItem(this.rememberKey) === 'true'
+    );
   }
 
   private isTokenExpired(token: string): boolean {
@@ -141,7 +370,8 @@ export class AuthService {
       const user = this.currentUser;
       if (user) {
         const updated = { ...user, emailVerified: true };
-        localStorage.setItem('forma_user', JSON.stringify(updated));
+        const storage = localStorage.getItem(this.userKey) ? localStorage : sessionStorage;
+        storage.setItem(this.userKey, JSON.stringify(updated));
         this.currentUserSubject.next(updated);
       }
     }),

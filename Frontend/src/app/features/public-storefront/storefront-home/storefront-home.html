@@ -1,0 +1,166 @@
+@if (isLoading()) {
+  <section class="storefront-home__state">
+    <p>Loading storefront...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-home__state storefront-home__state--error">
+    <h1>Store unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else if (storefront(); as home) {
+  <div class="storefront-home">
+    <app-storefront-public-header [storefront]="home" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+
+    <main class="storefront-home__content">
+      @for (section of sections(); track trackSection($index, section)) {
+        @switch (section.type) {
+          @case ('announcement-bar') {
+            <section class="storefront-home__announcement">
+              <p>{{ readStringProp(section, 'text') }}</p>
+              @if (readStringProp(section, 'linkLabel')) {
+                <a [attr.href]="resolveLinkHref(readStringProp(section, 'linkHref'))">
+                  {{ readStringProp(section, 'linkLabel') }}
+                </a>
+              }
+            </section>
+          }
+
+          @case ('hero') {
+            <section class="storefront-home__hero">
+              <div class="storefront-home__hero-copy">
+                @if (readStringProp(section, 'eyebrow')) {
+                  <span class="storefront-home__eyebrow">{{ readStringProp(section, 'eyebrow') }}</span>
+                }
+
+                <h1>{{ readStringProp(section, 'title') || home.storeName }}</h1>
+                <p>{{ readStringProp(section, 'description') }}</p>
+
+                <div class="storefront-home__hero-actions">
+                  <a
+                    class="storefront-home__button storefront-home__button--primary"
+                    [attr.href]="resolveLinkHref(readStringProp(section, 'primaryCtaHref'))"
+                  >
+                    {{ readStringProp(section, 'primaryCtaLabel') || 'Browse products' }}
+                  </a>
+
+                  @if (readStringProp(section, 'secondaryCtaLabel')) {
+                    <a
+                      class="storefront-home__button storefront-home__button--secondary"
+                      [attr.href]="resolveLinkHref(readStringProp(section, 'secondaryCtaHref'))"
+                    >
+                      {{ readStringProp(section, 'secondaryCtaLabel') }}
+                    </a>
+                  }
+                </div>
+              </div>
+            </section>
+          }
+
+          @case ('featured-products') {
+            <section class="storefront-home__featured" id="featured">
+              <div class="storefront-home__section-heading">
+                <div>
+                  <span>Catalog spotlight</span>
+                  <h2>{{ readStringProp(section, 'title') || 'Featured products' }}</h2>
+                </div>
+                <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">View all products</a>
+              </div>
+
+              @if (featuredProducts().length) {
+                <div class="storefront-home__product-grid">
+                  @for (product of featuredProducts(); track trackProduct($index, product)) {
+                    <article class="storefront-home__product-card">
+                      <a [attr.href]="productRoute(product.id)">
+                        <div class="storefront-home__product-media">
+                          @if (product.imageUrl) {
+                            <img [src]="product.imageUrl" [alt]="product.name" />
+                          } @else {
+                            <div class="storefront-home__product-placeholder">{{ product.name.slice(0, 1) }}</div>
+                          }
+                        </div>
+
+                        <div class="storefront-home__product-copy">
+                          <p class="storefront-home__product-category">
+                            {{ product.category || 'Featured product' }}
+                          </p>
+                          <h3>{{ product.name }}</h3>
+                          <p class="storefront-home__product-price">{{ product.price | currency:'TND':'symbol':'1.0-2' }}</p>
+                        </div>
+                      </a>
+                    </article>
+                  }
+                </div>
+              } @else {
+                <div class="storefront-home__empty">
+                  <p>Featured products will appear here once the store owner selects them in the editor.</p>
+                </div>
+              }
+            </section>
+          }
+
+          @case ('contact') {
+            <section class="storefront-home__contact">
+              <div class="storefront-home__contact-copy">
+                @if (readStringProp(section, 'eyebrow')) {
+                  <span class="storefront-home__eyebrow">{{ readStringProp(section, 'eyebrow') }}</span>
+                }
+
+                <h2>{{ readStringProp(section, 'title') || 'Contact our store' }}</h2>
+                <p>{{ readStringProp(section, 'description') }}</p>
+
+                @if (readStringProp(section, 'ctaLabel')) {
+                  <a
+                    class="storefront-home__button storefront-home__button--primary"
+                    [attr.href]="resolveLinkHref(readStringProp(section, 'ctaHref'))"
+                  >
+                    {{ readStringProp(section, 'ctaLabel') }}
+                  </a>
+                }
+              </div>
+
+              <div class="storefront-home__contact-cards">
+                @if (readStringProp(section, 'email')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Email</span>
+                    <strong>{{ readStringProp(section, 'email') }}</strong>
+                  </article>
+                }
+                @if (readStringProp(section, 'phone')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Phone</span>
+                    <strong>{{ readStringProp(section, 'phone') }}</strong>
+                  </article>
+                }
+                @if (readStringProp(section, 'address')) {
+                  <article class="storefront-home__contact-card">
+                    <span>Location</span>
+                    <strong>{{ readStringProp(section, 'address') }}</strong>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+
+          @case ('footer') {
+            <footer class="storefront-home__footer">
+              <div>
+                <strong>{{ readStringProp(section, 'brandText') || home.storeName }}</strong>
+              </div>
+
+              <div class="storefront-home__footer-meta">
+                @if (readStringProp(section, 'contactEmail')) {
+                  <a [href]="'mailto:' + readStringProp(section, 'contactEmail')">
+                    {{ readStringProp(section, 'contactEmail') }}
+                  </a>
+                }
+                @if (readStringProp(section, 'contactPhone')) {
+                  <span>{{ readStringProp(section, 'contactPhone') }}</span>
+                }
+              </div>
+            </footer>
+          }
+        }
+      }
+    </main>
+  </div>
+}

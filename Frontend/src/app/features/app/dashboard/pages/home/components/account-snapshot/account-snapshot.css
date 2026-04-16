@@ -1,0 +1,133 @@
+.account-snap {
+  background: var(--home-surface, #ffffff);
+  border: 1px solid var(--home-border, #d9d9df);
+  border-radius: var(--home-radius-lg, 24px);
+  padding: 20px;
+  box-shadow: var(--home-shadow, 0 1px 2px rgba(15, 23, 42, 0.04));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-snap__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--home-border, rgba(15, 23, 42, 0.07));
+}
+
+.account-snap__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-snap__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7468ff;
+}
+
+.account-snap__title {
+  margin: 0;
+  font-size: 1.24rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: var(--home-text-strong, #121722);
+}
+
+.account-snap__link {
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  background: var(--home-surface-soft, rgba(247, 249, 252, 0.95));
+  color: var(--home-text, #3b4554);
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition:
+    background-color var(--home-transition, 220ms ease),
+    border-color var(--home-transition, 220ms ease),
+    color var(--home-transition, 220ms ease);
+}
+
+.account-snap__link:hover {
+  background: var(--home-surface, #ffffff);
+  border-color: var(--home-border-strong, rgba(116, 104, 255, 0.18));
+  color: var(--home-accent, #7468ff);
+}
+
+.account-snap__plan {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.42rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--home-text-strong, #121722);
+}
+
+.account-snap__plan-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #7468ff;
+  filter: drop-shadow(0 0 3px rgba(116, 104, 255, 0.35));
+}
+
+.account-snap__plan-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+
+.account-snap__meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--home-text-muted, #7a818d);
+}
+
+.account-snap__badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.account-snap__badge {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(116, 104, 255, 0.1);
+  color: #7468ff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+:host-context(.theme-dark) .account-snap {
+  background: var(--home-surface, #171e2a);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .account-snap__link {
+  background: var(--home-surface-muted, #121925);
+  border-color: var(--home-border, rgba(255, 255, 255, 0.08));
+  color: rgba(226, 231, 244, 0.86);
+}
+
+:host-context(.theme-dark) .account-snap__link:hover {
+  background: #182131;
+}

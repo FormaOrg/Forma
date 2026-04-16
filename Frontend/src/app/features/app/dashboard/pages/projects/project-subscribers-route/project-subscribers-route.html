@@ -1,0 +1,148 @@
+<section class="project-subscribers">
+  @if (isLoading()) {
+    <section class="project-subscribers__state">
+      <div class="project-subscribers__skeleton"></div>
+      <div class="project-subscribers__skeleton"></div>
+      <div class="project-subscribers__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-subscribers__state project-subscribers__state--error" role="alert">
+      <h1>{{ 'project.subscribers.errors.title' | t }}</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadProject()">{{ 'project.subscribers.actions.tryAgain' | t }}</button>
+    </section>
+  } @else if (project(); as project) {
+    <section class="project-subscribers__hero project-subscribers__panel">
+      <div>
+        <p class="project-subscribers__eyebrow">{{ 'project.subscribers.eyebrow' | t }}</p>
+        <h1 class="project-subscribers__title">{{ 'project.subscribers.title' | t }}</h1>
+        <p class="project-subscribers__subtitle">
+          {{ project.name }} {{ 'project.subscribers.subtitle' | t }}
+        </p>
+      </div>
+
+      <a class="project-subscribers__hero-action" [routerLink]="['/app/projects', project.id, 'posts']">{{ 'project.subscribers.actions.openPosts' | t }}</a>
+    </section>
+
+    <section class="project-subscribers__summary-grid">
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">{{ 'project.subscribers.summary.total.label' | t }}</span>
+        <strong class="project-subscribers__summary-value">{{ subscribers().length }}</strong>
+        <span class="project-subscribers__summary-note">{{ 'project.subscribers.summary.total.note' | t }}</span>
+      </article>
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">{{ 'project.subscribers.summary.active.label' | t }}</span>
+        <strong class="project-subscribers__summary-value">{{ activeSubscribers() }}</strong>
+        <span class="project-subscribers__summary-note">{{ 'project.subscribers.summary.active.note' | t }}</span>
+      </article>
+      <article class="project-subscribers__summary-card project-subscribers__panel">
+        <span class="project-subscribers__summary-label">{{ 'project.subscribers.summary.intent.label' | t }}</span>
+        <strong class="project-subscribers__summary-value">{{ engagedSubscribers() }}</strong>
+        <span class="project-subscribers__summary-note">{{ 'project.subscribers.summary.intent.note' | t }}</span>
+      </article>
+    </section>
+
+    <section class="project-subscribers__layout">
+      <article class="project-subscribers__panel">
+        <div class="project-subscribers__section-head">
+          <div>
+            <p class="project-subscribers__section-kicker">{{ 'project.subscribers.sections.subscribers' | t }}</p>
+            <h2>{{ 'project.subscribers.sections.readerList' | t }}</h2>
+          </div>
+          <span class="project-subscribers__section-badge">{{ filteredSubscribers().length }} {{ 'project.subscribers.common.visible' | t }}</span>
+        </div>
+
+        <label class="project-subscribers__search">
+          <span>{{ 'project.subscribers.search.label' | t }}</span>
+          <input
+            type="search"
+            [value]="searchValue()"
+            (input)="updateSearch(($any($event.target).value ?? '').toString())"
+            [placeholder]="'project.subscribers.search.placeholder' | t"
+          />
+        </label>
+
+        <div class="project-subscribers__list">
+          @for (subscriber of filteredSubscribers(); track trackSubscriber($index, subscriber)) {
+            <button
+              type="button"
+              class="project-subscribers__row"
+              [class.project-subscribers__row--active]="selectedSubscriber().id === subscriber.id"
+              (click)="selectSubscriber(subscriber.id)"
+            >
+              <div class="project-subscribers__row-main">
+                <div class="project-subscribers__row-top">
+                  <strong>{{ subscriber.name }}</strong>
+                  <span
+                    class="project-subscribers__status"
+                    [class.project-subscribers__status--vip]="subscriber.status === 'vip'"
+                    [class.project-subscribers__status--paused]="subscriber.status === 'paused'"
+                    [class.project-subscribers__status--new]="subscriber.status === 'new'"
+                  >
+                    {{ subscriber.statusLabel }}
+                  </span>
+                </div>
+                <p>{{ subscriber.email }}</p>
+                <div class="project-subscribers__meta">
+                  <span>{{ subscriber.sourceLabel }}</span>
+                  <span>{{ subscriber.tagLabel }}</span>
+                  <span>{{ subscriber.openRateLabel }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </article>
+
+      <aside class="project-subscribers__panel">
+        @if (selectedSubscriber(); as selectedSubscriber) {
+          <div class="project-subscribers__section-head">
+            <div>
+              <p class="project-subscribers__section-kicker">{{ 'project.subscribers.sections.selectedReader' | t }}</p>
+              <h2>{{ selectedSubscriber.name }}</h2>
+            </div>
+            <span class="project-subscribers__section-badge project-subscribers__section-badge--accent">
+              {{ selectedSubscriber.tagLabel }}
+            </span>
+          </div>
+
+          <div class="project-subscribers__detail-card">
+            <p>{{ selectedSubscriber.email }}</p>
+
+            <div class="project-subscribers__detail-grid">
+              <div>
+                <span>{{ 'project.subscribers.details.status' | t }}</span>
+                <strong>{{ selectedSubscriber.statusLabel }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.subscribers.details.source' | t }}</span>
+                <strong>{{ selectedSubscriber.sourceLabel }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.subscribers.details.joined' | t }}</span>
+                <strong>{{ selectedSubscriber.joinedLabel }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.subscribers.details.recentSignal' | t }}</span>
+                <strong>{{ selectedSubscriber.lastTouchLabel }}</strong>
+              </div>
+            </div>
+
+            <div class="project-subscribers__checklist">
+              <h3>{{ 'project.subscribers.checklist.title' | t }}</h3>
+              <ul>
+                <li>{{ 'project.subscribers.checklist.item1' | t }}</li>
+                <li>{{ 'project.subscribers.checklist.item2' | t }}</li>
+                <li>{{ 'project.subscribers.checklist.item3' | t }}</li>
+              </ul>
+            </div>
+
+            <a class="project-subscribers__detail-action" [routerLink]="['/app/projects', project.id, 'editor']">
+              {{ 'project.subscribers.actions.editTouchpoints' | t }}
+            </a>
+          </div>
+        }
+      </aside>
+    </section>
+  }
+</section>

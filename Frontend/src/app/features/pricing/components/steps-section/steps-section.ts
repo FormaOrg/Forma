@@ -7,7 +7,7 @@ type StepItem = {
 };
 
 @Component({
-  selector: 'app-steps-section',
+  selector: 'app-pricing-steps-section',
   imports: [],
   templateUrl: './steps-section.html',
   styleUrl: './steps-section.css',

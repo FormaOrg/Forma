@@ -1,0 +1,44 @@
+<div class="sell-outer" #outerEl>
+
+  <!-- This sticks to the viewport while outer scrolls -->
+  <div class="sell-inner">
+
+    <!-- Header scrolls away with the inner panel naturally -->
+    <div class="sell-section__header">
+      <h2 class="sell-section__title">Sell everywhere your customers are</h2>
+      <p class="sell-section__subtitle">
+        Sell your products in more places with ease—in store, on the go,
+        on your eCommerce website and on leading marketplaces—all
+        synced to one dashboard.
+      </p>
+    </div>
+
+    <!-- Only the active card is visible -->
+    <div class="sell-cards">
+      @for (card of cards; track card.id; let i = $index) {
+        <div
+          class="sell-card"
+          [class.sell-card--visible]="activeIndex() === i"
+          [style.background]="card.bg"
+        >
+          <div class="sell-card__inner">
+            <div class="sell-card__text">
+              <h3 class="sell-card__title" [style.color]="card.textColor">{{ card.title }}</h3>
+              <p class="sell-card__desc" [style.color]="card.textColor">{{ card.desc }}</p>
+              <link-button
+                  [bgColor]="card.btn_bg"
+                  [txtColor]="card.btn_txt_color"
+                  [theme]="card.btn_theme"
+                  [content]="'Get Started'"
+              ></link-button>
+            </div>
+            <div class="sell-card__media">
+              <img [src]="card.image" [alt]="card.title" />
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

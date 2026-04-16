@@ -1,0 +1,523 @@
+<div #profileContainer class="profile-container">
+  <div class="profile-header">
+    <div class="profile-header__content">
+      <div class="profile-header__text">
+        <h1 class="profile-title">{{ 'settings.profile.title' | t }}</h1>
+        <p class="profile-subtitle">{{ 'settings.profile.subtitle' | t }}</p>
+      </div>
+      <div class="profile-header__actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="isSaving"
+        >
+          {{ 'common.reset' | t }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-save"
+          [class.is-loading]="isSaving"
+          (click)="onSave()"
+          [disabled]="profileForm.invalid || isSaving || isLoadingProfile || !hasProfileChanges"
+        >
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              @if (isSaving) {
+                <svg viewBox="25 25 50 50" class="icon icon-loading">
+                  <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                </svg>
+              } @else {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  class="icon icon-save"
+                >
+                  <path
+                    d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              }
+            </div>
+          </div>
+          <span>{{ isSaving ? ('common.saving' | t) : ('common.saveChanges' | t) }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="profileForm" class="profile-form">
+    @if (isLoadingProfile) {
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.picture.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-avatar">
+            <div class="profile-skeleton profile-skeleton--avatar"></div>
+            <div class="profile-skeleton-avatar__copy">
+              <div class="profile-skeleton profile-skeleton--title"></div>
+              <div class="profile-skeleton profile-skeleton--text profile-skeleton--text-lg"></div>
+              <div class="profile-skeleton profile-skeleton--button"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.personal.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-grid">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+              <div class="profile-skeleton-field">
+                <div class="profile-skeleton profile-skeleton--label"></div>
+                <div class="profile-skeleton profile-skeleton--input"></div>
+              </div>
+            }
+          </div>
+          <div class="profile-skeleton-field">
+            <div class="profile-skeleton profile-skeleton--label"></div>
+            <div class="profile-skeleton profile-skeleton--input"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.location.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton-grid">
+            @for (_ of [1, 2]; track $index) {
+              <div class="profile-skeleton-field">
+                <div class="profile-skeleton profile-skeleton--label"></div>
+                <div class="profile-skeleton profile-skeleton--input"></div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.profile.social.title' | t }}</h2>
+        <div class="section-content">
+          <div class="profile-skeleton profile-skeleton--text"></div>
+          @for (_ of [1, 2]; track $index) {
+            <div class="profile-skeleton-social">
+              <div class="profile-skeleton-social__left">
+                <div class="profile-skeleton profile-skeleton--social-icon"></div>
+                <div class="profile-skeleton-social__copy">
+                  <div class="profile-skeleton profile-skeleton--label"></div>
+                  <div class="profile-skeleton profile-skeleton--text profile-skeleton--text-sm"></div>
+                </div>
+              </div>
+              <div class="profile-skeleton profile-skeleton--chip"></div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+    <!-- Avatar Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.profile.picture.title' | t }}</h2>
+      <div class="section-content">
+        <div class="avatar-section">
+          <div class="avatar-preview" [class.avatar-preview--has-image]="!!avatarPreview">
+            @if (avatarPreview) {
+              <img [src]="avatarPreview" alt="Avatar preview" class="avatar-image" />
+              <button
+                type="button"
+                class="avatar-remove-overlay"
+                (click)="removeAvatar()"
+                [disabled]="isUploadingAvatar"
+                [attr.aria-label]="'settings.profile.picture.remove' | t"
+                [attr.title]="'settings.profile.picture.remove' | t"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 3.75h6m-8.25 3h10.5m-9.75 0 .75 11.25a1.5 1.5 0 0 0 1.5 1.5h4.5a1.5 1.5 0 0 0 1.5-1.5l.75-11.25m-6 3.75v5.25m3-5.25v5.25" />
+                </svg>
+              </button>
+            } @else {
+              <div class="avatar-placeholder">
+                <app-icon name="user" [size]="48" />
+              </div>
+            }
+          </div>
+          <div class="avatar-actions">
+            <div class="avatar-meta">
+              <div class="avatar-meta__title">{{ 'settings.profile.picture.uploadTitle' | t }}</div>
+              <div class="avatar-meta__hint">{{ 'settings.profile.picture.hint' | t }}</div>
+            </div>
+            <label class="upload-button">
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onAvatarChange($event)"
+                [disabled]="isUploadingAvatar"
+                hidden
+              />
+              {{
+                isUploadingAvatar
+                  ? ('common.saving' | t)
+                  : (avatarPreview
+                      ? ('settings.profile.picture.replaceButton' | t)
+                      : ('settings.profile.picture.button' | t))
+              }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="profile-section" id="personal-info-section">
+      <h2 class="section-title">{{ 'settings.profile.personal.title' | t }}</h2>
+      <div class="section-content">
+
+      <!-- Name Fields (Two Columns) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName" class="form-label">{{ 'settings.profile.fields.firstName' | t }} *</label>
+          <input
+            id="firstName"
+            type="text"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('firstName')"
+            formControlName="firstName"
+            [placeholder]="'settings.profile.placeholders.firstName' | t"
+          />
+          @if (isFieldInvalid('firstName')) {
+            <span class="form-error">{{ getFieldError('firstName') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">{{ 'settings.profile.fields.lastName' | t }} *</label>
+          <input
+            id="lastName"
+            type="text"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('lastName')"
+            formControlName="lastName"
+            [placeholder]="'settings.profile.placeholders.lastName' | t"
+          />
+          @if (isFieldInvalid('lastName')) {
+            <span class="form-error">{{ getFieldError('lastName') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <div class="form-label-row">
+          <label for="email" class="form-label">{{ 'settings.profile.fields.email' | t }}</label>
+        </div>
+        <div class="email-field-wrapper">
+          <input
+            id="email"
+            type="email"
+            class="form-input form-input--disabled"
+            formControlName="email"
+            readonly
+          />
+          <button
+            type="button"
+            class="email-edit-btn"
+            [attr.title]="'settings.profile.email.edit' | t"
+            (click)="openEmailModal()"
+          >
+            {{ 'common.edit' | t }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Email Change Modal -->
+      @if (showEmailModal) {
+        <div class="modal-overlay" (click)="closeEmailModal()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">{{ 'settings.profile.email.modalTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="closeEmailModal()" [attr.aria-label]="'common.close' | t">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <form [formGroup]="emailChangeForm" class="modal-body">
+              <div class="form-group">
+                @if (showResetPasswordMsg) {
+                  <div class="reset-password-msg success">
+                    <span>{{ resetPasswordMsg }}</span>
+                    <button type="button" class="msg-close-btn" (click)="showResetPasswordMsg = false" aria-label="Close">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+                <label for="currentPassword">{{ 'settings.profile.email.currentPassword' | t }}</label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('password')"
+                  formControlName="password"
+                  [placeholder]="'settings.profile.email.currentPasswordPlaceholder' | t"
+                />
+                @if (isFieldInvalid('password')) {
+                  <span class="form-error">{{ getFieldError('password') }}</span>
+                }
+                <div class="forgot-password-link">
+                  <a href="#" (click)="$event.preventDefault(); forgotPassword()">{{ 'auth.login.forgot' | t }}</a>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="newEmail">{{ 'settings.profile.email.newEmail' | t }}</label>
+                <input
+                  id="newEmail"
+                  type="email"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('newEmail')"
+                  formControlName="newEmail"
+                  [placeholder]="'settings.profile.email.newEmailPlaceholder' | t"
+                />
+                @if (isFieldInvalid('newEmail')) {
+                  <span class="form-error">{{ getFieldError('newEmail') }}</span>
+                }
+              </div>
+              <div class="form-group">
+                <label for="confirmEmail">{{ 'settings.profile.email.confirmEmail' | t }}</label>
+                <input
+                  id="confirmEmail"
+                  type="email"
+                  class="form-input"
+                  [class.form-input--error]="isFieldInvalid('confirmEmail')"
+                  formControlName="confirmEmail"
+                  [placeholder]="'settings.profile.email.confirmEmailPlaceholder' | t"
+                />
+                @if (isFieldInvalid('confirmEmail')) {
+                  <span class="form-error">{{ getFieldError('confirmEmail') }}</span>
+                }
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">{{ 'common.cancel' | t }}</button>
+              <button type="button" class="btn btn-primary" (click)="confirmEmailChange()" [disabled]="emailChangeForm.invalid || isSubmittingEmailChange">
+                {{ isSubmittingEmailChange ? ('common.sending' | t) : ('common.next' | t) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Email Code Confirmation Modal -->
+      @if (showEmailCodeModal) {
+        <div class="modal-overlay" (click)="showEmailCodeModal = false">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">{{ 'settings.profile.email.codeTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="cancelEmailCode()" [attr.aria-label]="'common.close' | t">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <form [formGroup]="emailCodeForm" class="modal-body">
+              <div class="modal-description">
+                {{ 'settings.profile.email.codeDescriptionPrefix' | t }} <b>{{ emailToConfirm }}</b>
+              </div>
+              <div class="form-group">
+                <input
+                  id="code"
+                  type="text"
+                  maxlength="6"
+                  class="form-input"
+                  [class.form-input--error]="emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)"
+                  formControlName="code"
+                  [placeholder]="'settings.profile.email.codePlaceholder' | t"
+                />
+                @if (emailCodeForm.get('code')?.invalid && (emailCodeForm.get('code')?.dirty || emailCodeForm.get('code')?.touched)) {
+                  <span class="form-error">{{ 'settings.profile.email.invalidCode' | t }}</span>
+                }
+              </div>
+              <div class="resend-code-link">
+                <a href="#" (click)="$event.preventDefault(); resendEmailCode()">{{ 'common.resendCode' | t }}</a>
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="cancelEmailCode()">{{ 'common.cancel' | t }}</button>
+              <button type="button" class="btn btn-primary" (click)="submitEmailCode()" [disabled]="emailCodeForm.invalid || isConfirmingEmailChange">
+                {{ isConfirmingEmailChange ? ('common.confirming' | t) : ('common.submit' | t) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Cancel Confirmation Modal -->
+      @if (showCancelConfirmModal) {
+        <div class="modal-overlay" (click)="closeCancelConfirmModal()">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h2 class="modal-title">{{ 'settings.profile.email.cancelTitle' | t }}</h2>
+              <button type="button" class="modal-close" (click)="closeCancelConfirmModal()" [attr.aria-label]="'common.close' | t">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="modal-description">
+                {{ 'settings.profile.email.cancelDescriptionPrefix' | t }} <b>{{ profileForm.get('email')?.value }}</b> {{ 'settings.profile.email.cancelDescriptionSuffix' | t }}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary-red" (click)="closeCancelConfirmModal()">{{ 'common.back' | t }}</button>
+              <button type="button" class="btn btn-danger" (click)="confirmCancelChange()">{{ 'common.cancel' | t }}</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Username Field -->
+      <div class="form-group">
+        <div class="form-label-row">
+          <label for="username" class="form-label">{{ 'settings.profile.fields.username' | t }} *</label>
+        </div>
+        <input
+          id="username"
+          type="text"
+          class="form-input"
+          [class.form-input--error]="isFieldInvalid('username')"
+          formControlName="username"
+          [placeholder]="'settings.profile.placeholders.username' | t"
+        />
+        @if (isFieldInvalid('username')) {
+          <span class="form-error">{{ getFieldError('username') }}</span>
+        }
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <div class="form-label-row">
+          <label for="phone" class="form-label">{{ 'settings.profile.fields.phone' | t }}</label>
+        </div>
+        <input
+          id="phone"
+          type="tel"
+          class="form-input"
+          [class.form-input--error]="isFieldInvalid('phone')"
+          formControlName="phone"
+          [placeholder]="'settings.profile.placeholders.phone' | t"
+        />
+        @if (isFieldInvalid('phone')) {
+          <span class="form-error">{{ getFieldError('phone') }}</span>
+        }
+      </div>
+      </div>
+    </div>
+
+    <!-- Location & Timezone Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.profile.location.title' | t }}</h2>
+      <div class="section-content">
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="country" class="form-label">{{ 'settings.profile.fields.country' | t }} *</label>
+          </div>
+          <select
+            id="country"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('country')"
+            formControlName="country"
+          >
+            <option value="" disabled>{{ 'settings.profile.placeholders.country' | t }}</option>
+            @for (country of countries; track country) {
+              <option [value]="country">{{ country }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('country')) {
+            <span class="form-error">{{ getFieldError('country') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="website" class="form-label">{{ 'settings.profile.fields.website' | t }}</label>
+          </div>
+          <input
+            id="website"
+            type="url"
+            class="form-input"
+            [class.form-input--error]="isFieldInvalid('website')"
+            formControlName="website"
+            [placeholder]="'settings.profile.placeholders.website' | t"
+          />
+          @if (isFieldInvalid('website')) {
+            <span class="form-error">{{ getFieldError('website') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Logins Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.profile.social.title' | t }}</h2>
+      <div class="section-content">
+        <p class="social-logins-intro">
+          {{ 'settings.profile.social.intro' | t }}
+        </p>
+        <div class="social-logins" role="list">
+          <div class="social-login-row" role="listitem">
+            <div class="social-login-row__left">
+              <div class="social-login-row__icon" aria-hidden="true">
+                <img src="assets/app/settings/profile/google.svg" alt="" class="social-login-row__icon-img" />
+              </div>
+              <div class="social-login-row__text">
+                <div class="social-login-row__title-line">
+                  <span class="social-login-row__title">{{ 'settings.profile.social.google' | t }}</span>
+                  <span
+                    class="social-login-row__status"
+                    [class.social-login-row__status--on]="isGoogleConnected"
+                    [class.social-login-row__status--off]="!isGoogleConnected"
+                  >
+                    @if (isGoogleConnected) {
+                      {{ 'settings.profile.social.connected' | t }}
+                    } @else {
+                      {{ 'settings.profile.social.notConnected' | t }}
+                    }
+                  </span>
+                </div>
+                <p class="social-login-row__meta">{{ googleConnectionLabel }}</p>
+              </div>
+            </div>
+            @if (isGoogleConnected) {
+              <button
+                type="button"
+                class="social-login-row__btn social-login-row__btn--disconnect"
+                [disabled]="isDisablingGoogle"
+                (click)="disableGoogleLink()"
+              >
+                Disable
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="social-login-row__btn social-login-row__btn--connect"
+                [disabled]="isLinkingGoogle"
+                (click)="startGoogleLink()"
+              >
+                {{ 'settings.profile.social.enable' | t }}
+              </button>
+            }
+          </div>
+        </div>
+        <p class="social-login-note">
+          {{ 'settings.profile.social.note' | t }}
+        </p>
+      </div>
+    </div>
+
+    <div class="form-actions-spacer" aria-hidden="true"></div>
+    }
+  </form>
+</div>

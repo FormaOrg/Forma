@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VisionCtaWave } from './vision-cta-wave';
+import { ProductVisionCtaWave } from './vision-cta-wave';
 
-describe('VisionCtaWave', () => {
-  let component: VisionCtaWave;
-  let fixture: ComponentFixture<VisionCtaWave>;
+describe('ProductVisionCtaWave', () => {
+  let component: ProductVisionCtaWave;
+  let fixture: ComponentFixture<ProductVisionCtaWave>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VisionCtaWave]
+      imports: [ProductVisionCtaWave]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(VisionCtaWave);
+    fixture = TestBed.createComponent(ProductVisionCtaWave);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

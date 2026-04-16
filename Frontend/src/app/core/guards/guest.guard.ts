@@ -20,7 +20,7 @@ export class GuestGuard implements CanActivate {
         return false;
       }
 
-      this.router.navigate(['/home']);
+      this.router.navigate(['/app/home']);
       return false;
     }
 

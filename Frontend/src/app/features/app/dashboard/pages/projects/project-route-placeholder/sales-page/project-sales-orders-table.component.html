@@ -1,0 +1,60 @@
+<div class="orders-table" role="table" aria-label="Orders">
+  <div class="orders-table__head" role="row">
+    <span class="orders-table__cell orders-table__cell--check">
+      <input
+        type="checkbox"
+        aria-label="Select all orders"
+        [checked]="allVisibleOrdersSelected"
+        (change)="onSelectAllChange($any($event.target).checked)"
+      />
+    </span>
+    <span class="orders-table__cell">Order</span>
+    <span class="orders-table__cell">Date Created</span>
+    <span class="orders-table__cell">Customer</span>
+    <span class="orders-table__cell">Collection</span>
+    <span class="orders-table__cell">Delivery</span>
+    <span class="orders-table__cell">Total</span>
+    <span class="orders-table__cell orders-table__cell--action"></span>
+  </div>
+
+  @for (order of orders; track order.rawId) {
+    <article class="orders-table__row" role="row">
+      <span class="orders-table__cell orders-table__cell--check">
+        <input
+          type="checkbox"
+          [checked]="isSelected(order.rawId)"
+          [attr.aria-label]="'Select order ' + order.id"
+          (change)="onOrderSelectionChange(order.rawId, $any($event.target).checked)"
+        />
+      </span>
+      <strong class="orders-table__cell">{{ order.id }}</strong>
+      <span class="orders-table__cell">{{ order.date }}</span>
+      <span class="orders-table__cell">{{ order.customer }}</span>
+      <span class="orders-table__cell">
+        <span
+          class="orders-status-pill"
+          [class.orders-status-pill--pending]="order.paymentStatus === 'Due On Delivery'"
+          [class.orders-status-pill--refunded]="order.paymentStatus === 'Deposit Returned'"
+        >
+          {{ order.paymentStatus }}
+        </span>
+      </span>
+      <span class="orders-table__cell">
+        <span
+          class="orders-status-pill orders-status-pill--outline"
+          [class.orders-status-pill--hold]="order.fulfillmentStatus === 'Scheduled'"
+          [class.orders-status-pill--packing]="order.fulfillmentStatus === 'Packing' || order.fulfillmentStatus === 'New'"
+        >
+          {{ order.fulfillmentStatus }}
+        </span>
+      </span>
+      <span class="orders-table__cell">{{ order.amount }}</span>
+      <span class="orders-table__cell orders-table__cell--action">
+        <button type="button" class="orders-table__edit" (click)="onEditOrder(order.rawId)">
+          <app-icon name="pen" [size]="15" />
+          <span>Edit</span>
+        </button>
+      </span>
+    </article>
+  }
+</div>

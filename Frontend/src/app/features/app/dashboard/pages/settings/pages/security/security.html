@@ -1,0 +1,447 @@
+<div #profileContainer class="profile-container">
+  <div class="profile-header">
+    <div class="profile-header__text">
+      <h1 class="profile-title">{{ 'settings.security.title' | t }}</h1>
+      <p class="profile-subtitle">{{ 'settings.security.subtitle' | t }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="securityForm" class="profile-form">
+    @if (isLoadingSecuritySettings) {
+      @for (_ of [1, 2, 3, 4]; track $index) {
+        <div class="profile-section">
+          <h2 class="section-title">{{ 'settings.security.title' | t }}</h2>
+          <div class="section-content">
+            <div class="security-skeleton-line security-skeleton-line--wide"></div>
+            <div class="security-skeleton-grid">
+              @for (__ of [1, 2]; track $index) {
+                <div class="security-skeleton-field">
+                  <div class="security-skeleton-line security-skeleton-line--label"></div>
+                  <div class="security-skeleton-box security-skeleton-box--input"></div>
+                </div>
+              }
+            </div>
+            <div class="security-skeleton-box security-skeleton-box--button"></div>
+          </div>
+        </div>
+      }
+    } @else {
+    <!-- Change Password Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.security.password.title' | t }}</h2>
+      <div class="section-content">
+        <p class="section-intro">
+          {{ 'settings.security.password.intro' | t }}
+        </p>
+          <div class="form-group">
+            <label for="currentPassword" class="form-label">{{ 'settings.security.password.current' | t }} *</label>
+            <div class="input-box" [class.invalid]="isFieldInvalid('currentPassword')">
+              <input
+                [type]="showCurrentPassword ? 'text' : 'password'"
+                id="currentPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('currentPassword')"
+                formControlName="currentPassword"
+                [placeholder]="'settings.security.password.currentPlaceholder' | t"
+              />
+              <span
+                [class]="showCurrentPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showCurrentPassword = !showCurrentPassword"></span>
+            </div>
+            @if (isFieldInvalid('currentPassword')) {
+              <span class="form-error">{{ getFieldError('currentPassword') }}</span>
+            }
+          </div>
+          <div class="form-group password-group">
+            <label for="newPassword" class="form-label">{{ 'settings.security.password.new' | t }} *</label>
+            <div class="password-field-shell">
+              @if (showPasswordStrengthHint) {
+                <div class="password-strength-popover" aria-live="polite">
+                  <p class="password-strength-title">{{ 'settings.security.password.hint.min' | t }}</p>
+                  <div class="password-strength-bars" aria-hidden="true">
+                    @for (segmentActive of passwordStrengthSegments; track $index) {
+                      <span class="password-strength-bar" [class.is-active]="segmentActive"></span>
+                    }
+                  </div>
+                  <p class="password-strength-subtitle">{{ 'settings.security.password.hint.subtitle' | t }}</p>
+                  <ul class="password-strength-list">
+                    <li [class.is-met]="hasMixedCasePassword">{{ 'settings.security.password.hint.mixed' | t }}</li>
+                    <li [class.is-met]="hasPasswordSymbol">{{ 'settings.security.password.hint.symbols' | t }}</li>
+                    <li [class.is-met]="hasLongPassword">{{ 'settings.security.password.hint.longer' | t }}</li>
+                  </ul>
+                </div>
+              }
+              <div class="input-box" [class.invalid]="isFieldInvalid('newPassword')">
+              <input
+                [type]="showNewPassword ? 'text' : 'password'"
+                id="newPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('newPassword')"
+                formControlName="newPassword"
+                [placeholder]="'settings.security.password.newPlaceholder' | t"
+                (focus)="onNewPasswordFocus()"
+                (blur)="onNewPasswordBlur()"
+              />
+              <span
+                [class]="showNewPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showNewPassword = !showNewPassword"></span>
+              </div>
+            </div>
+            @if (isFieldInvalid('newPassword')) {
+              <span class="form-error">{{ getFieldError('newPassword') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">{{ 'settings.security.password.confirm' | t }} *</label>
+            <div class="input-box" [class.invalid]="isFieldInvalid('confirmPassword')">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                class="form-input"
+                [class.form-input--error]="isFieldInvalid('confirmPassword')"
+                formControlName="confirmPassword"
+                [placeholder]="'settings.security.password.confirmPlaceholder' | t"
+              />
+              <span
+                [class]="showConfirmPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+                (click)="showConfirmPassword = !showConfirmPassword"></span>
+            </div>
+            @if (isFieldInvalid('confirmPassword')) {
+              <span class="form-error">{{ getFieldError('confirmPassword') }}</span>
+            }
+          </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onChangePassword()" [disabled]="!passwordSectionValid || isSavingPassword">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingPassword) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingPassword ? ('settings.security.password.changing' | t) : ('settings.security.password.change' | t) }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verify Logins by Email Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.security.twoStep.title' | t }}</h2>
+      <div class="section-content">
+        <p class="section-intro">
+          {{ 'settings.security.twoStep.intro' | t }}
+        </p>
+        <div class="verify-login-row">
+          <div class="verify-login-left">
+            <span class="verify-login-icon" aria-hidden="true">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                <rect width="20" height="14" x="2" y="5" rx="3" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="verify-login-copy">
+              <span class="verify-login-label">{{ 'settings.security.twoStep.rowTitle' | t }}</span>
+              <span class="verify-login-hint">{{ is2FAEnabled ? ('settings.security.twoStep.on' | t) : ('settings.security.twoStep.off' | t) }}</span>
+            </div>
+          </div>
+          <button type="button" class="verify-login-btn" [class.verify-login-btn--off]="is2FAEnabled" (click)="openVerifyEmailModal()">
+            {{ is2FAEnabled ? ('common.disable' | t) : ('common.enable' | t) }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Email Modal -->
+    @if (showVerifyEmailModal) {
+      <div class="modal-overlay" (click)="closeVerifyEmailModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">{{ 'settings.security.twoStep.confirmEmailTitle' | t }}</h2>
+            <button type="button" class="modal-close" (click)="closeVerifyEmailModal()" [attr.aria-label]="'common.close' | t">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-divider"></div>
+          <div class="modal-body">
+            <div class="modal-description">
+              {{ 'settings.security.twoStep.confirmEmailDescription1' | t }}<br>
+              {{ 'settings.security.twoStep.confirmEmailDescription2' | t }} <b>{{ userEmail }}</b> {{ 'settings.security.twoStep.confirmEmailDescription3' | t }}
+            </div>
+          </div>
+          <div class="modal-footer modal-footer--spread">
+            <a href="#" class="modal-inline-link" (click)="goToChangeEmail($event)">{{ 'settings.security.twoStep.changeEmail' | t }}</a>
+            <div class="modal-footer__actions">
+              <button type="button" class="btn btn-secondary" (click)="closeVerifyEmailModal()">{{ 'common.cancel' | t }}</button>
+              <button type="button" class="btn btn-primary" (click)="sendVerifyEmailCode()" [disabled]="isRequestingLoginVerification">
+                {{ isRequestingLoginVerification ? ('common.sending' | t) : ('common.sendCode' | t) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showDisableLoginVerificationModal) {
+      <div class="modal-overlay" (click)="closeDisableLoginVerificationModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">{{ 'settings.security.twoStep.disableTitle' | t }}</h2>
+            <button type="button" class="modal-close" (click)="closeDisableLoginVerificationModal()" [attr.aria-label]="'common.close' | t">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-description">
+              {{ 'settings.security.twoStep.disableDescription' | t }}
+            </div>
+          </div>
+          <div class="modal-footer modal-footer--actions-right">
+            <button type="button" class="btn btn-secondary" (click)="closeDisableLoginVerificationModal()">{{ 'common.cancel' | t }}</button>
+            <button type="button" class="btn btn-danger" (click)="disableLoginVerification()" [disabled]="isConfirmingLoginVerification">
+              {{ isConfirmingLoginVerification ? ('settings.security.twoStep.disabling' | t) : ('common.disable' | t) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showLoginVerificationCodeModal) {
+      <div class="modal-overlay" (click)="closeLoginVerificationCodeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">{{ 'settings.security.twoStep.codeTitle' | t }}</h2>
+            <button type="button" class="modal-close" (click)="closeLoginVerificationCodeModal()" [attr.aria-label]="'common.close' | t">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" [formGroup]="loginVerificationCodeForm">
+            <div class="modal-description">
+              {{ 'settings.security.twoStep.codeDescriptionPrefix' | t }} <b>{{ userEmail }}</b>
+              {{ pendingLoginVerificationEnable ? ('settings.security.twoStep.codeEnable' | t) : ('settings.security.twoStep.codeDisable' | t) }}
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                maxlength="6"
+                class="form-input"
+                [class.form-input--error]="loginVerificationCodeForm.get('code')?.invalid && (loginVerificationCodeForm.get('code')?.dirty || loginVerificationCodeForm.get('code')?.touched)"
+                formControlName="code"
+                [placeholder]="'settings.security.twoStep.codePlaceholder' | t"
+              />
+              @if (loginVerificationCodeForm.get('code')?.invalid && (loginVerificationCodeForm.get('code')?.dirty || loginVerificationCodeForm.get('code')?.touched)) {
+                <span class="form-error">{{ 'settings.security.twoStep.codeInvalid' | t }}</span>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeLoginVerificationCodeModal()">{{ 'common.cancel' | t }}</button>
+            <button type="button" class="btn btn-primary" (click)="submitLoginVerificationCode()" [disabled]="loginVerificationCodeForm.invalid || isConfirmingLoginVerification">
+              {{ isConfirmingLoginVerification ? ('common.confirming' | t) : ('common.confirm' | t) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Security Questions Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.security.questions.title' | t }}</h2>
+      <div class="section-content">
+        <p class="section-intro">
+          {{ 'settings.security.questions.intro' | t }}
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="question1" class="form-label">{{ 'settings.security.questions.question1' | t }} *</label>
+            <select
+              id="question1"
+              class="form-input security-question-select"
+              [class.form-input--error]="isFieldInvalid('question1')"
+              formControlName="question1"
+            >
+              <option value="" disabled selected>{{ 'settings.security.questions.select' | t }}</option>
+              @for (q of filteredQuestions1; track q) {
+                <option [value]="q">{{ q | t }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('question1')) {
+              <span class="form-error">{{ getFieldError('question1') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="answer1" class="form-label">{{ 'settings.security.questions.answer1' | t }} *</label>
+            <input
+              id="answer1"
+              type="text"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('answer1')"
+              formControlName="answer1"
+              [placeholder]="'settings.security.questions.answerPlaceholder' | t"
+            />
+            @if (isFieldInvalid('answer1')) {
+              <span class="form-error">{{ getFieldError('answer1') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="question2" class="form-label">{{ 'settings.security.questions.question2' | t }} *</label>
+            <select
+              id="question2"
+              class="form-input security-question-select"
+              [class.form-input--error]="isFieldInvalid('question2')"
+              formControlName="question2"
+            >
+              <option value="" disabled selected>{{ 'settings.security.questions.select' | t }}</option>
+              @for (q of filteredQuestions2; track q) {
+                <option [value]="q">{{ q | t }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('question2')) {
+              <span class="form-error">{{ getFieldError('question2') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="answer2" class="form-label">{{ 'settings.security.questions.answer2' | t }} *</label>
+            <input
+              id="answer2"
+              type="text"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('answer2')"
+              formControlName="answer2"
+              [placeholder]="'settings.security.questions.answerPlaceholder' | t"
+            />
+            @if (isFieldInvalid('answer2')) {
+              <span class="form-error">{{ getFieldError('answer2') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onSaveSecurityQuestions()" [disabled]="!securityQuestionsValid || isSavingQuestions">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingQuestions) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingQuestions ? ('common.saving' | t) : ('common.save' | t) }}</span>
+          </button>
+
+          @if (showVerifyQuestionsModal) {
+            <div class="modal-overlay" (click)="closeVerifyQuestionsModal()">
+              <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                  <h2 class="modal-title">{{ 'settings.security.verifyIdentity.title' | t }}</h2>
+                  <button type="button" class="modal-close" (click)="closeVerifyQuestionsModal()" [attr.aria-label]="'common.close' | t">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <form class="modal-body pdb" (submit)="$event.preventDefault(); confirmVerifyQuestionsPassword();">
+                  <div class="form-group">
+                    <label for="verifyQuestionsPassword">{{ 'settings.security.verifyIdentity.label' | t }}</label>
+                    <input
+                      id="verifyQuestionsPassword"
+                      type="password"
+                      class="form-input"
+                      [(ngModel)]="verifyQuestionsPassword"
+                      name="verifyQuestionsPassword"
+                      autocomplete="current-password"
+                      required
+                    />
+                  </div>
+                </form>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" (click)="closeVerifyQuestionsModal()">{{ 'common.cancel' | t }}</button>
+                  <button type="button" class="btn btn-primary" (click)="confirmVerifyQuestionsPassword()" [disabled]="isVerifyingSensitiveAction">
+                    {{ isVerifyingSensitiveAction ? ('common.confirming' | t) : ('common.confirm' | t) }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Recovery Options Section -->
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.security.recovery.title' | t }}</h2>
+      <div class="section-content">
+        <p class="section-intro">
+          {{ 'settings.security.recovery.intro' | t }}
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="recoveryEmail" class="form-label">{{ 'settings.security.recovery.email' | t }}</label>
+            <input
+              id="recoveryEmail"
+              type="email"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('recoveryEmail')"
+              formControlName="recoveryEmail"
+              [placeholder]="'settings.security.recovery.emailPlaceholder' | t"
+            />
+            @if (isFieldInvalid('recoveryEmail')) {
+              <span class="form-error">{{ getFieldError('recoveryEmail') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="recoveryPhone" class="form-label">{{ 'settings.security.recovery.phone' | t }}</label>
+            <input
+              id="recoveryPhone"
+              type="tel"
+              class="form-input"
+              [class.form-input--error]="isFieldInvalid('recoveryPhone')"
+              formControlName="recoveryPhone"
+              [placeholder]="'settings.security.recovery.phonePlaceholder' | t"
+            />
+            @if (isFieldInvalid('recoveryPhone')) {
+              <span class="form-error">{{ getFieldError('recoveryPhone') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary btn-save" (click)="onSaveRecoveryOptions()" [disabled]="!recoveryOptionsValid || !hasRecoveryOptionsChanges || isSavingRecovery">
+            <div class="svg-wrapper-1">
+              <div class="svg-wrapper">
+                @if (isSavingRecovery) {
+                  <svg viewBox="25 25 50 50" class="icon icon-loading">
+                    <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon icon-save">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"></path>
+                  </svg>
+                }
+              </div>
+            </div>
+            <span>{{ isSavingRecovery ? ('common.saving' | t) : ('common.save' | t) }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </form>
+</div>

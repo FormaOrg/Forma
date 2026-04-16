@@ -1,0 +1,23 @@
+<section class="setup" aria-labelledby="setup-title">
+  <div class="setup__head">
+    <div class="setup__heading">
+      <p class="setup__eyebrow">Checklist</p>
+      <h2 id="setup-title" class="setup__title">Workspace setup</h2>
+    </div>
+    <a [routerLink]="settingsRoute" class="setup__link">Finish</a>
+  </div>
+
+  <div class="setup__bar" role="progressbar" [attr.aria-valuenow]="percent" aria-valuemin="0" aria-valuemax="100">
+    <div class="setup__bar-fill" [style.width.%]="percent"></div>
+  </div>
+  <p class="setup__pct">{{ percent }}% complete</p>
+
+  <ul class="setup__list" role="list">
+    @for (step of steps; track step.id) {
+      <li class="setup__row" [class.setup__row--done]="step.done">
+        <span class="setup__dot" aria-hidden="true"></span>
+        <span class="setup__label">{{ step.label }}</span>
+      </li>
+    }
+  </ul>
+</section>

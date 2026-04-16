@@ -1,0 +1,18 @@
+<section class="sales-page__kpis" aria-label="Sales overview metrics">
+  @for (kpi of kpis; track kpi.label) {
+    <article class="sales-kpi-card">
+      <div class="sales-kpi-card__head">
+        <p class="sales-kpi-card__label">{{ kpi.label }}</p>
+        <span
+          class="sales-kpi-card__trend"
+          [class.sales-kpi-card__trend--up]="kpi.trend === 'up'"
+          [class.sales-kpi-card__trend--down]="kpi.trend === 'down'"
+        >
+          {{ kpi.change }}
+        </span>
+      </div>
+      <strong class="sales-kpi-card__value">{{ kpi.value }}</strong>
+      <p class="sales-kpi-card__helper">{{ kpi.helper }}</p>
+    </article>
+  }
+</section>

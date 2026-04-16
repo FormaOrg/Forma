@@ -1,0 +1,337 @@
+<div class="project-settings-container">
+  <div class="project-settings-header">
+    <div class="project-settings-header__text">
+      <h1 class="project-settings-title">Project settings</h1>
+      <p class="project-settings-subtitle">
+        Manage the storefront identity, SEO copy, social channels, and lifecycle controls for this workspace.
+      </p>
+
+      @if (project(); as project) {
+        <div class="project-settings-meta">
+          <span class="project-settings-meta__pill">{{ statusLabel() }}</span>
+          <span class="project-settings-meta__item">{{ projectTypeLabel() }}</span>
+          <span class="project-settings-meta__item">{{ creationMethodLabel() }}</span>
+          <span class="project-settings-meta__item">Updated {{ formatDate(project.updatedAt) }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="project-settings-form">
+      @for (_ of [1, 2, 3]; track $index) {
+        <div class="project-settings-section">
+          <h2 class="section-title">Loading section</h2>
+          <div class="section-content">
+            <div class="project-settings-skeleton project-settings-skeleton--intro"></div>
+            <div class="project-settings-skeleton-grid">
+              <div class="project-settings-skeleton-field">
+                <div class="project-settings-skeleton project-settings-skeleton--label"></div>
+                <div class="project-settings-skeleton project-settings-skeleton--input"></div>
+              </div>
+              <div class="project-settings-skeleton-field">
+                <div class="project-settings-skeleton project-settings-skeleton--label"></div>
+                <div class="project-settings-skeleton project-settings-skeleton--input"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (errorMessage()) {
+    <div class="project-settings-state" role="alert">
+      <h2>We couldn't load project settings</h2>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary" (click)="loadProject()">Try again</button>
+    </div>
+  } @else {
+    <form [formGroup]="settingsForm" class="project-settings-form" (ngSubmit)="saveSettings()">
+      <section class="project-settings-section">
+        <h2 class="section-title">Store details</h2>
+        <div class="section-content">
+          <p class="section-intro">
+            Define the brand-facing details customers should recognize first when they land on this project.
+          </p>
+
+          <div class="project-settings-logo-section">
+            <div
+              class="project-settings-logo-preview"
+              [class.project-settings-logo-preview--has-image]="!!project()?.logoUrl"
+            >
+              @if (project()?.logoUrl) {
+                <img
+                  [src]="project()?.logoUrl || ''"
+                  [alt]="(settingsForm.controls.name.value || 'Project') + ' logo'"
+                  class="project-settings-logo-image"
+                />
+                <button
+                  type="button"
+                  class="project-settings-logo-remove"
+                  [disabled]="isUploadingLogo()"
+                  aria-label="Remove project logo"
+                  title="Remove project logo"
+                  (click)="removeLogo()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 3.75h6m-8.25 3h10.5m-9.75 0 .75 11.25a1.5 1.5 0 0 0 1.5 1.5h4.5a1.5 1.5 0 0 0 1.5-1.5l.75-11.25m-6 3.75v5.25m3-5.25v5.25" />
+                  </svg>
+                </button>
+              } @else {
+                <div class="project-settings-logo-placeholder">
+                  {{ (settingsForm.controls.name.value || project()?.name || 'P').trim().charAt(0).toUpperCase() }}
+                </div>
+              }
+            </div>
+
+            <div class="project-settings-logo-actions">
+              <div class="project-settings-logo-meta">
+                <div class="project-settings-logo-meta__title">Project logo</div>
+                <div class="project-settings-logo-meta__hint">
+                  Upload a square image so the storefront identity feels polished across the project.
+                </div>
+              </div>
+
+              <label class="project-settings-upload-button">
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  [disabled]="isUploadingLogo()"
+                  (change)="uploadLogo($event)"
+                />
+                {{ isUploadingLogo() ? 'Uploading...' : (project()?.logoUrl ? 'Replace logo' : 'Upload logo') }}
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="store-name" class="form-label">Store name</label>
+              <input id="store-name" type="text" class="form-input" formControlName="name" placeholder="Skan" />
+            </div>
+
+            <div class="form-group">
+              <label for="store-title" class="form-label">Store title</label>
+              <input id="store-title" type="text" class="form-input" formControlName="storeTitle" placeholder="Skan studio store" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact-phone" class="form-label">Contact phone</label>
+              <input id="contact-phone" type="text" class="form-input" formControlName="contactPhone" placeholder="+216..." />
+            </div>
+
+            <div class="form-group">
+              <label for="store-email" class="form-label">Store email</label>
+              <input id="store-email" type="email" class="form-input" formControlName="storeEmail" placeholder="hello@skan.com" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="default-domain" class="form-label">Default domain</label>
+              <input id="default-domain" type="text" class="form-input" formControlName="defaultDomain" placeholder="domain.forma.tn" />
+          </div>
+        </div>
+      </section>
+
+      <section class="project-settings-section">
+        <h2 class="section-title">Description & SEO</h2>
+        <div class="section-content">
+          <p class="section-intro">
+            Keep both the store description and search-facing summary clear so the project feels complete everywhere.
+          </p>
+
+          <div class="form-group">
+            <label for="store-description" class="form-label">Description</label>
+            <textarea
+              id="store-description"
+              class="form-input form-textarea"
+              formControlName="description"
+              rows="6"
+              placeholder="Write a short description of the store, the catalog, or what makes the project special."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="meta-description" class="form-label">SEO text / meta description</label>
+            <textarea
+              id="meta-description"
+              class="form-input form-textarea"
+              formControlName="metaDescription"
+              rows="4"
+              placeholder="Write the search result snippet you want to associate with this project."
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-settings-section" id="social-links-section">
+        <h2 class="section-title">Social links</h2>
+        <div class="section-content">
+          <p class="section-intro">
+            Connect the social channels and messaging touchpoints that belong to this storefront.
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="facebook-url" class="form-label form-label--social">
+                <span>Facebook</span>
+                <span class="form-label__icon" aria-hidden="true">
+                  <img src="assets/app/project/social icons/facebook.svg" alt="" />
+                </span>
+              </label>
+              <input id="facebook-url" type="text" class="form-input" formControlName="facebookUrl" placeholder="https://facebook.com/..." />
+            </div>
+
+            <div class="form-group">
+              <label for="instagram-url" class="form-label form-label--social">
+                <span>Instagram</span>
+                <span class="form-label__icon" aria-hidden="true">
+                  <img src="assets/app/project/social icons/instagram.svg" alt="" />
+                </span>
+              </label>
+              <input id="instagram-url" type="text" class="form-input" formControlName="instagramUrl" placeholder="https://instagram.com/..." />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tiktok-url" class="form-label form-label--social">
+                <span>TikTok</span>
+                <span class="form-label__icon" aria-hidden="true">
+                  <img src="assets/app/project/social icons/tiktok.svg" alt="" />
+                </span>
+              </label>
+              <input id="tiktok-url" type="text" class="form-input" formControlName="tiktokUrl" placeholder="https://tiktok.com/@..." />
+            </div>
+
+            <div class="form-group">
+              <label for="whatsapp-number" class="form-label form-label--social">
+                <span>WhatsApp</span>
+                <span class="form-label__icon" aria-hidden="true">
+                  <img src="assets/app/project/social icons/whatsapp.svg" alt="" />
+                </span>
+              </label>
+              <input id="whatsapp-number" type="text" class="form-input" formControlName="whatsappNumber" placeholder="+216..." />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-settings-section">
+        <h2 class="section-title">Danger zone</h2>
+        <div class="section-content danger-section">
+          <p class="section-intro">
+            Archive the workspace if you want to stop treating it as active, restore it when you are ready to bring it back, or delete it permanently if the project is no longer needed.
+          </p>
+
+          <div class="danger-content">
+            <div class="danger-main">
+              <div class="danger-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                  <path fill-rule="evenodd" d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="danger-text">
+                <h3 class="danger-action-title">Project lifecycle controls</h3>
+                <p class="danger-action-description">
+                  These actions affect the whole project workspace, including the catalog, customers, and sales context attached to it.
+                </p>
+                <div class="danger-points" aria-hidden="true">
+                  <span class="danger-point">Storefront settings</span>
+                  <span class="danger-point">Catalog and customers</span>
+                  <span class="danger-point">Project history</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="danger-actions">
+              <button
+                type="button"
+                class="btn"
+                [class.btn-secondary-danger]="!isArchived()"
+                [class.btn-secondary]="isArchived()"
+                [disabled]="isArchiving() || isDeleting()"
+                (click)="openDangerModal(isArchived() ? 'restore' : 'archive')"
+              >
+                {{ isArchived() ? 'Restore project' : 'Archive project' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                [disabled]="isArchiving() || isDeleting()"
+                (click)="openDangerModal('delete')"
+              >
+                Delete project
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isSaving() || !hasChanges()">Reset</button>
+        <button type="submit" class="btn btn-primary btn-save" [class.is-loading]="isSaving()" [disabled]="!canSave()">
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              @if (isSaving()) {
+                <svg viewBox="25 25 50 50" class="icon icon-loading">
+                  <circle r="20" cy="50" cx="50" stroke-width="4"></circle>
+                </svg>
+              } @else {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  class="icon icon-save"
+                >
+                  <path
+                    d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              }
+            </div>
+          </div>
+          <span>{{ isSaving() ? 'Saving...' : 'Save changes' }}</span>
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (showDangerModal()) {
+    <div class="modal-overlay" (click)="closeDangerModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ modalTitle() }}</h2>
+          <button type="button" class="modal-close" (click)="closeDangerModal()" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-body">
+          <p class="modal-description">
+            {{ modalDescription() }}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDangerModal()">Cancel</button>
+          <button
+            type="button"
+            class="btn"
+            [class.btn-danger]="dangerAction() === 'delete'"
+            [class.btn-secondary-danger]="dangerAction() === 'archive'"
+            [class.btn-secondary]="dangerAction() === 'restore'"
+            (click)="confirmDangerAction()"
+          >
+            {{ modalConfirmLabel() }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

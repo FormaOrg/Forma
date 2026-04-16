@@ -3,54 +3,6 @@
   <div class="forma-footer__inner">
     <div class="forma-footer__top">
       <div class="forma-footer__grid">
-        <div class="forma-footer__col">
-          <h3 class="forma-footer__heading">Product</h3>
-          <ul class="forma-footer__list">
-            <li><a href="#">Overview</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">Templates</a></li>
-            <li><a href="#">Integrations</a></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Updates</a></li>
-          </ul>
-        </div>
-
-        <div class="forma-footer__col">
-          <h3 class="forma-footer__heading">Solutions</h3>
-          <ul class="forma-footer__list">
-            <li><a href="#">Startups</a></li>
-            <li><a href="#">Agencies</a></li>
-            <li><a href="#">E-commerce</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">Marketing teams</a></li>
-            <li><a href="#">Enterprise</a></li>
-          </ul>
-        </div>
-
-        <div class="forma-footer__col">
-          <h3 class="forma-footer__heading">Learn</h3>
-          <ul class="forma-footer__list">
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Guides</a></li>
-            <li><a href="#">Documentation</a></li>
-            <li><a href="#">Tutorials</a></li>
-            <li><a href="#">Best practices</a></li>
-            <li><a href="#">Resource library</a></li>
-          </ul>
-        </div>
-
-        <div class="forma-footer__col">
-          <h3 class="forma-footer__heading">Support</h3>
-          <ul class="forma-footer__list">
-            <li><a href="#">Help center</a></li>
-            <li><a href="#">Contact support</a></li>
-            <li><a href="#">System status</a></li>
-            <li><a href="#">Community</a></li>
-            <li><a href="#">Developers</a></li>
-            <li><a href="#">API docs</a></li>
-          </ul>
-        </div>
-
         <div class="forma-footer__brand">
           <a href="#" class="forma-footer__logo" aria-label="Forma home">
             <img src="assets/Landing Page/FormaLogo.svg" alt="Forma Logo">
@@ -65,6 +17,82 @@
           <div class="forma-footer__brand-links">
             <a href="#">About</a>
             <a href="#">Contact Us</a>
+          </div>
+        </div>
+
+        <div class="forma-footer__col" [class.open]="isSectionOpen('product')">
+          <button type="button" class="forma-footer__summary" (click)="toggleSection('product')">
+            <h3 class="forma-footer__heading">Product</h3>
+            <span class="forma-footer__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="forma-footer__panel">
+            <div class="forma-footer__panel-inner">
+              <ul class="forma-footer__list">
+                <li><a href="#">Overview</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Templates</a></li>
+                <li><a href="#">Integrations</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Updates</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="forma-footer__col" [class.open]="isSectionOpen('solutions')">
+          <button type="button" class="forma-footer__summary" (click)="toggleSection('solutions')">
+            <h3 class="forma-footer__heading">Solutions</h3>
+            <span class="forma-footer__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="forma-footer__panel">
+            <div class="forma-footer__panel-inner">
+              <ul class="forma-footer__list">
+                <li><a href="#">Startups</a></li>
+                <li><a href="#">Agencies</a></li>
+                <li><a href="#">E-commerce</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">Marketing teams</a></li>
+                <li><a href="#">Enterprise</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="forma-footer__col" [class.open]="isSectionOpen('learn')">
+          <button type="button" class="forma-footer__summary" (click)="toggleSection('learn')">
+            <h3 class="forma-footer__heading">Learn</h3>
+            <span class="forma-footer__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="forma-footer__panel">
+            <div class="forma-footer__panel-inner">
+              <ul class="forma-footer__list">
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Guides</a></li>
+                <li><a href="#">Documentation</a></li>
+                <li><a href="#">Tutorials</a></li>
+                <li><a href="#">Best practices</a></li>
+                <li><a href="#">Resource library</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="forma-footer__col" [class.open]="isSectionOpen('support')">
+          <button type="button" class="forma-footer__summary" (click)="toggleSection('support')">
+            <h3 class="forma-footer__heading">Support</h3>
+            <span class="forma-footer__chevron" aria-hidden="true"></span>
+          </button>
+          <div class="forma-footer__panel">
+            <div class="forma-footer__panel-inner">
+              <ul class="forma-footer__list">
+                <li><a href="#">Help center</a></li>
+                <li><a href="#">Contact support</a></li>
+                <li><a href="#">System status</a></li>
+                <li><a href="#">Community</a></li>
+                <li><a href="#">Developers</a></li>
+                <li><a href="#">API docs</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

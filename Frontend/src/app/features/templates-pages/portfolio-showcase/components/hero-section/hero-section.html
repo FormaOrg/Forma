@@ -1,0 +1,43 @@
+<section>
+    <div class="top">
+        <h2 class="title">Create a <span>Portfolio Website</span><br>that stands out</h2>
+        <p class="subtitle">
+            Showcase your work and attract clients. Build and promote your online portfolio
+            using design and business tools.
+        </p>
+        <link-button
+            [bgColor]="'#7566ff'"
+            [txtColor]="'white'"
+            [theme]="'white'"
+            [content]="'Get Started'"
+        ></link-button>
+    </div>
+
+    <div class="bottom">
+        <div class="portfolio-grid">
+
+            <!-- Row 1: left and right are scroll-animated, center is static -->
+            <div class="grid-card" [style.transform]="leftCardTransform()">
+                <img src="assets/Portfolio Website Gallery/Hero/1.jpg" alt="Portfolio template 1" />
+            </div>
+            <div class="grid-card">
+                <img src="assets/Portfolio Website Gallery/Hero/2.jpg" alt="Portfolio template 2" />
+            </div>
+            <div class="grid-card" [style.transform]="rightCardTransform()">
+                <img src="assets/Portfolio Website Gallery/Hero/3.jpg" alt="Portfolio template 3" />
+            </div>
+
+            <!-- Row 2: all static -->
+            <div class="grid-card">
+                <img src="assets/Portfolio Website Gallery/Hero/4.jpg" alt="Portfolio template 4" />
+            </div>
+            <div class="grid-card">
+                <img src="assets/Portfolio Website Gallery/Hero/5.jpg" alt="Portfolio template 5" />
+            </div>
+            <div class="grid-card">
+                <img src="assets/Portfolio Website Gallery/Hero/6.jpg" alt="Portfolio template 6" />
+            </div>
+
+        </div>
+    </div>
+</section>

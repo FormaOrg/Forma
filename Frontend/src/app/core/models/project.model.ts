@@ -6,7 +6,13 @@ export type ProjectType =
   | 'ECOMMERCE'
   | 'LANDING_PAGE';
 
-export type CreationMethod = 'DRAG_DROP' | 'VISUAL_DESIGNER' | 'AI_PROMPT' | 'HYBRID';
+export type CreationMethod =
+  | 'DRAG_DROP'
+  | 'VISUAL_DESIGNER'
+  | 'GUIDED_SETUP'
+  | 'QUICK_START'
+  | 'AI_PROMPT'
+  | 'HYBRID';
 export type ProjectStatus  = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type DeploymentStatus = 'PENDING' | 'DEPLOYED' | 'FAILED' | 'UNDEPLOYED';
 
@@ -15,11 +21,24 @@ export interface Project {
   id: number;
   name: string;
   description?: string;
+  logoUrl?: string | null;
+  storeTitle?: string | null;
+  contactPhone?: string | null;
+  storeEmail?: string | null;
+  defaultDomain?: string | null;
+  metaDescription?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  tiktokUrl?: string | null;
+  whatsappNumber?: string | null;
   type: ProjectType;
   creationMethod: CreationMethod;
   status: ProjectStatus;
   ownerId: number;
+  templateId?: number | null;
+  isPublished?: boolean;
   createdAt: string; // ISO 8601
+  updatedAt?: string; // ISO 8601
 }
 
 // ── Deployment — separate resource, references project ────
@@ -88,19 +107,52 @@ export interface EcommerceConfig {
   taxRate: number;
 }
 
+export interface TemplateRecord {
+  id: number | string;
+  name?: string | null;
+  title?: string | null;
+  description?: string | null;
+  summary?: string | null;
+  category?: string | null;
+  label?: string | null;
+  type?: ProjectType | string | null;
+  projectType?: ProjectType | string | null;
+  creationMethod?: CreationMethod | string | null;
+  previewImageUrl?: string | null;
+  previewUrl?: string | null;
+  previewRoute?: string | null;
+  route?: string | null;
+  featured?: boolean | null;
+  isOwned?: boolean | null;
+  tags?: string[] | null;
+  usesCount?: number | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
 // ── Request DTOs ───────────────────────────────────────────
 export interface CreateProjectRequest {
   name: string;
   description?: string;
   type: ProjectType;
   creationMethod: CreationMethod;
+  templateId?: number | null;
 }
 
 export interface UpdateProjectRequest {
   name?: string;
   description?: string;
   status?: ProjectStatus;
+  isPublished?: boolean;
+  storeTitle?: string | null;
+  contactPhone?: string | null;
+  storeEmail?: string | null;
+  defaultDomain?: string | null;
   metaDescription?: string;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  tiktokUrl?: string | null;
+  whatsappNumber?: string | null;
 }
 
 export interface DeployProjectRequest {

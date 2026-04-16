@@ -1,0 +1,62 @@
+:host {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 30%),
+    linear-gradient(180deg, #f8f3ea, #efe7da);
+  color: #1f1a14;
+}
+
+.storefront-success__card {
+  width: min(560px, 100%);
+  padding: 2rem;
+  border-radius: 28px;
+  background: rgba(255, 252, 247, 0.94);
+  border: 1px solid rgba(76, 57, 34, 0.08);
+  text-align: center;
+}
+
+.storefront-success__card span {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.76rem;
+}
+
+.storefront-success__summary {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1.5rem 0;
+}
+
+.storefront-success__summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.storefront-success__summary dt,
+.storefront-success__summary dd {
+  margin: 0;
+}
+
+.storefront-success__actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.storefront-success__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  background: #251b12;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}

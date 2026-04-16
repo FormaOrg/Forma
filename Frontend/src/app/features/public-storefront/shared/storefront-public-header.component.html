@@ -1,0 +1,285 @@
+@if (headerComponents().length) {
+  <header class="storefront-public-header">
+    <div class="storefront-public-header__canvas-shell">
+      <div class="storefront-public-header__canvas" [style.height.px]="headerHeight()">
+        @for (component of headerComponents(); track trackComponent($index, component)) {
+          @switch (component.type) {
+            @case ('button') {
+              <a
+                class="storefront-public-header__component storefront-public-header__component--interactive"
+                [ngStyle]="componentStyle(component)"
+                [attr.href]="resolveLinkHref(component.props.href)"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </a>
+            }
+            @case ('cart') {
+              <button
+                type="button"
+                class="storefront-public-header__component storefront-public-header__component--interactive storefront-public-header__component--cart"
+                [ngStyle]="componentStyle(component)"
+                (click)="openCartFromIcon($event)"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </button>
+            }
+            @case ('search') {
+              <button
+                type="button"
+                class="storefront-public-header__component storefront-public-header__component--interactive storefront-public-header__component--search"
+                [ngStyle]="componentStyle(component)"
+                (click)="openSearchOverlay($event)"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </button>
+            }
+            @case ('account') {
+              <button
+                type="button"
+                class="storefront-public-header__component storefront-public-header__component--interactive storefront-public-header__component--account"
+                [class.storefront-public-header__component--account-active]="hasCustomerSession()"
+                [ngStyle]="componentStyle(component)"
+                (click)="goToAccount($event)"
+                aria-label="Account"
+                title="Account"
+              >
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </button>
+            }
+            @default {
+              <div class="storefront-public-header__component" [ngStyle]="componentStyle(component)">
+                <app-storefront-editor-component-host
+                  [node]="component"
+                  [products]="[]"
+                  [renderWidth]="component.frame.width"
+                  [renderHeight]="component.frame.height"
+                  [cartCount]="cartCount()"
+                  [interactiveLinks]="true"
+                  [linkHrefResolver]="resolveComponentLinkHref"
+                />
+              </div>
+            }
+          }
+        }
+
+        @if (!hasEditorAccountComponent()) {
+          <button
+            type="button"
+            class="storefront-public-header__account-trigger"
+            [class.storefront-public-header__account-trigger--active]="hasCustomerSession()"
+            (click)="goToAccount($event)"
+            aria-label="Account"
+            title="Account"
+          >
+            <app-icon name="user" [size]="18"></app-icon>
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+} @else if (storefront(); as home) {
+  <header class="storefront-public-header storefront-public-header--fallback">
+    <div class="storefront-public-header__fallback-shell">
+      <a class="storefront-public-header__fallback-brand" [attr.href]="resolveLinkHref('/')">{{ home.storeName }}</a>
+
+      <nav class="storefront-public-header__fallback-nav" aria-label="Store navigation">
+        <a [attr.href]="resolveLinkHref('/')">Home</a>
+        <a [attr.href]="resolveLinkHref('/products')">Products</a>
+        <button type="button" (click)="goToAccount($event)">Account</button>
+        <button type="button" (click)="openCartFromIcon($event)">Cart ({{ cartCount() }})</button>
+      </nav>
+    </div>
+  </header>
+}
+
+@if (isSearchOpen()) {
+  <section class="storefront-public-header__search-overlay" aria-label="Search products">
+    <button
+      type="button"
+      class="storefront-public-header__search-backdrop"
+      (click)="closeSearchOverlay()"
+      aria-label="Close search"
+    ></button>
+    <div class="storefront-public-header__search-bar-shell" (click)="closeSearchOverlay()">
+      <div class="storefront-public-header__search-panel" (click)="$event.stopPropagation()">
+        <div class="storefront-public-header__search-input-row">
+          <div class="storefront-public-header__search-dropdown-anchor">
+            <label class="storefront-public-header__search-input-shell">
+              <span>{{ searchOverlayLabel() }}</span>
+              <input
+                type="text"
+                [value]="searchQuery()"
+                (input)="updateSearchQuery(($any($event.target)).value)"
+                [placeholder]="searchOverlayPlaceholder()"
+                autocomplete="off"
+                autofocus
+              />
+              @if (searchQuery()) {
+                <button
+                  type="button"
+                  class="storefront-public-header__search-clear"
+                  (click)="updateSearchQuery('')"
+                  aria-label="Clear search"
+                >
+                  <app-icon name="x" [size]="12"></app-icon>
+                </button>
+              }
+              <span class="storefront-public-header__search-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                  <circle cx="11" cy="11" r="6.25" stroke="currentColor" stroke-width="1.5"></circle>
+                  <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+              </span>
+            </label>
+
+            @if (searchQuery()) {
+              <div class="storefront-public-header__search-results-shell">
+                <div class="storefront-public-header__search-results">
+                  <div class="storefront-public-header__search-column">
+                    <span class="storefront-public-header__search-column-label">Suggestions</span>
+                    <div class="storefront-public-header__search-suggestions">
+                      @for (suggestion of searchSuggestions(); track suggestion) {
+                        <button type="button" class="storefront-public-header__search-suggestion" (click)="applySuggestion(suggestion)">
+                          {{ suggestion }}
+                        </button>
+                      }
+                      @if (!searchSuggestions().length) {
+                        <span class="storefront-public-header__search-empty">Keep typing to refine the match.</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="storefront-public-header__search-column">
+                    <span class="storefront-public-header__search-column-label">Products</span>
+                    <div class="storefront-public-header__search-products">
+                      @for (product of matchedProducts(); track product.id) {
+                        <button type="button" class="storefront-public-header__search-product" (click)="openProductFromSearch(product.id)">
+                          <span class="storefront-public-header__search-product-media">
+                            @if (product.imageUrl) {
+                              <img [src]="product.imageUrl" [alt]="product.name" />
+                            } @else {
+                              <span>{{ product.name.slice(0, 1) }}</span>
+                            }
+                          </span>
+                          <span class="storefront-public-header__search-product-copy">
+                            <strong>{{ product.name }}</strong>
+                            @if (product.category) {
+                              <span>{{ product.category }}</span>
+                            }
+                          </span>
+                        </button>
+                      }
+                      @if (!matchedProducts().length) {
+                        <span class="storefront-public-header__search-empty">No products match “{{ searchQuery() }}”.</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="storefront-public-header__search-submit" (click)="applySuggestion(searchQuery())">
+                  <span>Search for “{{ searchQuery() }}”</span>
+                  <span class="storefront-public-header__search-submit-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="icon icon-arrow" viewBox="0 0 14 10" width="14" height="10">
+                      <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"></path>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            }
+          </div>
+          <button type="button" class="storefront-public-header__search-close storefront-public-header__search-close--panel" (click)="closeSearchOverlay()" aria-label="Close search">
+            <app-icon name="x" [size]="18"></app-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (isCartDrawerOpen()) {
+  <button type="button" class="storefront-public-header__drawer-backdrop" (click)="closeCartDrawer()" aria-label="Close cart"></button>
+  <aside class="storefront-public-header__drawer" aria-label="Shopping cart">
+    <div class="storefront-public-header__drawer-header">
+      <div>
+        <span>Ready when you are</span>
+        <h2>Your cart</h2>
+      </div>
+      <button type="button" class="storefront-public-header__drawer-close" (click)="closeCartDrawer()" aria-label="Close cart">
+        <app-icon name="x" [size]="16"></app-icon>
+      </button>
+    </div>
+
+    @if (cartItems().length) {
+      <div class="storefront-public-header__drawer-items">
+        @for (item of cartItems(); track item.productId) {
+          <article class="storefront-public-header__drawer-item">
+            <div class="storefront-public-header__drawer-item-media">
+              @if (item.imageUrl) {
+                <img [src]="item.imageUrl" [alt]="item.name" />
+              } @else {
+                <span>{{ item.name.slice(0, 1) }}</span>
+              }
+            </div>
+
+            <div class="storefront-public-header__drawer-item-copy">
+              <p>{{ item.category || 'Product' }}</p>
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.price | currency:'TND':'symbol':'1.0-2' }}</span>
+
+              <div class="storefront-public-header__drawer-item-actions">
+                <button type="button" (click)="decreaseQuantity(item.productId, item.quantity)">−</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" (click)="increaseQuantity(item.productId, item.quantity)">+</button>
+                <button type="button" class="storefront-public-header__drawer-remove" (click)="removeItem(item.productId)">Remove</button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="storefront-public-header__drawer-footer">
+        <div class="storefront-public-header__drawer-subtotal">
+          <span>Subtotal</span>
+          <strong>{{ cartSubtotal() | currency:'TND':'symbol':'1.0-2' }}</strong>
+        </div>
+        <button type="button" class="storefront-public-header__drawer-link" (click)="goToFullCart()">Open full cart page</button>
+      </div>
+    } @else {
+      <div class="storefront-public-header__drawer-empty">
+        <h3>Your cart is empty</h3>
+        <p>Add a few products and they’ll appear here.</p>
+      </div>
+    }
+  </aside>
+}

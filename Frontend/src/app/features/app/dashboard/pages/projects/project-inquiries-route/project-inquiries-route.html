@@ -1,0 +1,218 @@
+<section class="project-inquiries">
+  @if (isLoading()) {
+    <section class="project-inquiries__state">
+      <div class="project-inquiries__skeleton"></div>
+      <div class="project-inquiries__skeleton"></div>
+      <div class="project-inquiries__skeleton"></div>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="project-inquiries__state project-inquiries__state--error" role="alert">
+      <h1>{{ 'project.inquiries.errors.title' | t }}</h1>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadProject()">{{ 'project.inquiries.actions.tryAgain' | t }}</button>
+    </section>
+  } @else if (project(); as project) {
+    <section class="project-inquiries__hero project-inquiries__panel">
+      <div>
+        <p class="project-inquiries__eyebrow">{{ 'project.inquiries.eyebrow' | t }}</p>
+        <h1 class="project-inquiries__title">{{ 'project.inquiries.title' | t }}</h1>
+        <p class="project-inquiries__subtitle">
+          {{ 'project.inquiries.subtitle.prefix' | t }} {{ project.projectName }}, {{ 'project.inquiries.subtitle.suffix' | t }}
+        </p>
+      </div>
+
+      <a class="project-inquiries__hero-action" [routerLink]="['/app/projects', project.projectId, 'editor']">{{ 'project.inquiries.actions.openContactPage' | t }}</a>
+    </section>
+
+    <section class="project-inquiries__summary-grid">
+      <article class="project-inquiries__summary-card project-inquiries__panel">
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.inbox.label' | t }}</span>
+        <strong class="project-inquiries__summary-value">{{ inquiries().length }}</strong>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.inbox.note' | t }}</span>
+      </article>
+      <article class="project-inquiries__summary-card project-inquiries__panel">
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.new.label' | t }}</span>
+        <strong class="project-inquiries__summary-value">{{ newCount() }}</strong>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.new.note' | t }}</span>
+      </article>
+      <article class="project-inquiries__summary-card project-inquiries__panel">
+        <span class="project-inquiries__summary-label">{{ 'project.inquiries.summary.replied.label' | t }}</span>
+        <strong class="project-inquiries__summary-value">{{ repliedCount() }}</strong>
+        <span class="project-inquiries__summary-note">{{ 'project.inquiries.summary.replied.note' | t }}</span>
+      </article>
+    </section>
+
+    <section class="project-inquiries__layout">
+      <article class="project-inquiries__panel">
+        <div class="project-inquiries__toolbar">
+          <label class="project-inquiries__search">
+            <input
+              type="search"
+              [placeholder]="'project.inquiries.search.placeholder' | t"
+              [value]="searchValue()"
+              (input)="updateSearch(searchInput.value)"
+              #searchInput
+            />
+          </label>
+
+          <div
+            class="project-inquiries__filters"
+            role="tablist"
+            [attr.aria-label]="'project.inquiries.filters.aria' | t"
+            [attr.data-status]="selectedStatus()"
+          >
+            <span class="project-inquiries__filters-pill" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="project-inquiries__filter"
+              [class.project-inquiries__filter--active]="selectedStatus() === 'ALL'"
+              (click)="setStatus('ALL')"
+            >
+              {{ 'project.inquiries.filters.all' | t }}
+            </button>
+            <button
+              type="button"
+              class="project-inquiries__filter"
+              [class.project-inquiries__filter--active]="selectedStatus() === 'new'"
+              (click)="setStatus('new')"
+            >
+              {{ 'project.inquiries.status.new' | t }}
+            </button>
+            <button
+              type="button"
+              class="project-inquiries__filter"
+              [class.project-inquiries__filter--active]="selectedStatus() === 'replied'"
+              (click)="setStatus('replied')"
+            >
+              {{ 'project.inquiries.status.replied' | t }}
+            </button>
+            <button
+              type="button"
+              class="project-inquiries__filter"
+              [class.project-inquiries__filter--active]="selectedStatus() === 'scheduled'"
+              (click)="setStatus('scheduled')"
+            >
+              {{ 'project.inquiries.status.scheduled' | t }}
+            </button>
+          </div>
+        </div>
+
+        <div class="project-inquiries__list">
+          @for (item of filteredInquiries(); track trackInquiry($index, item)) {
+            <button
+              type="button"
+              class="project-inquiries__row"
+              [class.project-inquiries__row--active]="selectedInquiry().id === item.id"
+              (click)="selectInquiry(item.id)"
+            >
+              <div class="project-inquiries__row-top">
+                <div>
+                  <strong>{{ item.name }}</strong>
+                  <p>{{ item.email }}</p>
+                </div>
+                <span
+                  class="project-inquiries__status"
+                  [class.project-inquiries__status--replied]="item.status === 'replied'"
+                  [class.project-inquiries__status--scheduled]="item.status === 'scheduled'"
+                >
+                  {{ item.statusLabel }}
+                </span>
+              </div>
+
+              <div class="project-inquiries__row-meta">
+                <span>{{ item.serviceLabel || ('project.inquiries.common.generalInquiry' | t) }}</span>
+                <span>{{ item.budgetLabel || ('project.inquiries.common.budgetNotShared' | t) }}</span>
+                <span>{{ formatReceivedLabel(item.createdAt) }}</span>
+              </div>
+            </button>
+          } @empty {
+            <div class="project-inquiries__empty">
+              <h2>{{ inquiries().length ? ('project.inquiries.empty.noMatchTitle' | t) : ('project.inquiries.empty.noneTitle' | t) }}</h2>
+              <p>
+                {{ inquiries().length ? ('project.inquiries.empty.noMatchText' | t) : ('project.inquiries.empty.noneText' | t) }}
+              </p>
+            </div>
+          }
+        </div>
+      </article>
+
+      <aside class="project-inquiries__panel">
+        @if (selectedInquiry(); as selectedInquiry) {
+          <div class="project-inquiries__detail-top" (click)="closeDropdowns()">
+            <div>
+              <p class="project-inquiries__section-kicker">Selected inquiry</p>
+              <h2>{{ selectedInquiry.name }}</h2>
+            </div>
+
+            <div
+              class="project-inquiries__dropdown"
+              [class.is-open]="statusDropdownOpen()"
+              (click)="$event.stopPropagation()"
+            >
+              <button type="button" class="project-inquiries__dropdown-trigger" (click)="toggleStatusDropdown()">
+                <span class="project-inquiries__dropdown-label">{{ 'project.inquiries.dropdown.status' | t }}</span>
+                <span class="project-inquiries__dropdown-value">{{ selectedInquiry.statusLabel }}</span>
+                <span class="project-inquiries__dropdown-caret" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </button>
+
+              @if (statusDropdownOpen()) {
+                <div class="project-inquiries__dropdown-menu">
+                  @for (option of statusOptions; track option.value) {
+                    <button
+                      type="button"
+                      class="project-inquiries__dropdown-item"
+                      [class.is-selected]="selectedInquiry.status === option.value"
+                      [disabled]="isUpdatingStatus()"
+                      (click)="updateInquiryStatus(selectedInquiry.id, option.value)"
+                    >
+                      {{ option.label | t }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="project-inquiries__detail-card">
+            <div class="project-inquiries__detail-grid">
+              <div>
+                <span>{{ 'project.inquiries.details.email' | t }}</span>
+                <strong>{{ selectedInquiry.email }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.inquiries.details.service' | t }}</span>
+                <strong>{{ selectedInquiry.serviceLabel || ('project.inquiries.common.generalInquiry' | t) }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.inquiries.details.budget' | t }}</span>
+                <strong>{{ selectedInquiry.budgetLabel || ('project.inquiries.common.budgetNotShared' | t) }}</strong>
+              </div>
+              <div>
+                <span>{{ 'project.inquiries.details.source' | t }}</span>
+                <strong>{{ selectedInquiry.sourceLabel || ('project.inquiries.common.unknownSource' | t) }}</strong>
+              </div>
+            </div>
+
+            <div class="project-inquiries__message">
+              <span>{{ 'project.inquiries.details.message' | t }}</span>
+              <p>{{ selectedInquiry.message || ('project.inquiries.common.noMessage' | t) }}</p>
+            </div>
+
+            <div class="project-inquiries__detail-actions">
+              <a [href]="'mailto:' + selectedInquiry.email" class="project-inquiries__detail-action">
+                {{ 'project.inquiries.actions.replyByEmail' | t }}
+              </a>
+              <a [routerLink]="['/app/projects', project.projectId, 'editor']" class="project-inquiries__detail-action project-inquiries__detail-action--ghost">
+                {{ 'project.inquiries.actions.reviewContactPage' | t }}
+              </a>
+            </div>
+          </div>
+        }
+      </aside>
+    </section>
+  }
+</section>

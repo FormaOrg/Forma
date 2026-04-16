@@ -1,0 +1,238 @@
+<app-project-sales-page
+  [rangeOptions]="salesRangeOptions"
+  [sortOptions]="salesSortOptions"
+  [filterOptions]="salesFilterOptions"
+  [query]="salesQuery()"
+  [rangeLabel]="salesRangeLabel()"
+  [kpis]="salesKpis()"
+  [trend]="salesTrend()"
+  [deliveryStats]="salesDeliveryStats()"
+  [topProducts]="salesTopProducts()"
+  [focusItems]="salesFocusItems()"
+  [orders]="salesOrders()"
+  [searchValue]="salesSearchValue()"
+  [errorMessage]="salesErrorMessage()"
+  [isLoading]="isSalesLoading()"
+  [hasLoaded]="hasLoadedSales()"
+  [hasData]="salesHasData()"
+  [hasOrders]="salesHasOrders()"
+  [isExporting]="isExportingSales()"
+  [selectedOrderIds]="selectedOrderIds()"
+  [allVisibleOrdersSelected]="allVisibleOrdersSelected()"
+  [ordersPage]="salesOrdersPage()"
+  [ordersTotalPages]="salesOrdersTotalPages()"
+  [ordersTotalElements]="salesOrdersTotalElements()"
+  [ordersExporting]="isExportingSales()"
+  [ordersDeleting]="isDeletingOrders()"
+  (rangeChange)="setSalesRange($event)"
+  (compareToggle)="toggleComparePeriod()"
+  (refresh)="refreshSalesData()"
+  (export)="exportSalesData()"
+  (retry)="retrySalesLoad()"
+  (filterChange)="setSalesFilter($event)"
+  (sortChange)="setSalesSort($event)"
+  (searchChange)="onSalesSearchInput($event)"
+  (toggleAllOrders)="toggleAllOrders($event)"
+  (toggleOrderSelection)="toggleOrderSelection($event.orderId, $event.selected)"
+  (deleteSelectedOrders)="deleteSelectedOrders()"
+  (pageChange)="goToOrdersPage($event)"
+  (createOrder)="openCreateOrderEditor()"
+  (editOrder)="openEditOrderEditor($event)"
+></app-project-sales-page>
+
+@if (isOrderEditorOpen()) {
+  <section class="sales-editor-backdrop" [class.is-closing]="isOrderEditorClosing()" (click)="closeOrderEditor()"></section>
+  <aside class="sales-editor" [class.is-closing]="isOrderEditorClosing()">
+    <header class="sales-editor__header">
+      <div class="sales-editor__header-copy">
+        <p class="sales-editor__eyebrow">Sales editor</p>
+        <h2>{{ orderEditorTitle() }}</h2>
+        <p class="sales-editor__subtitle">Add or update a local order, assign a customer, and keep product totals aligned with the order flow.</p>
+      </div>
+      <button type="button" class="sales-editor__close" (click)="closeOrderEditor()">Close</button>
+    </header>
+
+    @if (isOrderEditorLoading()) {
+      <div class="sales-editor__loading" aria-hidden="true">
+        <div class="sales-editor__skeleton sales-editor__skeleton--title"></div>
+        <div class="sales-editor__skeleton sales-editor__skeleton--copy"></div>
+
+        <div class="sales-editor__skeleton-section">
+          <div class="sales-editor__skeleton sales-editor__skeleton--field"></div>
+          <div class="sales-editor__skeleton sales-editor__skeleton--field"></div>
+          <div class="sales-editor__skeleton sales-editor__skeleton--field"></div>
+          <div class="sales-editor__skeleton sales-editor__skeleton--field"></div>
+        </div>
+
+        <div class="sales-editor__skeleton-section">
+          <div class="sales-editor__skeleton sales-editor__skeleton--item"></div>
+          <div class="sales-editor__skeleton sales-editor__skeleton--item"></div>
+        </div>
+
+        <div class="sales-editor__skeleton-footer">
+          <div class="sales-editor__skeleton sales-editor__skeleton--button"></div>
+          <div class="sales-editor__skeleton sales-editor__skeleton--button sales-editor__skeleton--button-primary"></div>
+        </div>
+      </div>
+    } @else {
+      <form class="sales-editor__form" [formGroup]="orderForm" (ngSubmit)="saveOrder()">
+        <div class="sales-editor__body">
+          <section class="sales-editor__section">
+            <div class="sales-editor__section-head">
+              <h3>Order basics</h3>
+              <p>Keep the order easy to identify and schedule.</p>
+            </div>
+
+            <div class="sales-editor__split">
+              <label>
+                <span>Order number</span>
+                <input type="text" formControlName="orderNumber" placeholder="ORD-2026-001" />
+              </label>
+
+              <label>
+                <span>Customer</span>
+                <select formControlName="customerId">
+                  <option [ngValue]="null">Guest customer</option>
+                  @for (customer of availableCustomers(); track customer.id) {
+                    <option [ngValue]="customer.id">{{ customerLabel(customer) }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+
+            <div class="sales-editor__split">
+              <label>
+                <span>Placed at</span>
+                <input type="datetime-local" formControlName="placedAt" />
+              </label>
+
+              <label>
+                <span>Scheduled for</span>
+                <input type="datetime-local" formControlName="scheduledFor" />
+              </label>
+            </div>
+
+            <div class="sales-editor__split">
+              <label>
+                <span>Payment status</span>
+                <select formControlName="paymentStatus">
+                  @for (option of paymentStatusOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label>
+                <span>Delivery status</span>
+                <select formControlName="fulfillmentStatus">
+                  @for (option of fulfillmentStatusOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+
+            <div class="sales-editor__split">
+              <label>
+                <span>Delivered at</span>
+                <input type="datetime-local" formControlName="deliveredAt" />
+              </label>
+
+              <label>
+                <span>Delivery fee</span>
+                <input type="number" min="0" step="0.01" formControlName="deliveryFee" />
+              </label>
+            </div>
+          </section>
+
+          <section class="sales-editor__section">
+            <div class="sales-editor__section-head">
+              <h3>Products</h3>
+              <p>Build the order basket and let the total recalculate from what you add.</p>
+            </div>
+
+            <div class="sales-editor__items" formArrayName="items">
+              @for (item of orderItems.controls; track $index) {
+                <div class="sales-editor__item" [formGroupName]="$index">
+                  <div class="sales-editor__item-head">
+                    <strong>Product {{ $index + 1 }}</strong>
+                    @if (orderItems.length > 1) {
+                      <button type="button" class="sales-editor__remove-item" (click)="removeOrderItem($index)">Remove</button>
+                    }
+                  </div>
+
+                  <label>
+                    <span>Product</span>
+                    <select formControlName="productId" (change)="onEditorProductChange($index)">
+                      <option [ngValue]="null">Custom product</option>
+                      @for (product of availableProducts(); track product.id) {
+                        <option [ngValue]="product.id">{{ product.name }}</option>
+                      }
+                    </select>
+                  </label>
+
+                  <div class="sales-editor__split">
+                    <label>
+                      <span>Name</span>
+                      <input type="text" formControlName="productName" placeholder="Curated Tote" />
+                    </label>
+
+                    <label>
+                      <span>SKU</span>
+                      <input type="text" formControlName="productSku" placeholder="CT-101" />
+                    </label>
+                  </div>
+
+                  <div class="sales-editor__split">
+                    <label>
+                      <span>Quantity</span>
+                      <input type="number" min="1" step="1" formControlName="quantity" />
+                    </label>
+
+                    <label>
+                      <span>Unit price</span>
+                      <input type="number" min="0" step="0.01" formControlName="unitPrice" />
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <button type="button" class="sales-editor__add-item" (click)="addOrderItem()">Add another product</button>
+          </section>
+
+          <section class="sales-editor__section">
+            <div class="sales-editor__section-head">
+              <h3>Delivery details</h3>
+              <p>Add any routing notes and address context for the order.</p>
+            </div>
+
+            <label>
+              <span>Delivery address</span>
+              <input type="text" formControlName="deliveryAddress" placeholder="Lac 2, Tunis" />
+            </label>
+
+            <label>
+              <span>Notes</span>
+              <textarea rows="4" formControlName="notes" placeholder="Collection on delivery, call before arrival."></textarea>
+            </label>
+          </section>
+        </div>
+
+        <footer class="sales-editor__footer">
+          <div class="sales-editor__totals">
+            <span>Subtotal {{ getEditorSubtotal() }}</span>
+            <strong>Total {{ getEditorTotal() }}</strong>
+          </div>
+
+          <div class="sales-editor__footer-actions">
+            <button type="button" class="sales-editor__secondary" (click)="closeOrderEditor()">Cancel</button>
+            <button type="submit" class="sales-editor__primary" [disabled]="!canSubmitOrder()">
+              {{ isOrderSaving() ? 'Saving...' : editingOrderId() ? 'Save changes' : 'Create order' }}
+            </button>
+          </div>
+        </footer>
+      </form>
+    }
+  </aside>
+}

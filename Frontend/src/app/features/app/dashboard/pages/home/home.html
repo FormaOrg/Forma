@@ -1,0 +1,232 @@
+<section class="home-page">
+  @if (isLoadingHome) {
+    <section class="home-skeleton-hero" aria-hidden="true">
+      <div class="home-skeleton home-skeleton--title"></div>
+      <div class="home-skeleton home-skeleton--text home-skeleton--text-lg"></div>
+    </section>
+
+    <section class="home-page__stats home-page__stats--loading" aria-hidden="true">
+      @for (_ of [1, 2, 3, 4]; track $index) {
+        <article class="home-skeleton-card">
+          <div class="home-skeleton-card__head">
+            <div class="home-skeleton home-skeleton--icon"></div>
+            <div class="home-skeleton home-skeleton--label"></div>
+          </div>
+          <div class="home-skeleton home-skeleton--value"></div>
+          <div class="home-skeleton home-skeleton--text"></div>
+        </article>
+      }
+    </section>
+
+    <section class="home-page__workspace" aria-hidden="true">
+      <div class="home-page__main-column">
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+            <div class="home-skeleton home-skeleton--button"></div>
+          </div>
+          <div class="home-skeleton-list">
+            @for (_ of [1, 2, 3]; track $index) {
+              <div class="home-skeleton-row">
+                <div class="home-skeleton-row__copy">
+                  <div class="home-skeleton home-skeleton--line-md"></div>
+                  <div class="home-skeleton home-skeleton--line-sm"></div>
+                </div>
+                <div class="home-skeleton home-skeleton--chip"></div>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+            <div class="home-skeleton home-skeleton--button"></div>
+          </div>
+          <div class="home-skeleton-grid">
+            @for (_ of [1, 2, 3]; track $index) {
+              <div class="home-skeleton-template">
+                <div class="home-skeleton home-skeleton--thumb"></div>
+                <div class="home-skeleton-template__copy">
+                  <div class="home-skeleton home-skeleton--line-md"></div>
+                  <div class="home-skeleton home-skeleton--line-xs"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+            <div class="home-skeleton home-skeleton--button"></div>
+          </div>
+          <div class="home-skeleton home-skeleton--progress"></div>
+          <div class="home-skeleton home-skeleton--line-xs"></div>
+          <div class="home-skeleton-list">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+              <div class="home-skeleton-check">
+                <div class="home-skeleton home-skeleton--dot"></div>
+                <div class="home-skeleton home-skeleton--line-md"></div>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+
+      <aside class="home-page__rail">
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+          </div>
+          <div class="home-skeleton-list">
+            @for (_ of [1, 2, 3, 4]; track $index) {
+              <div class="home-skeleton-activity">
+                <div class="home-skeleton home-skeleton--activity-icon"></div>
+                <div class="home-skeleton-activity__copy">
+                  <div class="home-skeleton home-skeleton--line-md"></div>
+                  <div class="home-skeleton home-skeleton--line-xs"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+          </div>
+          <div class="home-skeleton-list">
+            @for (_ of [1, 2, 3]; track $index) {
+              <div class="home-skeleton-action">
+                <div class="home-skeleton home-skeleton--action-icon"></div>
+                <div class="home-skeleton-action__copy">
+                  <div class="home-skeleton home-skeleton--line-md"></div>
+                  <div class="home-skeleton home-skeleton--line-sm"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article class="home-skeleton-panel">
+          <div class="home-skeleton-panel__header">
+            <div class="home-skeleton home-skeleton--title-sm"></div>
+            <div class="home-skeleton home-skeleton--button"></div>
+          </div>
+          <div class="home-skeleton home-skeleton--pill"></div>
+          <div class="home-skeleton home-skeleton--line-sm"></div>
+          <div class="home-skeleton-badges">
+            <div class="home-skeleton home-skeleton--badge"></div>
+            <div class="home-skeleton home-skeleton--badge"></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  } @else {
+    <app-greeting-section class="home-page__hero" [userName]="userName"></app-greeting-section>
+
+    <section class="home-page__stats" [attr.aria-label]="'dashboard.home.stats.aria' | t">
+      <app-data-card
+        class="home-page__panel"
+        [icon]="globeIcon"
+        [title]="'dashboard.home.stats.sitesCreated.title' | t"
+        [value]="sitesCreatedValue"
+        [description]="sitesCreatedDescription"
+      ></app-data-card>
+
+      <app-data-card
+        class="home-page__panel"
+        [icon]="checkIcon"
+        [title]="'dashboard.home.stats.published.title' | t"
+        [value]="publishedSitesValue"
+        [description]="publishedSitesDescription"
+      ></app-data-card>
+
+      <app-data-card
+        class="home-page__panel"
+        [icon]="draftIcon"
+        [title]="'dashboard.home.stats.drafts.title' | t"
+        [value]="draftSitesValue"
+        [description]="draftSitesDescription"
+      ></app-data-card>
+
+      <app-data-card
+        class="home-page__panel"
+        [icon]="clockIcon"
+        [title]="'dashboard.home.stats.lastActivity.title' | t"
+        [value]="lastActivityValue"
+        [description]="lastActivityDescription"
+      ></app-data-card>
+    </section>
+
+    <section class="home-page__workspace">
+      <div class="home-page__main-column">
+        <app-recent-projects class="home-page__panel home-page__panel--featured" [projects]="recentProjects"></app-recent-projects>
+        <app-recent-templates class="home-page__panel" [templates]="recentTemplates"></app-recent-templates>
+        <app-setup-progress class="home-page__panel" [percent]="setupPercent" [steps]="setupSteps" [settingsRoute]="'/app/settings/profile'"></app-setup-progress>
+      </div>
+
+      <aside class="home-page__rail">
+        <app-recent-activity class="home-page__panel" [activities]="recentActivities"></app-recent-activity>
+
+        <section class="home-quick-actions home-page__panel" aria-labelledby="home-quick-actions-title">
+          <div class="home-quick-actions__header">
+            <div>
+              <p class="home-quick-actions__eyebrow">{{ 'dashboard.home.quickActions.eyebrow' | t }}</p>
+              <h2 id="home-quick-actions-title" class="home-quick-actions__title">{{ 'dashboard.home.quickActions.title' | t }}</h2>
+            </div>
+          </div>
+
+          <div class="home-quick-actions__list">
+            <a class="home-quick-actions__item" routerLink="/app/create-project">
+              <span class="home-quick-actions__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5V19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                  <path d="M5 12H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="home-quick-actions__body">
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.create.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.create.hint' | t }}</span>
+              </span>
+            </a>
+
+            <a class="home-quick-actions__item" routerLink="/app/templates">
+              <span class="home-quick-actions__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4L20 8.5L12 13L4 8.5L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                  <path d="M4 12.5L12 17L20 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="home-quick-actions__body">
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.templates.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.templates.hint' | t }}</span>
+              </span>
+            </a>
+
+            <a class="home-quick-actions__item" routerLink="/app/settings/profile">
+              <span class="home-quick-actions__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="1.8" />
+                  <path d="M4 21C4 17.6863 7.58172 15 12 15C16.4183 15 20 17.6863 20 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="home-quick-actions__body">
+                <span class="home-quick-actions__label">{{ 'dashboard.home.quickActions.profile.label' | t }}</span>
+                <span class="home-quick-actions__hint">{{ 'dashboard.home.quickActions.profile.hint' | t }}</span>
+              </span>
+            </a>
+          </div>
+        </section>
+
+        <app-account-snapshot
+          class="home-page__panel"
+          [planLabel]="planLabel"
+          [renewsLabel]="renewsLabel"
+          [badges]="accountBadges"
+        ></app-account-snapshot>
+      </aside>
+    </section>
+  }
+</section>

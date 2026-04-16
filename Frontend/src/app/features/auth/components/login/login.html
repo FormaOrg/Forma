@@ -1,117 +1,112 @@
-<!-- login.component.html -->
-<div class="login-page">
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
 
-  <div class="login-card">
+<div class="login-header">
+  <h2>Welcome Back</h2>
+  <p>Enter your email and password to access your account</p>
+</div>
 
-    <!-- LEFT: dark inner panel -->
-    <div class="login-card-left">
-      <div class="left-tagline">Turn structure into experience.</div>
-      <div class="left-bottom">
-        <h2>Build Everything You Want</h2>
-        <p>Shape ideas into flexible, high-performance websites — your way.</p>
-      </div>
+<form #f="ngForm" (ngSubmit)="onSubmit($event)" novalidate>
+  <div class="unverified-banner" *ngIf="emailNotVerified">
+    <div class="unverified-banner-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
     </div>
 
-    <!-- RIGHT: white form panel -->
-    <div class="login-card-right">
+    <div class="unverified-banner-body">
+      <p class="unverified-banner-title">Email not verified</p>
+      <p class="unverified-banner-sub">
+        Check your inbox for the verification link, or resend it below.
+      </p>
 
-      <div class="logo-section">
-        <div class="logo-icon">
-          <img src="assets/images/forma-icon.svg" alt="Forma logo">
-        </div>
-        <h1 class="logo">Forma</h1>
-      </div>
-
-      <div class="login-header">
-        <h2>Welcome Back</h2>
-        <p>Enter your email and password to access your account</p>
-      </div>
-
-      <form #f="ngForm" (ngSubmit)="onSubmit($event)" novalidate>
-
-        <!-- ── UNVERIFIED EMAIL BANNER ── -->
-        <div class="unverified-banner" *ngIf="emailNotVerified">
-          <div class="unverified-banner-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-          </div>
-          <div class="unverified-banner-body">
-            <p class="unverified-banner-title">Email not verified</p>
-            <p class="unverified-banner-sub">
-              Check your inbox for the verification link, or resend it below.
-            </p>
-            <div class="resend-success" *ngIf="resendSuccess">✓ {{ resendSuccess }}</div>
-            <div class="resend-error" *ngIf="resendError">{{ resendError }}</div>
-            <button type="button" class="resend-btn" (click)="resendVerification()" [disabled]="isResending">
-              <span *ngIf="isResending" class="btn-spinner"></span>
-              {{ isResending ? 'Sending...' : 'Resend verification email' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="input-form">
-          <label for="email">Email</label>
-          <div class="input-box" [class.invalid]="emailRef.invalid && (emailRef.touched || f.submitted)">
-            <input type="email" id="email" name="email" [(ngModel)]="email" #emailRef="ngModel"
-              placeholder="Enter your email" required email>
-          </div>
-          <div class="error" *ngIf="emailRef.invalid && (emailRef.touched || f.submitted)">
-            <span *ngIf="emailRef.errors?.['required']">Email is required</span>
-            <span *ngIf="emailRef.errors?.['email']">Invalid email format</span>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="input-form">
-          <label for="password">Password</label>
-          <div class="input-box" [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
-            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
-              [(ngModel)]="password" #passwordRef="ngModel" placeholder="Enter your password" required minlength="6">
-            <span [class]="showPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
-              (click)="showPassword = !showPassword"></span>
-          </div>
-          <div class="error" *ngIf="passwordRef.invalid && (passwordRef.touched || f.submitted)">
-            <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
-            <span *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters</span>
-          </div>
-        </div>
-
-        <!-- Remember / Forgot -->
-        <div class="remember-forgot">
-          <label class="remember-me">
-            <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe">
-            <span>Remember me</span>
-          </label>
-          <a routerLink="/forgot-password" class="forgot-password">Forgot password</a>
-        </div>
-
-        <div class="error" *ngIf="error && !emailNotVerified" style="margin-bottom: 14px; text-align: center;">
-          {{ error }}
-        </div>
-
-        <button type="submit" [disabled]="f.invalid">Sign In</button>
-
-        <!-- Google -->
-        <div class="alternative">
-          <div class="social-buttons">
-            <button type="button" class="social-btn" title="Sign In with Google">
-              <span class="icon icon-google"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="signup-link">
-          Don't have an account? <a routerLink="/register"><strong>Sign Up</strong></a>
-        </div>
-
-      </form>
-
+      <button
+        type="button"
+        class="resend-btn"
+        (click)="resendVerification()"
+        [disabled]="isResending">
+        <span *ngIf="isResending" class="btn-spinner"></span>
+        {{ isResending ? 'Sending...' : 'Resend verification email' }}
+      </button>
     </div>
-
   </div>
 
-</div>
+  <div class="input-form">
+    <label for="email">Email</label>
+    <div class="input-box" [class.invalid]="emailRef.invalid && (emailRef.touched || f.submitted)">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="email"
+        #emailRef="ngModel"
+        placeholder="Enter your email"
+        required
+        email>
+    </div>
+
+    <div class="error" [class.visible]="emailRef.invalid && (emailRef.touched || f.submitted)">
+      <span *ngIf="emailRef.errors?.['required']">Email is required</span>
+      <span *ngIf="emailRef.errors?.['email']">Invalid email format</span>
+      <span *ngIf="!(emailRef.invalid && (emailRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="input-form">
+    <label for="password">Password</label>
+    <div class="input-box" [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        id="password"
+        name="password"
+        [(ngModel)]="password"
+        #passwordRef="ngModel"
+        placeholder="Enter your password"
+        required
+        minlength="6">
+      <span
+        [class]="showPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+        (click)="showPassword = !showPassword"></span>
+    </div>
+
+    <div class="error" [class.visible]="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+      <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+      <span *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters</span>
+      <span *ngIf="!(passwordRef.invalid && (passwordRef.touched || f.submitted))">&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="remember-forgot">
+    <label class="remember-me">
+      <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe">
+      <span>Remember me</span>
+    </label>
+
+    <a routerLink="/forgot-password" class="forgot-password">Forgot password</a>
+  </div>
+
+  <button type="submit" [disabled]="f.invalid">Sign In</button>
+
+  <div class="alternative">
+    <div class="social-buttons">
+      <button
+        type="button"
+        class="social-btn"
+        [disabled]="isGoogleLoading"
+        (click)="loginWithGoogle()">
+        <span class="icon icon-google" aria-hidden="true"></span>
+        <span>Sign in with Google</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="signup-link">
+    Don't have an account?
+    <a routerLink="/register"><strong>Sign Up</strong></a>
+  </div>
+</form>

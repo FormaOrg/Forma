@@ -1,0 +1,148 @@
+:host {
+  display: block;
+}
+
+.orders-table {
+  background: #ffffff;
+  overflow: hidden;
+  border-radius: 0 0 16px 16px;
+  border-left: 1px solid rgba(215, 217, 223, 0.95);
+  border-right: 1px solid rgba(215, 217, 223, 0.95);
+  border-bottom: 1px solid rgba(215, 217, 223, 0.95);
+}
+
+.orders-table__head,
+.orders-table__row {
+  display: grid;
+  grid-template-columns: 42px 0.9fr 1.2fr 1.1fr 0.9fr 1fr 0.7fr 84px;
+  align-items: center;
+  gap: 10px;
+}
+
+.orders-table__head {
+  min-height: 32px;
+  padding: 0 14px;
+  background: #f4f5f8;
+  color: #4b5060;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.orders-table__row {
+  min-height: 54px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(225, 227, 236, 0.95);
+  transition: background-color 160ms ease;
+}
+
+.orders-table__row:hover {
+  background: #fafbfe;
+}
+
+.orders-table__row:last-child {
+  border-bottom: none;
+}
+
+.orders-table__cell,
+.orders-status-pill {
+  font-size: 0.74rem;
+}
+
+.orders-table__cell {
+  color: #3e4654;
+  font-weight: 420;
+}
+
+.orders-table__row .orders-table__cell:nth-child(2) {
+  color: #1a2030;
+  font-weight: 560;
+}
+
+.orders-table__row .orders-table__cell:nth-child(3),
+.orders-table__row .orders-table__cell:nth-child(4) {
+  line-height: 1.35;
+}
+
+.orders-table__row .orders-table__cell:last-child {
+  color: #111111;
+  font-weight: 560;
+}
+
+.orders-table__cell--check {
+  display: inline-flex;
+  align-items: center;
+}
+
+.orders-table__cell--action {
+  justify-self: end;
+}
+
+.orders-table__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.orders-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #dff5e7;
+  color: #4f8f66;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.orders-status-pill--pending {
+  background: #fff1df;
+  color: #ba6b2e;
+}
+
+.orders-status-pill--refunded {
+  background: #ffe5e8;
+  color: #c15367;
+}
+
+.orders-status-pill--outline {
+  background: #eef0ff;
+  color: #5f5dd4;
+}
+
+.orders-status-pill--packing {
+  background: rgba(117, 102, 255, 0.1);
+}
+
+.orders-status-pill--hold {
+  background: rgba(240, 138, 0, 0.12);
+  color: #b96d28;
+}
+
+@media (max-width: 768px) {
+  .orders-table__head {
+    display: none;
+  }
+
+  .orders-table__row {
+    grid-template-columns: 28px 1fr 1fr;
+    gap: 10px 12px;
+    padding: 12px 14px;
+    min-height: auto;
+  }
+
+  .orders-table__cell--action {
+    justify-self: start;
+  }
+}

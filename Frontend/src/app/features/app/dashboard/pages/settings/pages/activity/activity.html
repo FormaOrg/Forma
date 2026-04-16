@@ -1,0 +1,330 @@
+<div #profileContainer class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">{{ 'settings.activity.title' | t }}</h1>
+    <p class="profile-subtitle">{{ 'settings.activity.subtitle' | t }}</p>
+  </div>
+
+  <!-- Active Sessions Section -->
+  <div class="profile-section">
+    <div class="section-header">
+      <h2 class="section-title">{{ 'settings.activity.sessions.title' | t }}</h2>
+      @if (activeSessions.length > 1) {
+        <button type="button" class="btn btn-secondary btn-sm" (click)="signOutAllOtherSessions()" [disabled]="isSigningOutAll">
+          {{ isSigningOutAll ? ('settings.activity.sessions.signingOut' | t) : ('settings.activity.sessions.signOutOthers' | t) }}
+        </button>
+      }
+    </div>
+    <div class="section-content">
+      @if (isLoadingSessions) {
+        <div class="activity-skeleton-list">
+          @for (_ of [1, 2]; track $index) {
+            <div class="activity-skeleton-card">
+              <div class="activity-skeleton-header">
+                <div class="activity-skeleton-left">
+                  <div class="activity-skeleton-box activity-skeleton-box--icon"></div>
+                  <div class="activity-skeleton-copy">
+                    <div class="activity-skeleton-line activity-skeleton-line--title"></div>
+                    <div class="activity-skeleton-line activity-skeleton-line--text"></div>
+                  </div>
+                </div>
+                <div class="activity-skeleton-box activity-skeleton-box--button"></div>
+              </div>
+              <div class="activity-skeleton-details">
+                @for (__ of [1, 2, 3]; track $index) {
+                  <div class="activity-skeleton-field">
+                    <div class="activity-skeleton-line activity-skeleton-line--label"></div>
+                    <div class="activity-skeleton-line activity-skeleton-line--value"></div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (activeSessions.length === 0) {
+        <div class="empty-state">
+          <p>{{ 'settings.activity.sessions.empty' | t }}</p>
+        </div>
+      } @else {
+        <div class="sessions-list">
+          @for (session of activeSessions; track session.id) {
+            <div class="session-card" [class.current]="session.isCurrent">
+              <div class="session-header">
+                <div class="session-info">
+                  <div class="device-icon" [class]="'device-' + session.deviceType.toLowerCase()">
+                    @if (session.deviceType === 'Desktop') {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M7 19H17M9 16V19M15 16V19M5 5H19C20.1046 5 21 5.89543 21 7V14C21 15.1046 20.1046 16 19 16H5C3.89543 16 3 15.1046 3 14V7C3 5.89543 3.89543 5 5 5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    } @else if (session.deviceType === 'Mobile') {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="2" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    }
+                  </div>
+                  <div class="device-details">
+                    <h3 class="device-name">
+                      {{ session.deviceName }}
+                      @if (session.isCurrent) {
+                        <span class="badge badge-current">{{ 'settings.activity.sessions.current' | t }}</span>
+                      }
+                    </h3>
+                    <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
+                  </div>
+                </div>
+                @if (!session.isCurrent) {
+                  <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
+                    {{ 'common.signOut' | t }}
+                  </button>
+                }
+              </div>
+              <div class="session-details">
+                <div class="detail-item">
+                  <span class="detail-label">{{ 'settings.activity.details.location' | t }}</span>
+                  <span class="detail-value">{{ session.location }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">{{ 'settings.activity.details.ip' | t }}</span>
+                  <span class="detail-value">{{ session.ipAddress }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">{{ 'settings.activity.details.lastActive' | t }}</span>
+                  <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        @if (activeSessions.length > 5) {
+          <div class="section-footer">
+            <button type="button" class="btn btn-secondary" (click)="openSessionsModal()">
+              {{ 'common.seeMore' | t }}
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Sessions Modal -->
+  @if (showSessionsModal) {
+    <div class="modal-overlay" (click)="closeSessionsModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ 'settings.activity.sessions.modalTitle' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeSessionsModal()" [attr.aria-label]="'common.close' | t">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="modal-filters">
+            <div class="filter-group">
+              <label class="filter-label">{{ 'settings.activity.filters.deviceType' | t }}</label>
+              <select [(ngModel)]="sessionsFilterDeviceType" class="filter-select">
+                <option value="all">{{ 'settings.activity.filters.allDevices' | t }}</option>
+                <option value="Desktop">{{ 'settings.activity.filters.desktop' | t }}</option>
+                <option value="Mobile">{{ 'settings.activity.filters.mobile' | t }}</option>
+                <option value="Tablet">{{ 'settings.activity.filters.tablet' | t }}</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetSessionFilters()">{{ 'common.resetFilters' | t }}</button>
+          </div>
+          <!-- Sessions List -->
+          @if (filteredSessions.length === 0) {
+            <div class="empty-state">
+              <p>{{ 'settings.activity.sessions.noMatch' | t }}</p>
+            </div>
+          } @else {
+            <div class="sessions-list modal-sessions-list">
+              @for (session of filteredSessions; track session.id) {
+                <div class="session-card" [class.current]="session.isCurrent">
+                  <div class="session-header">
+                    <div class="session-info">
+                      <div class="device-icon" [class]="'device-' + session.deviceType.toLowerCase()">
+                        @if (session.deviceType === 'Desktop') {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 19H17M9 16V19M15 16V19M5 5H19C20.1046 5 21 5.89543 21 7V14C21 15.1046 20.1046 16 19 16H5C3.89543 16 3 15.1046 3 14V7C3 5.89543 3.89543 5 5 5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        } @else if (session.deviceType === 'Mobile') {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        } @else {
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="2" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M9 20h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        }
+                      </div>
+                      <div class="device-details">
+                        <h3 class="device-name">
+                          {{ session.deviceName }}
+                          @if (session.isCurrent) {
+                            <span class="badge badge-current">{{ 'settings.activity.sessions.current' | t }}</span>
+                          }
+                        </h3>
+                        <p class="device-meta">{{ session.browser }} • {{ session.os }}</p>
+                      </div>
+                    </div>
+                    @if (!session.isCurrent) {
+                      <button type="button" class="btn btn-outline btn-sm" (click)="signOutSession(session.id)">
+                        {{ 'common.signOut' | t }}
+                      </button>
+                    }
+                  </div>
+                  <div class="session-details">
+                    <div class="detail-item">
+                      <span class="detail-label">{{ 'settings.activity.details.location' | t }}</span>
+                      <span class="detail-value">{{ session.location }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">{{ 'settings.activity.details.ip' | t }}</span>
+                      <span class="detail-value">{{ session.ipAddress }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">{{ 'settings.activity.details.lastActive' | t }}</span>
+                      <span class="detail-value">{{ formatTimeAgo(session.lastActive) }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Login History Section -->
+  <div class="profile-section">
+    <div class="section-header section-header--simple">
+      <h2 class="section-title">{{ 'settings.activity.history.title' | t }}</h2>
+    </div>
+    <div class="section-content">
+      @if (isLoadingLoginHistory) {
+        <div class="activity-skeleton-list">
+          @for (_ of [1, 2, 3]; track $index) {
+            <div class="activity-skeleton-history">
+              <div class="activity-skeleton-box activity-skeleton-box--status"></div>
+              <div class="activity-skeleton-copy activity-skeleton-copy--grow">
+                <div class="activity-skeleton-line activity-skeleton-line--title"></div>
+                <div class="activity-skeleton-line activity-skeleton-line--text"></div>
+                <div class="activity-skeleton-line activity-skeleton-line--wide"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (loginHistory.length === 0) {
+        <div class="empty-state">
+          <p>{{ 'settings.activity.history.empty' | t }}</p>
+        </div>
+      } @else {
+        <div class="login-history-list">
+          @for (login of loginHistory.slice(0, 5); track login.id) {
+            <div class="login-record">
+              <div class="login-device-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 19H17M9 16V19M15 16V19M5 5H19C20.1046 5 21 5.89543 21 7V14C21 15.1046 20.1046 16 19 16H5C3.89543 16 3 15.1046 3 14V7C3 5.89543 3.89543 5 5 5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="login-info">
+                <div class="login-header">
+                  <div>
+                    <h4 class="login-device">{{ login.deviceName }}</h4>
+                    <p class="login-meta">{{ login.browser }} • {{ login.os }}</p>
+                  </div>
+                  <div class="login-time">
+                    <span class="login-date">{{ formatDate(login.timestamp) }}</span>
+                  </div>
+                </div>
+                <div class="login-details">
+                  <span class="login-detail">{{ login.location }}</span>
+                  <span class="login-detail">{{ 'settings.activity.history.ipPrefix' | t }} {{ login.ipAddress }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        @if (loginHistory.length > 5) {
+          <div class="section-footer">
+            <button type="button" class="btn btn-secondary" (click)="openLoginHistoryModal()">
+              {{ 'common.seeMore' | t }}
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Login History Modal -->
+  @if (showLoginHistoryModal) {
+    <div class="modal-overlay" (click)="closeLoginHistoryModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ 'settings.activity.history.modalTitle' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeLoginHistoryModal()" [attr.aria-label]="'common.close' | t">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div style="border-bottom: 1px solid #eee; width: 100%; margin-bottom: 0;"></div>
+        <div class="modal-body">
+          <!-- Filters -->
+          <div class="modal-filters">
+            <div class="filter-group">
+              <label class="filter-label">{{ 'settings.activity.filters.dateRange' | t }}</label>
+              <select [(ngModel)]="loginFilterDateRange" class="filter-select">
+                <option value="7days">{{ 'settings.activity.filters.last7Days' | t }}</option>
+                <option value="30days">{{ 'settings.activity.filters.last30Days' | t }}</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" (click)="resetLoginFilters()">{{ 'common.resetFilters' | t }}</button>
+          </div>
+          <!-- Login History List -->
+          @if (filteredLoginHistory.length === 0) {
+            <div class="empty-state">
+              <p>{{ 'settings.activity.history.noMatch' | t }}</p>
+            </div>
+          } @else {
+            <div class="login-history-list modal-login-history-list">
+              @for (login of filteredLoginHistory; track login.id) {
+                <div class="login-record">
+                  <div class="login-device-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 19H17M9 16V19M15 16V19M5 5H19C20.1046 5 21 5.89543 21 7V14C21 15.1046 20.1046 16 19 16H5C3.89543 16 3 15.1046 3 14V7C3 5.89543 3.89543 5 5 5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="login-info">
+                    <div class="login-header">
+                      <div>
+                        <h4 class="login-device">{{ login.deviceName }}</h4>
+                        <p class="login-meta">{{ login.browser }} • {{ login.os }}</p>
+                      </div>
+                      <div class="login-time">
+                        <span class="login-date">{{ formatDate(login.timestamp) }}</span>
+                      </div>
+                    </div>
+                    <div class="login-details">
+                      <span class="login-detail">{{ login.location }}</span>
+                      <span class="login-detail">{{ 'settings.activity.history.ipPrefix' | t }} {{ login.ipAddress }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }

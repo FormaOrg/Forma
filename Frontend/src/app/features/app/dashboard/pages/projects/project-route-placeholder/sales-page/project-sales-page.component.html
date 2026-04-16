@@ -1,0 +1,106 @@
+<section class="sales-page">
+  <section class="sales-page__hero">
+    <div class="sales-page__hero-copy">
+      <p class="sales-page__eyebrow">Local order operations</p>
+      <h1 class="sales-page__title">Sales</h1>
+      <p class="sales-page__subtitle">
+        Track order revenue, delivery workload, and what local shop owners need to fulfill and deliver on time.
+      </p>
+    </div>
+
+    <div class="sales-page__hero-actions">
+      @for (range of rangeOptions; track range.value) {
+        <button
+          type="button"
+          class="sales-page__hero-action"
+          [class.sales-page__hero-action--active]="query.range === range.value"
+          (click)="rangeChange.emit(range.value)"
+        >
+          {{ range.label }}
+        </button>
+      }
+      <button
+        type="button"
+        class="sales-page__hero-action"
+        [class.sales-page__hero-action--active]="query.compare"
+        (click)="compareToggle.emit()"
+      >
+        Compare period
+      </button>
+      <button type="button" class="sales-page__hero-action" (click)="refresh.emit()">Refresh</button>
+      <button type="button" class="sales-page__hero-action" [disabled]="isExporting" (click)="export.emit()">
+        {{ isExporting ? 'Exporting...' : 'Export' }}
+      </button>
+    </div>
+  </section>
+
+  @if (isLoading && !hasLoaded) {
+    <section class="sales-skeleton" aria-hidden="true">
+      <div class="sales-skeleton__kpis">
+        @for (item of skeletonCards; track item) {
+          <div class="sales-skeleton__card"></div>
+        }
+      </div>
+      <div class="sales-skeleton__panel sales-skeleton__panel--large"></div>
+      <div class="sales-skeleton__grid">
+        <div class="sales-skeleton__panel"></div>
+        <div class="sales-skeleton__panel"></div>
+      </div>
+    </section>
+  } @else if (errorMessage && !hasData) {
+    <section class="sales-feedback sales-feedback--error">
+      <h2 class="sales-feedback__title">Unable to load sales data</h2>
+      <p class="sales-feedback__copy">{{ errorMessage }}</p>
+      <button type="button" class="sales-feedback__action" (click)="retry.emit()">Try again</button>
+    </section>
+  } @else if (hasLoaded && !hasData) {
+    <section class="sales-feedback">
+      <h2 class="sales-feedback__title">No sales data yet</h2>
+      <p class="sales-feedback__copy">
+        Once this store starts receiving real orders, revenue trends, delivery stats, and top products will appear here.
+      </p>
+      <button type="button" class="sales-feedback__action" (click)="refresh.emit()">Refresh data</button>
+    </section>
+  } @else {
+    <app-project-sales-kpi-grid [kpis]="kpis" />
+
+    <app-project-sales-orders-panel
+      [kpis]="kpis"
+      [rangeLabel]="rangeLabel"
+      [query]="query"
+      [filterOptions]="filterOptions"
+      [sortOptions]="sortOptions"
+      [searchValue]="searchValue"
+      [hasOrders]="hasOrders"
+      [orders]="orders"
+      [selectedOrderIds]="selectedOrderIds"
+      [allVisibleOrdersSelected]="allVisibleOrdersSelected"
+      [page]="ordersPage"
+      [totalPages]="ordersTotalPages"
+      [totalElements]="ordersTotalElements"
+      [isExporting]="ordersExporting"
+      [isDeleting]="ordersDeleting"
+      (refresh)="refresh.emit()"
+      (export)="export.emit()"
+      (deleteSelected)="deleteSelectedOrders.emit()"
+      (filterChange)="filterChange.emit($event)"
+      (sortChange)="sortChange.emit($event)"
+      (searchChange)="searchChange.emit($event)"
+      (toggleAllOrders)="toggleAllOrders.emit($event)"
+      (toggleOrderSelection)="toggleOrderSelection.emit($event)"
+      (pageChange)="pageChange.emit($event)"
+      (createOrder)="createOrder.emit()"
+      (editOrder)="editOrder.emit($event)"
+    />
+
+    <section class="sales-page__main-grid">
+      <app-project-sales-chart [trend]="trend" />
+      <app-project-sales-delivery-panel [items]="deliveryStats" />
+    </section>
+
+    <section class="sales-page__secondary-grid">
+      <app-project-sales-products-panel [products]="topProducts" />
+      <app-project-sales-focus-panel [items]="focusItems" />
+    </section>
+  }
+</section>

@@ -1,0 +1,200 @@
+<header class="app-header">
+  <div class="app-header__left">
+    <button
+      type="button"
+      class="app-header__icon-btn"
+      (click)="onToggleSidebar()"
+      [attr.aria-label]="sidebarCollapsed ? ('app.header.sidebar.expand' | t) : ('app.header.sidebar.collapse' | t)"
+    >
+      @if (sidebarCollapsed == true) {
+        <img src="assets/Logo/collapse.svg" alt="collapse" style="height: 20px;"/>
+      }
+      @else {
+        <img src="assets/Logo/expand.svg" alt="expand"  style="height: 20px;"/>
+      }
+
+      <!-- <app-icon [name]="sidebarCollapsed ? 'menu' : 'panel-left'" [size]="iconSize" /> -->
+    </button>
+
+    <div class="app-header__title-block">
+      <!-- <span class="app-header__crumb">Workspace</span> -->
+      <span class="app-header__title" aria-current="page">{{ pageTitle() }}</span>
+    </div>
+  </div>
+
+  <div class="app-header__center">
+    <button
+      type="button"
+      class="app-header__search"
+      (mousedown)="$event.preventDefault()"
+      (click)="openCommandPalette()"
+    >
+      <span class="app-header__search-icon" aria-hidden="true">
+        <app-icon name="search" [size]="18" />
+      </span>
+      <span class="app-header__search-input">{{ search.placeholderKey | t }}</span>
+      <kbd class="app-header__kbd">{{ search.shortcut }}</kbd>
+    </button>
+  </div>
+
+  <div class="app-header__right">
+
+    @for (button of actionButtons; track button.label) {
+      <a
+        class="app-header__action"
+        [class.app-header__action--primary]="button.variant === 'primary'"
+        [class.app-header__action--secondary]="button.variant === 'secondary'"
+        [routerLink]="button.route"
+      >
+        @if (button.variant === 'primary') {
+          <app-icon name="sparkles" [size]="16" class="app-header__action-icon" />
+        }
+        <span>{{ button.labelKey | t }}</span>
+      </a>
+    }
+
+    <div class="app-header__profile" data-profile-anchor>
+      <button
+        type="button"
+        class="app-header__avatar-btn"
+        (click)="toggleProfileMenu($event)"
+        [class.app-header__avatar-btn--open]="isProfileMenuOpen"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="isProfileMenuOpen"
+      >
+        @if (profile.avatar) {
+          <img
+            [src]="profile.avatar"
+            [alt]="profile.name"
+            class="app-header__avatar"
+            width="36"
+            height="36"
+          />
+        } @else {
+          <span class="app-header__avatar-placeholder" aria-hidden="true">
+            <app-icon name="user" [size]="20" />
+          </span>
+        }
+      </button>
+
+      @if (isProfileMenuOpen) {
+        <div class="app-header__dropdown" role="menu" (click)="$event.stopPropagation()">
+          <div class="app-header__dropdown-summary">
+            @if (profile.avatar) {
+              <img
+                [src]="profile.avatar"
+                [alt]=""
+                width="40"
+                height="40"
+                class="app-header__dropdown-avatar"
+              />
+            } @else {
+              <span class="app-header__dropdown-avatar-placeholder" aria-hidden="true">
+                <app-icon name="user" [size]="18" />
+              </span>
+            }
+            <div class="app-header__dropdown-meta">
+              <span class="app-header__dropdown-name">{{ profile.name }}</span>
+              <span class="app-header__dropdown-role">{{ profile.role }}</span>
+            </div>
+          </div>
+          <div class="app-header__dropdown-rule" aria-hidden="true"></div>
+
+          @for (item of profileMenuItems; track item.label) {
+            @if (item.route && item.action !== 'logout') {
+              <a
+                class="app-header__dropdown-row"
+                [class.app-header__dropdown-row--danger]="item.danger"
+                [routerLink]="item.route"
+                role="menuitem"
+                (click)="onProfileAction(item)"
+              >
+                <span class="app-header__dropdown-ic">
+                  <app-icon [name]="item.icon" [size]="18" />
+                </span>
+                <span>{{ item.labelKey | t }}</span>
+              </a>
+            } @else {
+              <button
+                type="button"
+                class="app-header__dropdown-row app-header__dropdown-row--btn"
+                [class.app-header__dropdown-row--danger]="item.danger"
+                role="menuitem"
+                (click)="onProfileAction(item)"
+              >
+                <span class="app-header__dropdown-ic">
+                  <app-icon [name]="item.icon" [size]="18" />
+                </span>
+                <span>{{ item.labelKey | t }}</span>
+              </button>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+</header>
+
+@if (isCommandPaletteOpen) {
+  <div class="app-header__command-backdrop" (click)="closeCommandPalette()">
+    <div class="app-header__command-palette" (click)="$event.stopPropagation()">
+      <div class="app-header__command-shell">
+        <div class="app-header__command-search">
+          <span class="app-header__command-icon" aria-hidden="true">
+            <app-icon name="search" [size]="18" />
+          </span>
+          <input
+            #commandPaletteInput
+            type="text"
+            class="app-header__command-input"
+            [ngModel]="commandQuery()"
+            (ngModelChange)="updateCommandQuery($event)"
+            (keydown)="onCommandPaletteKeydown($event)"
+            [placeholder]="'app.command.input' | t"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div #commandResults class="app-header__command-results">
+          @if (filteredCommandItems.length === 0) {
+            <div class="app-header__command-empty">
+              <span class="app-header__command-empty-title">{{ 'app.command.empty.title' | t }}</span>
+              <span class="app-header__command-empty-copy">{{ 'app.command.empty.copy' | t }}</span>
+            </div>
+          } @else {
+            @for (section of groupedCommandItems; track section.group) {
+              <div class="app-header__command-group">
+                <div class="app-header__command-group-label">{{ section.group === 'Pages' ? ('app.command.group.pages' | t) : ('app.command.group.actions' | t) }}</div>
+
+                @for (item of section.items; track item.id) {
+                  <button
+                    type="button"
+                    class="app-header__command-item"
+                    [class.app-header__command-item--active]="isCommandHighlighted(item)"
+                    (mouseenter)="highlightedIndex.set(filteredCommandItems.indexOf(item))"
+                    (click)="executeCommand(item)"
+                  >
+                    <span class="app-header__command-item-icon">
+                      <app-icon [name]="item.icon" [size]="18" />
+                    </span>
+                    <span class="app-header__command-item-title">{{ item.title }}</span>
+                    @if (item.hint) {
+                      <span class="app-header__command-item-hint">{{ item.hint }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          }
+        </div>
+
+        <div class="app-header__command-footer">
+          <span><kbd>Enter</kbd> {{ 'app.command.footer.open' | t }}</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> {{ 'app.command.footer.move' | t }}</span>
+          <span><kbd>Esc</kbd> {{ 'app.command.footer.close' | t }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

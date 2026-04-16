@@ -19,7 +19,7 @@ interface StageCard {
 }
 
 @Component({
-  selector: 'app-learning-stages',
+  selector: 'app-tutorials-learning-stages',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './learning-stages.html',

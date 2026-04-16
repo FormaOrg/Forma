@@ -1,11 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface UploadResponse {
+  id?: number;
   url: string;
   message: string;
+  publicId?: string;
+}
+
+export interface ProjectMediaUploadResponse extends UploadResponse {
+  id: number;
+  fileName: string;
+  fileUrl: string;
+  type: 'IMAGE' | 'VIDEO' | 'DOCUMENT';
+  fileSize: number;
+  uploadedAt: string;
 }
 
 export interface ValidationResult {
@@ -33,13 +45,34 @@ export class UploadService {
     return this.http.post<UploadResponse>(`${this.apiUrl}/avatar`, formData);
   }
 
+  deleteAvatar(): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/avatar`);
+  }
+
   // ── Project media (images used inside site pages) ──────
 
-  uploadProjectMedia(file: File, projectId: number): Observable<UploadResponse> {
+  uploadProjectMedia(file: File, projectId: number): Observable<ProjectMediaUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('projectId', projectId.toString());
-    return this.http.post<UploadResponse>(`${this.apiUrl}/media`, formData);
+    return this.http
+      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${environment.apiUrl}/projects/${projectId}/media`, formData)
+      .pipe(
+        map((response) => ({
+          ...response,
+          url: response.fileUrl,
+          message: 'Media uploaded successfully',
+        }))
+      );
+  }
+
+  uploadProjectLogo(file: File, projectId: number): Observable<UploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<UploadResponse>(`${this.apiUrl}/projects/${projectId}/logo`, formData);
+  }
+
+  deleteProjectLogo(projectId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/projects/${projectId}/logo`);
   }
 
   // ── Design asset (Figma-style visual designer) ─────────
@@ -49,6 +82,21 @@ export class UploadService {
     formData.append('file', file);
     formData.append('projectId', projectId.toString());
     return this.http.post<UploadResponse>(`${this.apiUrl}/design-asset`, formData);
+  }
+
+  importProjectMedia(
+    projectId: number,
+    payload: { sourceUrl: string; fileName?: string }
+  ): Observable<ProjectMediaUploadResponse> {
+    return this.http
+      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${environment.apiUrl}/projects/${projectId}/media/import`, payload)
+      .pipe(
+        map((response) => ({
+          ...response,
+          url: response.fileUrl,
+          message: 'Media imported successfully',
+        }))
+      );
   }
 
   // ── Delete ─────────────────────────────────────────────
@@ -67,6 +115,10 @@ export class UploadService {
 
   validateMedia(file: File): ValidationResult {
     return this.validateFile(file, this.MAX_MEDIA_SIZE, 'Image');
+  }
+
+  validateProjectLogo(file: File): ValidationResult {
+    return this.validateAvatar(file);
   }
 
   private validateFile(file: File, maxSize: number, label: string): ValidationResult {

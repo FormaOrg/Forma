@@ -1,0 +1,713 @@
+app-project-customers-route {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page {
+  box-sizing: border-box;
+  max-width: 1360px;
+  width: min(100%, 1360px);
+  min-width: 0;
+  padding: 24px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-x: clip;
+}
+
+app-project-customers-route .customers-page__panel,
+app-project-customers-route .customers-page__card,
+app-project-customers-route .customers-page__state,
+app-project-customers-route .customers-page__editor {
+  border-radius: 16px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 6px 18px rgba(17, 17, 17, 0.03);
+}
+
+app-project-customers-route .customers-page__hero,
+app-project-customers-route .customers-page__main,
+app-project-customers-route .customers-page__sidebar,
+app-project-customers-route .customers-page__editor {
+  padding: 18px 20px;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__hero,
+app-project-customers-route .customers-page__title-row,
+app-project-customers-route .customers-page__hero-actions,
+app-project-customers-route .customers-page__section-head,
+app-project-customers-route .customers-page__card-head,
+app-project-customers-route .customers-page__footer,
+app-project-customers-route .customers-page__editor-head,
+app-project-customers-route .customers-page__form-split {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+app-project-customers-route .customers-page__hero-actions,
+app-project-customers-route .customers-page__title-row,
+app-project-customers-route .customers-page__badges,
+app-project-customers-route .customers-page__editor-footer {
+  flex-wrap: wrap;
+}
+
+app-project-customers-route .customers-page__hero {
+  align-items: center;
+}
+
+app-project-customers-route .customers-page__hero-actions {
+  align-items: center;
+  align-self: center;
+}
+
+app-project-customers-route .customers-page__eyebrow,
+app-project-customers-route .customers-page__section-label {
+  margin: 0 0 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+app-project-customers-route .customers-page__title,
+app-project-customers-route .customers-page__section-head h2,
+app-project-customers-route .customers-page__card-title-group h3,
+app-project-customers-route .customers-page__state h2,
+app-project-customers-route .customers-page__editor-head h2 {
+  margin: 0;
+  color: #111111;
+}
+
+app-project-customers-route .customers-page__title {
+  font-size: 2rem;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+app-project-customers-route .customers-page__subtitle,
+app-project-customers-route .customers-page__state p,
+app-project-customers-route .customers-page__card-title-group p,
+app-project-customers-route .customers-page__address,
+app-project-customers-route .customers-page__filter-summary span,
+app-project-customers-route .customers-page__insight small,
+app-project-customers-route .customers-page__stat small,
+app-project-customers-route .customers-page__footer-copy span,
+app-project-customers-route .customers-page__form label span,
+app-project-customers-route .customers-page__section-head p {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(11, 11, 18, 0.64);
+}
+
+app-project-customers-route .customers-page__results-pill,
+app-project-customers-route .customers-page__content-note,
+app-project-customers-route .customers-page__badges span {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: #f7f8fb;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-customers-route .customers-page__hero-action,
+app-project-customers-route .customers-page__edit,
+app-project-customers-route .customers-page__danger,
+app-project-customers-route .customers-page__state button,
+app-project-customers-route .customers-page__primary,
+app-project-customers-route .customers-page__secondary {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(117, 102, 255, 0.24);
+  background: #ffffff;
+  color: #7566ff;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+app-project-customers-route .customers-page__hero-action--primary,
+app-project-customers-route .customers-page__primary {
+  border-color: #7566ff;
+  background: #7566ff;
+  color: #ffffff;
+}
+
+app-project-customers-route .customers-page__hero-action--secondary,
+app-project-customers-route .customers-page__secondary,
+app-project-customers-route .customers-page__danger {
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-customers-route .customers-page__hero-action--primary:hover,
+app-project-customers-route .customers-page__primary:hover {
+  border-color: #7566ff;
+  background: #6757f6;
+  color: #ffffff;
+}
+
+app-project-customers-route .customers-page__text-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #7566ff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+app-project-customers-route .customers-page__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+app-project-customers-route .customers-page__stat {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-project-customers-route .customers-page__stat span,
+app-project-customers-route .customers-page__insight span,
+app-project-customers-route .customers-page__meta dt,
+app-project-customers-route .customers-page__search span,
+app-project-customers-route .customers-page__zone span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-customers-route .customers-page__stat strong,
+app-project-customers-route .customers-page__insight strong {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #111111;
+}
+
+app-project-customers-route .customers-page__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.82fr);
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__main,
+app-project-customers-route .customers-page__sidebar,
+app-project-customers-route .customers-page__toolbar,
+app-project-customers-route .customers-page__list,
+app-project-customers-route .customers-page__card,
+app-project-customers-route .customers-page__card-main,
+app-project-customers-route .customers-page__insight-list,
+app-project-customers-route .customers-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__search,
+app-project-customers-route .customers-page__zone,
+app-project-customers-route .customers-page__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+app-project-customers-route .customers-page__toolbar {
+  padding-bottom: 4px;
+}
+
+app-project-customers-route .customers-page__search input,
+app-project-customers-route .customers-page__zone select,
+app-project-customers-route .customers-page__form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(211, 216, 226, 0.9);
+  background: #ffffff;
+  padding: 0 14px;
+  font: inherit;
+  color: #111111;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+app-project-customers-route .customers-page__search input::placeholder,
+app-project-customers-route .customers-page__form input::placeholder {
+  color: rgba(17, 24, 39, 0.42);
+}
+
+app-project-customers-route .customers-page__search input:focus,
+app-project-customers-route .customers-page__zone select:focus,
+app-project-customers-route .customers-page__form input:focus {
+  outline: none;
+  border-color: rgba(117, 102, 255, 0.52);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.12);
+}
+
+app-project-customers-route .customers-page__filter-summary,
+app-project-customers-route .customers-page__insight,
+app-project-customers-route .customers-page__footer-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+app-project-customers-route .customers-page__card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+app-project-customers-route .customers-page__action-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+app-project-customers-route .customers-page__action-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+app-project-customers-route .customers-page__edit,
+app-project-customers-route .customers-page__danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+app-project-customers-route .customers-page__edit {
+  border-color: rgba(117, 102, 255, 0.24);
+  background: rgba(117, 102, 255, 0.08);
+  color: #7566ff;
+}
+
+app-project-customers-route .customers-page__edit:hover {
+  border-color: rgba(117, 102, 255, 0.32);
+  background: rgba(117, 102, 255, 0.12);
+}
+
+app-project-customers-route .customers-page__danger {
+  border-color: rgba(255, 118, 118, 0.2);
+  background: rgba(255, 118, 118, 0.08);
+  color: #d85e5e;
+}
+
+app-project-customers-route .customers-page__danger:hover {
+  border-color: rgba(255, 118, 118, 0.28);
+  background: rgba(255, 118, 118, 0.12);
+}
+
+app-project-customers-route .customers-page__state {
+  padding: 28px;
+  text-align: center;
+}
+
+app-project-customers-route .customers-page__state--loading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-customers-route .customers-page__skeleton {
+  height: 120px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.18), rgba(117, 102, 255, 0.08));
+  background-size: 200% 100%;
+  animation: customers-page-shimmer 1.4s linear infinite;
+}
+
+app-project-customers-route .customers-page__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__card {
+  padding: 18px 20px;
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__card-top {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+app-project-customers-route .customers-page__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: #f7f6ff;
+  color: #7566ff;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+app-project-customers-route .customers-page__card-title-group h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+app-project-customers-route .customers-page__meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+app-project-customers-route .customers-page__meta div {
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__meta dd,
+app-project-customers-route .customers-page__footer-copy strong {
+  display: block;
+  margin: 4px 0 0;
+  color: #111111;
+  font-weight: 600;
+}
+
+app-project-customers-route .customers-page__address {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+}
+
+app-project-customers-route .customers-page__footer {
+  align-items: flex-end;
+}
+
+app-project-customers-route .customers-page__sidebar {
+  gap: 12px;
+}
+
+app-project-customers-route .customers-page__insight {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+}
+
+app-project-customers-route .customers-page__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.26);
+  z-index: 20;
+  animation: customersEditorBackdropIn 220ms ease;
+}
+
+app-project-customers-route .customers-page__editor {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+  width: min(440px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 18px;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  transform-origin: right center;
+  animation: customersEditorSlideIn 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+app-project-customers-route .customers-page__backdrop.is-closing {
+  animation: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+app-project-customers-route .customers-page__editor.is-closing {
+  animation: none;
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+app-project-customers-route .customers-page__editor-head {
+  align-items: flex-start;
+  padding: 4px 2px 2px;
+}
+
+app-project-customers-route .customers-page__editor-copy {
+  min-width: 0;
+}
+
+app-project-customers-route .customers-page__editor-subtitle {
+  margin: 8px 0 0;
+  color: rgba(11, 11, 18, 0.64);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+app-project-customers-route .customers-page__editor .customers-page__form label {
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-customers-route .customers-page__form {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+app-project-customers-route .customers-page__editor-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 2px;
+}
+
+app-project-customers-route .customers-page__editor .customers-page__form label span {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: inherit;
+}
+
+app-project-customers-route .customers-page__editor .customers-page__form input {
+  min-height: 0;
+  padding: 11px 14px;
+}
+
+app-project-customers-route .customers-page__editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(225, 227, 236, 0.9);
+  flex-shrink: 0;
+}
+
+@keyframes customersEditorBackdropIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes customersEditorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+app-project-customers-route .customers-page__editor-section {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-project-customers-route .customers-page__editor-section-head h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+app-project-customers-route .customers-page__editor-section-head p {
+  margin: 4px 0 0;
+  color: rgba(11, 11, 18, 0.58);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+@keyframes customers-page-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.theme-dark app-project-customers-route .customers-page__panel,
+.theme-dark app-project-customers-route .customers-page__card,
+.theme-dark app-project-customers-route .customers-page__insight,
+.theme-dark app-project-customers-route .customers-page__state,
+.theme-dark app-project-customers-route .customers-page__editor,
+.theme-dark app-project-customers-route .customers-page__editor-section,
+.theme-dark app-project-customers-route .customers-page__address {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+.theme-dark app-project-customers-route .customers-page__title,
+.theme-dark app-project-customers-route .customers-page__section-head h2,
+.theme-dark app-project-customers-route .customers-page__card-title-group h3,
+.theme-dark app-project-customers-route .customers-page__state h2,
+.theme-dark app-project-customers-route .customers-page__editor-head h2,
+.theme-dark app-project-customers-route .customers-page__editor-section-head h3,
+.theme-dark app-project-customers-route .customers-page__stat strong,
+.theme-dark app-project-customers-route .customers-page__insight strong,
+.theme-dark app-project-customers-route .customers-page__meta dd,
+.theme-dark app-project-customers-route .customers-page__footer-copy strong,
+.theme-dark app-project-customers-route .customers-page__search input,
+.theme-dark app-project-customers-route .customers-page__zone select,
+.theme-dark app-project-customers-route .customers-page__form input {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-customers-route .customers-page__subtitle,
+.theme-dark app-project-customers-route .customers-page__state p,
+.theme-dark app-project-customers-route .customers-page__card-title-group p,
+.theme-dark app-project-customers-route .customers-page__editor-subtitle,
+.theme-dark app-project-customers-route .customers-page__address,
+.theme-dark app-project-customers-route .customers-page__filter-summary span,
+.theme-dark app-project-customers-route .customers-page__insight small,
+.theme-dark app-project-customers-route .customers-page__editor-section-head p,
+.theme-dark app-project-customers-route .customers-page__stat span,
+.theme-dark app-project-customers-route .customers-page__stat small,
+.theme-dark app-project-customers-route .customers-page__meta dt,
+.theme-dark app-project-customers-route .customers-page__search span,
+.theme-dark app-project-customers-route .customers-page__zone span,
+.theme-dark app-project-customers-route .customers-page__content-note,
+.theme-dark app-project-customers-route .customers-page__results-pill,
+.theme-dark app-project-customers-route .customers-page__badges span {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-customers-route .customers-page__editor .customers-page__form label {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-customers-route .customers-page__results-pill,
+.theme-dark app-project-customers-route .customers-page__badges span,
+.theme-dark app-project-customers-route .customers-page__search input,
+.theme-dark app-project-customers-route .customers-page__zone select,
+.theme-dark app-project-customers-route .customers-page__form input,
+.theme-dark app-project-customers-route .customers-page__avatar {
+  background: #171e2a;
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-customers-route .customers-page__search input::placeholder,
+.theme-dark app-project-customers-route .customers-page__form input::placeholder {
+  color: rgba(226, 231, 244, 0.36);
+}
+
+.theme-dark app-project-customers-route .customers-page__search input:focus,
+.theme-dark app-project-customers-route .customers-page__zone select:focus,
+.theme-dark app-project-customers-route .customers-page__form input:focus {
+  border-color: rgba(117, 102, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.14);
+}
+
+.theme-dark app-project-customers-route .customers-page__hero-action--primary,
+.theme-dark app-project-customers-route .customers-page__primary {
+  border-color: #7566ff;
+  background: #7566ff;
+  color: #ffffff;
+}
+
+.theme-dark app-project-customers-route .customers-page__editor-footer {
+  border-top-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-customers-route .customers-page__edit {
+  border-color: rgba(117, 102, 255, 0.24);
+  background: rgba(117, 102, 255, 0.14);
+  color: #9b90ff;
+}
+
+.theme-dark app-project-customers-route .customers-page__danger {
+  border-color: rgba(255, 118, 118, 0.2);
+  background: rgba(255, 118, 118, 0.1);
+  color: #ff9898;
+}
+
+@media (max-width: 1100px) {
+  app-project-customers-route .customers-page__stats,
+  app-project-customers-route .customers-page__workspace,
+  app-project-customers-route .customers-page__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  app-project-customers-route .customers-page {
+    padding: 18px 14px 22px;
+  }
+
+  app-project-customers-route .customers-page__hero,
+  app-project-customers-route .customers-page__section-head,
+  app-project-customers-route .customers-page__card-head,
+  app-project-customers-route .customers-page__footer,
+  app-project-customers-route .customers-page__editor-head,
+  app-project-customers-route .customers-page__form-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  app-project-customers-route .customers-page__meta,
+  app-project-customers-route .customers-page__card-top {
+    grid-template-columns: 1fr;
+  }
+
+  app-project-customers-route .customers-page__editor {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}

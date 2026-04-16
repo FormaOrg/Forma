@@ -1,0 +1,197 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   OUTER — tall scroll container
+   height = how long we stay in this section
+   4 cards × 100vh + header room
+   ========================================= */
+
+.sell-outer {
+  height: calc(4 * 100vh + 300px);
+  position: relative;
+  padding-bottom: 84px;
+}
+
+/* =========================================
+   INNER — sticks to viewport
+   This is what stays on screen.
+   Unsticks automatically when outer's bottom
+   passes the viewport top.
+   ========================================= */
+
+.sell-inner {
+  position: sticky;
+  top: 80px; /* clears fixed site header */
+  padding: 40px 84px 0;
+  background: #ffffff;
+}
+
+/* =========================================
+   HEADER — plain flow inside sticky inner
+   ========================================= */
+
+.sell-section__header {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 60px;
+  align-items: start;
+  padding-bottom: 32px;
+}
+
+.sell-section__title {
+  margin: 0;
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 400;
+  color: #111111;
+  line-height: 1.1;
+  max-width: 800px;
+}
+
+.sell-section__subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #444444;
+  line-height: 1.65;
+  padding-top: 8px;
+  padding-right: 30px;
+}
+
+/* =========================================
+   CARDS CONTAINER — relative, fixed height
+   ========================================= */
+
+.sell-cards {
+  position: relative;
+  min-height: 340px;
+}
+
+/* =========================================
+   INDIVIDUAL CARD
+   All cards are stacked in the same spot.
+   Only the active one is visible.
+   ========================================= */
+
+.sell-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  box-shadow:
+    0 -2px 0 rgba(0, 0, 0, 0.04),
+    0 8px 40px rgba(0, 0, 0, 0.08);
+}
+
+.sell-card--visible {
+  opacity: 1;
+  pointer-events: auto;
+  /* Sits on top of others */
+  position: relative;
+}
+
+/* =========================================
+   CARD INNER LAYOUT
+   ========================================= */
+
+.sell-card__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-height: 340px;
+  padding: 70px 140px;
+}
+
+.sell-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sell-card__title {
+  margin: 0;
+  font-size: 3em;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.sell-card__desc {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.sell-card__media {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+}
+
+.sell-card__media img {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1100px) {
+  .sell-inner {
+    padding: 40px 40px 0;
+  }
+
+  .sell-section__header {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .sell-card__inner {
+    padding: 48px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sell-outer {
+    height: auto;
+  }
+
+  .sell-inner {
+    position: relative;
+    top: auto;
+    padding: 40px 20px 0;
+  }
+
+  .sell-card {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    margin-bottom: 24px;
+  }
+
+  .sell-card__inner {
+    grid-template-columns: 1fr;
+    padding: 40px 28px;
+    gap: 32px;
+    min-height: auto;
+  }
+
+  .sell-card__media {
+    justify-content: center;
+  }
+
+  .sell-card__media img {
+    max-height: 200px;
+  }
+}

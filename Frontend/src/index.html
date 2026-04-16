@@ -6,11 +6,138 @@
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <style>
+      html:not(.forma-app-ready) app-root {
+        visibility: hidden;
+      }
+    </style>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        const url = new URL(window.location.href);
+        const state = url.searchParams.get('state');
+        const code = url.searchParams.get('code');
+        const error = url.searchParams.get('error');
+
+        if (!window.opener || !state || !state.startsWith('google-auth:') || (!code && !error)) {
+          return;
+        }
+
+        window.__FORMA_SKIP_BOOTSTRAP__ = true;
+
+        const apiUrl = 'http://localhost:8081/api';
+        const resultKey = 'forma_google_auth_result';
+        const pendingAuthKey = 'forma_google_auth_pending_response';
+        const loginVerificationKey = 'forma_login_verification';
+        const messageType = 'forma-google-auth-result';
+        const channelName = 'forma-google-auth';
+
+        const rememberMe = state.split(':')[2] === '1';
+        const targetRoute = decodeURIComponent(state.split(':')[3] || '/app/home');
+        const redirectUri = url.pathname === '/' ? url.origin : (url.origin + url.pathname.replace(/\/$/, ''));
+
+        const publish = function (payload) {
+          localStorage.setItem(resultKey, JSON.stringify(payload));
+
+          if (payload.success && payload.response) {
+            if (payload.response.requiresLoginVerification && payload.response.loginVerificationToken) {
+              localStorage.setItem(loginVerificationKey, JSON.stringify({
+                token: payload.response.loginVerificationToken,
+                email: payload.response.user.email,
+                message: payload.response.message,
+                rememberMe: rememberMe,
+                returnUrl: targetRoute
+              }));
+            } else {
+              localStorage.setItem(pendingAuthKey, JSON.stringify({
+                response: payload.response,
+                rememberMe: rememberMe
+              }));
+            }
+          }
+
+          try {
+            if (typeof BroadcastChannel !== 'undefined') {
+              const channel = new BroadcastChannel(channelName);
+              channel.postMessage(payload);
+              channel.close();
+            }
+          } catch (_) {}
+
+          try {
+            window.opener.postMessage(
+              { type: messageType, payload: payload },
+              window.location.origin
+            );
+          } catch (_) {}
+
+          const nextUrl = payload.success && payload.response
+            ? (payload.response.requiresLoginVerification && payload.response.loginVerificationToken
+              ? '/login-verification?returnUrl=' + encodeURIComponent(targetRoute)
+              : targetRoute)
+            : '/login';
+
+          try {
+            window.opener.location.assign(nextUrl);
+          } catch (_) {}
+
+          window.setTimeout(function () {
+            window.close();
+          }, 100);
+        };
+
+        const fail = function (message) {
+          publish({
+            state: state,
+            success: false,
+            message: message
+          });
+        };
+
+        if (error) {
+          fail('Google sign-in failed. Please try again.');
+          return;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.innerHTML = '<div style="font-family:Poppins,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;color:#0f172a">Finishing Google sign-in...</div>';
+        });
+
+        fetch(apiUrl + '/auth/google/code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            code: code,
+            redirectUri: redirectUri,
+            rememberMe: rememberMe
+          })
+        })
+          .then(function (response) {
+            return response.json().catch(function () {
+              return {};
+            }).then(function (data) {
+              if (!response.ok) {
+                throw new Error(data.message || 'Google sign-in failed. Please try again.');
+              }
+
+              publish({
+                state: state,
+                success: true,
+                response: data
+              });
+            });
+          })
+          .catch(function (err) {
+            fail(err && err.message ? err.message : 'Google sign-in failed. Please try again.');
+          });
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

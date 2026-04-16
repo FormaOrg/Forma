@@ -1,0 +1,19 @@
+<section class="sales-panel">
+  <div class="sales-panel__header">
+    <div>
+      <p class="sales-panel__eyebrow">Delivery flow</p>
+      <h2 class="sales-panel__title">Delivery snapshot</h2>
+      <p class="sales-panel__subtitle">Operational counts generated from current delivery and collection statuses.</p>
+    </div>
+  </div>
+
+  <div class="sales-delivery-grid">
+    @for (item of items; track item.label) {
+      <article class="sales-delivery-card">
+        <span class="sales-delivery-card__label">{{ item.label }}</span>
+        <strong class="sales-delivery-card__value">{{ item.value }}</strong>
+        <p class="sales-delivery-card__note">{{ item.note }}</p>
+      </article>
+    }
+  </div>
+</section>

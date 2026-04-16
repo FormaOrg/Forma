@@ -1,0 +1,10 @@
+.env
+.git
+.gitignore
+.idea
+.mvn
+mvnw
+mvnw.cmd
+target
+run-now.log
+*.log

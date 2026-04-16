@@ -1,82 +1,61 @@
-<!-- email-verification-required.component.html -->
-<div class="verify-required-page">
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
 
-  <div class="verify-card">
+<div class="content centered-state">
 
-    <!-- LEFT: dark panel -->
-    <div class="verify-card-left">
-      <div class="left-tagline">Turn structure into experience.</div>
-      <div class="left-bottom">
-        <h2>Build Everything You Want</h2>
-        <p>Shape ideas into flexible, high-performance websites — your way.</p>
-      </div>
-    </div>
-
-    <!-- RIGHT: white content panel -->
-    <div class="verify-card-right">
-
-      <div class="logo-section">
-        <div class="logo-icon">
-          <img src="assets/images/forma-icon.svg" alt="Forma logo">
-        </div>
-        <h1 class="logo">Forma</h1>
-      </div>
-
-      <div class="content">
-
-        <div class="icon-container">
-          <svg class="email-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-        </div>
-
-        <h2 class="title">Check Your Email</h2>
-        <p class="subtitle">We sent a verification link to activate your account</p>
-
-        <div class="info-box">
-          <p class="info-text">
-            Verification email sent to:<br>
-            <strong>{{ userEmail }}</strong>
-          </p>
-        </div>
-
-        <p class="instruction">
-          Click the link in your email to activate your account. Check your spam folder if you don't see it.
-        </p>
-
-        <div class="success-message" *ngIf="resendSuccess">
-          <span class="icon-check">✓</span>
-          {{ resendSuccess }}
-        </div>
-
-        <div class="error-message" *ngIf="resendError">
-          <span class="icon-error">✗</span>
-          {{ resendError }}
-        </div>
-
-        <div class="action-buttons">
-          <button
-            class="btn btn-primary"
-            (click)="resendVerification()"
-            [disabled]="isResending">
-            <span *ngIf="isResending" class="loading-spinner small"></span>
-            {{ isResending ? 'Sending...' : 'Resend Verification Email' }}
-          </button>
-
-          <button class="btn btn-outline" (click)="logout()">
-            Sign Out
-          </button>
-        </div>
-
-        <div class="help-text">
-          Need help? <a routerLink="/contact">Contact Support</a>
-        </div>
-
-      </div>
-
-    </div>
-
+  <div class="icon-container centered">
+    <svg class="email-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+      <polyline points="22,6 12,13 2,6"></polyline>
+    </svg>
   </div>
 
+  <h2 class="title">Check Your Email</h2>
+  <p class="subtitle">We sent a verification link to activate your account</p>
+
+  <div class="info-box">
+    <p class="info-text">
+      Verification email sent to:<br>
+      <strong>{{ userEmail }}</strong>
+    </p>
+  </div>
+
+  <p class="instruction">
+    Click the link in your email to activate your account. Check your spam folder if you don't see it.
+  </p>
+
+  <div class="message-slot">
+    <div class="success-message" [class.visible]="!!resendSuccess">
+      <span class="icon-check">✓</span>
+      <span>{{ resendSuccess || ' ' }}</span>
+    </div>
+  </div>
+
+  <div class="message-slot">
+    <div class="error-message" [class.visible]="!!resendError">
+      <span class="icon-error">✗</span>
+      <span>{{ resendError || ' ' }}</span>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button
+      class="btn btn-primary"
+      (click)="resendVerification()"
+      [disabled]="isResending">
+      <span *ngIf="isResending" class="loading-spinner small"></span>
+      {{ isResending ? 'Sending...' : 'Resend Verification Email' }}
+    </button>
+
+    <button class="btn btn-outline" (click)="logout()">
+      Sign Out
+    </button>
+  </div>
+
+  <div class="help-text">
+    Need help? <a routerLink="/contact">Contact Support</a>
+  </div>
 </div>

@@ -1,0 +1,25 @@
+<section class="sales-panel sales-panel--chart">
+  <div class="sales-panel__header">
+    <div>
+      <p class="sales-panel__eyebrow">Revenue trend</p>
+      <h2 class="sales-panel__title">Order value over time</h2>
+      <p class="sales-panel__subtitle">Daily revenue based on real orders in the selected period.</p>
+    </div>
+    <div class="sales-chart__legend">
+      <span class="sales-chart__legend-item">
+        <span class="sales-chart__legend-dot sales-chart__legend-dot--revenue"></span>
+        Revenue
+      </span>
+    </div>
+  </div>
+
+  @if (trend.length > 0) {
+    <div class="sales-chart">
+      <div class="sales-chart__canvas">
+        <canvas #salesTrendCanvas class="sales-chart__canvas-element"></canvas>
+      </div>
+    </div>
+  } @else {
+    <div class="sales-panel__empty">No chart data for this period.</div>
+  }
+</section>

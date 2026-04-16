@@ -110,3 +110,74 @@ button {
     background-color: #863a29;
     color: #fff;
 }
+
+@media (max-width: 1200px) {
+    section {
+        padding: 110px 48px;
+    }
+
+    .left {
+        width: auto;
+        max-width: 560px;
+    }
+
+    .right {
+        width: 420px;
+        flex-shrink: 0;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .features div {
+        width: 100%;
+        min-height: 360px;
+        padding: 110px 24px 42px;
+    }
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 84px 20px;
+    }
+
+    .flx.spc-btw {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .left,
+    .right {
+        width: 100%;
+        max-width: none;
+    }
+
+    .left {
+        font-size: 1.7em;
+    }
+
+    .right p {
+        font-size: 1.05em;
+        margin-bottom: 22px;
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        margin-top: 48px;
+    }
+
+    .features div {
+        min-height: 0;
+        padding: 42px 22px 28px;
+        border-radius: 22px;
+    }
+
+    .features .title {
+        font-size: 1.35em;
+        margin-bottom: 14px;
+    }
+}

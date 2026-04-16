@@ -1,0 +1,66 @@
+<section class="recent-templates">
+  <header class="recent-templates__header">
+    <div class="recent-templates__intro">
+      <h2 class="recent-templates__title">{{ 'dashboard.home.recentTemplates.title' | t }}</h2>
+      <p class="recent-templates__subtitle">{{ 'dashboard.home.recentTemplates.subtitle' | t }}</p>
+    </div>
+
+    <a routerLink="/app/templates" class="recent-templates__link">{{ 'dashboard.home.recentTemplates.browse' | t }}</a>
+  </header>
+
+  @if (templates.length) {
+    <ul class="recent-templates__list" role="list">
+      @for (t of templates; track trackBy($index, t)) {
+        <li>
+          <a class="tpl-row" [routerLink]="t.route">
+            <div class="tpl-row__preview">
+              <img [src]="t.image" [alt]="t.name" class="tpl-row__img" />
+            </div>
+
+            <div class="tpl-row__body">
+              <span class="tpl-row__name">{{ t.name }}</span>
+              <span class="tpl-row__hint">{{ t.hint }}</span>
+            </div>
+
+            <span class="tpl-row__chev" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M9 6L15 12L9 18"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="recent-templates__empty-state">
+      <div class="recent-templates__empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 4L20 8.5L12 13L4 8.5L12 4Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M4 12.5L12 17L20 12.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h3 class="recent-templates__empty-title">{{ 'dashboard.home.recentTemplates.emptyTitle' | t }}</h3>
+      <p class="recent-templates__empty-text">
+        {{ 'dashboard.home.recentTemplates.emptyText' | t }}
+      </p>
+      <a routerLink="/app/templates" class="recent-templates__empty-action">{{ 'dashboard.home.recentTemplates.browse' | t }}</a>
+    </div>
+  }
+</section>

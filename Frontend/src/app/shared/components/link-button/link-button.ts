@@ -1,9 +1,10 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'link-button',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './link-button.html',
   styleUrls: ['./link-button.css'],
 })
@@ -21,4 +22,5 @@ export class LinkButton {
   @Input() arrowSlide: string = "-7px";
   @Input() border: string = "none";
   @Input() arrowFilter: string = "none";
+  @Input() routerLink?: string | any[];
 }

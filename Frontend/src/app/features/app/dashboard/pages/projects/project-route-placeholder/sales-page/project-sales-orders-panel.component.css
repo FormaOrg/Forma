@@ -1,0 +1,473 @@
+app-project-sales-orders-panel {
+  display: block;
+}
+
+app-project-sales-orders-panel .orders-panel {
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  overflow: visible;
+}
+
+app-project-sales-orders-panel .orders-panel--featured {
+  margin-top: 2px;
+}
+
+app-project-sales-orders-panel .orders-panel__header {
+  padding: 16px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-project-sales-orders-panel .orders-panel__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+app-project-sales-orders-panel .orders-panel__title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 600;
+  color: #111111;
+}
+
+app-project-sales-orders-panel .orders-panel__primary-action {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  background: #7566ff;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+
+app-project-sales-orders-panel .orders-panel__secondary-action {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-strip {
+  margin: 0 16px 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-metrics {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-label,
+app-project-sales-orders-panel .orders-panel__summary-delta {
+  font-size: 0.74rem;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-label {
+  color: #3c4351;
+  font-weight: 480;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-value {
+  font-size: 0.92rem;
+  line-height: 1;
+  font-weight: 560;
+  color: #111111;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-delta {
+  color: rgba(17, 17, 17, 0.42);
+}
+
+app-project-sales-orders-panel .orders-panel__summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-action,
+app-project-sales-orders-panel .orders-panel__summary-link {
+  font-size: 0.76rem;
+  font-weight: 520;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-action {
+  color: #7566ff;
+}
+
+app-project-sales-orders-panel .orders-panel__summary-link {
+  color: rgba(17, 17, 17, 0.54);
+}
+
+app-project-sales-orders-panel .orders-panel__table-shell {
+  margin: 0 16px 16px;
+  border: none;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: visible;
+}
+
+app-project-sales-orders-panel .orders-panel__toolbar {
+  position: relative;
+  z-index: 3;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-bottom: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 16px 16px 0 0;
+  background: #ffffff;
+}
+
+app-project-sales-orders-panel .orders-panel__toolbar-mode {
+  width: 100%;
+  animation: orders-toolbar-mode-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+app-project-sales-orders-panel .orders-panel__toolbar-mode--default {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-project-sales-orders-panel .orders-panel__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-summary,
+app-project-sales-orders-panel .orders-panel__selection-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-count {
+  font-size: 0.84rem;
+  font-weight: 560;
+  color: #111111;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-link,
+app-project-sales-orders-panel .orders-panel__selection-action {
+  min-height: 34px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #7566ff;
+  font-size: 0.82rem;
+  font-weight: 540;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-action {
+  padding: 0 14px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 540;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-action--danger {
+  color: #b34c5a;
+}
+
+app-project-sales-orders-panel .orders-panel__selection-action:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@keyframes orders-toolbar-mode-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown {
+  position: relative;
+  min-width: 172px;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-trigger {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px 0 13px;
+  border-radius: 14px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown.is-open .orders-panel__dropdown-trigger {
+  border-color: rgba(117, 102, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.08);
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-label,
+app-project-sales-orders-panel .orders-panel__dropdown-value {
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a91a3;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-value {
+  color: #2f3642;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7f8798;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-caret svg {
+  width: 14px;
+  height: 14px;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  box-shadow:
+    0 8px 18px rgba(17, 17, 17, 0.08),
+    0 1px 4px rgba(17, 17, 17, 0.03);
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-item {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 11px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #3c4351;
+  text-align: left;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 520;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+app-project-sales-orders-panel .orders-panel__dropdown-item:hover,
+app-project-sales-orders-panel .orders-panel__dropdown-item.is-selected {
+  background: rgba(117, 102, 255, 0.08);
+  color: #7566ff;
+}
+
+app-project-sales-orders-panel .orders-panel__search {
+  min-width: 280px;
+  height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+app-project-sales-orders-panel .orders-panel__search:focus-within {
+  border-color: rgba(117, 102, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.08);
+}
+
+app-project-sales-orders-panel .orders-panel__search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.74rem;
+  color: #3c4351;
+}
+
+app-project-sales-orders-panel .orders-panel__search-icon {
+  display: inline-flex;
+  color: #8d92a0;
+}
+
+app-project-sales-orders-panel .orders-panel__pagination {
+  padding: 12px 14px;
+  border-left: 1px solid rgba(215, 217, 223, 0.95);
+  border-right: 1px solid rgba(215, 217, 223, 0.95);
+  border-bottom: 1px solid rgba(215, 217, 223, 0.95);
+  border-top: 1px solid rgba(225, 227, 236, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 0 0 16px 16px;
+  background: #ffffff;
+}
+
+app-project-sales-orders-panel .orders-panel__pagination-label {
+  font-size: 0.76rem;
+  color: #4b5060;
+}
+
+app-project-sales-orders-panel .orders-panel__pagination-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  color: #3c4351;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+app-project-sales-orders-panel .orders-panel__pagination-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+app-project-sales-orders-panel .orders-panel__empty {
+  padding: 22px;
+  border-left: 1px solid rgba(215, 217, 223, 0.95);
+  border-right: 1px solid rgba(215, 217, 223, 0.95);
+  border-bottom: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 0 0 16px 16px;
+  background: #ffffff;
+  text-align: center;
+}
+
+app-project-sales-orders-panel .orders-panel__empty h3,
+app-project-sales-orders-panel .orders-panel__empty p {
+  margin: 0;
+}
+
+app-project-sales-orders-panel .orders-panel__empty h3 {
+  font-size: 1rem;
+  color: #111111;
+}
+
+app-project-sales-orders-panel .orders-panel__empty p {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #6f7480;
+}
+
+@media (max-width: 768px) {
+  app-project-sales-orders-panel .orders-panel__summary-strip,
+  app-project-sales-orders-panel .orders-panel__toolbar,
+  app-project-sales-orders-panel .orders-panel__selection-bar,
+  app-project-sales-orders-panel .orders-panel__header,
+  app-project-sales-orders-panel .orders-panel__header-actions,
+  app-project-sales-orders-panel .orders-panel__selection-summary,
+  app-project-sales-orders-panel .orders-panel__selection-actions,
+  app-project-sales-orders-panel .orders-panel__toolbar-actions,
+  app-project-sales-orders-panel .orders-panel__pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  app-project-sales-orders-panel .orders-panel__summary-metrics,
+  app-project-sales-orders-panel .orders-panel__summary-actions {
+    gap: 12px;
+  }
+
+  app-project-sales-orders-panel .orders-panel__search {
+    width: 100%;
+    min-width: 0;
+  }
+
+  app-project-sales-orders-panel .orders-panel__dropdown,
+  app-project-sales-orders-panel .orders-panel__selection-action,
+  app-project-sales-orders-panel .orders-panel__pagination-btn {
+    width: 100%;
+  }
+}

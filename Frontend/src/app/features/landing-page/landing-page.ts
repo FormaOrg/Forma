@@ -9,6 +9,7 @@ import { FaqSection } from './components/faq-section/faq-section';
 import { MadeOnForma } from './components/made-on-forma/made-on-forma';
 import { BuilderHelpDeck } from './components/builder-help-deck/builder-help-deck';
 import { VisionCtaWave } from './components/vision-cta-wave/vision-cta-wave';
+import { I18nService } from './i18n/i18n.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -28,4 +29,7 @@ import { VisionCtaWave } from './components/vision-cta-wave/vision-cta-wave';
   styleUrl: './landing-page.css',
 })
 export class LandingPage {
+  constructor(private readonly i18n: I18nService) {
+    void this.i18n.init();
+  }
 }

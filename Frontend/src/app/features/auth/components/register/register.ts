@@ -4,6 +4,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterRequest, AuthResponse } from '../../../../core/models/user.model';
+import { GoogleAuthPopupService } from '../../../../core/services/google-auth-popup.service';
 
 interface RegisterModel {
   firstName: string;
@@ -18,7 +19,6 @@ interface RegisterModel {
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.html',
-  styleUrls: ['./register.css'],
   imports: [NgIf, FormsModule, NgClass, RouterModule]
 })
 export class RegisterComponent implements OnInit {
@@ -35,12 +35,14 @@ export class RegisterComponent implements OnInit {
   showConfirmPassword = false;
   agreeTerms = false;
   isLoading = false;
+  isGoogleLoading = false;
   error = '';
   successMessage = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private googleAuthPopupService: GoogleAuthPopupService
   ) {}
 
   ngOnInit(): void {
@@ -123,9 +125,34 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Social login — stubbed for MVP
-  signupWithGoogle():   void { this.error = 'Social signup coming soon!'; }
-  signupWithGithub():   void { this.error = 'Social signup coming soon!'; }
-  signupWithFacebook(): void { this.error = 'Social signup coming soon!'; }
-  signupWithLinkedIn(): void { this.error = 'Social signup coming soon!'; }
+  async signupWithGoogle(): Promise<void> {
+    if (this.isGoogleLoading) {
+      return;
+    }
+
+    this.error = '';
+    this.isGoogleLoading = true;
+
+    try {
+      const response = await this.googleAuthPopupService.start(true, '/app/home');
+      this.isGoogleLoading = false;
+
+      if (response.requiresLoginVerification && response.loginVerificationToken) {
+        this.authService.savePendingLoginVerification({
+          token: response.loginVerificationToken,
+          email: response.user.email,
+          message: response.message,
+          rememberMe: true,
+          returnUrl: '/app/home'
+        });
+        await this.router.navigate(['/login-verification']);
+        return;
+      }
+
+      await this.router.navigate(['/app/home']);
+    } catch (error: any) {
+      this.isGoogleLoading = false;
+      this.error = error?.message ?? 'Google sign-up failed. Please try again.';
+    }
+  }
 }

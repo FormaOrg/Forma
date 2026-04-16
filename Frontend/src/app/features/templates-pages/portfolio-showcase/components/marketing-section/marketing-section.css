@@ -1,0 +1,198 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.marketing-section {
+  background-color: #014051;
+  padding: 100px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.marketing-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 60px;
+  margin-bottom: 20px;
+}
+
+.marketing-section__title {
+  font-size: 4.5em;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.15;
+  margin: 0;
+  flex: 1;
+}
+
+.marketing-section__cta {
+  flex: 0 0 550px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.marketing-section__subtitle {
+  font-size: 1.2em;
+  color: #fff;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.marketing-section__cta link-button {
+  display: contents;
+}
+
+/* =========================================
+   ROW
+   ========================================= */
+
+.marketing-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 24px;
+  height: 550px;
+}
+
+.marketing-row--reverse {
+  direction: rtl;
+}
+
+.marketing-row--reverse > * {
+  direction: ltr;
+}
+
+/* =========================================
+   CARD WRAPPER
+   ========================================= */
+
+.marketing-card-wrap {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* =========================================
+   DESCRIPTION CARD
+   ========================================= */
+
+.marketing-card {
+  --row-height: 550px;
+  --card-height: 400px;
+  --track: calc(var(--row-height) - var(--card-height));
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--card-height);
+
+  transform: translateY(calc(var(--progress, 0) * var(--track)));
+  will-change: transform;
+
+  background-color: #ccf0a0;
+  border-radius: 20px;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.marketing-card__title {
+  font-size: 2em;
+  font-weight: 500;
+  color: #014051;
+  line-height: 1.25;
+  margin: 0;
+  max-width: 300px;
+}
+
+.marketing-card__desc {
+  font-size: 1.2em;
+  color: #014051;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 650px;
+}
+
+/* =========================================
+   SINGLE IMAGE
+   ========================================= */
+
+.marketing-image {
+  border-radius: 24px;
+  overflow: hidden;
+  height: 100%;
+  background-color: #346674;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.marketing-image img {
+  display: block;
+  width: calc(100% - 30px);
+  height: calc(100% - 30px);
+  object-fit: contain;
+  object-position: center;
+  border-radius: 9px;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1024px) {
+  .marketing-section {
+    padding: 72px 40px;
+  }
+
+  .marketing-section__header {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .marketing-section__cta {
+    flex: unset;
+    width: 100%;
+  }
+
+  .marketing-row {
+    grid-template-columns: 1fr;
+    height: auto;
+    direction: ltr;
+  }
+
+  .marketing-row--reverse {
+    direction: ltr;
+  }
+
+  .marketing-card-wrap {
+    height: 260px;
+  }
+
+  .marketing-card {
+    position: relative;
+    transform: none;
+  }
+
+  .marketing-image {
+    height: 320px;
+  }
+}
+
+@media (max-width: 600px) {
+  .marketing-section {
+    padding: 48px 24px;
+  }
+}

@@ -1,0 +1,45 @@
+<section class="marketing-section">
+
+  <!-- Header -->
+  <div class="marketing-section__header">
+    <h2 class="marketing-section__title">Reach more people,<br>land more clients</h2>
+    <div class="marketing-section__cta">
+      <p class="marketing-section__subtitle">
+        Grow your audience using built-in marketing tools designed to boost visibility for your portfolio website.
+      </p>
+
+      <link-button
+        [bgColor]="'#ffffff'"
+        [txtColor]="'#000'"
+        [theme]="'black'"
+        [content]="'Get Started'"
+      ></link-button>
+    </div>
+  </div>
+
+  <!-- Rows -->
+  @for (row of rows; track row.title; let i = $index) {
+    <div
+      class="marketing-row"
+      [class.marketing-row--reverse]="row.reverse"
+      #rowEl
+    >
+
+      <div class="marketing-card-wrap">
+        <div
+          class="marketing-card"
+          [style.--progress]="cardProgress(i)"
+        >
+          <h3 class="marketing-card__title">{{ row.title }}</h3>
+          <p class="marketing-card__desc">{{ row.description }}</p>
+        </div>
+      </div>
+
+      <div class="marketing-image">
+        <img [src]="row.image" [alt]="row.title" loading="lazy" />
+      </div>
+
+    </div>
+  }
+
+</section>

@@ -1,0 +1,157 @@
+<div #profileContainer class="profile-container">
+  <div class="profile-header">
+    <div class="profile-header__text">
+      <h1 class="profile-title">{{ 'settings.preferences.title' | t }}</h1>
+      <p class="profile-subtitle">{{ 'settings.preferences.subtitle' | t }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="preferencesForm" class="profile-form">
+    @if (isLoadingPreferences) {
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.preferences.appearance.title' | t }}</h2>
+        <div class="section-content">
+          <div class="preferences-skeleton-line preferences-skeleton-line--wide"></div>
+          <div class="preferences-skeleton-field">
+            <div class="preferences-skeleton-line preferences-skeleton-line--label"></div>
+            <div class="preferences-skeleton-box preferences-skeleton-box--input"></div>
+          </div>
+          <div class="preferences-skeleton-field">
+            <div class="preferences-skeleton-line preferences-skeleton-line--label"></div>
+            <div class="preferences-skeleton-themes">
+              @for (_ of [1, 2, 3]; track $index) {
+                <div class="preferences-skeleton-box preferences-skeleton-box--theme"></div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">{{ 'settings.preferences.danger.title' | t }}</h2>
+        <div class="section-content">
+          <div class="preferences-skeleton-danger">
+            <div class="preferences-skeleton-box preferences-skeleton-box--icon"></div>
+            <div class="preferences-skeleton-danger__copy">
+              <div class="preferences-skeleton-line preferences-skeleton-line--title"></div>
+              <div class="preferences-skeleton-line preferences-skeleton-line--wide"></div>
+              <div class="preferences-skeleton-line preferences-skeleton-line--medium"></div>
+            </div>
+            <div class="preferences-skeleton-box preferences-skeleton-box--button"></div>
+          </div>
+        </div>
+      </div>
+    } @else {
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.preferences.appearance.title' | t }}</h2>
+      <div class="section-content">
+        <p class="section-intro">
+          {{ 'settings.preferences.appearance.intro' | t }}
+        </p>
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label" for="language">{{ 'settings.preferences.language.label' | t }}</label>
+          </div>
+          <p class="field-description">{{ 'settings.preferences.language.description' | t }}</p>
+          <select formControlName="language" class="form-select" (change)="onLanguageSelected()">
+            @for (lang of languages; track lang.code) {
+              <option [value]="lang.code">{{ lang.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="subsection">
+          <div class="form-label-row">
+            <label class="form-label">{{ 'settings.preferences.theme.label' | t }}</label>
+          </div>
+          <p class="field-description">
+            {{ 'settings.preferences.theme.description' | t }}
+          </p>
+          <div class="theme-grid">
+            @for (theme of themes; track theme.id) {
+              <label class="theme-card" [class.theme-card--selected]="preferencesForm.get('theme')?.value === theme.id">
+                <input
+                  type="radio"
+                  name="theme"
+                  [value]="theme.id"
+                  formControlName="theme"
+                  (change)="onThemeSelected()"
+                  hidden
+                />
+                <div class="theme-preview">
+                  <div class="theme-preview-content" [class]="'theme-' + theme.id"></div>
+                </div>
+                <span class="theme-label">{{ theme.labelKey | t }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <h2 class="section-title">{{ 'settings.preferences.danger.title' | t }}</h2>
+      <div class="section-content danger-section">
+        <p class="section-intro">
+          {{ 'settings.preferences.danger.intro' | t }}
+        </p>
+        <div class="danger-content">
+          <div class="danger-main">
+            <div class="danger-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                <path fill-rule="evenodd" d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="danger-text">
+              <h3 class="danger-action-title">{{ 'settings.preferences.danger.cardTitle' | t }}</h3>
+              <p class="danger-action-description">
+                {{ 'settings.preferences.danger.cardDescription' | t }}
+              </p>
+              <div class="danger-points" aria-hidden="true">
+                <span class="danger-point">{{ 'settings.preferences.danger.points.projects' | t }}</span>
+                <span class="danger-point">{{ 'settings.preferences.danger.points.templates' | t }}</span>
+                <span class="danger-point">{{ 'settings.preferences.danger.points.access' | t }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="danger-actions">
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="onDeleteAccount()"
+            >
+              {{ 'settings.preferences.danger.button' | t }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </form>
+
+  @if (showDeleteModal) {
+    <div class="modal-overlay" (click)="closeDeleteModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ 'settings.preferences.deleteModal.title' | t }}</h2>
+          <button type="button" class="modal-close" (click)="closeDeleteModal()" [attr.aria-label]="'common.close' | t">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-body">
+          <p class="modal-description">
+            {{ 'settings.preferences.deleteModal.description' | t }}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">{{ 'common.cancel' | t }}</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteAccount()">{{ 'settings.preferences.deleteModal.confirm' | t }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

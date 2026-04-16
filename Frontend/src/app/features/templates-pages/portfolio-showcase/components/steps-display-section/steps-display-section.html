@@ -1,0 +1,65 @@
+<section class="faq-section">
+    <div class="faq-top">
+        <h2 class="faq-title">Build your portfolio, your way</h2>
+    </div>
+    <div class="faq-bottom">
+        <div class="faq-left">
+            <div class="accordion">
+
+                <div class="accordion-item" [class.active]="activeIndex === 0" (click)="setActive(0)">
+                    <button class="accordion-header">
+                        <span>Pick a template</span>
+                        <img src="assets/Landing Page/FAQ Section/chevron-down.svg" class="chevron" [class.rotated]="activeIndex === 0" alt="">
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <p>Browse hundreds of professionally designed portfolio templates and pick the one that best fits your style and industry.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" [class.active]="activeIndex === 1" (click)="setActive(1)">
+                    <button class="accordion-header">
+                        <span>Choose your layout</span>
+                        <img src="assets/Landing Page/FAQ Section/chevron-down.svg" class="chevron" [class.rotated]="activeIndex === 1" alt="">
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <p>Pick one of our designer-made layouts and switch between them anytime to showcase your work exactly the way you want.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" [class.active]="activeIndex === 2" (click)="setActive(2)">
+                    <button class="accordion-header">
+                        <span>Customize everything</span>
+                        <img src="assets/Landing Page/FAQ Section/chevron-down.svg" class="chevron" [class.rotated]="activeIndex === 2" alt="">
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <p>Add or edit pages, text and visuals, then throw in more of your style with no-code motion effects and animations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" [class.active]="activeIndex === 3" (click)="setActive(3)">
+                    <button class="accordion-header">
+                        <span>Run it all from one place</span>
+                        <img src="assets/Landing Page/FAQ Section/chevron-down.svg" class="chevron" [class.rotated]="activeIndex === 3" alt="">
+                    </button>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <p>Streamline your day-to-day with a centralized dashboard where you can manage all your projects, media and contacts.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <img
+            [src]="activeStep.image"
+            [alt]="activeStep.alt"
+        />
+    </div>
+</section>

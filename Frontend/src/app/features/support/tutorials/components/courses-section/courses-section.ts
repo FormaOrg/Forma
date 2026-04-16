@@ -13,7 +13,7 @@ interface CourseCard {
 }
 
 @Component({
-  selector: 'app-courses-section',
+  selector: 'app-tutorials-courses-section',
   imports: [
     CommonModule
   ],

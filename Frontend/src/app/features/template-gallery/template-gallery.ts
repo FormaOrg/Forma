@@ -1,16 +1,23 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { Header } from "../../shared/header/header";
 import { HeroSection } from './components/hero-section/hero-section';
-import { TemplateGrid } from './components/template-grid/template-grid';
+import { TemplateGridLive } from './components/template-grid/template-grid-live';
 import { Footer } from "../../shared/footer/footer";
+import { ProjectService } from '../../core/services/project.service';
+import { ProjectType, TemplateRecord } from '../../core/models/project.model';
 
 export type TemplateItem = {
-  id: number;
+  id: number | string;
   name: string;
   image: string;
   type: string;
   industry: string;
   category: 'all' | 'blank';
+  previewUrl?: string | null;
+  previewRoute?: string | null;
+  updatedAt?: number;
+  usesCount?: number;
 };
  
 export type ActiveFilters = {
@@ -22,11 +29,13 @@ export type ActiveFilters = {
 
 @Component({
   selector: 'app-templates-gallery',
-  imports: [Header, HeroSection, TemplateGrid, Footer],
+  imports: [Header, HeroSection, TemplateGridLive, Footer],
   templateUrl: './template-gallery.html',
   styleUrl: './template-gallery.css',
 })
 export class TemplateGallery {
+  private readonly projectService = inject(ProjectService);
+
   readonly searchQuery = signal<string>('');
   readonly activeFilters = signal<ActiveFilters>({
     type: null,
@@ -34,6 +43,19 @@ export class TemplateGallery {
     category: 'all',
     sortBy: 'recommended',
   });
+  readonly templates = signal<TemplateItem[]>([]);
+  readonly isLoading = signal(true);
+  readonly errorMessage = signal('');
+  readonly typeOptions = computed(() =>
+    Array.from(new Set(this.templates().map((template) => template.type))).sort((left, right) => left.localeCompare(right))
+  );
+  readonly industryOptions = computed(() =>
+    Array.from(new Set(this.templates().map((template) => template.industry))).sort((left, right) => left.localeCompare(right))
+  );
+
+  constructor() {
+    this.loadTemplates();
+  }
  
   onSearchChange(query: string): void {
     this.searchQuery.set(query);
@@ -45,5 +67,79 @@ export class TemplateGallery {
 
   onSortChange(sortBy: ActiveFilters['sortBy']): void {
     this.activeFilters.update((current) => ({ ...current, sortBy }));
+  }
+
+  loadTemplates(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.projectService.getPublicTemplates()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (records) => this.templates.set(records.map((record) => this.toTemplateItem(record))),
+        error: () => {
+          this.templates.set([]);
+          this.errorMessage.set('Unable to load templates right now.');
+        },
+      });
+  }
+
+  private toTemplateItem(record: TemplateRecord): TemplateItem {
+    const categoryLabel = this.readString(record.category) ?? this.readString(record.label) ?? 'General';
+    const tags = Array.isArray(record.tags) ? record.tags.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0) : [];
+    const projectType = this.toProjectType(record.projectType ?? record.type, 'LANDING_PAGE');
+
+    return {
+      id: record.id,
+      name: this.readString(record.name) ?? this.readString(record.title) ?? 'Untitled template',
+      image: this.readString(record.previewImageUrl) ?? 'assets/Templates Gallery/Mock Templates/1.jpg',
+      type: this.formatLabel(projectType),
+      industry: tags[0] ?? categoryLabel,
+      category: categoryLabel.toLowerCase().includes('blank') ? 'blank' : 'all',
+      previewUrl: this.readString(record.previewUrl) ?? null,
+      previewRoute: this.resolvePreviewRoute(
+        this.readString(record.previewRoute) ?? this.readString(record.route),
+        projectType
+      ) ?? null,
+      updatedAt: Date.parse(this.readString(record.updatedAt) ?? this.readString(record.createdAt) ?? '') || 0,
+      usesCount: typeof record.usesCount === 'number' ? record.usesCount : 0,
+    };
+  }
+
+  private readString(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+  }
+
+  private formatLabel(value: string): string {
+    return value
+      .toLowerCase()
+      .split('_')
+      .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+      .join(' ');
+  }
+
+  private toProjectType(value: unknown, fallback: ProjectType): ProjectType {
+    switch (this.readString(value)?.toUpperCase()) {
+      case 'BLOG':
+        return 'BLOG';
+      case 'BUSINESS':
+        return 'BUSINESS';
+      case 'ECOMMERCE':
+        return 'ECOMMERCE';
+      case 'LANDING_PAGE':
+        return 'LANDING_PAGE';
+      case 'PORTFOLIO':
+        return 'PORTFOLIO';
+      default:
+        return fallback;
+    }
+  }
+
+  private resolvePreviewRoute(route: string | undefined, projectType: ProjectType): string | undefined {
+    if (projectType === 'LANDING_PAGE' && (!route || route === '/product')) {
+      return '/landing-page-website';
+    }
+
+    return route;
   }
 }

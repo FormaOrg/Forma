@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
-  selector: 'domain-section',
-  imports: [],
+  selector: 'app-landing-page-domain-section',
+  imports: [TranslatePipe],
   templateUrl: './domain-section.html',
   styleUrl: './domain-section.css',
 })

@@ -1,0 +1,829 @@
+app-project-route-placeholder {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+app-project-route-placeholder .project-home,
+app-project-route-placeholder .project-setup,
+app-project-route-placeholder .project-placeholder {
+  max-width: 1400px;
+  width: 100%;
+  padding: 28px 32px 36px;
+}
+
+app-project-route-placeholder .project-home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-project-route-placeholder .project-home__panel,
+app-project-route-placeholder .project-setup__panel,
+app-project-route-placeholder .project-placeholder__card {
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 6px 18px rgba(17, 17, 17, 0.03);
+}
+
+app-project-route-placeholder .project-home__hero,
+app-project-route-placeholder .project-home__section-head,
+app-project-route-placeholder .project-home__activity-row,
+app-project-route-placeholder .project-setup__panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+app-project-route-placeholder .project-home__eyebrow,
+app-project-route-placeholder .project-setup__eyebrow,
+app-project-route-placeholder .project-placeholder__eyebrow {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+app-project-route-placeholder .project-home__eyebrow {
+  margin-bottom: 4px;
+}
+
+app-project-route-placeholder .project-home__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.05;
+  font-weight: 700;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-home__title span {
+  color: #7566ff;
+}
+
+app-project-route-placeholder .project-home__hero-action,
+app-project-route-placeholder .project-home__primary-cta,
+app-project-route-placeholder .project-home__ghost-cta,
+app-project-route-placeholder .project-home__activity-link,
+app-project-route-placeholder .project-home__section-link {
+  text-decoration: none;
+}
+
+app-project-route-placeholder .project-home__hero-action {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(117, 102, 255, 0.24);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7566ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #ffffff;
+}
+
+app-project-route-placeholder .project-home__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+app-project-route-placeholder .project-home__status-pill {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: #f7f8fb;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-route-placeholder .project-home__status-pill--accent {
+  color: #7566ff;
+}
+
+app-project-route-placeholder .project-home__section-title {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.12;
+  font-weight: 700;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-home__section-copy {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(11, 11, 18, 0.64);
+}
+
+app-project-route-placeholder .project-home__section-link {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #7566ff;
+}
+
+app-project-route-placeholder .project-home__stats-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+app-project-route-placeholder .project-home__stat-card {
+  min-height: 112px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-project-route-placeholder .project-home__stat-label,
+app-project-route-placeholder .project-home__stat-helper {
+  margin: 0;
+}
+
+app-project-route-placeholder .project-home__stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-route-placeholder .project-home__stat-value {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-home__stat-helper {
+  font-size: 0.76rem;
+  color: rgba(11, 11, 18, 0.54);
+}
+
+app-project-route-placeholder .project-home__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.85fr);
+  gap: 14px;
+  align-items: start;
+}
+
+app-project-route-placeholder .project-home__panel--activity,
+app-project-route-placeholder .project-home__panel--suggested {
+  display: flex;
+  flex-direction: column;
+}
+
+app-project-route-placeholder .project-home__activity-feature {
+  margin-top: 14px;
+  padding: 26px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: linear-gradient(180deg, #fcfcff, #f7f9fd);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+app-project-route-placeholder .project-home__activity-title,
+app-project-route-placeholder .project-home__activity-row-title,
+app-project-route-placeholder .project-home__suggested-title {
+  margin: 0;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-home__activity-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+app-project-route-placeholder .project-home__activity-copy,
+app-project-route-placeholder .project-home__activity-row-copy,
+app-project-route-placeholder .project-home__suggested-copy {
+  margin: 0;
+  color: rgba(11, 11, 18, 0.64);
+}
+
+app-project-route-placeholder .project-home__activity-copy {
+  max-width: 54ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+app-project-route-placeholder .project-home__primary-cta {
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #7566ff, #6d7cff);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+app-project-route-placeholder .project-home__activity-list {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+app-project-route-placeholder .project-home__activity-row {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+  align-items: center;
+}
+
+app-project-route-placeholder .project-home__activity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7566ff, #5aa6ff);
+  flex-shrink: 0;
+}
+
+app-project-route-placeholder .project-home__activity-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+app-project-route-placeholder .project-home__activity-row-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+app-project-route-placeholder .project-home__activity-row-copy {
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+app-project-route-placeholder .project-home__activity-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+app-project-route-placeholder .project-home__activity-time {
+  font-size: 0.72rem;
+  color: rgba(11, 11, 18, 0.46);
+}
+
+app-project-route-placeholder .project-home__activity-link,
+app-project-route-placeholder .project-home__ghost-cta {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(117, 102, 255, 0.2);
+  color: #7566ff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: #ffffff;
+}
+
+app-project-route-placeholder .project-home__suggested-list {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-route-placeholder .project-home__suggested-card {
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+app-project-route-placeholder .project-home__suggested-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(117, 102, 255, 0.16), rgba(117, 102, 255, 0.05)),
+    #f7f8fc;
+  position: relative;
+}
+
+app-project-route-placeholder .project-home__suggested-icon::before,
+app-project-route-placeholder .project-home__suggested-icon::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(117, 102, 255, 0.7);
+}
+
+app-project-route-placeholder .project-home__suggested-icon::before {
+  width: 16px;
+  height: 4px;
+  top: 12px;
+  left: 12px;
+}
+
+app-project-route-placeholder .project-home__suggested-icon::after {
+  width: 22px;
+  height: 4px;
+  top: 21px;
+  left: 9px;
+}
+
+app-project-route-placeholder .project-home__suggested-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+app-project-route-placeholder .project-home__suggested-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+app-project-route-placeholder .project-home__suggested-copy {
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+app-project-route-placeholder .project-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+app-project-route-placeholder .project-setup__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+app-project-route-placeholder .project-setup__meta-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f6f8fc;
+  border: 1px solid rgba(117, 102, 255, 0.08);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.68);
+}
+
+app-project-route-placeholder .project-setup__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+app-project-route-placeholder .project-setup__panel--skeleton .project-setup__task {
+  pointer-events: none;
+}
+
+app-project-route-placeholder .project-setup__skeleton {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.18), rgba(117, 102, 255, 0.08));
+  background-size: 200% 100%;
+  animation: project-home-page-shimmer 1.4s linear infinite;
+}
+
+app-project-route-placeholder .project-setup__skeleton--eyebrow {
+  width: 118px;
+  height: 12px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--title {
+  width: min(420px, 76%);
+  height: 34px;
+  border-radius: 12px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--pill {
+  width: 112px;
+  height: 26px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--label {
+  width: 104px;
+  height: 12px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--value {
+  width: 48px;
+  height: 18px;
+  border-radius: 8px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--progress-fill {
+  width: 58%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+app-project-route-placeholder .project-setup__skeleton--dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+app-project-route-placeholder .project-setup__skeleton--task-title {
+  width: 42%;
+  height: 14px;
+  border-radius: 8px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--task-status {
+  width: 88px;
+  height: 22px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--task-copy {
+  width: 88%;
+  height: 12px;
+  border-radius: 8px;
+}
+
+app-project-route-placeholder .project-setup__skeleton--task-copy-short {
+  width: 62%;
+}
+
+app-project-route-placeholder .project-setup__skeleton--task-action {
+  width: 92px;
+  min-height: 32px;
+  border-radius: 999px;
+}
+
+app-project-route-placeholder .project-setup__panel--primary {
+  min-height: 100%;
+}
+
+app-project-route-placeholder .project-setup__panel-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+app-project-route-placeholder .project-setup__title,
+app-project-route-placeholder .project-placeholder__title {
+  margin: 0;
+  font-size: 1.36rem;
+  line-height: 1.12;
+  font-weight: 700;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-setup__copy,
+app-project-route-placeholder .project-placeholder__copy {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.84rem;
+  line-height: 1.48;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-route-placeholder .project-placeholder__card {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+app-project-route-placeholder .project-setup__progress {
+  min-width: 184px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+app-project-route-placeholder .project-setup__progress-summary {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(117, 102, 255, 0.14);
+  background: #f8f7ff;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-project-route-placeholder .project-setup__progress-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.64);
+}
+
+app-project-route-placeholder .project-setup__progress strong {
+  font-size: 1rem;
+  line-height: 1;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-setup__progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(117, 102, 255, 0.12);
+  overflow: hidden;
+}
+
+app-project-route-placeholder .project-setup__progress-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7566ff, #5aa6ff);
+}
+
+app-project-route-placeholder .project-setup__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+app-project-route-placeholder .project-setup__task {
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 12px;
+  padding: 15px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+app-project-route-placeholder .project-setup__task--active {
+  border-color: rgba(117, 102, 255, 0.45);
+  background: linear-gradient(180deg, rgba(117, 102, 255, 0.04), rgba(255, 255, 255, 1));
+  box-shadow: 0 10px 24px rgba(117, 102, 255, 0.06);
+}
+
+app-project-route-placeholder .project-setup__task:hover {
+  border-color: rgba(117, 102, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+app-project-route-placeholder .project-setup__task-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-project-route-placeholder .project-setup__task-title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+app-project-route-placeholder .project-setup__task-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #7566ff;
+  flex-shrink: 0;
+}
+
+app-project-route-placeholder .project-setup__task--done .project-setup__task-dot {
+  background: #22a06b;
+}
+
+app-project-route-placeholder .project-setup__task-title {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #111111;
+}
+
+app-project-route-placeholder .project-setup__task-title--done {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(29, 138, 93, 0.7);
+}
+
+app-project-route-placeholder .project-setup__task-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(240, 138, 0, 0.1);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #f08a00;
+}
+
+app-project-route-placeholder .project-setup__task-description {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.42;
+  color: rgba(11, 11, 18, 0.62);
+}
+
+app-project-route-placeholder .project-setup__task-description--done {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(29, 138, 93, 0.55);
+}
+
+app-project-route-placeholder .project-setup__task-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(117, 102, 255, 0.24);
+  background: #ffffff;
+  color: #7566ff;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+app-project-route-placeholder .project-setup__task-action:hover {
+  background: rgba(117, 102, 255, 0.06);
+  border-color: rgba(117, 102, 255, 0.34);
+}
+
+app-project-route-placeholder .project-setup__task-action--done {
+  border-color: rgba(34, 160, 107, 0.18);
+  color: #1d8a5d;
+  background: rgba(34, 160, 107, 0.06);
+}
+
+.theme-dark app-project-route-placeholder .project-home__panel,
+.theme-dark app-project-route-placeholder .project-placeholder__card {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+.theme-dark app-project-route-placeholder .project-setup__panel,
+.theme-dark app-project-route-placeholder .project-setup__task {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+.theme-dark app-project-route-placeholder .project-setup__skeleton {
+  background: linear-gradient(90deg, rgba(33, 40, 56, 0.95) 0%, rgba(42, 50, 69, 1) 50%, rgba(33, 40, 56, 0.95) 100%);
+  background-size: 220% 100%;
+}
+
+.theme-dark app-project-route-placeholder .project-home__title,
+.theme-dark app-project-route-placeholder .project-home__section-title,
+.theme-dark app-project-route-placeholder .project-home__activity-title,
+.theme-dark app-project-route-placeholder .project-home__activity-row-title,
+.theme-dark app-project-route-placeholder .project-home__suggested-title,
+.theme-dark app-project-route-placeholder .project-home__stat-value,
+.theme-dark app-project-route-placeholder .project-setup__title,
+.theme-dark app-project-route-placeholder .project-placeholder__title {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-route-placeholder .project-home__status-pill,
+.theme-dark app-project-route-placeholder .project-home__stat-card,
+.theme-dark app-project-route-placeholder .project-home__activity-row,
+.theme-dark app-project-route-placeholder .project-home__suggested-card {
+  background: #171e2a;
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-route-placeholder .project-home__activity-feature {
+  background: linear-gradient(180deg, #1a2231, #151c29);
+  border-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-route-placeholder .project-home__section-copy,
+.theme-dark app-project-route-placeholder .project-home__stat-label,
+.theme-dark app-project-route-placeholder .project-home__stat-helper,
+.theme-dark app-project-route-placeholder .project-home__activity-copy,
+.theme-dark app-project-route-placeholder .project-home__activity-row-copy,
+.theme-dark app-project-route-placeholder .project-home__suggested-copy,
+.theme-dark app-project-route-placeholder .project-home__activity-time,
+.theme-dark app-project-route-placeholder .project-home__status-pill,
+.theme-dark app-project-route-placeholder .project-setup__copy,
+.theme-dark app-project-route-placeholder .project-setup__task-description,
+.theme-dark app-project-route-placeholder .project-placeholder__copy {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-route-placeholder .project-home__hero-action,
+.theme-dark app-project-route-placeholder .project-home__activity-link,
+.theme-dark app-project-route-placeholder .project-home__ghost-cta,
+.theme-dark app-project-route-placeholder .project-setup__task-action {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.theme-dark app-project-route-placeholder .project-setup__meta-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(117, 102, 255, 0.14);
+  color: rgba(226, 231, 244, 0.7);
+}
+
+.theme-dark app-project-route-placeholder .project-setup__progress-summary {
+  background: rgba(117, 102, 255, 0.08);
+  border-color: rgba(117, 102, 255, 0.18);
+}
+
+.theme-dark app-project-route-placeholder .project-setup__progress-label {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-route-placeholder .project-setup__task-title {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-route-placeholder .project-setup__task--active {
+  background: linear-gradient(180deg, rgba(117, 102, 255, 0.1), rgba(23, 30, 42, 1));
+}
+
+.theme-dark app-project-route-placeholder .project-setup__task-action--done {
+  background: rgba(34, 160, 107, 0.12);
+  border-color: rgba(34, 160, 107, 0.2);
+  color: #7fe2af;
+}
+
+@media (max-width: 900px) {
+  app-project-route-placeholder .project-home__workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  app-project-route-placeholder .project-home,
+  app-project-route-placeholder .project-setup,
+  app-project-route-placeholder .project-placeholder {
+    padding: 18px 14px 20px;
+  }
+
+  app-project-route-placeholder .project-home__hero,
+  app-project-route-placeholder .project-home__section-head,
+  app-project-route-placeholder .project-home__activity-row,
+  app-project-route-placeholder .project-setup__panel-header,
+  app-project-route-placeholder .project-setup__task {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  app-project-route-placeholder .project-home__stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  app-project-route-placeholder .project-home__activity-side {
+    align-items: stretch;
+  }
+
+  app-project-route-placeholder .project-setup__progress {
+    min-width: 0;
+  }
+
+  app-project-route-placeholder .project-setup__task-action {
+    width: 100%;
+    justify-content: center;
+  }
+}

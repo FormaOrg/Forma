@@ -1,0 +1,107 @@
+<aside
+  class="project-sidebar"
+  [class.project-sidebar--collapsed]="collapsed"
+  [class.project-sidebar--brandless]="!showBrand"
+>
+  @if (showBrand) {
+    <div class="project-sidebar__brand">
+      <div class="project-sidebar__mark" aria-hidden="true">
+        <img [src]="logoSrc()" alt="" width="28" height="28" />
+      </div>
+      <span class="project-sidebar__wordmark">Forma</span>
+    </div>
+  }
+
+  <div class="project-sidebar__body">
+    <div class="project-sidebar__top-action">
+      <a
+        class="project-sidebar__row"
+        [routerLink]="footerItems[0].route!"
+        routerLinkActive="project-sidebar__row--active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [class.project-sidebar__row--collapsed]="collapsed"
+      >
+        <span class="project-sidebar__icon">
+          <app-icon [name]="footerItems[0].icon" [size]="iconSize" />
+        </span>
+        <span class="project-sidebar__label">{{ sidebarLabelKey(footerItems[0].label) | t }}</span>
+        <span class="project-sidebar__row-pad" aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <section
+      class="project-sidebar__workspace-card"
+      [class.project-sidebar__workspace-card--collapsed]="collapsed"
+      [class.project-sidebar__workspace-card--complete]="isWorkspaceComplete()"
+      [attr.aria-label]="'project.sidebar.aria.workspaceOverview' | t"
+    >
+      <div class="project-sidebar__workspace-copy">
+        <p class="project-sidebar__workspace-title">{{ workspaceTitleKey() | t }}</p>
+        <p class="project-sidebar__workspace-progress">
+          {{ workspaceProgress().completed }}/{{ workspaceProgress().total }} {{ 'project.sidebar.completed' | t }}
+        </p>
+        @if (isWorkspaceComplete()) {
+          <p class="project-sidebar__workspace-id">{{ 'project.sidebar.setupComplete' | t }}</p>
+        } @else if (workspaceProgress().nextStep) {
+          <p class="project-sidebar__workspace-id">{{ 'project.sidebar.next' | t }}: {{ workspaceProgress().nextStep }}</p>
+        }
+      </div>
+      <div
+        class="project-sidebar__workspace-bar"
+        [class.project-sidebar__workspace-bar--hidden]="isWorkspaceComplete()"
+        aria-hidden="true"
+      >
+        <span class="project-sidebar__workspace-bar-fill" [style.width.%]="progressPercent()"></span>
+      </div>
+    </section>
+
+    <nav class="project-sidebar__nav" [attr.aria-label]="'project.sidebar.aria.navigation' | t">
+      @for (section of sections(); track trackSectionId($index, section)) {
+        @if (!$first) {
+          <div class="project-sidebar__separator" aria-hidden="true"></div>
+        }
+
+        <div class="project-sidebar__section-label">
+          <span class="project-sidebar__section-label-text">{{ sidebarLabelKey(section.label) | t }}</span>
+        </div>
+
+        <ul class="project-sidebar__list" role="list">
+          @for (item of section.items; track trackItemLabel($index, item)) {
+            <li class="project-sidebar__item">
+              <a
+                class="project-sidebar__row"
+                [routerLink]="projectRoute(item.path)"
+                routerLinkActive="project-sidebar__row--active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [class.project-sidebar__row--collapsed]="collapsed"
+              >
+                <span class="project-sidebar__icon">
+                  <app-icon [name]="item.icon" [size]="iconSize" />
+                </span>
+                <span class="project-sidebar__label">{{ sidebarLabelKey(item.label) | t }}</span>
+                <span class="project-sidebar__row-pad" aria-hidden="true"></span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </nav>
+  </div>
+
+  <div class="project-sidebar__footer">
+    <div class="project-sidebar__separator" aria-hidden="true"></div>
+    <a
+      class="project-sidebar__row project-sidebar__row--footer"
+      [routerLink]="projectRoute(footerItems[1].path)"
+      routerLinkActive="project-sidebar__row--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [class.project-sidebar__row--collapsed]="collapsed"
+    >
+      <span class="project-sidebar__icon">
+        <app-icon [name]="footerItems[1].icon" [size]="iconSize" />
+      </span>
+      <span class="project-sidebar__label">{{ sidebarLabelKey(footerItems[1].label) | t }}</span>
+      <span class="project-sidebar__row-pad" aria-hidden="true"></span>
+    </a>
+  </div>
+</aside>

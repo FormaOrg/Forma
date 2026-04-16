@@ -1,0 +1,502 @@
+app-project-sales-route .sales-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.26);
+  z-index: 20;
+  animation: salesEditorBackdropIn 220ms ease;
+}
+
+app-project-sales-route .sales-editor {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+  width: min(520px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 21;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  transform-origin: right center;
+  animation: salesEditorSlideIn 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+app-project-sales-route .sales-editor-backdrop.is-closing {
+  animation: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+app-project-sales-route .sales-editor.is-closing {
+  animation: none;
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+app-project-sales-route .sales-editor__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 2px 2px;
+}
+
+app-project-sales-route .sales-editor__header-copy {
+  min-width: 0;
+}
+
+app-project-sales-route .sales-editor__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+app-project-sales-route .sales-editor__header h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 640;
+  letter-spacing: -0.04em;
+}
+
+app-project-sales-route .sales-editor__subtitle {
+  margin: 8px 0 0;
+  color: #6f7480;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+app-project-sales-route .sales-editor__close,
+app-project-sales-route .sales-editor__secondary,
+app-project-sales-route .sales-editor__primary,
+app-project-sales-route .sales-editor__add-item,
+app-project-sales-route .sales-editor__remove-item {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(117, 102, 255, 0.16);
+  border-radius: 999px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 520;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+app-project-sales-route .sales-editor__primary,
+app-project-sales-route .sales-editor__add-item {
+  color: #7566ff;
+}
+
+app-project-sales-route .sales-editor__secondary,
+app-project-sales-route .sales-editor__close,
+app-project-sales-route .sales-editor__remove-item {
+  color: #6f7480;
+}
+
+app-project-sales-route .sales-editor__close:hover,
+app-project-sales-route .sales-editor__secondary:hover,
+app-project-sales-route .sales-editor__primary:hover,
+app-project-sales-route .sales-editor__add-item:hover,
+app-project-sales-route .sales-editor__remove-item:hover {
+  border-color: rgba(117, 102, 255, 0.32);
+  background: #f7f6ff;
+}
+
+app-project-sales-route .sales-editor__loading {
+  padding: 18px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 16px;
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-project-sales-route .sales-editor__skeleton-section {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #ffffff;
+  display: grid;
+  gap: 12px;
+}
+
+app-project-sales-route .sales-editor__skeleton-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+app-project-sales-route .sales-editor__skeleton {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(233, 236, 243, 0.9) 0%,
+    rgba(243, 245, 249, 1) 50%,
+    rgba(233, 236, 243, 0.9) 100%
+  );
+  background-size: 220% 100%;
+  animation: salesEditorShimmer 1.25s linear infinite;
+}
+
+app-project-sales-route .sales-editor__skeleton--title {
+  width: 48%;
+  height: 28px;
+}
+
+app-project-sales-route .sales-editor__skeleton--copy {
+  width: 82%;
+  height: 14px;
+}
+
+app-project-sales-route .sales-editor__skeleton--field {
+  height: 46px;
+}
+
+app-project-sales-route .sales-editor__skeleton--item {
+  height: 136px;
+}
+
+app-project-sales-route .sales-editor__skeleton--button {
+  width: 120px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+app-project-sales-route .sales-editor__skeleton--button-primary {
+  width: 144px;
+}
+
+app-project-sales-route .sales-editor__form {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+app-project-sales-route .sales-editor__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 2px;
+}
+
+app-project-sales-route .sales-editor__section {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+app-project-sales-route .sales-editor__section-head h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+app-project-sales-route .sales-editor__section-head p {
+  margin: 4px 0 0;
+  color: rgba(11, 11, 18, 0.58);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+app-project-sales-route .sales-editor__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(11, 11, 18, 0.72);
+}
+
+app-project-sales-route .sales-editor__form input,
+app-project-sales-route .sales-editor__form textarea,
+app-project-sales-route .sales-editor__form select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+app-project-sales-route .sales-editor__form textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+app-project-sales-route .sales-editor__form input::placeholder,
+app-project-sales-route .sales-editor__form textarea::placeholder {
+  color: rgba(17, 24, 39, 0.42);
+}
+
+app-project-sales-route .sales-editor__form input:focus,
+app-project-sales-route .sales-editor__form textarea:focus,
+app-project-sales-route .sales-editor__form select:focus {
+  outline: none;
+  border-color: rgba(117, 102, 255, 0.52);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.12);
+}
+
+app-project-sales-route .sales-editor__split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@keyframes salesEditorBackdropIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes salesEditorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+app-project-sales-route .sales-editor__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-sales-route .sales-editor__item {
+  padding: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  border-radius: 14px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-sales-route .sales-editor__item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+app-project-sales-route .sales-editor__item-head strong {
+  color: #111111;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+app-project-sales-route .sales-editor__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(225, 227, 236, 0.95);
+  flex-shrink: 0;
+}
+
+app-project-sales-route .sales-editor__totals {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+app-project-sales-route .sales-editor__totals span {
+  color: rgba(11, 11, 18, 0.54);
+  font-size: 0.76rem;
+}
+
+app-project-sales-route .sales-editor__totals strong {
+  color: #111111;
+  font-size: 0.94rem;
+}
+
+app-project-sales-route .sales-editor__footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+app-project-sales-route .sales-editor__close:disabled,
+app-project-sales-route .sales-editor__secondary:disabled,
+app-project-sales-route .sales-editor__primary:disabled,
+app-project-sales-route .sales-editor__add-item:disabled,
+app-project-sales-route .sales-editor__remove-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 900px) {
+  app-project-sales-route .sales-editor__split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  app-project-sales-route .sales-editor {
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    padding: 16px;
+  }
+
+  app-project-sales-route .sales-editor__footer,
+  app-project-sales-route .sales-editor__footer-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  app-project-sales-route .sales-editor__secondary,
+  app-project-sales-route .sales-editor__primary {
+    flex: 1 1 calc(50% - 4px);
+  }
+}
+
+.theme-dark app-project-sales-route .sales-editor {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+.theme-dark app-project-sales-route .sales-editor__header h2,
+.theme-dark app-project-sales-route .sales-editor__section-head h3,
+.theme-dark app-project-sales-route .sales-editor__item-head strong,
+.theme-dark app-project-sales-route .sales-editor__totals strong {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-sales-route .sales-editor__subtitle,
+.theme-dark app-project-sales-route .sales-editor__loading,
+.theme-dark app-project-sales-route .sales-editor__form label,
+.theme-dark app-project-sales-route .sales-editor__section-head p,
+.theme-dark app-project-sales-route .sales-editor__totals span {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-sales-route .sales-editor__loading,
+.theme-dark app-project-sales-route .sales-editor__section,
+.theme-dark app-project-sales-route .sales-editor__item,
+.theme-dark app-project-sales-route .sales-editor__form input,
+.theme-dark app-project-sales-route .sales-editor__form textarea,
+.theme-dark app-project-sales-route .sales-editor__form select {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-sales-route .sales-editor__footer {
+  border-top-color: rgba(226, 231, 244, 0.1);
+}
+
+.theme-dark app-project-sales-route .sales-editor__skeleton-section {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+}
+
+.theme-dark app-project-sales-route .sales-editor__skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(34, 43, 61, 0.92) 0%,
+    rgba(43, 54, 76, 1) 50%,
+    rgba(34, 43, 61, 0.92) 100%
+  );
+  background-size: 220% 100%;
+}
+
+.theme-dark app-project-sales-route .sales-editor__form input::placeholder,
+.theme-dark app-project-sales-route .sales-editor__form textarea::placeholder {
+  color: rgba(226, 231, 244, 0.36);
+}
+
+.theme-dark app-project-sales-route .sales-editor__form input:focus,
+.theme-dark app-project-sales-route .sales-editor__form textarea:focus,
+.theme-dark app-project-sales-route .sales-editor__form select:focus {
+  border-color: rgba(117, 102, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.14);
+}
+
+.theme-dark app-project-sales-route .sales-editor__close,
+.theme-dark app-project-sales-route .sales-editor__secondary,
+.theme-dark app-project-sales-route .sales-editor__primary,
+.theme-dark app-project-sales-route .sales-editor__add-item,
+.theme-dark app-project-sales-route .sales-editor__remove-item {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+}
+
+.theme-dark app-project-sales-route .sales-editor__primary,
+.theme-dark app-project-sales-route .sales-editor__add-item {
+  color: #7566ff;
+}
+
+.theme-dark app-project-sales-route .sales-editor__secondary,
+.theme-dark app-project-sales-route .sales-editor__close,
+.theme-dark app-project-sales-route .sales-editor__remove-item {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+.theme-dark app-project-sales-route .sales-editor__close:hover,
+.theme-dark app-project-sales-route .sales-editor__secondary:hover,
+.theme-dark app-project-sales-route .sales-editor__primary:hover,
+.theme-dark app-project-sales-route .sales-editor__add-item:hover,
+.theme-dark app-project-sales-route .sales-editor__remove-item:hover {
+  background: rgba(117, 102, 255, 0.12);
+}
+
+@keyframes salesEditorShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -20% 0;
+  }
+}

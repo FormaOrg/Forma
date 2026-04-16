@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+.sales-panel {
+  padding: 18px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sales-panel__header > div {
+  min-width: 0;
+}
+
+.sales-panel__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7566ff;
+}
+
+.sales-panel__title {
+  margin: 0;
+  font-size: 1.34rem;
+  line-height: 1.1;
+  font-weight: 590;
+  letter-spacing: -0.03em;
+  color: #111111;
+}
+
+.sales-panel__subtitle {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #6f7480;
+}
+
+.sales-delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sales-delivery-card {
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fbfbfd;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sales-delivery-card__label {
+  font-size: 0.8rem;
+  font-weight: 560;
+  color: #111111;
+}
+
+.sales-delivery-card__value {
+  font-size: 1.24rem;
+  line-height: 1;
+  font-weight: 580;
+  color: #111111;
+}
+
+.sales-delivery-card__note {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: #6f7480;
+}
+
+@media (max-width: 640px) {
+  .sales-delivery-grid {
+    grid-template-columns: 1fr;
+  }
+}
