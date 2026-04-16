@@ -16,6 +16,7 @@ export type StorefrontEditorComponentType =
   | 'faq'
   | 'contact-form'
   | 'testimonials'
+  | 'checkout-form'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -219,6 +220,12 @@ export interface StorefrontEditorSocialLinksProps {
   style: 'ghost' | 'filled';
   color: string;
   backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  iconSize: number;
+  itemSize: number;
+  spacing: number;
+  radius: number;
   labels: string[];
 }
 
@@ -256,6 +263,18 @@ export interface StorefrontEditorTestimonialsProps {
   cardBackground: string;
   textColor: string;
   items: StorefrontEditorTestimonialItem[];
+}
+
+export interface StorefrontEditorCheckoutFormProps {
+  title: string;
+  description: string;
+  firstNameLabel: string;
+  lastNameLabel: string;
+  phoneLabel: string;
+  emailLabel: string;
+  addressLabel: string;
+  notesLabel: string;
+  submitLabel: string;
 }
 
 export interface StorefrontEditorContainerProps {
@@ -366,6 +385,7 @@ export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'soc
 export type StorefrontEditorFaqNode = StorefrontEditorComponentBase<'faq', StorefrontEditorFaqProps>;
 export type StorefrontEditorContactFormNode = StorefrontEditorComponentBase<'contact-form', StorefrontEditorContactFormProps>;
 export type StorefrontEditorTestimonialsNode = StorefrontEditorComponentBase<'testimonials', StorefrontEditorTestimonialsProps>;
+export type StorefrontEditorCheckoutFormNode = StorefrontEditorComponentBase<'checkout-form', StorefrontEditorCheckoutFormProps>;
 export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'container', StorefrontEditorContainerProps>;
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
 export type StorefrontEditorProductFeedNode = StorefrontEditorComponentBase<'product-feed', StorefrontEditorProductFeedProps>;
@@ -389,6 +409,7 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorFaqNode
   | StorefrontEditorContactFormNode
   | StorefrontEditorTestimonialsNode
+  | StorefrontEditorCheckoutFormNode
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
   | StorefrontEditorProductFeedNode
@@ -450,6 +471,8 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 430, width: 440, height: 520 };
     case 'testimonials':
       return { x: 32, y: 32, width: 560, height: 320 };
+    case 'checkout-form':
+      return { x: 32, y: 120, width: 760, height: 520 };
     case 'container':
       return { x: 32, y: 32, width: 340, height: 220 };
     case 'graphic':
@@ -1027,6 +1050,12 @@ export function createStorefrontEditorComponentNode(
           style: 'ghost',
           color: '#111827',
           backgroundColor: '#111827',
+          borderColor: '#111827',
+          borderWidth: 1,
+          iconSize: 18,
+          itemSize: 38,
+          spacing: 12,
+          radius: 12,
           labels: ['instagram', 'facebook', 'tiktok'],
         },
       };
@@ -1098,6 +1127,22 @@ export function createStorefrontEditorComponentNode(
               initials: 'PL',
             },
           ],
+        },
+      };
+    case 'checkout-form':
+      return {
+        ...createStorefrontEditorComponentBase('checkout-form'),
+        name: 'Checkout form',
+        props: {
+          title: 'Checkout',
+          description: 'Collect delivery and contact information before placing the order.',
+          firstNameLabel: 'First name',
+          lastNameLabel: 'Last name',
+          phoneLabel: 'Phone',
+          emailLabel: 'Email',
+          addressLabel: 'Address',
+          notesLabel: 'Order notes',
+          submitLabel: 'Place order',
         },
       };
     case 'container':

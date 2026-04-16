@@ -4,86 +4,101 @@ import { Component, computed, input } from '@angular/core';
 import { ProjectCatalogProduct } from '../../../../../../../../core/models/project-catalog.model';
 import { StorefrontEditorProductDetailsNode } from '../storefront-editor-component.model';
 
+const MOCK_PRODUCT: ProjectCatalogProduct = {
+  id: 0,
+  name: 'Mock Product',
+  description: 'This is a preview product used when the catalog is empty.',
+  sku: 'MOCK-001',
+  category: 'Featured',
+  productType: 'PHYSICAL',
+  status: 'ACTIVE',
+  price: 79,
+  compareAtPrice: 99,
+  inventoryQuantity: 8,
+  imageUrl: null,
+  tags: ['new', 'bestseller'],
+  readyToPublish: true,
+  readinessIssues: [],
+  createdAt: null,
+  updatedAt: null,
+};
+
 @Component({
   selector: 'app-storefront-editor-block-product-details',
   standalone: true,
   imports: [CommonModule, CurrencyPipe],
   template: `
-    @if (product(); as product) {
-      <article class="storefront-editor-product-details">
-        <div class="storefront-editor-product-details__media">
-          @if (product.imageUrl) {
-            <img [src]="product.imageUrl" [alt]="product.name" />
-          } @else {
-            <div class="storefront-editor-product-details__placeholder">{{ product.name.slice(0, 1) }}</div>
+    <article class="storefront-editor-product-details">
+      <div class="storefront-editor-product-details__media">
+        @if (product().imageUrl) {
+          <img [src]="product().imageUrl" [alt]="product().name" />
+        } @else {
+          <div class="storefront-editor-product-details__placeholder">{{ product().name.slice(0, 1) }}</div>
+        }
+      </div>
+
+      <div class="storefront-editor-product-details__content">
+        @if (node().props.showCategory && product().category) {
+          <span class="storefront-editor-product-details__eyebrow">{{ product().category }}</span>
+        }
+
+        <h2>{{ product().name }}</h2>
+
+        <div class="storefront-editor-product-details__price-row">
+          <strong>{{ product().price | currency:'TND':'symbol':'1.0-2' }}</strong>
+          @if (node().props.showCompareAtPrice && product().compareAtPrice) {
+            <span>{{ product().compareAtPrice | currency:'TND':'symbol':'1.0-2' }}</span>
           }
         </div>
 
-        <div class="storefront-editor-product-details__content">
-          @if (node().props.showCategory && product.category) {
-            <span class="storefront-editor-product-details__eyebrow">{{ product.category }}</span>
-          }
+        <p class="storefront-editor-product-details__stock" [class.storefront-editor-product-details__stock--out]="!inStock()">
+          {{ inStock() ? node().props.inStockLabel : node().props.outOfStockLabel }}
+        </p>
 
-          <h2>{{ product.name }}</h2>
+        @if (node().props.showDescription && product().description) {
+          <p class="storefront-editor-product-details__description">{{ product().description }}</p>
+        }
 
-          <div class="storefront-editor-product-details__price-row">
-            <strong>{{ product.price | currency:'TND':'symbol':'1.0-2' }}</strong>
-            @if (node().props.showCompareAtPrice && product.compareAtPrice) {
-              <span>{{ product.compareAtPrice | currency:'TND':'symbol':'1.0-2' }}</span>
+        @if (node().props.showFacts) {
+          <div class="storefront-editor-product-details__facts">
+            @if (product().sku) {
+              <div>
+                <span>{{ node().props.skuLabel }}</span>
+                <strong>{{ product().sku }}</strong>
+              </div>
+            }
+            <div>
+              <span>Type</span>
+              <strong>{{ product().productType || 'Product' }}</strong>
+            </div>
+          </div>
+        }
+
+        @if (node().props.showTags && product().tags.length) {
+          <div class="storefront-editor-product-details__tags">
+            @for (tag of product().tags; track tag) {
+              <span>{{ tag }}</span>
             }
           </div>
+        }
 
-          <p class="storefront-editor-product-details__stock" [class.storefront-editor-product-details__stock--out]="!inStock()">
-            {{ inStock() ? node().props.inStockLabel : node().props.outOfStockLabel }}
-          </p>
-
-          @if (node().props.showDescription && product.description) {
-            <p class="storefront-editor-product-details__description">{{ product.description }}</p>
-          }
-
-          @if (node().props.showFacts) {
-            <div class="storefront-editor-product-details__facts">
-              @if (product.sku) {
-                <div>
-                  <span>{{ node().props.skuLabel }}</span>
-                  <strong>{{ product.sku }}</strong>
-                </div>
-              }
-              <div>
-                <span>Type</span>
-                <strong>{{ product.productType || 'Product' }}</strong>
-              </div>
-            </div>
-          }
-
-          @if (node().props.showTags && product.tags.length) {
-            <div class="storefront-editor-product-details__tags">
-              @for (tag of product.tags; track tag) {
-                <span>{{ tag }}</span>
-              }
-            </div>
-          }
-
-          <div class="storefront-editor-product-details__quantity">
-            <span>{{ node().props.quantityLabel }}</span>
-            <div class="storefront-editor-product-details__stepper">
-              <button type="button" disabled>-</button>
-              <span>1</span>
-              <button type="button" disabled>+</button>
-            </div>
-          </div>
-
-          <div class="storefront-editor-product-details__actions">
-            <button type="button" [disabled]="!inStock()">{{ node().props.addToCartLabel }}</button>
-            <button type="button" class="storefront-editor-product-details__buy-now" [disabled]="!inStock()">
-              {{ node().props.buyNowLabel }}
-            </button>
+        <div class="storefront-editor-product-details__quantity">
+          <span>{{ node().props.quantityLabel }}</span>
+          <div class="storefront-editor-product-details__stepper">
+            <button type="button" disabled>-</button>
+            <span>1</span>
+            <button type="button" disabled>+</button>
           </div>
         </div>
-      </article>
-    } @else {
-      <div class="storefront-editor-product-details__empty">Add products in the catalog to preview product details here.</div>
-    }
+
+        <div class="storefront-editor-product-details__actions">
+          <button type="button" [disabled]="!inStock()">{{ node().props.addToCartLabel }}</button>
+          <button type="button" class="storefront-editor-product-details__buy-now" [disabled]="!inStock()">
+            {{ node().props.buyNowLabel }}
+          </button>
+        </div>
+      </div>
+    </article>
   `,
   styles: [`
     :host { display:block; width:100%; height:100%; }
@@ -117,7 +132,6 @@ import { StorefrontEditorProductDetailsNode } from '../storefront-editor-compone
     .storefront-editor-product-details__actions button { min-height:50px; border-radius:999px; border:1px solid #111827; padding:0 24px; background:#111827; color:#fff; font:600 15px/1 Poppins,sans-serif; }
     .storefront-editor-product-details__actions button[disabled] { cursor:not-allowed; opacity:.45; }
     .storefront-editor-product-details__buy-now { background:#fff !important; color:#111827 !important; }
-    .storefront-editor-product-details__empty { width:100%; height:100%; display:flex; align-items:center; justify-content:center; border:1px dashed #cbd5e1; border-radius:24px; font:500 15px/1.5 Poppins,sans-serif; color:#64748b; background:#fff; padding:24px; text-align:center; box-sizing:border-box; }
     @media (max-width: 860px) {
       .storefront-editor-product-details { grid-template-columns:1fr; }
     }
@@ -127,6 +141,6 @@ export class StorefrontEditorBlockProductDetailsComponent {
   readonly node = input.required<StorefrontEditorProductDetailsNode>();
   readonly products = input<ProjectCatalogProduct[]>([]);
 
-  readonly product = computed(() => this.products()[0] ?? null);
+  readonly product = computed(() => this.products()[0] ?? MOCK_PRODUCT);
   readonly inStock = computed(() => (this.product()?.inventoryQuantity ?? 0) > 0);
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 
 import { ProjectCatalogProduct } from '../../../../../../../core/models/project-catalog.model';
+import { Project } from '../../../../../../../core/models/project.model';
 
 import { StorefrontEditorComponentNode } from './storefront-editor-component.model';
 import { StorefrontEditorBlockTextComponent } from './blocks/storefront-editor-block-text.component';
@@ -19,6 +20,7 @@ import { StorefrontEditorBlockSocialLinksComponent } from './blocks/storefront-e
 import { StorefrontEditorBlockFaqComponent } from './blocks/storefront-editor-block-faq.component';
 import { StorefrontEditorBlockContactFormComponent } from './blocks/storefront-editor-block-contact-form.component';
 import { StorefrontEditorBlockTestimonialsComponent } from './blocks/storefront-editor-block-testimonials.component';
+import { StorefrontEditorBlockCheckoutFormComponent } from './blocks/storefront-editor-block-checkout-form.component';
 import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-editor-block-container.component';
 import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
 import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-editor-block-product-feed.component';
@@ -46,6 +48,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
     StorefrontEditorBlockFaqComponent,
     StorefrontEditorBlockContactFormComponent,
     StorefrontEditorBlockTestimonialsComponent,
+    StorefrontEditorBlockCheckoutFormComponent,
     StorefrontEditorBlockContainerComponent,
     StorefrontEditorBlockGraphicComponent,
     StorefrontEditorBlockProductFeedComponent,
@@ -109,7 +112,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
         <app-storefront-editor-block-spacer [node]="$any(node())" />
       }
       @case ('social-links') {
-        <app-storefront-editor-block-social-links [node]="$any(node())" />
+        <app-storefront-editor-block-social-links [node]="$any(node())" [project]="project()" />
       }
       @case ('faq') {
         <app-storefront-editor-block-faq [node]="$any(node())" />
@@ -119,6 +122,8 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
       }
       @case ('testimonials') {
         <app-storefront-editor-block-testimonials [node]="$any(node())" />
+      @case ('checkout-form') {
+        <app-storefront-editor-block-checkout-form [node]="$any(node())" />
       }
       @case ('container') {
         <app-storefront-editor-block-container [node]="$any(node())" />
@@ -144,6 +149,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
 export class StorefrontEditorComponentHostComponent {
   readonly node = input.required<StorefrontEditorComponentNode>();
   readonly products = input<ProjectCatalogProduct[]>([]);
+  readonly project = input<Project | null>(null);
   readonly disableImageCrop = input(false);
   readonly renderWidth = input<number | null>(null);
   readonly renderHeight = input<number | null>(null);

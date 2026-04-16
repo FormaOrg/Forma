@@ -13,6 +13,33 @@ type CartPreviewItem = {
   quantity: number;
 };
 
+const MOCK_CART_ITEMS: CartPreviewItem[] = [
+  {
+    id: 9001,
+    name: 'Mock Hoodie',
+    category: 'Apparel',
+    price: 120,
+    imageUrl: null,
+    quantity: 1,
+  },
+  {
+    id: 9002,
+    name: 'Mock Sneakers',
+    category: 'Footwear',
+    price: 180,
+    imageUrl: null,
+    quantity: 2,
+  },
+  {
+    id: 9003,
+    name: 'Mock Cap',
+    category: 'Accessories',
+    price: 45,
+    imageUrl: null,
+    quantity: 1,
+  },
+];
+
 @Component({
   selector: 'app-storefront-editor-block-cart-content',
   standalone: true,
@@ -123,8 +150,8 @@ export class StorefrontEditorBlockCartContentComponent {
   readonly node = input.required<StorefrontEditorCartContentNode>();
   readonly products = input<ProjectCatalogProduct[]>([]);
 
-  readonly items = computed<CartPreviewItem[]>(() =>
-    this.products()
+  readonly items = computed<CartPreviewItem[]>(() => {
+    const mappedProducts = this.products()
       .slice(0, 3)
       .map((product, index) => ({
         id: product.id,
@@ -133,8 +160,10 @@ export class StorefrontEditorBlockCartContentComponent {
         price: product.price,
         imageUrl: product.imageUrl,
         quantity: index === 0 ? 2 : 1,
-      }))
-  );
+      }));
+
+    return mappedProducts.length ? mappedProducts : MOCK_CART_ITEMS;
+  });
 
   readonly subtotal = computed(() =>
     this.items().reduce((total, item) => total + item.price * item.quantity, 0)

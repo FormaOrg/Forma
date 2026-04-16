@@ -15,7 +15,7 @@ import {
   StorefrontEditorViewport,
   StorefrontHomepageSection,
 } from '../../../../../../core/models/project-storefront.model';
-import { Project } from '../../../../../../core/models/project.model';
+import { Project, UpdateProjectRequest } from '../../../../../../core/models/project.model';
 import { ProjectCatalogService } from '../../../../../../core/services/project-catalog.service';
 import { ProjectStorefrontService } from '../../../../../../core/services/project-storefront.service';
 import { ProjectService } from '../../../../../../core/services/project.service';
@@ -24,7 +24,7 @@ import { PublicStorefrontService } from '../../../../../../core/services/public-
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
-import { AppIcon } from '../../../../../../shared/app/icons/app-icon';
+import { AppIcon, AppIconName } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
 import {
   STOREFRONT_EDITOR_PAGE_DESIGN_CATEGORIES,
@@ -61,6 +61,7 @@ import {
   StorefrontEditorProductFeedNode,
   StorefrontEditorProductDetailsNode,
   StorefrontEditorSearchNode,
+  StorefrontEditorSocialLinksNode,
   StorefrontEditorTextNode,
   StorefrontEditorTextStylePreset,
   buildStorefrontEditorImageSourceMetadata,
@@ -154,8 +155,19 @@ type CartToolbarMenu = 'edit-text' | 'settings' | null;
 type CartContentToolbarMenu = 'edit-text' | 'settings' | null;
 type ProductDetailsToolbarMenu = 'edit-text' | 'settings' | null;
 type SearchToolbarMenu = 'edit-text' | 'settings' | null;
+type SocialLinksToolbarMenu = 'settings' | 'background' | 'borders' | 'corners' | 'spacing' | null;
+type SocialLinkKey = 'instagram' | 'facebook' | 'tiktok' | 'whatsapp';
 type MenuItemReorderState = {
   itemId: string;
+  rowTop: number;
+  rowHeight: number;
+  pointerOffsetY: number;
+  minTranslateY: number;
+  maxTranslateY: number;
+  currentTranslateY: number;
+};
+type SocialLinkReorderState = {
+  key: SocialLinkKey;
   rowTop: number;
   rowHeight: number;
   pointerOffsetY: number;
@@ -253,6 +265,8 @@ type StorefrontEditorBrandKitPreset = {
   boxBorder: string;
   lines: string[];
 };
+
+const STOREFRONT_EDITOR_SOCIAL_LINK_KEYS: readonly SocialLinkKey[] = ['instagram', 'facebook', 'tiktok', 'whatsapp'];
 type StorefrontPageDesignTemplate = {
   id: string;
   name: string;
@@ -494,6 +508,15 @@ private readonly authService = inject(AuthService);
       }
     | null = null;
   private activeComponentDragUndoSnapshot: StorefrontEditorSnapshot | null = null;
+  private pendingComponentDragStart:
+    | {
+        sectionId: string;
+        componentId: string;
+        target: HTMLElement;
+        clientX: number;
+        clientY: number;
+      }
+    | null = null;
   private pendingComponentDragPointer:
     | {
         clientX: number;
@@ -501,6 +524,7 @@ private readonly authService = inject(AuthService);
       }
     | null = null;
   private activeComponentDragFrame: number | null = null;
+  private readonly componentDragStartThreshold = 4;
   private activeSelectionDrag:
     | {
         sectionId: string;
@@ -822,6 +846,10 @@ readonly selectedSearchComponent = computed<StorefrontEditorSearchNode | null>((
   const component = this.selectedComponent();
   return component?.type === 'search' ? this.resolveResponsiveComponentNode(component) : null;
 });
+readonly selectedSocialLinksComponent = computed<StorefrontEditorSocialLinksNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'social-links' ? this.resolveResponsiveComponentNode(component) : null;
+});
 readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
   const component = this.selectedComponent();
   return component?.type === 'container' ? component : null;
@@ -867,6 +895,9 @@ readonly isCartToolbarVisible = computed(
 );
 readonly isSearchToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedSearchComponent() !== null
+);
+readonly isSocialLinksToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedSocialLinksComponent() !== null
 );
 readonly isProductFeedToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedProductFeedComponent() !== null
@@ -968,6 +999,20 @@ readonly activeCartContentSettingsSection = signal<CartContentSettingsSection>('
 readonly activeProductDetailsToolbarMenu = signal<ProductDetailsToolbarMenu>(null);
 readonly activeProductDetailsSettingsSection = signal<ProductDetailsSettingsSection>('content');
 readonly activeSearchToolbarMenu = signal<SearchToolbarMenu>(null);
+readonly activeSocialLinksToolbarMenu = signal<SocialLinksToolbarMenu>(null);
+private lastSelectedSocialLinksComponentId: string | null = null;
+private lastSyncedSocialLinksProjectFingerprint = '';
+private pendingSocialLinksProjectSave = false;
+readonly isSavingSocialLinksProjectSettings = signal(false);
+readonly socialLinksDraftValues = signal<Record<SocialLinkKey, string>>({
+  instagram: '',
+  facebook: '',
+  tiktok: '',
+  whatsapp: '',
+});
+readonly draggedSocialLinkKey = signal<SocialLinkKey | null>(null);
+readonly socialLinkDropTargetKey = signal<SocialLinkKey | null>(null);
+readonly activeSocialLinkReorder = signal<SocialLinkReorderState | null>(null);
 readonly activeButtonTextDropdownMenu = signal<ButtonTextDropdownMenu>(null);
   readonly activeProductFeedToolbarMenu = signal<ProductFeedToolbarMenu>(null);
   readonly activeProductFeedSettingsSection = signal<ProductFeedSettingsSection>('category');
@@ -2007,6 +2052,34 @@ effect(() => {
 });
 
 effect(() => {
+  const component = this.selectedSocialLinksComponent();
+  const project = this.project();
+  const selectedId = component?.id ?? null;
+
+  if (!component) {
+    this.activeSocialLinksToolbarMenu.set(null);
+    this.clearSocialLinkReorderState();
+    this.lastSelectedSocialLinksComponentId = null;
+    this.lastSyncedSocialLinksProjectFingerprint = '';
+    return;
+  }
+
+  const fingerprint = this.buildSocialLinksProjectFingerprint(project);
+  if (selectedId !== this.lastSelectedSocialLinksComponentId) {
+    this.lastSelectedSocialLinksComponentId = selectedId;
+    this.lastSyncedSocialLinksProjectFingerprint = fingerprint;
+    this.socialLinksDraftValues.set(this.createSocialLinksDraftFromProject(project));
+    this.ensureSelectedSocialLinksOrder(component);
+    return;
+  }
+
+  if (fingerprint !== this.lastSyncedSocialLinksProjectFingerprint && !this.isSavingSocialLinksProjectSettings()) {
+    this.lastSyncedSocialLinksProjectFingerprint = fingerprint;
+    this.socialLinksDraftValues.set(this.createSocialLinksDraftFromProject(project));
+  }
+});
+
+effect(() => {
   const component = this.selectedProductDetailsComponent();
   if (!component) {
     this.activeProductDetailsToolbarMenu.set(null);
@@ -2177,6 +2250,12 @@ if (event.key === 'Escape' && this.activeProductDetailsToolbarMenu()) {
 if (event.key === 'Escape' && this.activeSearchToolbarMenu()) {
   event.preventDefault();
   this.activeSearchToolbarMenu.set(null);
+  return;
+}
+
+if (event.key === 'Escape' && this.activeSocialLinksToolbarMenu()) {
+  event.preventDefault();
+  this.closeActiveSocialLinksToolbarMenu();
   return;
 }
 
@@ -2374,6 +2453,7 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
    this.activeMenuItemActionsId.set(null);
    this.closeMenuItemLinkEditor();
    this.renamingMenuItemId.set(null);
+   this.closeActiveSocialLinksToolbarMenu();
    this.activeProductFeedToolbarMenu.set(null);
    this.closeComponentContextMenu();
    return;
@@ -2560,6 +2640,12 @@ if (this.activeProductFeedToolbarMenu()) {
   }
 }
 
+if (this.activeSocialLinksToolbarMenu()) {
+  if (!target.closest('.storefront-editor__context-toolbar-shell, .storefront-editor__button-toolbar-side-panel')) {
+    this.closeActiveSocialLinksToolbarMenu();
+  }
+}
+
  if (this.isComponentContextMenuOpen()) {
    if (!target.closest('.storefront-editor__component-context-menu')) {
      this.closeComponentContextMenu();
@@ -2659,6 +2745,12 @@ if (this.activeProductFeedToolbarMenu()) {
       return;
     }
 
+    if (this.activeSocialLinkReorder()) {
+      event.preventDefault();
+      this.updateSocialLinkReorder(event);
+      return;
+    }
+
     if (this.activeAddElementsComponentDrag) {
       event.preventDefault();
       this.updateAddElementsComponentDrag(event);
@@ -2699,6 +2791,15 @@ if (this.activeProductFeedToolbarMenu()) {
       event.preventDefault();
       this.updateRotatingComponent(event);
       return;
+    }
+
+    if (!this.activeComponentDrag && this.pendingComponentDragStart) {
+      const deltaX = event.clientX - this.pendingComponentDragStart.clientX;
+      const deltaY = event.clientY - this.pendingComponentDragStart.clientY;
+      if (Math.hypot(deltaX, deltaY) >= this.componentDragStartThreshold) {
+        this.activatePendingComponentDrag(this.pendingComponentDragStart);
+        this.pendingComponentDragStart = null;
+      }
     }
 
     if (!this.activeComponentDrag) {
@@ -2862,6 +2963,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     return;
   }
 
+  if (this.activeSocialLinkReorder()) {
+    this.finalizeSocialLinkReorder();
+    return;
+  }
+
   if (this.activeImageCrop) {
     this.activeImageCrop = null;
     return;
@@ -2874,6 +2980,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
   if (this.activeSectionLayoutResize) {
     this.activeSectionLayoutResize = null;
+    return;
+  }
+
+  if (this.pendingComponentDragStart) {
+    this.pendingComponentDragStart = null;
     return;
   }
 
@@ -2935,8 +3046,98 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.isResizingComponent.set(false);
     this.isRotatingComponent.set(false);
     this.isResizingSection.set(false);
+  this.componentAttachSectionId.set(null);
+  this.finishComponentSelectionBox();
+  }
+
+  private activatePendingComponentDrag(pendingDrag: {
+    sectionId: string;
+    componentId: string;
+    target: HTMLElement;
+    clientX: number;
+    clientY: number;
+  }): void {
+    const section = this.sections().find((item) => item.id === pendingDrag.sectionId);
+    const component = section
+      ? this.readSectionComponents(section).find((item) => item.id === pendingDrag.componentId)
+      : null;
+    if (!section || !component || component.isLocked || !component.isVisible) {
+      return;
+    }
+
+    const sectionComponents = this.readSectionComponents(section);
+    const selectedIds = new Set(this.selectedComponentIds());
+    const dragComponents = sectionComponents.filter((item) => {
+      if (component.groupId && this.isolatedGroupComponentId() !== component.id) {
+        return item.groupId === component.groupId;
+      }
+
+      return selectedIds.has(item.id)
+        ? selectedIds.has(pendingDrag.componentId)
+        : item.id === pendingDrag.componentId;
+    });
+    const dragRoots = dragComponents.length ? dragComponents : [component];
+    const dragComponentIds = new Set(dragRoots.map((item) => item.id));
+    for (const dragRoot of dragRoots) {
+      if (dragRoot.type !== 'container') {
+        continue;
+      }
+
+      this.getContainerAssociatedComponents(sectionComponents, dragRoot).forEach((item) => {
+        dragComponentIds.add(item.id);
+      });
+    }
+
+    const orderedComponents = sectionComponents
+      .filter((item) => dragComponentIds.has(item.id))
+      .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+    const dragBounds = this.getDraggedComponentsBounds(orderedComponents.map((item) => {
+      const frame = this.getComponentFrame(item);
+      return {
+        startX: frame.x,
+        startY: frame.y,
+        width: frame.width,
+        height: frame.height,
+      };
+    }));
+    const container = pendingDrag.target.closest('.storefront-editor__preview-section-content');
+    const containerRect = container instanceof HTMLElement
+      ? container.getBoundingClientRect()
+      : pendingDrag.target.getBoundingClientRect();
+    const scale = this.getPreviewInteractionScale();
+
+    this.activeComponentDrag = {
+      sectionId: pendingDrag.sectionId,
+      sourceContainerId: component.parentContainerId ?? null,
+      pointerOffsetX: pendingDrag.clientX - (containerRect.left + dragBounds.x * scale),
+      pointerOffsetY: pendingDrag.clientY - (containerRect.top + dragBounds.y * scale),
+      components: orderedComponents.map((item) => {
+        const frame = this.getComponentFrame(item);
+        return {
+          componentId: item.id,
+          startX: frame.x,
+          startY: frame.y,
+          width: frame.width,
+          height: frame.height,
+        };
+      }),
+    };
+
+    this.componentAttachContainerTarget.set(null);
     this.componentAttachSectionId.set(null);
-    this.finishComponentSelectionBox();
+
+    const storefront = this.workingStorefront();
+    this.activeComponentDragUndoSnapshot = storefront
+      ? this.createEditorSnapshot(storefront, this.selectedSectionId())
+      : null;
+
+    this.removeSectionLayoutAssignments(
+      pendingDrag.sectionId,
+      orderedComponents.map((item) => item.id),
+      { selectedSectionId: pendingDrag.sectionId, syncRail: false, transient: true }
+    );
+
+    this.suppressNextComponentClickSelectionId = pendingDrag.componentId;
   }
 
   loadEditor(): void {
@@ -3813,75 +4014,14 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
-    const sectionComponents = section ? this.readSectionComponents(section) : [];
-    const selectedIds = new Set(this.selectedComponentIds());
-    const dragComponents = sectionComponents.filter((item) => {
-      if (component.groupId && this.isolatedGroupComponentId() !== component.id) {
-        return item.groupId === component.groupId;
-      }
-
-      return selectedIds.has(item.id)
-        ? selectedIds.has(componentId)
-        : item.id === componentId;
-    });
-    const dragRoots = dragComponents.length ? dragComponents : [component];
-    const dragComponentIds = new Set(dragRoots.map((item) => item.id));
-    for (const dragRoot of dragRoots) {
-      if (dragRoot.type !== 'container') {
-        continue;
-      }
-
-      this.getContainerAssociatedComponents(sectionComponents, dragRoot).forEach((item) => {
-        dragComponentIds.add(item.id);
-      });
-    }
-    const effectiveComponents = sectionComponents.filter((item) => dragComponentIds.has(item.id));
-    const orderedComponents = [...effectiveComponents].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
-    const dragBounds = this.getDraggedComponentsBounds(orderedComponents.map((item) => {
-      const frame = this.getComponentFrame(item);
-      return {
-        startX: frame.x,
-        startY: frame.y,
-        width: frame.width,
-        height: frame.height,
-      };
-    }));
-    const container = target.closest('.storefront-editor__preview-section-content');
-    const containerRect = container instanceof HTMLElement ? container.getBoundingClientRect() : target.getBoundingClientRect();
-    const scale = this.getPreviewInteractionScale();
-    this.activeComponentDrag = {
-      sectionId,
-      sourceContainerId: component.parentContainerId ?? null,
-      pointerOffsetX: event.clientX - (containerRect.left + dragBounds.x * scale),
-      pointerOffsetY: event.clientY - (containerRect.top + dragBounds.y * scale),
-      components: orderedComponents.map((item) => {
-        const frame = this.getComponentFrame(item);
-        return {
-          componentId: item.id,
-          startX: frame.x,
-          startY: frame.y,
-          width: frame.width,
-          height: frame.height,
-        };
-      }),
-      };
-
-    this.componentAttachContainerTarget.set(null);
-    this.componentAttachSectionId.set(null);
-
-    const storefront = this.workingStorefront();
-    this.activeComponentDragUndoSnapshot = storefront
-      ? this.createEditorSnapshot(storefront, this.selectedSectionId())
-      : null;
-
-    this.removeSectionLayoutAssignments(
-      sectionId,
-      orderedComponents.map((item) => item.id),
-      { selectedSectionId: sectionId, syncRail: false, transient: true }
-    );
-
-    this.suppressNextComponentClickSelectionId = componentId;
     this.selectComponent(sectionId, componentId, event);
+    this.pendingComponentDragStart = {
+      sectionId,
+      componentId,
+      target,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    };
   }
 
   isolateGroupedComponent(sectionId: string, componentId: string, event: MouseEvent): void {
@@ -4110,6 +4250,11 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
   clearComponentSelection(sectionId?: string, event?: MouseEvent): void {
     event?.stopPropagation();
+    const target = event?.target;
+    if (target instanceof Element && target.closest('.storefront-editor__preview-component')) {
+      return;
+    }
+
     if (this.justFinishedComponentSelectionBox) {
       this.justFinishedComponentSelectionBox = false;
       return;
@@ -4881,6 +5026,7 @@ this.activeAccountToolbarMenu.set(null);
 this.activeTestimonialsToolbarMenu.set(null);
 this.activeCartToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
+this.closeActiveSocialLinksToolbarMenu();
 this.closeButtonTextDropdownMenu();
 this.activeProductFeedToolbarMenu.set(null);
   this.closeAddElementsPanel();
@@ -7269,6 +7415,142 @@ removeTestimonialItem(index: number): void {
 setTestimonialRating(index: number, rating: number): void {
   this.updateTestimonialItem(index, { rating });
 }
+  socialLinksManageItems(component: StorefrontEditorSocialLinksNode | null): Array<{
+    key: SocialLinkKey;
+    label: string;
+    icon: AppIconName;
+    value: string;
+  }> {
+    const order = this.normalizeSocialLinksOrder(component?.props.labels ?? []);
+    const draft = this.socialLinksDraftValues();
+    return order.map((key) => ({
+      key,
+      label: this.socialLinkLabel(key),
+      icon: this.socialLinkIcon(key),
+      value: draft[key] ?? '',
+    }));
+  }
+
+  updateSocialLinksDraftValue(key: SocialLinkKey, value: string): void {
+    this.socialLinksDraftValues.update((current) => ({ ...current, [key]: value }));
+  }
+
+  commitSocialLinksDraftValue(): void {
+    this.persistSocialLinksProjectSettings();
+  }
+
+  startSocialLinkReorder(key: SocialLinkKey, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const handle = event.currentTarget;
+    if (!(handle instanceof HTMLElement)) {
+      return;
+    }
+
+    const itemElement = handle.closest('.storefront-editor__social-links-manage-item');
+    const listElement = handle.closest('.storefront-editor__social-links-manage-list');
+    if (!(itemElement instanceof HTMLElement) || !(listElement instanceof HTMLElement)) {
+      return;
+    }
+
+    const rowRect = itemElement.getBoundingClientRect();
+    const listRect = listElement.getBoundingClientRect();
+    this.draggedSocialLinkKey.set(key);
+    this.socialLinkDropTargetKey.set(key);
+    this.activeSocialLinkReorder.set({
+      key,
+      rowTop: rowRect.top,
+      rowHeight: rowRect.height,
+      pointerOffsetY: event.clientY - rowRect.top,
+      minTranslateY: listRect.top - rowRect.top,
+      maxTranslateY: listRect.bottom - rowRect.bottom,
+      currentTranslateY: 0,
+    });
+    document.body.style.userSelect = 'none';
+  }
+
+  socialLinkReorderTransform(key: SocialLinkKey): string | null {
+    const reorder = this.activeSocialLinkReorder();
+    if (!reorder || reorder.key !== key) {
+      return null;
+    }
+
+    return `translateY(${Math.round(reorder.currentTranslateY)}px)`;
+  }
+
+  isSocialLinkBeingReordered(key: SocialLinkKey): boolean {
+    return this.activeSocialLinkReorder()?.key === key;
+  }
+
+  clearSocialLinkReorderState(): void {
+    if (this.activeSocialLinkReorder()) {
+      document.body.style.userSelect = '';
+    }
+    this.activeSocialLinkReorder.set(null);
+    this.draggedSocialLinkKey.set(null);
+    this.socialLinkDropTargetKey.set(null);
+  }
+
+  private updateSocialLinkReorder(event: MouseEvent): void {
+    const reorder = this.activeSocialLinkReorder();
+    if (!reorder) {
+      return;
+    }
+
+    const nextTop = event.clientY - reorder.pointerOffsetY;
+    const nextTranslateY = Math.max(
+      reorder.minTranslateY,
+      Math.min(nextTop - reorder.rowTop, reorder.maxTranslateY)
+    );
+    const currentCenterY = reorder.rowTop + nextTranslateY + reorder.rowHeight / 2;
+    const itemElements = Array.from(
+      document.querySelectorAll<HTMLElement>('.storefront-editor__social-links-manage-item[data-social-link-key]')
+    );
+
+    let nextTargetKey = reorder.key;
+    let lastCandidateKey = reorder.key;
+    for (const itemElement of itemElements) {
+      const candidateValue = itemElement.dataset['socialLinkKey'] ?? null;
+      const candidateKey = this.normalizeSocialLinkKey(candidateValue);
+      if (!candidateKey || candidateKey === reorder.key) {
+        continue;
+      }
+
+      const rect = itemElement.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      if (currentCenterY <= centerY) {
+        nextTargetKey = candidateKey;
+        lastCandidateKey = candidateKey;
+        break;
+      }
+
+      lastCandidateKey = candidateKey;
+    }
+
+    if (nextTargetKey === reorder.key) {
+      nextTargetKey = lastCandidateKey;
+    }
+
+    this.activeSocialLinkReorder.set({
+      ...reorder,
+      currentTranslateY: nextTranslateY,
+    });
+    this.socialLinkDropTargetKey.set(nextTargetKey);
+  }
+
+  private finalizeSocialLinkReorder(): void {
+    const reorder = this.activeSocialLinkReorder();
+    if (!reorder) {
+      return;
+    }
+
+    const targetKey = this.socialLinkDropTargetKey() ?? reorder.key;
+    if (targetKey !== reorder.key) {
+      this.reorderSelectedSocialLinkLabels(reorder.key, targetKey);
+    }
+
+    this.clearSocialLinkReorderState();
+  }
 
 toggleCartToolbarMenu(menu: Exclude<CartToolbarMenu, null>): void {
   const next = this.activeCartToolbarMenu() === menu ? null : menu;
@@ -7307,6 +7589,35 @@ toggleSearchToolbarMenu(menu: Exclude<SearchToolbarMenu, null>): void {
     this.searchEditLabelValue.set(this.selectedSearchComponent()?.props.label ?? 'Search');
     this.searchEditPlaceholderValue.set(this.selectedSearchComponent()?.props.placeholder ?? 'Search products');
   }
+}
+
+toggleSocialLinksToolbarMenu(menu: Exclude<SocialLinksToolbarMenu, null>): void {
+  const current = this.activeSocialLinksToolbarMenu();
+  if (current === menu) {
+    this.closeActiveSocialLinksToolbarMenu();
+    return;
+  }
+
+  if (current === 'settings') {
+    this.persistSocialLinksProjectSettings();
+    this.clearSocialLinkReorderState();
+  }
+
+  if (menu === 'settings') {
+    this.socialLinksDraftValues.set(this.createSocialLinksDraftFromProject(this.project()));
+  }
+
+  const next = menu;
+  this.activeSocialLinksToolbarMenu.set(next);
+}
+
+closeActiveSocialLinksToolbarMenu(): void {
+  if (this.activeSocialLinksToolbarMenu() === 'settings') {
+    this.persistSocialLinksProjectSettings();
+    this.clearSocialLinkReorderState();
+  }
+
+  this.activeSocialLinksToolbarMenu.set(null);
 }
 
 setActiveCartSettingsSection(section: CartSettingsSection): void {
@@ -7624,6 +7935,85 @@ updateSelectedSearchIconColor(value: string): void {
   }
 
   this.updateSelectedSearchProps({ iconColor: normalized });
+}
+
+updateSelectedSocialLinksStyle(value: StorefrontEditorSocialLinksNode['props']['style']): void {
+  if (value !== 'ghost' && value !== 'filled') {
+    return;
+  }
+  this.updateSelectedSocialLinksProps({ style: value });
+}
+
+updateSelectedSocialLinksColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ color: normalized });
+}
+
+updateSelectedSocialLinksBackgroundColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ backgroundColor: normalized });
+}
+
+updateSelectedSocialLinksBorderColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized || normalized === 'transparent') {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ borderColor: normalized });
+}
+
+updateSelectedSocialLinksIconSize(value: string | number): void {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ iconSize: this.clamp(parsed, 12, 64) });
+}
+
+updateSelectedSocialLinksItemSize(value: string | number): void {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ itemSize: this.clamp(parsed, 24, 120) });
+}
+
+updateSelectedSocialLinksSpacing(value: string | number): void {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ spacing: this.clamp(parsed, 0, 64) });
+}
+
+updateSelectedSocialLinksRadius(value: string | number): void {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ radius: this.clamp(parsed, 0, 999) });
+}
+
+updateSelectedSocialLinksBorderWidth(value: string | number): void {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ borderWidth: this.clamp(parsed, 0, 8) });
 }
 
 updateSelectedButtonLinkValue(value: string): void {
@@ -9514,7 +9904,203 @@ accountPreviewNode(
     },
   };
 }
+socialLinksIconSize(component: StorefrontEditorSocialLinksNode | null): number {
+  return this.clamp(Number(component?.props.iconSize ?? 18), 12, 64);
+}
 
+socialLinksItemSize(component: StorefrontEditorSocialLinksNode | null): number {
+  return this.clamp(Number(component?.props.itemSize ?? 38), 24, 120);
+}
+
+socialLinksSpacing(component: StorefrontEditorSocialLinksNode | null): number {
+  return this.clamp(Number(component?.props.spacing ?? 12), 0, 64);
+}
+
+socialLinksRadius(component: StorefrontEditorSocialLinksNode | null): number {
+  return this.clamp(Number(component?.props.radius ?? 12), 0, 999);
+}
+
+socialLinksBorderWidth(component: StorefrontEditorSocialLinksNode | null): number {
+  return this.clamp(Number(component?.props.borderWidth ?? 1), 0, 8);
+}
+
+private socialLinkLabel(key: SocialLinkKey): string {
+  switch (key) {
+    case 'instagram':
+      return 'Instagram';
+    case 'facebook':
+      return 'Facebook';
+    case 'tiktok':
+      return 'TikTok';
+    case 'whatsapp':
+      return 'WhatsApp';
+    default:
+      return key;
+  }
+}
+
+private socialLinkIcon(key: SocialLinkKey): AppIconName {
+  switch (key) {
+    case 'instagram':
+      return 'instagram';
+    case 'facebook':
+      return 'facebook';
+    case 'tiktok':
+      return 'tiktok';
+    case 'whatsapp':
+      return 'external-link';
+    default:
+      return 'external-link';
+  }
+}
+
+private normalizeSocialLinkKey(value: string | null | undefined): SocialLinkKey | null {
+  const normalized = (value ?? '').trim().toLowerCase();
+  switch (normalized) {
+    case 'instagram':
+    case 'ig':
+      return 'instagram';
+    case 'facebook':
+    case 'fb':
+      return 'facebook';
+    case 'tiktok':
+    case 'tt':
+    case 'tk':
+      return 'tiktok';
+    case 'whatsapp':
+    case 'wa':
+    case 'whats-app':
+      return 'whatsapp';
+    default:
+      return null;
+  }
+}
+
+private normalizeSocialLinksOrder(labels: readonly string[]): SocialLinkKey[] {
+  const ordered: SocialLinkKey[] = [];
+  for (const label of labels) {
+    const key = this.normalizeSocialLinkKey(label);
+    if (key && !ordered.includes(key)) {
+      ordered.push(key);
+    }
+  }
+  for (const key of STOREFRONT_EDITOR_SOCIAL_LINK_KEYS) {
+    if (!ordered.includes(key)) {
+      ordered.push(key);
+    }
+  }
+  return ordered;
+}
+
+private reorderSelectedSocialLinkLabels(draggedKey: SocialLinkKey, targetKey: SocialLinkKey): void {
+  const component = this.selectedSocialLinksComponent();
+  if (!component) {
+    return;
+  }
+
+  const order = this.normalizeSocialLinksOrder(component.props.labels);
+  const draggedIndex = order.indexOf(draggedKey);
+  const targetIndex = order.indexOf(targetKey);
+  if (draggedIndex < 0 || targetIndex < 0) {
+    return;
+  }
+
+  const nextOrder = [...order];
+  const [dragged] = nextOrder.splice(draggedIndex, 1);
+  if (!dragged) {
+    return;
+  }
+  nextOrder.splice(targetIndex, 0, dragged);
+  this.updateSelectedSocialLinksProps({ labels: nextOrder });
+}
+
+private ensureSelectedSocialLinksOrder(component: StorefrontEditorSocialLinksNode): void {
+  const normalized = this.normalizeSocialLinksOrder(component.props.labels);
+  const current = component.props.labels.map((label) => label.trim().toLowerCase());
+  if (current.length === normalized.length && current.every((entry, index) => entry === normalized[index])) {
+    return;
+  }
+
+  this.updateSelectedSocialLinksProps({ labels: normalized });
+}
+
+private createSocialLinksDraftFromProject(project: Project | null): Record<SocialLinkKey, string> {
+  return {
+    instagram: this.normalizeSocialLinkValue(project?.instagramUrl),
+    facebook: this.normalizeSocialLinkValue(project?.facebookUrl),
+    tiktok: this.normalizeSocialLinkValue(project?.tiktokUrl),
+    whatsapp: this.normalizeSocialLinkValue(project?.whatsappNumber),
+  };
+}
+
+private normalizeSocialLinkValue(value: string | null | undefined): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+private buildSocialLinksProjectFingerprint(project: Project | null): string {
+  const draft = this.createSocialLinksDraftFromProject(project);
+  return `${draft.instagram}|${draft.facebook}|${draft.tiktok}|${draft.whatsapp}`;
+}
+
+private persistSocialLinksProjectSettings(): void {
+  const projectId = this.projectId();
+  const project = this.project();
+  if (!projectId || !project) {
+    return;
+  }
+
+  const draft = this.socialLinksDraftValues();
+  const currentDraft = this.createSocialLinksDraftFromProject(project);
+  if (
+    draft.instagram.trim() === currentDraft.instagram &&
+    draft.facebook.trim() === currentDraft.facebook &&
+    draft.tiktok.trim() === currentDraft.tiktok &&
+    draft.whatsapp.trim() === currentDraft.whatsapp
+  ) {
+    return;
+  }
+
+  if (this.isSavingSocialLinksProjectSettings()) {
+    this.pendingSocialLinksProjectSave = true;
+    return;
+  }
+
+  const payload: UpdateProjectRequest = {
+    instagramUrl: this.blankToNullSocialLink(draft.instagram),
+    facebookUrl: this.blankToNullSocialLink(draft.facebook),
+    tiktokUrl: this.blankToNullSocialLink(draft.tiktok),
+    whatsappNumber: this.blankToNullSocialLink(draft.whatsapp),
+  };
+
+  this.isSavingSocialLinksProjectSettings.set(true);
+  this.projectService
+    .updateProject(projectId, payload)
+    .pipe(
+      finalize(() => this.isSavingSocialLinksProjectSettings.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe({
+      next: (updatedProject) => {
+        this.project.set(updatedProject);
+        this.socialLinksDraftValues.set(this.createSocialLinksDraftFromProject(updatedProject));
+        this.lastSyncedSocialLinksProjectFingerprint = this.buildSocialLinksProjectFingerprint(updatedProject);
+
+        if (this.pendingSocialLinksProjectSave) {
+          this.pendingSocialLinksProjectSave = false;
+          this.persistSocialLinksProjectSettings();
+        }
+      },
+      error: () => {
+        this.pendingSocialLinksProjectSave = false;
+        this.toastService.error('Unable to save social links right now.');
+      },
+    });
+}
+
+private blankToNullSocialLink(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
 cartPreviewNode(
   component: StorefrontEditorCartNode,
   iconStyle: StorefrontEditorCartIconStyle
@@ -11284,6 +11870,24 @@ private updateSelectedSearchProps(
 
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'search'
+      ? this.writeComponentProps(current, patch)
+      : current,
+    options
+  );
+}
+
+private updateSelectedSocialLinksProps(
+  patch: Partial<StorefrontEditorSocialLinksNode['props']>,
+  options: { transient?: boolean; preview?: boolean } = {}
+): void {
+  const sectionId = this.selectedSectionId();
+  const component = this.selectedSocialLinksComponent();
+  if (!sectionId || !component) {
+    return;
+  }
+
+  this.updateComponentNode(sectionId, component.id, (current) =>
+    current.type === 'social-links'
       ? this.writeComponentProps(current, patch)
       : current,
     options

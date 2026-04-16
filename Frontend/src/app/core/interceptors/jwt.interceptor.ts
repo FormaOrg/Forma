@@ -36,10 +36,6 @@ export class JwtInterceptor implements HttpInterceptor {
         if (error.status === 401 && !request.url.includes('/auth/')) {
           return this.handle401(request, next);
         }
-        if (error.status === 403 && !request.url.includes('/auth/') && this.authService.isLoggedIn()) {
-          this.authService.logout();
-          return EMPTY;
-        }
         return throwError(() => error);
       })
     );
