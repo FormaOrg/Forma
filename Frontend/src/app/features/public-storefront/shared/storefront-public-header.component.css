@@ -45,8 +45,7 @@
 .storefront-public-header__canvas-shell {
   display: flex;
   justify-content: center;
-  overflow-x: auto;
-  padding-bottom: 8px;
+  overflow-x: hidden;
 }
 
 .storefront-public-header__canvas {

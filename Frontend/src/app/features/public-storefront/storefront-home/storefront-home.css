@@ -7,6 +7,10 @@
   color: #1f1a14;
 }
 
+:host:has(.storefront-preview) {
+  background: #fff;
+}
+
 .storefront-home,
 .storefront-home__state {
   min-height: 100vh;
@@ -293,6 +297,44 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+
+/* ── Editor preview canvas ── */
+
+.storefront-preview {
+  overflow-x: hidden;
+  background: #fff;
+}
+
+.storefront-preview__canvas {
+  width: 1200px;
+}
+
+.storefront-preview__section {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.storefront-preview__component {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.storefront-preview__component-content {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Legacy public storefront ── */
 
 @media (max-width: 720px) {
   .storefront-home__header,

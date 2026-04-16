@@ -193,60 +193,121 @@ const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
           [style.--product-feed-text-color]="node().props.textColor"
         >
           @for (product of visibleProducts(); track product.id) {
-            <article class="storefront-editor-block-product-feed__card">
-              <div
-                class="storefront-editor-block-product-feed__image-wrap"
-                [style.borderRadius.px]="node().props.imageRadius"
+            @let productHref = resolveProductHref(product.id);
+            @if (productHref) {
+              <a
+                class="storefront-editor-block-product-feed__card storefront-editor-block-product-feed__card--link"
+                [href]="productHref"
               >
-                @if (badgeLabel(product); as badge) {
-                  <span
-                    class="storefront-editor-block-product-feed__badge"
-                    [class.storefront-editor-block-product-feed__badge--light]="badgeTone() === 'light'"
-                    [style.background]="node().props.badgeBackgroundColor"
-                    [style.color]="node().props.badgeTextColor"
-                  >
-                    {{ badge }}
-                  </span>
-                }
-
-                @if (product.imageUrl) {
-                  <img [src]="product.imageUrl" [alt]="product.name" class="storefront-editor-block-product-feed__image" />
-                } @else {
-                  <span class="storefront-editor-block-product-feed__image-empty">{{ initials(product.name) }}</span>
-                }
-
-                @if (node().props.quickAddStyle === 'overlay') {
-                  <span class="storefront-editor-block-product-feed__quick-add">
-                    +
-                  </span>
-                }
-              </div>
-
-              <div class="storefront-editor-block-product-feed__copy">
-                <div class="storefront-editor-block-product-feed__name">{{ product.name }}</div>
-                <div class="storefront-editor-block-product-feed__price-row">
-                  @if (node().props.showCompareAtPrice && product.compareAtPrice && product.compareAtPrice > product.price) {
-                    <span class="storefront-editor-block-product-feed__compare-price">{{ formatPrice(product.compareAtPrice) }}</span>
+                <div
+                  class="storefront-editor-block-product-feed__image-wrap"
+                  [style.borderRadius.px]="node().props.imageRadius"
+                >
+                  @if (badgeLabel(product); as badge) {
+                    <span
+                      class="storefront-editor-block-product-feed__badge"
+                      [class.storefront-editor-block-product-feed__badge--light]="badgeTone() === 'light'"
+                      [style.background]="node().props.badgeBackgroundColor"
+                      [style.color]="node().props.badgeTextColor"
+                    >
+                      {{ badge }}
+                    </span>
                   }
-                  <span class="storefront-editor-block-product-feed__price">{{ formatPrice(product.price) }}</span>
+
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" class="storefront-editor-block-product-feed__image" />
+                  } @else {
+                    <span class="storefront-editor-block-product-feed__image-empty">{{ initials(product.name) }}</span>
+                  }
+
+                  @if (node().props.quickAddStyle === 'overlay') {
+                    <span class="storefront-editor-block-product-feed__quick-add">
+                      +
+                    </span>
+                  }
                 </div>
 
-                @if (node().props.showColorDots) {
-                  <div class="storefront-editor-block-product-feed__swatches">
-                    @for (swatch of colorSwatches(product); track swatch) {
-                      <span class="storefront-editor-block-product-feed__swatch" [style.background]="swatch"></span>
+                <div class="storefront-editor-block-product-feed__copy">
+                  <div class="storefront-editor-block-product-feed__name">{{ product.name }}</div>
+                  <div class="storefront-editor-block-product-feed__price-row">
+                    @if (node().props.showCompareAtPrice && product.compareAtPrice && product.compareAtPrice > product.price) {
+                      <span class="storefront-editor-block-product-feed__compare-price">{{ formatPrice(product.compareAtPrice) }}</span>
                     }
+                    <span class="storefront-editor-block-product-feed__price">{{ formatPrice(product.price) }}</span>
                   </div>
-                }
 
-                @if (node().props.showAddToCart && node().props.quickAddStyle === 'button') {
-                  <div class="storefront-editor-block-product-feed__add-to-cart">
-                    <span class="storefront-editor-block-product-feed__add-to-cart-plus">+</span>
-                    <span>Add to Cart</span>
+                  @if (node().props.showColorDots) {
+                    <div class="storefront-editor-block-product-feed__swatches">
+                      @for (swatch of colorSwatches(product); track swatch) {
+                        <span class="storefront-editor-block-product-feed__swatch" [style.background]="swatch"></span>
+                      }
+                    </div>
+                  }
+
+                  @if (node().props.showAddToCart && node().props.quickAddStyle === 'button') {
+                    <div class="storefront-editor-block-product-feed__add-to-cart">
+                      <span class="storefront-editor-block-product-feed__add-to-cart-plus">+</span>
+                      <span>Add to Cart</span>
+                    </div>
+                  }
+                </div>
+              </a>
+            } @else {
+              <article class="storefront-editor-block-product-feed__card">
+                <div
+                  class="storefront-editor-block-product-feed__image-wrap"
+                  [style.borderRadius.px]="node().props.imageRadius"
+                >
+                  @if (badgeLabel(product); as badge) {
+                    <span
+                      class="storefront-editor-block-product-feed__badge"
+                      [class.storefront-editor-block-product-feed__badge--light]="badgeTone() === 'light'"
+                      [style.background]="node().props.badgeBackgroundColor"
+                      [style.color]="node().props.badgeTextColor"
+                    >
+                      {{ badge }}
+                    </span>
+                  }
+
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" class="storefront-editor-block-product-feed__image" />
+                  } @else {
+                    <span class="storefront-editor-block-product-feed__image-empty">{{ initials(product.name) }}</span>
+                  }
+
+                  @if (node().props.quickAddStyle === 'overlay') {
+                    <span class="storefront-editor-block-product-feed__quick-add">
+                      +
+                    </span>
+                  }
+                </div>
+
+                <div class="storefront-editor-block-product-feed__copy">
+                  <div class="storefront-editor-block-product-feed__name">{{ product.name }}</div>
+                  <div class="storefront-editor-block-product-feed__price-row">
+                    @if (node().props.showCompareAtPrice && product.compareAtPrice && product.compareAtPrice > product.price) {
+                      <span class="storefront-editor-block-product-feed__compare-price">{{ formatPrice(product.compareAtPrice) }}</span>
+                    }
+                    <span class="storefront-editor-block-product-feed__price">{{ formatPrice(product.price) }}</span>
                   </div>
-                }
-              </div>
-            </article>
+
+                  @if (node().props.showColorDots) {
+                    <div class="storefront-editor-block-product-feed__swatches">
+                      @for (swatch of colorSwatches(product); track swatch) {
+                        <span class="storefront-editor-block-product-feed__swatch" [style.background]="swatch"></span>
+                      }
+                    </div>
+                  }
+
+                  @if (node().props.showAddToCart && node().props.quickAddStyle === 'button') {
+                    <div class="storefront-editor-block-product-feed__add-to-cart">
+                      <span class="storefront-editor-block-product-feed__add-to-cart-plus">+</span>
+                      <span>Add to Cart</span>
+                    </div>
+                  }
+                </div>
+              </article>
+            }
           }
         </div>
       </div>
@@ -348,6 +409,12 @@ const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
       display: flex;
       flex-direction: column;
       gap: 10px;
+    }
+
+    a.storefront-editor-block-product-feed__card--link {
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
     }
 
     .storefront-editor-block-product-feed__image-wrap {
@@ -484,6 +551,16 @@ const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
 export class StorefrontEditorBlockProductFeedComponent {
   readonly node = input.required<StorefrontEditorProductFeedNode>();
   readonly products = input<ProjectCatalogProduct[]>([]);
+  readonly linkHrefResolver = input<((value: string) => string) | null>(null);
+
+  resolveProductHref(productId: number): string | null {
+    const resolver = this.linkHrefResolver();
+    if (!resolver || productId < 0) {
+      return null;
+    }
+
+    return resolver(`/products/${productId}`);
+  }
 
   readonly filterLabels = ['Collection', 'Price', 'Color', 'Size'] as const;
   readonly isUsingMockProducts = computed(() => this.products().every((product) => product.status === 'ARCHIVED'));

@@ -133,7 +133,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
         <app-storefront-editor-block-graphic [node]="$any(node())" />
       }
       @case ('product-feed') {
-        <app-storefront-editor-block-product-feed [node]="$any(node())" [products]="products()" />
+        <app-storefront-editor-block-product-feed [node]="$any(node())" [products]="products()" [linkHrefResolver]="linkHrefResolver()" />
       }
       @case ('blog-feed') {
         <app-storefront-editor-block-blog-feed [node]="$any(node())" />
