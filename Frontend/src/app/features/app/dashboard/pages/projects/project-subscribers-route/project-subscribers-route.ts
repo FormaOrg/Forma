@@ -2,27 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { finalize, map } from 'rxjs';
+import { finalize, forkJoin, map } from 'rxjs';
 
+import { ProjectBlogSubscriberItem } from '../../../../../../core/models/project-blog-workspace.model';
 import { Project } from '../../../../../../core/models/project.model';
+import { ProjectBlogWorkspaceService } from '../../../../../../core/services/project-blog-workspace.service';
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
 import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
-
-type SubscriberStatus = 'new' | 'engaged' | 'vip' | 'paused';
-
-interface BlogSubscriberItem {
-  id: number;
-  name: string;
-  email: string;
-  status: SubscriberStatus;
-  statusLabel: string;
-  sourceLabel: string;
-  tagLabel: string;
-  joinedLabel: string;
-  openRateLabel: string;
-  lastTouchLabel: string;
-}
 
 @Component({
   selector: 'app-project-subscribers-route',
@@ -33,6 +20,7 @@ interface BlogSubscriberItem {
 export class ProjectSubscribersRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
+  private readonly projectBlogWorkspaceService = inject(ProjectBlogWorkspaceService);
   private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
@@ -43,65 +31,9 @@ export class ProjectSubscribersRoute {
   readonly project = signal<Project | null>(null);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
-  readonly selectedSubscriberId = signal(1);
+  readonly selectedSubscriberId = signal(0);
   readonly searchValue = signal('');
-
-  readonly subscribers = computed<BlogSubscriberItem[]>(() => {
-    if (!this.project()) {
-      return [];
-    }
-
-    return [
-      {
-        id: 1,
-        name: 'Lina Rahal',
-        email: 'lina@northnote.co',
-        status: 'vip',
-        statusLabel: this.i18n.t('project.subscribers.status.vip'),
-        sourceLabel: this.i18n.t('project.subscribers.mock.source.homepageForm'),
-        tagLabel: this.i18n.t('project.subscribers.mock.tag.editorialStrategy'),
-        joinedLabel: this.i18n.t('project.subscribers.mock.joined.thisMonth'),
-        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.82'),
-        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.repliedYesterday'),
-      },
-      {
-        id: 2,
-        name: 'Youssef Karray',
-        email: 'youssef@letters.studio',
-        status: 'engaged',
-        statusLabel: this.i18n.t('project.subscribers.status.engaged'),
-        sourceLabel: this.i18n.t('project.subscribers.mock.source.leadMagnet'),
-        tagLabel: this.i18n.t('project.subscribers.mock.tag.contentOps'),
-        joinedLabel: this.i18n.t('project.subscribers.mock.joined.threeWeeksAgo'),
-        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.61'),
-        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.clickedMonday'),
-      },
-      {
-        id: 3,
-        name: 'Meriem B.',
-        email: 'meriem@craftmemo.com',
-        status: 'new',
-        statusLabel: this.i18n.t('project.subscribers.status.new'),
-        sourceLabel: this.i18n.t('project.subscribers.mock.source.inlineForm'),
-        tagLabel: this.i18n.t('project.subscribers.mock.tag.designSystems'),
-        joinedLabel: this.i18n.t('project.subscribers.mock.joined.today'),
-        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.awaitingFirstSend'),
-        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.noneYet'),
-      },
-      {
-        id: 4,
-        name: 'Sami Ferchichi',
-        email: 'sami@archive.school',
-        status: 'paused',
-        statusLabel: this.i18n.t('project.subscribers.status.paused'),
-        sourceLabel: this.i18n.t('project.subscribers.mock.source.import'),
-        tagLabel: this.i18n.t('project.subscribers.mock.tag.growth'),
-        joinedLabel: this.i18n.t('project.subscribers.mock.joined.twoMonthsAgo'),
-        openRateLabel: this.i18n.t('project.subscribers.mock.openRate.12'),
-        lastTouchLabel: this.i18n.t('project.subscribers.mock.lastTouch.needsReengagement'),
-      },
-    ];
-  });
+  readonly subscribers = signal<ProjectBlogSubscriberItem[]>([]);
 
   readonly filteredSubscribers = computed(() => {
     const query = this.searchValue().trim().toLowerCase();
@@ -144,16 +76,20 @@ export class ProjectSubscribersRoute {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.projectService
-      .getProjectById(projectId)
+    forkJoin({
+      project: this.projectService.getProjectById(projectId),
+      subscribers: this.projectBlogWorkspaceService.getSubscribers(projectId),
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (project) => {
+        next: ({ project, subscribers }) => {
           this.project.set(project);
-          this.selectedSubscriberId.set(1);
+          this.subscribers.set(subscribers);
+          this.selectedSubscriberId.set(subscribers[0]?.id ?? 0);
         },
         error: () => {
           this.project.set(null);
+          this.subscribers.set([]);
           this.errorMessage.set(this.i18n.t('project.subscribers.errors.load'));
         },
       });
@@ -167,5 +103,5 @@ export class ProjectSubscribersRoute {
     this.selectedSubscriberId.set(subscriberId);
   }
 
-  trackSubscriber = (_: number, subscriber: BlogSubscriberItem): number => subscriber.id;
+  trackSubscriber = (_: number, subscriber: ProjectBlogSubscriberItem): number => subscriber.id;
 }
