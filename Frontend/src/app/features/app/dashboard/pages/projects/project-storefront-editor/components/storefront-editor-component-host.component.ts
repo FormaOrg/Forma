@@ -122,6 +122,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
       }
       @case ('testimonials') {
         <app-storefront-editor-block-testimonials [node]="$any(node())" />
+      }
       @case ('checkout-form') {
         <app-storefront-editor-block-checkout-form [node]="$any(node())" />
       }
