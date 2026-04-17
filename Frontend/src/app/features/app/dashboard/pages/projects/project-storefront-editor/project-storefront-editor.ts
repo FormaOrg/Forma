@@ -939,10 +939,16 @@ readonly buttonTextFontSearch = signal('');
 readonly iconComponentSearch = signal('');
 readonly iconLibraryResults = signal<ProjectIconLibraryItem[]>([]);
 readonly isIconLibraryLoading = signal(false);
+readonly textLinkMode = signal<'page' | 'section' | 'url'>('page');
 readonly textLinkPageId = signal<string>('home');
+readonly textLinkSectionId = signal<string>('');
+readonly textLinkUrl = signal('');
   readonly textLinkOpenMode = signal<'current' | 'new'>('current');
   readonly activeImageToolbarMenu = signal<ImageToolbarMenu>(null);
+  readonly imageLinkMode = signal<'page' | 'section' | 'url'>('page');
   readonly imageLinkPageId = signal<string>('home');
+  readonly imageLinkSectionId = signal<string>('');
+  readonly imageLinkUrl = signal('');
   readonly imageLinkOpenMode = signal<'current' | 'new'>('current');
   readonly isImageSettingsLinkPopupOpen = signal(false);
   readonly imageSettingsLinkPopupPlacement = signal<'below' | 'viewport-bottom'>('below');
@@ -1002,7 +1008,10 @@ readonly activeMenuItemLinkId = signal<string | null>(null);
 readonly pendingNewMenuItemId = signal<string | null>(null);
 readonly menuItemLinkPopupPosition = signal({ x: 12, y: 12 });
   readonly menuLinkValue = signal('');
+  readonly menuLinkMode = signal<'page' | 'section' | 'url'>('page');
   readonly menuLinkPageId = signal<string>('home');
+  readonly menuLinkSectionId = signal<string>('');
+  readonly menuLinkUrl = signal('');
   readonly menuLinkOpenMode = signal<'current' | 'new'>('current');
   readonly renamingMenuItemId = signal<string | null>(null);
   readonly renamingMenuItemValue = signal('');
@@ -1996,10 +2005,13 @@ effect(() => {
     this.exitImageCropMode();
   }
 
-  this.syncManagedPageLinkSelection(
+  this.syncLinkSelectionState(
     image.props.href ?? '',
     image.props.openInNewTab ?? false,
+    this.imageLinkMode,
     this.imageLinkPageId,
+    this.imageLinkSectionId,
+    this.imageLinkUrl,
     this.imageLinkOpenMode
   );
 });
@@ -2040,10 +2052,13 @@ effect(() => {
 
   const firstItem = component.props.items[0] ?? null;
   if (firstItem && !this.activeMenuItemLinkId()) {
-    this.syncManagedPageLinkSelection(
+    this.syncLinkSelectionState(
       firstItem.href ?? '',
       firstItem.openInNewTab ?? false,
+      this.menuLinkMode,
       this.menuLinkPageId,
+      this.menuLinkSectionId,
+      this.menuLinkUrl,
       this.menuLinkOpenMode
     );
     this.menuLinkValue.set(firstItem.href ?? '');
@@ -4053,6 +4068,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }
 
     this.selectComponent(sectionId, componentId, event);
+    this.suppressNextComponentClickSelectionId = componentId;
     this.pendingComponentDragStart = {
       sectionId,
       componentId,
@@ -5544,10 +5560,13 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     }
     if (next === 'link') {
       const component = this.selectedTextComponent();
-      this.syncManagedPageLinkSelection(
+      this.syncLinkSelectionState(
         component?.props.href ?? '',
         component?.props.openInNewTab ?? false,
+        this.textLinkMode,
         this.textLinkPageId,
+        this.textLinkSectionId,
+        this.textLinkUrl,
         this.textLinkOpenMode
       );
     }
@@ -5603,6 +5622,21 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
 
   setTextLinkPage(pageId: string): void {
     this.textLinkPageId.set(pageId);
+    if (!this.availableSectionsForManagedPage(pageId).some((section) => section.id === this.textLinkSectionId())) {
+      this.textLinkSectionId.set(this.availableSectionsForManagedPage(pageId)[0]?.id ?? '');
+    }
+  }
+
+  setTextLinkMode(mode: 'page' | 'section' | 'url'): void {
+    this.textLinkMode.set(mode);
+  }
+
+  setTextLinkSection(sectionId: string): void {
+    this.textLinkSectionId.set(sectionId);
+  }
+
+  updateTextLinkUrl(value: string): void {
+    this.textLinkUrl.set(value);
   }
 
   setTextLinkOpenMode(mode: 'current' | 'new'): void {
@@ -5640,24 +5674,32 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
 saveSelectedTextLink(): void {
-  if (!this.textLinkPageId()) {
+  const href = this.buildHrefFromLinkSelection(
+    this.textLinkMode(),
+    this.textLinkPageId(),
+    this.textLinkSectionId(),
+    this.textLinkUrl()
+  );
+  if (!href) {
     return;
   }
 
-  const href = this.buildManagedPageHref(this.textLinkPageId());
   if (this.isEditingSelectedTextComponent()) {
       if (!this.focusActiveTextEditor()) {
         return;
       }
 
       document.execCommand('createLink', false, href);
+      const selection = window.getSelection();
+      const anchor = selection?.anchorNode instanceof Element
+        ? selection.anchorNode.closest('a')
+        : selection?.anchorNode?.parentElement?.closest('a');
       if (this.textLinkOpenMode() === 'new') {
-        const selection = window.getSelection();
-        const anchor = selection?.anchorNode instanceof Element
-          ? selection.anchorNode.closest('a')
-          : selection?.anchorNode?.parentElement?.closest('a');
         anchor?.setAttribute('target', '_blank');
         anchor?.setAttribute('rel', 'noreferrer noopener');
+      } else {
+        anchor?.removeAttribute('target');
+        anchor?.removeAttribute('rel');
       }
       this.syncEditingTextValueFromDom();
       this.activeTextToolbarMenu.set(null);
@@ -5679,8 +5721,7 @@ removeSelectedTextLink(): void {
 
       document.execCommand('unlink');
       this.syncEditingTextValueFromDom();
-      this.textLinkPageId.set('');
-      this.textLinkOpenMode.set('current');
+      this.resetTextLinkState();
       this.activeTextToolbarMenu.set(null);
       return;
     }
@@ -5689,8 +5730,7 @@ removeSelectedTextLink(): void {
       href: '',
       openInNewTab: false,
     });
-    this.textLinkPageId.set('');
-    this.textLinkOpenMode.set('current');
+    this.resetTextLinkState();
     this.activeTextToolbarMenu.set(null);
   }
 
@@ -5709,10 +5749,13 @@ removeSelectedTextLink(): void {
 
     if (next === 'link' || next === 'settings') {
       const component = this.selectedImageComponent();
-      this.syncManagedPageLinkSelection(
+      this.syncLinkSelectionState(
         component?.props.href ?? '',
         component?.props.openInNewTab ?? false,
+        this.imageLinkMode,
         this.imageLinkPageId,
+        this.imageLinkSectionId,
+        this.imageLinkUrl,
         this.imageLinkOpenMode
       );
     }
@@ -5720,6 +5763,21 @@ removeSelectedTextLink(): void {
 
   setImageLinkPage(pageId: string): void {
     this.imageLinkPageId.set(pageId);
+    if (!this.availableSectionsForManagedPage(pageId).some((section) => section.id === this.imageLinkSectionId())) {
+      this.imageLinkSectionId.set(this.availableSectionsForManagedPage(pageId)[0]?.id ?? '');
+    }
+  }
+
+  setImageLinkMode(mode: 'page' | 'section' | 'url'): void {
+    this.imageLinkMode.set(mode);
+  }
+
+  setImageLinkSection(sectionId: string): void {
+    this.imageLinkSectionId.set(sectionId);
+  }
+
+  updateImageLinkUrl(value: string): void {
+    this.imageLinkUrl.set(value);
   }
 
   setImageLinkOpenMode(mode: 'current' | 'new'): void {
@@ -5727,11 +5785,16 @@ removeSelectedTextLink(): void {
   }
 
 saveSelectedImageLink(): void {
-  if (!this.imageLinkPageId()) {
+  const href = this.buildHrefFromLinkSelection(
+    this.imageLinkMode(),
+    this.imageLinkPageId(),
+    this.imageLinkSectionId(),
+    this.imageLinkUrl()
+  );
+  if (!href) {
     return;
   }
 
-  const href = this.buildManagedPageHref(this.imageLinkPageId());
   this.updateSelectedImageProps({
       href,
       openInNewTab: this.imageLinkOpenMode() === 'new',
@@ -5745,8 +5808,7 @@ removeSelectedImageLink(): void {
     href: '',
     openInNewTab: false,
   });
-  this.imageLinkPageId.set('');
-  this.imageLinkOpenMode.set('current');
+  this.resetImageLinkState();
   this.isImageSettingsLinkPopupOpen.set(false);
   this.activeImageToolbarMenu.set(null);
 }
@@ -5778,10 +5840,13 @@ removeSelectedImageLink(): void {
     this.isImageSettingsLinkPopupOpen.set(next);
 
     const component = this.selectedImageComponent();
-    this.syncManagedPageLinkSelection(
+    this.syncLinkSelectionState(
       component?.props.href ?? '',
       component?.props.openInNewTab ?? false,
+      this.imageLinkMode,
       this.imageLinkPageId,
+      this.imageLinkSectionId,
+      this.imageLinkUrl,
       this.imageLinkOpenMode
     );
     setTimeout(() => this.syncImageSettingsLinkPopupPlacement(anchor), 0);
@@ -6258,8 +6323,54 @@ private buildManagedPageHref(pageId: string): string {
     return slug ? `/${slug}` : '/';
   }
 
+private buildManagedSectionHref(pageId: string, sectionId: string): string {
+  const pageHref = this.buildManagedPageHref(pageId);
+  const normalizedSectionId = sectionId.trim();
+  if (!pageHref || !normalizedSectionId) {
+    return pageHref;
+  }
+
+  return `${pageHref}#${normalizedSectionId}`;
+}
+
+private normalizeExternalUrl(value: string): string {
+  const normalized = value.trim();
+  if (!normalized) {
+    return '';
+  }
+
+  if (
+    /^https?:\/\//i.test(normalized) ||
+    /^mailto:/i.test(normalized) ||
+    /^tel:/i.test(normalized) ||
+    normalized.startsWith('/') ||
+    normalized.startsWith('#')
+  ) {
+    return normalized;
+  }
+
+  return `https://${normalized}`;
+}
+
+private buildHrefFromLinkSelection(
+  mode: 'page' | 'section' | 'url',
+  pageId: string,
+  sectionId: string,
+  url: string
+): string {
+  if (mode === 'url') {
+    return this.normalizeExternalUrl(url);
+  }
+
+  if (mode === 'section') {
+    return this.buildManagedSectionHref(pageId, sectionId);
+  }
+
+  return this.buildManagedPageHref(pageId);
+}
+
 private findManagedPageIdForHref(href: string): string {
-  const normalizedHref = href.trim();
+  const normalizedHref = href.trim().split('#')[0] ?? '';
   if (!normalizedHref) {
     return '';
   }
@@ -6272,14 +6383,88 @@ private findManagedPageIdForHref(href: string): string {
   return match?.id ?? '';
 }
 
-  private syncManagedPageLinkSelection(
+  private findSectionIdForHref(href: string): string {
+    const hashIndex = href.indexOf('#');
+    if (hashIndex < 0) {
+      return '';
+    }
+
+    return href.slice(hashIndex + 1).trim();
+  }
+
+  private syncLinkSelectionState(
     href: string,
     openInNewTab: boolean,
+    modeSignal: WritableSignal<'page' | 'section' | 'url'>,
     pageIdSignal: WritableSignal<string>,
+    sectionIdSignal: WritableSignal<string>,
+    urlSignal: WritableSignal<string>,
     openModeSignal: WritableSignal<'current' | 'new'>
   ): void {
-    pageIdSignal.set(this.findManagedPageIdForHref(href));
+    const normalizedHref = href.trim();
+    const pageId = this.findManagedPageIdForHref(normalizedHref) || 'home';
+    const sectionId = this.findSectionIdForHref(normalizedHref);
+    const isExternalUrl =
+      !!normalizedHref &&
+      !normalizedHref.startsWith('/') &&
+      !normalizedHref.startsWith('#');
+
+    if (isExternalUrl) {
+      modeSignal.set('url');
+      urlSignal.set(normalizedHref);
+      pageIdSignal.set('home');
+      sectionIdSignal.set('');
+    } else if (sectionId) {
+      modeSignal.set('section');
+      pageIdSignal.set(pageId);
+      sectionIdSignal.set(sectionId);
+      urlSignal.set('');
+    } else {
+      modeSignal.set('page');
+      pageIdSignal.set(pageId);
+      sectionIdSignal.set(this.availableSectionsForManagedPage(pageId)[0]?.id ?? '');
+      urlSignal.set('');
+    }
+
     openModeSignal.set(openInNewTab ? 'new' : 'current');
+  }
+
+  availableSectionsForManagedPage(pageId: string): StorefrontHomepageSection[] {
+    const targetPage = this.managedPages().find((page) => page.id === pageId);
+    return targetPage?.draftDocument?.sections ?? [];
+  }
+
+  managedPageOptionLabel(pageId: string): string {
+    const page = this.managedPages().find((entry) => entry.id === pageId);
+    if (!page) {
+      return pageId;
+    }
+
+    return page.id === this.selectedManagedPageId() ? `${page.name} (This)` : page.name;
+  }
+
+  resetTextLinkState(): void {
+    this.textLinkMode.set('page');
+    this.textLinkPageId.set('home');
+    this.textLinkSectionId.set(this.availableSectionsForManagedPage('home')[0]?.id ?? '');
+    this.textLinkUrl.set('');
+    this.textLinkOpenMode.set('current');
+  }
+
+  resetImageLinkState(): void {
+    this.imageLinkMode.set('page');
+    this.imageLinkPageId.set('home');
+    this.imageLinkSectionId.set(this.availableSectionsForManagedPage('home')[0]?.id ?? '');
+    this.imageLinkUrl.set('');
+    this.imageLinkOpenMode.set('current');
+  }
+
+  resetMenuLinkState(): void {
+    this.menuLinkMode.set('page');
+    this.menuLinkPageId.set('home');
+    this.menuLinkSectionId.set(this.availableSectionsForManagedPage('home')[0]?.id ?? '');
+    this.menuLinkUrl.set('');
+    this.menuLinkOpenMode.set('current');
   }
 
   toggleContainerToolbarMenu(menu: Exclude<ContainerToolbarMenu, null>): void {
@@ -7096,17 +7281,15 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     this.activeMenuItemActionsId.set(null);
     this.renamingMenuItemId.set(null);
     this.activeMenuItemLinkId.set(itemId);
-    if (item.href?.trim()) {
-      this.syncManagedPageLinkSelection(
-        item.href ?? '',
-        item.openInNewTab ?? false,
-        this.menuLinkPageId,
-        this.menuLinkOpenMode
-      );
-    } else {
-      this.menuLinkPageId.set('');
-      this.menuLinkOpenMode.set('current');
-    }
+    this.syncLinkSelectionState(
+      item.href ?? '',
+      item.openInNewTab ?? false,
+      this.menuLinkMode,
+      this.menuLinkPageId,
+      this.menuLinkSectionId,
+      this.menuLinkUrl,
+      this.menuLinkOpenMode
+    );
     this.menuLinkValue.set(item.href ?? '');
     const target = event?.currentTarget;
     if (target instanceof HTMLElement) {
@@ -7118,6 +7301,21 @@ private syncImageBorderColorPickerFromHex(color: string): void {
 
   setMenuLinkPage(pageId: string): void {
     this.menuLinkPageId.set(pageId);
+    if (!this.availableSectionsForManagedPage(pageId).some((section) => section.id === this.menuLinkSectionId())) {
+      this.menuLinkSectionId.set(this.availableSectionsForManagedPage(pageId)[0]?.id ?? '');
+    }
+  }
+
+  setMenuLinkMode(mode: 'page' | 'section' | 'url'): void {
+    this.menuLinkMode.set(mode);
+  }
+
+  setMenuLinkSection(sectionId: string): void {
+    this.menuLinkSectionId.set(sectionId);
+  }
+
+  updateMenuLinkUrl(value: string): void {
+    this.menuLinkUrl.set(value);
   }
 
   setMenuLinkOpenMode(mode: 'current' | 'new'): void {
@@ -7126,13 +7324,19 @@ private syncImageBorderColorPickerFromHex(color: string): void {
 
   saveSelectedMenuItemLink(): void {
     const itemId = this.activeMenuItemLinkId();
-    if (!itemId || !this.menuLinkPageId()) {
+    const href = this.buildHrefFromLinkSelection(
+      this.menuLinkMode(),
+      this.menuLinkPageId(),
+      this.menuLinkSectionId(),
+      this.menuLinkUrl()
+    );
+    if (!itemId || !href) {
       return;
     }
 
     this.updateSelectedMenuItem(itemId, (current) => ({
       ...current,
-      href: this.buildManagedPageHref(this.menuLinkPageId()),
+      href,
       openInNewTab: this.menuLinkOpenMode() === 'new',
     }));
     this.pendingNewMenuItemId.set(null);
@@ -7150,8 +7354,7 @@ private syncImageBorderColorPickerFromHex(color: string): void {
     }
 
     this.activeMenuItemLinkId.set(null);
-    this.menuLinkPageId.set('');
-    this.menuLinkOpenMode.set('current');
+    this.resetMenuLinkState();
     this.menuLinkValue.set('');
   }
 
