@@ -18,6 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectIconLibraryService {
 
+    private static final String LEGACY_BUCKET_SEGMENT = "/storage/v1/object/public/icons/";
+    private static final String CURRENT_BUCKET_SEGMENT = "/storage/v1/object/public/icon/";
+
     private final JdbcTemplate jdbcTemplate;
     private final ProjectService projectService;
 
@@ -55,10 +58,18 @@ public class ProjectIconLibraryService {
                 .name(rs.getString("name"))
                 .slug(rs.getString("slug"))
                 .category(rs.getString("category"))
-                .publicUrl(rs.getString("public_url"))
+                .publicUrl(normalizePublicUrl(rs.getString("public_url")))
                 .keywords(readStringArray(rs, "keywords"))
                 .tags(readStringArray(rs, "tags"))
                 .build();
+    }
+
+    private String normalizePublicUrl(String publicUrl) {
+        if (publicUrl == null || publicUrl.isBlank()) {
+            return publicUrl;
+        }
+
+        return publicUrl.replace(LEGACY_BUCKET_SEGMENT, CURRENT_BUCKET_SEGMENT);
     }
 
     private List<String> readStringArray(ResultSet rs, String columnName) throws SQLException {

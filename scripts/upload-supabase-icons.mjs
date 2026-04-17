@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const BUCKET_NAME = process.env.SUPABASE_ICONS_BUCKET || 'icons';
+const BUCKET_NAME = process.env.SUPABASE_ICONS_BUCKET || 'icon';
 const ICONS_SOURCE_DIR = process.env.ICONS_SOURCE_DIR;
 const UPSERT = /^(1|true|yes)$/i.test(process.env.SUPABASE_ICONS_UPSERT || 'true');
 const SYNC_ICON_LIBRARY = /^(1|true|yes)$/i.test(process.env.SYNC_ICON_LIBRARY || 'true');

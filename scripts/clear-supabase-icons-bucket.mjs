@@ -2,7 +2,7 @@ import path from 'node:path';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const BUCKET_NAME = process.env.SUPABASE_ICONS_BUCKET || 'icons';
+const BUCKET_NAME = process.env.SUPABASE_ICONS_BUCKET || 'icon';
 const PAGE_SIZE = Number(process.env.SUPABASE_ICONS_PAGE_SIZE || 1000);
 const DELETE_ICON_LIBRARY_ROWS = /^(1|true|yes)$/i.test(
   process.env.DELETE_ICON_LIBRARY_ROWS || 'false'

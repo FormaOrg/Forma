@@ -18,6 +18,8 @@ public class ProjectIconLibraryService {
 
     private static final int DEFAULT_LIMIT = 24;
     private static final int MAX_LIMIT = 60;
+    private static final String LEGACY_BUCKET_SEGMENT = "/storage/v1/object/public/icons/";
+    private static final String CURRENT_BUCKET_SEGMENT = "/storage/v1/object/public/icon/";
 
     private final JdbcTemplate jdbcTemplate;
     private final ProjectService projectService;
@@ -57,10 +59,18 @@ public class ProjectIconLibraryService {
                 .name(resultSet.getString("name"))
                 .slug(resultSet.getString("slug"))
                 .category(resultSet.getString("category"))
-                .publicUrl(resultSet.getString("public_url"))
+                .publicUrl(normalizePublicUrl(resultSet.getString("public_url")))
                 .keywords(readTextArray(resultSet, "keywords"))
                 .tags(readTextArray(resultSet, "tags"))
                 .build();
+    }
+
+    private String normalizePublicUrl(String publicUrl) {
+        if (publicUrl == null || publicUrl.isBlank()) {
+            return publicUrl;
+        }
+
+        return publicUrl.replace(LEGACY_BUCKET_SEGMENT, CURRENT_BUCKET_SEGMENT);
     }
 
     private List<String> readTextArray(ResultSet resultSet, String columnName) throws SQLException {

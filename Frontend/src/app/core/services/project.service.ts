@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ProjectIconLibraryItem } from '../models/project-icon-library.model';
 import {
@@ -19,6 +20,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly legacyIconBucketSegment = '/storage/v1/object/public/icons/';
+  private readonly currentIconBucketSegment = '/storage/v1/object/public/icon/';
 
   constructor(private http: HttpClient) {}
 
@@ -148,7 +151,15 @@ export class ProjectService {
           limit,
         },
       }
-    ).pipe(catchError(this.handleError));
+    ).pipe(
+      map((items) =>
+        items.map((item) => ({
+          ...item,
+          publicUrl: this.normalizeIconPublicUrl(item.publicUrl),
+        }))
+      ),
+      catchError(this.handleError)
+    );
   }
 
   deleteMedia(projectId: number, mediaId: number): Observable<void> {
@@ -168,5 +179,16 @@ export class ProjectService {
   private handleError(error: any): Observable<never> {
     console.error('ProjectService error:', error);
     return throwError(() => error);
+  }
+
+  private normalizeIconPublicUrl(publicUrl: string): string {
+    if (!publicUrl?.trim()) {
+      return publicUrl;
+    }
+
+    return publicUrl.replace(
+      this.legacyIconBucketSegment,
+      this.currentIconBucketSegment
+    );
   }
 }
