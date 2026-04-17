@@ -7,6 +7,12 @@ const BUCKET_NAME = process.env.SUPABASE_ICONS_BUCKET || 'icons';
 const ICONS_SOURCE_DIR = process.env.ICONS_SOURCE_DIR;
 const UPSERT = /^(1|true|yes)$/i.test(process.env.SUPABASE_ICONS_UPSERT || 'true');
 const SYNC_ICON_LIBRARY = /^(1|true|yes)$/i.test(process.env.SYNC_ICON_LIBRARY || 'true');
+const UPLOAD_BATCH_SIZE = Math.max(1, Number.parseInt(process.env.SUPABASE_UPLOAD_BATCH_SIZE || '5', 10) || 5);
+const UPLOAD_RETRY_COUNT = Math.max(0, Number.parseInt(process.env.SUPABASE_UPLOAD_RETRY_COUNT || '5', 10) || 5);
+const UPLOAD_RETRY_BASE_DELAY_MS = Math.max(
+  100,
+  Number.parseInt(process.env.SUPABASE_UPLOAD_RETRY_BASE_DELAY_MS || '1000', 10) || 1000
+);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
@@ -80,6 +86,22 @@ function encodeObjectPath(storagePath) {
     .join('/');
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status) {
+  return status === 408 || status === 409 || status === 425 || status === 429 || status >= 500;
+}
+
+function isRetryableError(error) {
+  if (typeof error?.status === 'number') {
+    return isRetryableStatus(error.status);
+  }
+
+  return true;
+}
+
 async function collectSvgFiles(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
@@ -122,23 +144,45 @@ function buildIconRow(storagePath) {
 
 async function uploadSvg(filePath) {
   const storagePath = toStoragePath(filePath);
-  const response = await fetch(
-    `${baseUrl}/storage/v1/object/${encodeURIComponent(BUCKET_NAME)}/${encodeObjectPath(storagePath)}`,
-    {
-      method: 'POST',
-      headers: authHeaders({
-        'Content-Type': 'image/svg+xml',
-        'x-upsert': UPSERT ? 'true' : 'false',
-      }),
-      body: await fs.readFile(filePath),
-    }
-  );
+  const body = await fs.readFile(filePath);
 
-  if (!response.ok) {
-    throw new Error(`Upload failed for ${storagePath}: ${response.status} ${await readErrorBody(response)}`);
+  for (let attempt = 0; attempt <= UPLOAD_RETRY_COUNT; attempt += 1) {
+    try {
+      const response = await fetch(
+        `${baseUrl}/storage/v1/object/${encodeURIComponent(BUCKET_NAME)}/${encodeObjectPath(storagePath)}`,
+        {
+          method: 'POST',
+          headers: authHeaders({
+            'Content-Type': 'image/svg+xml',
+            'x-upsert': UPSERT ? 'true' : 'false',
+          }),
+          body,
+        }
+      );
+
+      if (!response.ok) {
+        const error = new Error(
+          `Upload failed for ${storagePath}: ${response.status} ${await readErrorBody(response)}`
+        );
+        error.status = response.status;
+        throw error;
+      }
+
+      return storagePath;
+    } catch (error) {
+      if (attempt >= UPLOAD_RETRY_COUNT || !isRetryableError(error)) {
+        throw error;
+      }
+
+      const delayMs = UPLOAD_RETRY_BASE_DELAY_MS * 2 ** attempt;
+      console.warn(
+        `Retrying ${storagePath} after attempt ${attempt + 1} failed. Waiting ${delayMs}ms.\n${formatError(error)}`
+      );
+      await sleep(delayMs);
+    }
   }
 
-  return storagePath;
+  throw new Error(`Upload failed for ${storagePath}: exhausted retries`);
 }
 
 async function upsertIconLibraryRows(rows) {
@@ -170,8 +214,8 @@ async function main() {
 
   const uploadedStoragePaths = [];
 
-  for (let index = 0; index < files.length; index += 25) {
-    const chunk = files.slice(index, index + 25);
+  for (let index = 0; index < files.length; index += UPLOAD_BATCH_SIZE) {
+    const chunk = files.slice(index, index + UPLOAD_BATCH_SIZE);
     console.log(`Uploading files ${index + 1}-${index + chunk.length} of ${files.length}...`);
     const uploaded = await Promise.all(chunk.map((filePath) => uploadSvg(filePath)));
     uploadedStoragePaths.push(...uploaded);
@@ -193,6 +237,8 @@ async function main() {
         sourceDir: sourceRoot,
         uploadedFiles: uploadedStoragePaths.length,
         syncedIconLibrary: SYNC_ICON_LIBRARY,
+        uploadBatchSize: UPLOAD_BATCH_SIZE,
+        uploadRetryCount: UPLOAD_RETRY_COUNT,
       },
       null,
       2
