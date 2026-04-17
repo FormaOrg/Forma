@@ -27,6 +27,8 @@ import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { AppIcon, AppIconName } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
+import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
+import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 import {
   STOREFRONT_EDITOR_PAGE_DESIGN_CATEGORIES,
   STOREFRONT_EDITOR_PAGE_DESIGN_TEMPLATES,
@@ -418,13 +420,14 @@ type SectionLibraryTemplate = {
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockAccountComponent, StorefrontEditorBlockCartComponent],
+  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockAccountComponent, StorefrontEditorBlockCartComponent, TranslatePipe],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
 export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
+  private static readonly MIN_SUPPORTED_VIEWPORT_WIDTH = 900;
   private static readonly COMPONENT_MIN_SIZE = 20;
   private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
   private static readonly ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS = 180;
@@ -471,6 +474,7 @@ private readonly route = inject(ActivatedRoute);
 private readonly router = inject(Router);
 private readonly destroyRef = inject(DestroyRef);
 private readonly authService = inject(AuthService);
+  private readonly i18n = inject(I18nService);
   private readonly projectService = inject(ProjectService);
   private readonly projectCatalogService = inject(ProjectCatalogService);
   private readonly projectStorefrontService = inject(ProjectStorefrontService);
@@ -727,6 +731,9 @@ readonly previewStageScrollbarWidth = signal(0);
 readonly previewStageScrollCompensation = signal(0);
 readonly previewStageLogicalHeight = signal<number | null>(null);
 readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
+readonly viewportWidth = signal(
+  typeof window !== 'undefined' ? window.innerWidth : ProjectStorefrontEditor.MIN_SUPPORTED_VIEWPORT_WIDTH
+);
   readonly zoomPercent = signal(120);
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
@@ -739,6 +746,9 @@ readonly sectionClipboard = signal<StorefrontHomepageSection | null>(null);
   readonly mediaAssets = signal<StorefrontMediaManagerAsset[]>([]);
 
   readonly isEcommerceProject = computed(() => this.project()?.type === 'ECOMMERCE');
+  readonly isMobileEditorBlocked = computed(
+    () => this.viewportWidth() < ProjectStorefrontEditor.MIN_SUPPORTED_VIEWPORT_WIDTH
+  );
   readonly sections = computed(() => this.workingStorefront()?.draftHomepage.sections ?? []);
   readonly managedPages = computed(() => this.editorSession().managedPages ?? this.buildDefaultManagedPages());
   readonly selectedManagedPageId = computed(() => this.editorSession().selectedManagedPageId ?? 'home');
@@ -2210,6 +2220,10 @@ effect(() => {
 
   @HostListener('window:resize')
   handleWindowResize(): void {
+    if (typeof window !== 'undefined') {
+      this.viewportWidth.set(window.innerWidth);
+    }
+
     this.updateAddElementsTabScrollState();
     this.updateAddElementsSubmenuScrollState();
     this.updateSectionLibraryTabScrollState();
@@ -6285,6 +6299,22 @@ updateSelectedImageShadow(value: StorefrontEditorButtonNode['props']['shadow']):
     return Math.min(buildStorefrontEditorTextProps(style).fontSize, 22);
   }
 
+  t(key: string): string {
+    return this.i18n.t(key);
+  }
+
+  publishButtonLabel(): string {
+    return this.isPublishing()
+      ? this.i18n.t('project.storefront.editor.topbar.publishing')
+      : this.i18n.t('project.storefront.editor.topbar.publish');
+  }
+
+  selectedImageLinkButtonLabel(): string {
+    return this.selectedImageComponent()?.props.href
+      ? this.i18n.t('project.storefront.editor.image.link.edit')
+      : this.i18n.t('project.storefront.editor.image.link.choose');
+  }
+
   startEditingSelectedTextComponent(): void {
     const sectionId = this.selectedSectionId();
     const component = this.selectedTextComponent();
@@ -6440,7 +6470,9 @@ private findManagedPageIdForHref(href: string): string {
       return pageId;
     }
 
-    return page.id === this.selectedManagedPageId() ? `${page.name} (This)` : page.name;
+    return page.id === this.selectedManagedPageId()
+      ? `${page.name} (${this.i18n.t('project.storefront.editor.link.currentPageSuffix')})`
+      : page.name;
   }
 
   resetTextLinkState(): void {
@@ -12159,8 +12191,8 @@ private loadIconLibraryResults(): void {
   }
 
   this.isIconLibraryLoading.set(true);
-  this.projectService
-    .searchProjectIcons(projectId, this.iconComponentSearch().trim(), 24)
+    this.projectService
+      .searchProjectIcons(projectId, this.iconComponentSearch().trim(), 100)
     .pipe(
       finalize(() => {
         if (searchRequestId === this.iconLibrarySearchRequestId) {

@@ -76,19 +76,37 @@
 } @else if (errorMessage()) {
   <section class="storefront-editor storefront-editor--state">
     <div class="storefront-editor__state-card storefront-editor__state-card--error">
-      <p class="storefront-editor__state-eyebrow">Storefront editor</p>
-      <h1 class="storefront-editor__state-title">We couldn't open this editor.</h1>
+      <p class="storefront-editor__state-eyebrow">{{ 'project.storefront.editor.state.eyebrow' | t }}</p>
+      <h1 class="storefront-editor__state-title">{{ 'project.storefront.editor.state.errorTitle' | t }}</h1>
       <p class="storefront-editor__state-copy">{{ errorMessage() }}</p>
-      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">Back to project</button>
+      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">{{ 'project.storefront.editor.state.backToProject' | t }}</button>
     </div>
   </section>
 } @else if (!isEcommerceProject()) {
   <section class="storefront-editor storefront-editor--state">
     <div class="storefront-editor__state-card">
-      <p class="storefront-editor__state-eyebrow">Storefront editor</p>
-      <h1 class="storefront-editor__state-title">This editor is only available for ecommerce projects.</h1>
-      <p class="storefront-editor__state-copy">Other project types can keep using their current workspace until their dedicated editors are ready.</p>
-      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">Back to project</button>
+      <p class="storefront-editor__state-eyebrow">{{ 'project.storefront.editor.state.eyebrow' | t }}</p>
+      <h1 class="storefront-editor__state-title">{{ 'project.storefront.editor.state.ecommerceOnlyTitle' | t }}</h1>
+      <p class="storefront-editor__state-copy">{{ 'project.storefront.editor.state.ecommerceOnlyCopy' | t }}</p>
+      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">{{ 'project.storefront.editor.state.backToProject' | t }}</button>
+    </div>
+  </section>
+} @else if (isMobileEditorBlocked()) {
+  <section class="storefront-editor storefront-editor--state storefront-editor--state-mobile-blocked">
+    <div class="storefront-editor__state-card storefront-editor__state-card--mobile">
+      <div class="storefront-editor__state-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="7" y="3" width="10" height="18" rx="2.5" stroke="currentColor" stroke-width="1.8"></rect>
+          <path d="M10 6.5H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+          <path d="M4 10.5H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+          <path d="M18 13.5H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <p class="storefront-editor__state-eyebrow">{{ 'project.storefront.editor.state.eyebrow' | t }}</p>
+      <h1 class="storefront-editor__state-title">{{ 'project.storefront.editor.state.mobileBlockedTitle' | t }}</h1>
+      <p class="storefront-editor__state-copy">{{ 'project.storefront.editor.state.mobileBlockedCopy' | t }}</p>
+      <p class="storefront-editor__state-note">{{ 'project.storefront.editor.state.mobileBlockedNote' | t }}</p>
+      <button type="button" class="storefront-editor__state-link" (click)="navigateBackToProject()">{{ 'project.storefront.editor.state.backToProject' | t }}</button>
     </div>
   </section>
 } @else if (workingStorefront(); as storefront) {
@@ -97,7 +115,7 @@
     type="button"
     class="storefront-editor__overlay"
     [class.storefront-editor__overlay--dimmed]="isSectionLibraryVisible() || isPageDesignPickerVisible()"
-    aria-label="Close open panels"
+    [attr.aria-label]="'project.storefront.editor.common.closeOpenPanels' | t"
     (click)="closeFloatingUi()"
   ></button>
 }
@@ -125,11 +143,11 @@
           @if (isFormaMenuOpen()) {
             <div class="storefront-editor__menu storefront-editor__menu--brand">
               <button type="button" class="storefront-editor__menu-row" (click)="openPublicPreview()">
-                <span>Preview</span>
+                <span>{{ 'project.storefront.editor.topbar.preview' | t }}</span>
                 <small>Ctrl + P</small>
               </button>
               <button type="button" class="storefront-editor__menu-row" (click)="triggerPublishFromMenu()">
-                <span>Publish</span>
+                <span>{{ 'project.storefront.editor.topbar.publish' | t }}</span>
                 <small>Ctrl + Shift + P</small>
               </button>
               <button type="button" class="storefront-editor__menu-row storefront-editor__menu-row--muted">
@@ -179,7 +197,7 @@
             type="button"
             class="storefront-editor__account-trigger"
             (click)="toggleAccountMenu()"
-            aria-label="Account menu"
+            [attr.aria-label]="'project.storefront.editor.account.menu' | t"
           >
             @if (currentUserAvatar()) {
               <img
@@ -219,13 +237,13 @@
                 <span class="storefront-editor__menu-icon">
                   <app-icon name="account-settings" [size]="18"></app-icon>
                 </span>
-                <span>Account Settings</span>
+                <span>{{ 'project.storefront.editor.account.settings' | t }}</span>
               </button>
               <button type="button" class="storefront-editor__menu-row" (click)="logout()">
                 <span class="storefront-editor__menu-icon">
                   <app-icon name="logout-door" [size]="18"></app-icon>
                 </span>
-                <span>Log Out</span>
+                <span>{{ 'project.storefront.editor.account.logout' | t }}</span>
               </button>
 
               <div class="storefront-editor__menu-divider"></div>
@@ -234,7 +252,7 @@
                 <span class="storefront-editor__menu-icon">
                   <app-icon name="invite-plus" [size]="18"></app-icon>
                 </span>
-                <span>Invite Collaborators</span>
+                <span>{{ 'project.storefront.editor.account.inviteCollaborators' | t }}</span>
               </button>
             </div>
           }
@@ -246,7 +264,7 @@
         </button>
 
         <button type="button" class="storefront-editor__topbar-select">
-          <span>My Business</span>
+          <span>{{ 'project.storefront.editor.topbar.myBusiness' | t }}</span>
           <app-icon name="chevron-down" [size]="14"></app-icon>
         </button>
 
@@ -256,7 +274,7 @@
             class="storefront-editor__topbar-select storefront-editor__topbar-brand-trigger"
             (click)="toggleBrandKitPopup()"
           >
-            <span>Brand</span>
+            <span>{{ 'project.storefront.editor.topbar.brand' | t }}</span>
             <app-icon name="chevron-down" [size]="14"></app-icon>
           </button>
         </div>
@@ -269,24 +287,24 @@
             class="storefront-editor__zoom-trigger"
             (click)="toggleZoomMenu()"
           >
-            <span>Fit ({{ zoomPercent() }}%)</span>
+            <span>{{ 'project.storefront.editor.topbar.fit' | t }} ({{ zoomPercent() }}%)</span>
             <app-icon name="chevron-down" [size]="14"></app-icon>
           </button>
 
           @if (isZoomMenuOpen()) {
             <div class="storefront-editor__menu storefront-editor__menu--zoom">
               <div class="storefront-editor__zoom-controls">
-                <button type="button" class="storefront-editor__zoom-button" (click)="nudgeZoom('out')" aria-label="Zoom out">
+                <button type="button" class="storefront-editor__zoom-button" (click)="nudgeZoom('out')" [attr.aria-label]="'project.storefront.editor.zoom.out' | t">
                   <app-icon name="zoom-minus" [size]="18"></app-icon>
                 </button>
                 <strong>{{ zoomPercent() }}%</strong>
-                <button type="button" class="storefront-editor__zoom-button" (click)="nudgeZoom('in')" aria-label="Zoom in">
+                <button type="button" class="storefront-editor__zoom-button" (click)="nudgeZoom('in')" [attr.aria-label]="'project.storefront.editor.zoom.in' | t">
                   <app-icon name="zoom-plus" [size]="18"></app-icon>
                 </button>
               </div>
 
               <button type="button" class="storefront-editor__menu-row" (click)="fitPreviewToScreen()">
-                <span>Fit to Screen</span>
+                <span>{{ 'project.storefront.editor.zoom.fitToScreen' | t }}</span>
                 <small>⇧ + 1</small>
               </button>
               <button type="button" class="storefront-editor__menu-row" (click)="setZoom(50)">
@@ -308,31 +326,31 @@
       </div>
 
       <div class="storefront-editor__topbar-right">
-        <button type="button" class="storefront-editor__header-link">Upgrade</button>
+        <button type="button" class="storefront-editor__header-link">{{ 'project.storefront.editor.topbar.upgrade' | t }}</button>
         <div class="storefront-editor__icon-button-wrap">
           <button
             type="button"
             class="storefront-editor__icon-button"
-            aria-label="Undo"
+            [attr.aria-label]="'project.storefront.editor.topbar.undo' | t"
             [disabled]="!canUndo()"
             (click)="undo()"
           >
             <app-icon name="undo-flow" [size]="22"></app-icon>
           </button>
-          <div class="storefront-editor__icon-tooltip">Undo</div>
+          <div class="storefront-editor__icon-tooltip">{{ 'project.storefront.editor.topbar.undo' | t }}</div>
         </div>
 
         <div class="storefront-editor__icon-button-wrap">
           <button
             type="button"
             class="storefront-editor__icon-button"
-            aria-label="Redo"
+            [attr.aria-label]="'project.storefront.editor.topbar.redo' | t"
             [disabled]="!canRedo()"
             (click)="redo()"
           >
             <app-icon name="redo-flow" [size]="22"></app-icon>
           </button>
-        <div class="storefront-editor__icon-tooltip">Redo</div>
+        <div class="storefront-editor__icon-tooltip">{{ 'project.storefront.editor.topbar.redo' | t }}</div>
       </div>
 
         <div
@@ -340,7 +358,7 @@
           [class.storefront-editor__autosave--dirty]="hasUnsavedChanges()"
           tabindex="0"
           role="status"
-          aria-label="Autosave status"
+          [attr.aria-label]="'project.storefront.editor.topbar.autosaveStatus' | t"
         >
           <app-icon name="cloud-check" [size]="22"></app-icon>
           <div class="storefront-editor__autosave-tooltip">
@@ -349,7 +367,7 @@
         </div>
 
         <button type="button" class="storefront-editor__header-secondary" (click)="openPublicPreview()">
-          Preview
+          {{ 'project.storefront.editor.topbar.preview' | t }}
         </button>
 
         <button
@@ -358,7 +376,7 @@
           (click)="publishStorefront()"
           [disabled]="isPublishing() || isUnpublishing()"
         >
-          {{ isPublishing() ? 'Publishing...' : storefront.storeStatus === 'PUBLISHED' ? 'Publish' : 'Publish' }}
+          {{ publishButtonLabel() }}
         </button>
       </div>
     </header>
@@ -567,14 +585,14 @@
       >
         <div class="storefront-editor__pages-panel-head">
           <div>
-            <h2>Site Pages ({{ managedPages().length }})</h2>
+          <h2>{{ 'project.storefront.editor.pages.sitePages' | t }} ({{ managedPages().length }})</h2>
           </div>
 
           <div class="storefront-editor__pages-panel-actions">
             <button
               type="button"
               class="storefront-editor__pages-layout-button"
-              [attr.aria-label]="pagesPanelLayout() === 'grid' ? 'Switch to rows layout' : 'Switch to grid layout'"
+              [attr.aria-label]="pagesPanelLayout() === 'grid' ? ('project.storefront.editor.pages.switchToRows' | t) : ('project.storefront.editor.pages.switchToGrid' | t)"
               (click)="togglePagesLayout()"
             >
               <app-icon [name]="pagesPanelLayout() === 'grid' ? 'layout-grid' : 'menu'" [size]="16"></app-icon>
@@ -583,7 +601,7 @@
               <button
                 type="button"
                 class="storefront-editor__pages-close"
-                aria-label="Close pages panel"
+                [attr.aria-label]="'project.storefront.editor.pages.closePanel' | t"
                 (click)="togglePagesPanel()"
               >
               <svg
@@ -704,7 +722,7 @@
                     <button
                       type="button"
                       class="storefront-editor__page-card-more-button"
-                      aria-label="Page options"
+                      [attr.aria-label]="'project.storefront.editor.pages.pageOptions' | t"
                       (click)="$event.stopPropagation(); togglePageCardMenu(page.id, $event)"
                     >
                       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
@@ -721,9 +739,9 @@
         <div class="storefront-editor__pages-selector-actions">
           <button type="button" class="storefront-editor__pages-primary" (click)="toggleAddPageMenu($event)">
             <span>+</span>
-            <span>Add Page</span>
+            <span>{{ 'project.storefront.editor.pages.addPage' | t }}</span>
           </button>
-          <button type="button" class="storefront-editor__pages-secondary" (click)="openManagePages()">Manage Pages</button>
+          <button type="button" class="storefront-editor__pages-secondary" (click)="openManagePages()">{{ 'project.storefront.editor.pages.managePages' | t }}</button>
 
           @if (isAddPageMenuOpen()) {
             <div class="storefront-editor__add-page-menu storefront-editor__add-page-menu--selector">
@@ -732,13 +750,13 @@
                   <path d="M7 5.75c.294 0 .562.173.684.44l2.27 5a.75.75 0 0 1-1.366.62l-.425-.934a.753.753 0 0 1-.142.014H5.98a.756.756 0 0 1-.145-.014l-.423.934a.75.75 0 0 1-1.365-.62l2.27-5A.751.751 0 0 1 7 5.75Zm-.488 3.64h.977L7 8.313 6.512 9.39Z"></path>
                   <path d="M15 3.5c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1h12ZM3.5 13h7V5h-7v8Zm8.5 0h2.5V9H12v4Zm0-5.5h2.5V5H12v2.5Z"></path>
                 </svg>
-                <span>Choose a design</span>
+                <span>{{ 'project.storefront.editor.pages.chooseDesign' | t }}</span>
               </button>
               <button type="button" class="storefront-editor__add-page-menu-button" (click)="createBlankPage()">
                 <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
                   <path d="M13.5 3c.83 0 1.5.68 1.5 1.5v9c0 .82-.67 1.5-1.5 1.5h-9c-.83 0-1.5-.68-1.5-1.5v-9C3 3.68 3.67 3 4.5 3h9Zm-9 1.5v9h9v-9h-9Z"></path>
                 </svg>
-                <span>Blank page</span>
+                <span>{{ 'project.storefront.editor.pages.blankPage' | t }}</span>
               </button>
             </div>
           }
@@ -760,7 +778,7 @@
         >
           <div class="storefront-editor__pages-panel-head">
             <div class="storefront-editor__pages-panel-title">
-              <h2>Site Pages ({{ managedPages().length }})</h2>
+              <h2>{{ 'project.storefront.editor.pages.sitePages' | t }} ({{ managedPages().length }})</h2>
             </div>
 
             <div class="storefront-editor__pages-panel-actions">
@@ -768,7 +786,7 @@
                 <app-icon name="search" [size]="16"></app-icon>
                 <input
                   type="text"
-                  placeholder="Search pages"
+                  [placeholder]="'project.storefront.editor.pages.searchPages' | t"
                   [ngModel]="pagesManagerSearch()"
                   (ngModelChange)="pagesManagerSearch.set($event)"
                 />
@@ -777,7 +795,7 @@
               <button
                 type="button"
                 class="storefront-editor__pages-layout-button"
-                [attr.aria-label]="pagesPanelLayout() === 'grid' ? 'Switch to rows layout' : 'Switch to grid layout'"
+                [attr.aria-label]="pagesPanelLayout() === 'grid' ? ('project.storefront.editor.pages.switchToRows' | t) : ('project.storefront.editor.pages.switchToGrid' | t)"
                 (click)="togglePagesLayout()"
               >
                 <app-icon [name]="pagesPanelLayout() === 'grid' ? 'layout-grid' : 'menu'" [size]="16"></app-icon>
@@ -786,7 +804,7 @@
               <button
                 type="button"
                 class="storefront-editor__pages-close"
-                aria-label="Close pages panel"
+                [attr.aria-label]="'project.storefront.editor.pages.closePanel' | t"
                 (click)="closeManagePages()"
               >
                 <svg
@@ -812,7 +830,7 @@
               <div class="storefront-editor__pages-add-wrap">
                 <button type="button" class="storefront-editor__pages-primary" (click)="toggleAddPageMenu($event)">
                   <span>+</span>
-                  <span>Add Page</span>
+                  <span>{{ 'project.storefront.editor.pages.addPage' | t }}</span>
                 </button>
 
                 @if (isAddPageMenuOpen()) {
@@ -822,13 +840,13 @@
                         <path d="M7 5.75c.294 0 .562.173.684.44l2.27 5a.75.75 0 0 1-1.366.62l-.425-.934a.753.753 0 0 1-.142.014H5.98a.756.756 0 0 1-.145-.014l-.423.934a.75.75 0 0 1-1.365-.62l2.27-5A.751.751 0 0 1 7 5.75Zm-.488 3.64h.977L7 8.313 6.512 9.39Z"></path>
                         <path d="M15 3.5c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1h12ZM3.5 13h7V5h-7v8Zm8.5 0h2.5V9H12v4Zm0-5.5h2.5V5H12v2.5Z"></path>
                       </svg>
-                      <span>Choose a design</span>
+                      <span>{{ 'project.storefront.editor.pages.chooseDesign' | t }}</span>
                     </button>
                     <button type="button" class="storefront-editor__add-page-menu-button" (click)="createBlankPage()">
                       <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
                         <path d="M13.5 3c.83 0 1.5.68 1.5 1.5v9c0 .82-.67 1.5-1.5 1.5h-9c-.83 0-1.5-.68-1.5-1.5v-9C3 3.68 3.67 3 4.5 3h9Zm-9 1.5v9h9v-9h-9Z"></path>
                       </svg>
-                      <span>Blank page</span>
+                      <span>{{ 'project.storefront.editor.pages.blankPage' | t }}</span>
                     </button>
                   </div>
                 }
@@ -854,13 +872,25 @@
                       <span class="storefront-editor__page-card-canvas-header">
                         <strong>{{ page.name }}</strong>
                         <span class="storefront-editor__page-card-canvas-nav">
-                          <span>{{ page.kind === 'blank' ? 'Blank page' : page.kind === 'home' ? 'Main page' : 'Designed page' }}</span>
+                          <span>
+                            {{
+                              page.kind === 'blank'
+                                ? ('project.storefront.editor.pages.kind.blank' | t)
+                                : page.kind === 'home'
+                                  ? ('project.storefront.editor.pages.kind.main' | t)
+                                  : ('project.storefront.editor.pages.kind.designed' | t)
+                            }}
+                          </span>
                         </span>
                       </span>
                       <span class="storefront-editor__pages-card-preview" [attr.data-accent]="page.designId || page.kind">
                         <span class="storefront-editor__pages-card-preview-title">{{ page.name }}</span>
                         <span class="storefront-editor__pages-card-preview-copy">
-                          {{ page.kind === 'blank' ? 'Start from an empty canvas and build the layout yourself.' : 'Use a prepared page structure and customize the content.' }}
+                          {{
+                            page.kind === 'blank'
+                              ? ('project.storefront.editor.pages.copy.blank' | t)
+                              : ('project.storefront.editor.pages.copy.designed' | t)
+                          }}
                         </span>
                       </span>
                     </span>
@@ -2445,7 +2475,7 @@
                       type="text"
                       [value]="textFontSearch()"
                       (input)="updateTextFontSearch($any($event.target).value)"
-                      placeholder="Search fonts"
+                      [placeholder]="'project.storefront.editor.text.searchFonts' | t"
                     />
                   </label>
                   <div class="storefront-editor__context-toolbar-font-scroll">
@@ -2462,7 +2492,7 @@
                     }
                     @if (!filteredTextFontOptions().length) {
                       <div class="storefront-editor__text-font-empty-state">
-                        No fonts matched "{{ textFontSearch() }}"
+                        {{ 'project.storefront.editor.text.noFontsMatched' | t }} "{{ textFontSearch() }}"
                       </div>
                     }
                   </div>
@@ -2483,13 +2513,13 @@
                   <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
                   <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
                 </svg>
-                <span>Link</span>
+                <span>{{ 'project.storefront.editor.link.label' | t }}</span>
               </button>
 
               @if (activeTextToolbarMenu() === 'link') {
                 <div class="storefront-editor__text-link-popup">
                   <div class="storefront-editor__text-link-popup-header">
-                    <h3>Link to</h3>
+                    <h3>{{ 'project.storefront.editor.link.title' | t }}</h3>
                     <div class="storefront-editor__text-link-popup-actions">
                       <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
                       <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="toggleTextToolbarMenu('link')">x</button>
@@ -2531,7 +2561,7 @@
 
                   @if (textLinkMode() === 'page') {
                     <label class="storefront-editor__text-link-popup-field">
-                      <span>Choose a page</span>
+                      <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
                       <select [value]="textLinkPageId()" (change)="setTextLinkPage($any($event.target).value)">
                         @for (page of managedPages(); track page.id) {
                           <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -2540,7 +2570,7 @@
                     </label>
 
                     <div class="storefront-editor__text-link-popup-field">
-                      <span>Choose how it opens</span>
+                      <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
                       <div class="storefront-editor__text-link-popup-toggle">
                         <button
                           type="button"
@@ -2548,7 +2578,7 @@
                           class="storefront-editor__text-link-popup-toggle-button"
                           (click)="setTextLinkOpenMode('current')"
                         >
-                          Current tab
+                          {{ 'project.storefront.editor.link.currentTab' | t }}
                         </button>
                         <button
                           type="button"
@@ -2556,14 +2586,14 @@
                           class="storefront-editor__text-link-popup-toggle-button"
                           (click)="setTextLinkOpenMode('new')"
                         >
-                          New tab
+                          {{ 'project.storefront.editor.link.newTab' | t }}
                         </button>
                       </div>
                     </div>
                   } @else if (textLinkMode() === 'section') {
-                    <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+                    <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.section' | t }}</div>
                     <label class="storefront-editor__text-link-popup-field">
-                      <span>Choose a page</span>
+                      <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
                       <select [value]="textLinkPageId()" (change)="setTextLinkPage($any($event.target).value)">
                         @for (page of managedPages(); track page.id) {
                           <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -2571,7 +2601,7 @@
                       </select>
                     </label>
                     <label class="storefront-editor__text-link-popup-field">
-                      <span>Choose a section</span>
+                      <span>{{ 'project.storefront.editor.link.chooseSection' | t }}</span>
                       <select [value]="textLinkSectionId()" (change)="setTextLinkSection($any($event.target).value)">
                         @for (section of availableSectionsForManagedPage(textLinkPageId()); track section.id) {
                           <option [value]="section.id">{{ sectionLabel(section) }}</option>
@@ -2579,19 +2609,19 @@
                       </select>
                     </label>
                   } @else {
-                    <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+                    <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.webAddress' | t }}</div>
                     <label class="storefront-editor__text-link-popup-field">
-                      <span>Web address</span>
+                      <span>{{ 'project.storefront.editor.link.webAddress' | t }}</span>
                       <input
                         type="text"
                         [value]="textLinkUrl()"
                         (input)="updateTextLinkUrl($any($event.target).value)"
-                        placeholder="e.g., www.example.com"
+                        [placeholder]="'project.storefront.editor.link.webAddressPlaceholder' | t"
                       />
                     </label>
 
                     <div class="storefront-editor__text-link-popup-field">
-                      <span>Choose how it opens</span>
+                      <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
                       <div class="storefront-editor__text-link-popup-toggle">
                         <button
                           type="button"
@@ -2599,7 +2629,7 @@
                           class="storefront-editor__text-link-popup-toggle-button"
                           (click)="setTextLinkOpenMode('current')"
                         >
-                          Current tab
+                          {{ 'project.storefront.editor.link.currentTab' | t }}
                         </button>
                         <button
                           type="button"
@@ -2607,20 +2637,20 @@
                           class="storefront-editor__text-link-popup-toggle-button"
                           (click)="setTextLinkOpenMode('new')"
                         >
-                          New tab
+                          {{ 'project.storefront.editor.link.newTab' | t }}
                         </button>
                       </div>
                     </div>
 
                     <p class="storefront-editor__text-link-popup-helper">
-                      You can only open this link from your published site.
+                      {{ 'project.storefront.editor.link.publishedSiteOnly' | t }}
                     </p>
                   }
 
                   <div class="storefront-editor__text-link-popup-footer">
-                    <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedTextLink()">Remove Link</button>
+                    <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedTextLink()">{{ 'project.storefront.editor.link.removeLink' | t }}</button>
                     <div class="storefront-editor__text-link-popup-footer-actions">
-                      <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="toggleTextToolbarMenu('link')">Cancel</button>
+                      <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="toggleTextToolbarMenu('link')">{{ 'common.cancel' | t }}</button>
                       <button
                         type="button"
                         class="storefront-editor__text-link-popup-primary"
@@ -2631,7 +2661,7 @@
                         "
                         (click)="saveSelectedTextLink()"
                       >
-                        Done
+                        {{ 'project.storefront.editor.link.done' | t }}
                       </button>
                     </div>
                   </div>
@@ -2985,7 +3015,7 @@
           [style.transform]="isImageSettingsLinkPopupOpen() && imageSettingsLinkPopupPlacement() === 'viewport-bottom' ? 'none' : null"
         >
           <div class="storefront-editor__text-link-popup-header">
-            <h3>Link to</h3>
+            <h3>{{ 'project.storefront.editor.link.title' | t }}</h3>
             <div class="storefront-editor__text-link-popup-actions">
               <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
               <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="closeImageLinkPopups()">x</button>
@@ -3028,7 +3058,7 @@
 
           @if (imageLinkMode() === 'page') {
             <label class="storefront-editor__text-link-popup-field">
-              <span>Choose a page</span>
+              <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
               <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
                 @for (page of managedPages(); track page.id) {
                   <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -3037,16 +3067,16 @@
             </label>
 
             <div class="storefront-editor__text-link-popup-field">
-              <span>Choose how it opens</span>
+              <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
               <div class="storefront-editor__text-link-popup-toggle">
-                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
-                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">{{ 'project.storefront.editor.link.currentTab' | t }}</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">{{ 'project.storefront.editor.link.newTab' | t }}</button>
               </div>
             </div>
           } @else if (imageLinkMode() === 'section') {
-            <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+            <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.section' | t }}</div>
             <label class="storefront-editor__text-link-popup-field">
-              <span>Choose a page</span>
+              <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
               <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
                 @for (page of managedPages(); track page.id) {
                   <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -3054,7 +3084,7 @@
               </select>
             </label>
             <label class="storefront-editor__text-link-popup-field">
-              <span>Choose a section</span>
+              <span>{{ 'project.storefront.editor.link.chooseSection' | t }}</span>
               <select [value]="imageLinkSectionId()" (change)="setImageLinkSection($any($event.target).value)">
                 @for (section of availableSectionsForManagedPage(imageLinkPageId()); track section.id) {
                   <option [value]="section.id">{{ sectionLabel(section) }}</option>
@@ -3062,34 +3092,34 @@
               </select>
             </label>
           } @else {
-            <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+            <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.webAddress' | t }}</div>
             <label class="storefront-editor__text-link-popup-field">
-              <span>Web address</span>
+              <span>{{ 'project.storefront.editor.link.webAddress' | t }}</span>
               <input
                 type="text"
                 [value]="imageLinkUrl()"
                 (input)="updateImageLinkUrl($any($event.target).value)"
-                placeholder="e.g., www.example.com"
+                [placeholder]="'project.storefront.editor.link.webAddressPlaceholder' | t"
               />
             </label>
 
             <div class="storefront-editor__text-link-popup-field">
-              <span>Choose how it opens</span>
+              <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
               <div class="storefront-editor__text-link-popup-toggle">
-                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
-                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">{{ 'project.storefront.editor.link.currentTab' | t }}</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">{{ 'project.storefront.editor.link.newTab' | t }}</button>
               </div>
             </div>
 
             <p class="storefront-editor__text-link-popup-helper">
-              You can only open this link from your published site.
+              {{ 'project.storefront.editor.link.publishedSiteOnly' | t }}
             </p>
           }
 
           <div class="storefront-editor__text-link-popup-footer">
-            <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedImageLink()">Remove Link</button>
+            <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedImageLink()">{{ 'project.storefront.editor.link.removeLink' | t }}</button>
             <div class="storefront-editor__text-link-popup-footer-actions">
-              <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeImageLinkPopups()">Cancel</button>
+              <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeImageLinkPopups()">{{ 'common.cancel' | t }}</button>
               <button
                 type="button"
                 class="storefront-editor__text-link-popup-primary"
@@ -3100,7 +3130,7 @@
                 "
                 (click)="saveSelectedImageLink()"
               >
-                Done
+                {{ 'project.storefront.editor.link.done' | t }}
               </button>
             </div>
           </div>
@@ -3120,7 +3150,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
               <path d="M6.75 11.427c.41 0 .75.34.75.75 0 2.07 1.68 3.75 3.75 3.75h4.33l-1.23-1.23a.755.755 0 0 1 0-1.06c.29-.29.77-.29 1.06 0v.01l2.29 2.29a.997.997 0 0 1 0 1.411l-2.29 2.29c-.29.29-.77.29-1.06 0a.755.755 0 0 1 0-1.06l1.15-1.15h-4.25A5.25 5.25 0 0 1 6 12.177c0-.41.34-.75.75-.75Zm1.84-6.21c.29-.29.77-.29 1.06 0 .29.29.29.77 0 1.06L8.5 7.428h4.25c2.9 0 5.25 2.35 5.25 5.25 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-2.07-1.68-3.75-3.75-3.75H8.42l1.23 1.23c.29.29.29.77 0 1.06-.29.29-.77.29-1.06 0v-.01L6.3 8.917a.996.996 0 0 1 0-1.41l2.29-2.29Z"></path>
             </svg>
-            <span>Replace Image</span>
+              <span>{{ 'project.storefront.editor.image.replace' | t }}</span>
           </button>
 
           <button
@@ -3147,7 +3177,7 @@
                 <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
                 <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
               </svg>
-              <span>Link</span>
+              <span>{{ 'project.storefront.editor.link.label' | t }}</span>
             </button>
 
             @if (activeImageToolbarMenu() === 'link') {
@@ -4833,7 +4863,7 @@
                               type="text"
                               [value]="buttonTextFontSearch()"
                               (input)="updateButtonTextFontSearch($any($event.target).value)"
-                              placeholder="Search fonts"
+                              [placeholder]="'project.storefront.editor.text.searchFonts' | t"
                             />
                           </div>
                           <div class="storefront-editor__button-toolbar-font-scroll">
@@ -4865,7 +4895,7 @@
                             }
                             @if (!filteredButtonFontOptions().length) {
                               <div class="storefront-editor__text-font-empty-state">
-                                No fonts matched "{{ buttonTextFontSearch() }}"
+                                {{ 'project.storefront.editor.text.noFontsMatched' | t }} "{{ buttonTextFontSearch() }}"
                               </div>
                             }
                           </div>
@@ -5307,12 +5337,12 @@
             </div>
 
             <div class="storefront-editor__image-settings-section">
-              <span class="storefront-editor__image-settings-label">Image</span>
+              <span class="storefront-editor__image-settings-label">{{ 'project.storefront.editor.image.label' | t }}</span>
               <button type="button" class="storefront-editor__image-settings-preview" (click)="openMediaManagerForSelectedImage()">
                 @if (image.props.src) {
-                  <img [src]="image.props.src" [alt]="image.props.alt || 'Image preview'" />
+                  <img [src]="image.props.src" [alt]="image.props.alt || t('project.storefront.editor.image.previewAlt')" />
                 } @else {
-                  <span class="storefront-editor__image-settings-preview-empty">No image selected</span>
+                  <span class="storefront-editor__image-settings-preview-empty">{{ 'project.storefront.editor.image.noneSelected' | t }}</span>
                 }
                 <span class="storefront-editor__image-settings-preview-overlay">
                   <span class="storefront-editor__image-settings-preview-replace">
@@ -5326,7 +5356,7 @@
 
             <div class="storefront-editor__image-settings-section">
               <label class="storefront-editor__button-toolbar-field">
-                <span>Display Mode</span>
+                <span>{{ 'project.storefront.editor.image.displayMode' | t }}</span>
                 <select [value]="imageDisplayMode(image)" (change)="updateSelectedImageDisplayMode($any($event.target).value)">
                   @for (option of imageDisplayModeOptions; track option.id) {
                     <option [value]="option.id">{{ option.label }}</option>
@@ -5336,10 +5366,10 @@
             </div>
 
             <div class="storefront-editor__image-settings-section">
-              <span class="storefront-editor__image-settings-label">Links to</span>
+              <span class="storefront-editor__image-settings-label">{{ 'project.storefront.editor.image.linksTo' | t }}</span>
               <div class="storefront-editor__image-settings-link-shell">
                 <button type="button" class="storefront-editor__image-settings-link-button" (click)="toggleImageSettingsLinkPopup($event)">
-                  <span>{{ image.props.href ? 'Edit link...' : 'Choose a link...' }}</span>
+                  <span>{{ selectedImageLinkButtonLabel() }}</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
                     <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
                     <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
@@ -5360,7 +5390,7 @@
         @if (activeContainerToolbarMenu() === 'designs') {
           <aside class="storefront-editor__container-toolbar-designs-panel storefront-editor__button-toolbar-designs-panel">
             <div class="storefront-editor__button-toolbar-panel-header">
-              <h3>Explore Designs</h3>
+              <h3>{{ 'project.storefront.editor.container.exploreDesigns' | t }}</h3>
               <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleContainerToolbarMenu('designs')">
                 <app-icon name="x" [size]="14"></app-icon>
               </button>
@@ -5395,7 +5425,7 @@
         @if (activeMenuToolbarMenu() === 'manage') {
           <aside class="storefront-editor__button-toolbar-side-panel storefront-editor__menu-toolbar-side-panel storefront-editor__menu-manage-panel">
             <div class="storefront-editor__button-toolbar-panel-header">
-              <h3>Manage Menu</h3>
+              <h3>{{ 'project.storefront.editor.menu.manage' | t }}</h3>
               <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleMenuToolbarMenu('manage')">
                 <app-icon name="x" [size]="14"></app-icon>
               </button>
@@ -5416,7 +5446,7 @@
                       type="button"
                       class="storefront-editor__menu-manage-drag"
                       (mousedown)="startMenuItemReorder(item.id, $event)"
-                      aria-label="Reorder item"
+                      [attr.aria-label]="'project.storefront.editor.menu.reorderItem' | t"
                     >
                       <svg fill="currentColor" viewBox="0 0 12 24" width="12" height="24" aria-hidden="true" data-hook="dnd">
                         <g>
@@ -5471,7 +5501,7 @@
                       class="storefront-editor__menu-manage-more"
                       [class.storefront-editor__menu-manage-more--visible]="activeMenuItemActionsId() === item.id || activeMenuItemLinkId() === item.id"
                       (click)="openMenuItemActions(item.id, $event)"
-                      aria-label="More options"
+                      [attr.aria-label]="'project.storefront.editor.common.moreOptions' | t"
                     >
                       <svg viewBox="0 0 18 18" fill="currentColor" width="16" height="16" aria-hidden="true">
                         <circle cx="4.5" cy="9" r="1.25"></circle>
@@ -5493,7 +5523,7 @@
                           <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
                           <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
                         </svg>
-                        <span>{{ menuItemHasLink(item) ? 'Change link' : 'Add link' }}</span>
+                        <span>{{ menuItemHasLink(item) ? ('project.storefront.editor.link.change' | t) : ('project.storefront.editor.link.add' | t) }}</span>
                       </button>
                       <button type="button" class="storefront-editor__menu-item-actions-entry" (click)="startRenamingMenuItem(item.id, $event)">
                         <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -5501,7 +5531,7 @@
                             <path d="M3 6a1 1 0 0 1 1-1h3v1H4v13h3v1H4a1 1 0 0 1-1-1V6Zm4 5V9a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v2h-1V9h-3v7h1.997v1H9v-1h2V9H8v2H7Zm12-6a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-3v-1h3V6h-3V5h3Z"></path>
                           </g>
                         </svg>
-                        <span>Rename</span>
+                        <span>{{ 'common.edit' | t }}</span>
                       </button>
                       <button type="button" class="storefront-editor__menu-item-actions-entry" (click)="removeSelectedMenuItem(item.id, $event)">
                         <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -5510,7 +5540,7 @@
                             <path d="M13.38 5c.9 0 1.63.73 1.63 1.63V8h2.24a.75.75 0 0 1 0 1.5H17V16c0 1.66-1.34 3-3 3h-4c-1.66 0-3-1.34-3-3V9.5h-.25a.75.75 0 0 1 0-1.5h2.26V6.63c0-.9.73-1.63 1.63-1.63h2.74ZM8.5 16c0 .83.67 1.5 1.5 1.5h4c.83 0 1.5-.67 1.5-1.5V9.5h-7V16Zm2.13-9.5c-.07 0-.13.06-.13.13V8h3V6.63a.133.133 0 0 0-.08-.12l-.06-.01h-2.73Z"></path>
                           </g>
                         </svg>
-                        <span>Remove from menu</span>
+                        <span>{{ 'project.storefront.editor.menu.removeItem' | t }}</span>
                       </button>
                       <button type="button" class="storefront-editor__menu-item-actions-entry" [disabled]="!item.href" (click)="removeSelectedMenuItemLink(item.id)">
                         <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -5520,7 +5550,7 @@
                             <path d="M13.404 9.588a.722.722 0 0 1 1.012 0 .72.72 0 0 1 0 1.013l-.45.448-1.011-1.011.449-.45Z"></path>
                           </g>
                         </svg>
-                        <span>Remove link</span>
+                        <span>{{ 'project.storefront.editor.link.removeLink' | t }}</span>
                       </button>
                       <button type="button" class="storefront-editor__menu-item-actions-entry" (click)="duplicateSelectedMenuItem(item.id, $event)">
                         <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -5528,7 +5558,7 @@
                             <path d="M17 5c1.1 0 2 .9 2 2v7c0 1.1-.9 2-2 2h-1v1c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2v-7c0-1.1.9-2 2-2h1V7c0-1.1.9-2 2-2h7ZM7 9.5c-.27 0-.5.23-.5.5v7c0 .27.23.5.5.5h7c.27 0 .5-.23.5-.5v-7c0-.27-.23-.5-.5-.5H7Zm3-3c-.27 0-.5.23-.5.5v1H14c1.1 0 2 .9 2 2v4.5h1c.27 0 .5-.23.5-.5V7c0-.27-.23-.5-.5-.5h-7Z"></path>
                           </g>
                         </svg>
-                        <span>Duplicate</span>
+                        <span>{{ 'project.storefront.editor.common.duplicate' | t }}</span>
                       </button>
                     </div>
                   }
@@ -5540,7 +5570,7 @@
                       [style.top.px]="menuItemLinkPopupPosition().y"
                     >
                       <div class="storefront-editor__text-link-popup-header">
-                        <h3>Link to</h3>
+                        <h3>{{ 'project.storefront.editor.link.title' | t }}</h3>
                         <div class="storefront-editor__text-link-popup-actions">
                           <button type="button" class="storefront-editor__text-link-popup-icon-button">?</button>
                           <button type="button" class="storefront-editor__text-link-popup-icon-button" (click)="closeMenuItemLinkEditor()">x</button>
@@ -5583,7 +5613,7 @@
 
                       @if (menuLinkMode() === 'page') {
                         <label class="storefront-editor__text-link-popup-field">
-                          <span>Choose a page</span>
+                          <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
                           <select [value]="menuLinkPageId()" (change)="setMenuLinkPage($any($event.target).value)">
                             @for (page of managedPages(); track page.id) {
                               <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -5592,7 +5622,7 @@
                         </label>
 
                         <div class="storefront-editor__text-link-popup-field">
-                          <span>Choose how it opens</span>
+                          <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
                           <div class="storefront-editor__text-link-popup-toggle">
                             <button
                               type="button"
@@ -5600,7 +5630,7 @@
                               class="storefront-editor__text-link-popup-toggle-button"
                               (click)="setMenuLinkOpenMode('current')"
                             >
-                              Current tab
+                              {{ 'project.storefront.editor.link.currentTab' | t }}
                             </button>
                             <button
                               type="button"
@@ -5608,14 +5638,14 @@
                               class="storefront-editor__text-link-popup-toggle-button"
                               (click)="setMenuLinkOpenMode('new')"
                             >
-                              New tab
+                              {{ 'project.storefront.editor.link.newTab' | t }}
                             </button>
                           </div>
                         </div>
                       } @else if (menuLinkMode() === 'section') {
-                        <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+                        <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.section' | t }}</div>
                         <label class="storefront-editor__text-link-popup-field">
-                          <span>Choose a page</span>
+                          <span>{{ 'project.storefront.editor.link.choosePage' | t }}</span>
                           <select [value]="menuLinkPageId()" (change)="setMenuLinkPage($any($event.target).value)">
                             @for (page of managedPages(); track page.id) {
                               <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
@@ -5623,7 +5653,7 @@
                           </select>
                         </label>
                         <label class="storefront-editor__text-link-popup-field">
-                          <span>Choose a section</span>
+                          <span>{{ 'project.storefront.editor.link.chooseSection' | t }}</span>
                           <select [value]="menuLinkSectionId()" (change)="setMenuLinkSection($any($event.target).value)">
                             @for (section of availableSectionsForManagedPage(menuLinkPageId()); track section.id) {
                               <option [value]="section.id">{{ sectionLabel(section) }}</option>
@@ -5631,19 +5661,19 @@
                           </select>
                         </label>
                       } @else {
-                        <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+                        <div class="storefront-editor__text-link-popup-mode-title">{{ 'project.storefront.editor.link.webAddress' | t }}</div>
                         <label class="storefront-editor__text-link-popup-field">
-                          <span>Web address</span>
+                          <span>{{ 'project.storefront.editor.link.webAddress' | t }}</span>
                           <input
                             type="text"
                             [value]="menuLinkUrl()"
                             (input)="updateMenuLinkUrl($any($event.target).value)"
-                            placeholder="e.g., www.example.com"
+                            [placeholder]="'project.storefront.editor.link.webAddressPlaceholder' | t"
                           />
                         </label>
 
                         <div class="storefront-editor__text-link-popup-field">
-                          <span>Choose how it opens</span>
+                          <span>{{ 'project.storefront.editor.link.chooseHowItOpens' | t }}</span>
                           <div class="storefront-editor__text-link-popup-toggle">
                             <button
                               type="button"
@@ -5651,7 +5681,7 @@
                               class="storefront-editor__text-link-popup-toggle-button"
                               (click)="setMenuLinkOpenMode('current')"
                             >
-                              Current tab
+                              {{ 'project.storefront.editor.link.currentTab' | t }}
                             </button>
                             <button
                               type="button"
@@ -5659,20 +5689,20 @@
                               class="storefront-editor__text-link-popup-toggle-button"
                               (click)="setMenuLinkOpenMode('new')"
                             >
-                              New tab
+                              {{ 'project.storefront.editor.link.newTab' | t }}
                             </button>
                           </div>
                         </div>
 
                         <p class="storefront-editor__text-link-popup-helper">
-                          You can only open this link from your published site.
+                          {{ 'project.storefront.editor.link.publishedSiteOnly' | t }}
                         </p>
                       }
 
                       <div class="storefront-editor__text-link-popup-footer">
-                        <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedMenuItemLink(item.id)">Remove Link</button>
+                        <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedMenuItemLink(item.id)">{{ 'project.storefront.editor.link.removeLink' | t }}</button>
                         <div class="storefront-editor__text-link-popup-footer-actions">
-                          <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeMenuItemLinkEditor()">Cancel</button>
+                          <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeMenuItemLinkEditor()">{{ 'common.cancel' | t }}</button>
                           <button
                             type="button"
                             class="storefront-editor__text-link-popup-primary"
@@ -5683,7 +5713,7 @@
                             "
                             (click)="saveSelectedMenuItemLink()"
                           >
-                            Done
+                            {{ 'project.storefront.editor.link.done' | t }}
                           </button>
                         </div>
                       </div>
@@ -6931,25 +6961,25 @@
               @if (!isNarrowPreviewChrome() && !hideMobileDomainChrome()) {
                 <div class="storefront-editor__domain-pill">
                   @if (isCompactPreviewChrome()) {
-                    <button type="button" class="storefront-editor__domain-link">Connect Domain</button>
+                    <button type="button" class="storefront-editor__domain-link">{{ 'project.storefront.editor.preview.connectDomain' | t }}</button>
                   } @else {
                     <span class="storefront-editor__domain-badge">↻</span>
-                    <span><strong>{{ previewDomain() }}</strong> is available!</span>
-                    <button type="button">Connect Domain</button>
+                    <span><strong>{{ previewDomain() }}</strong> {{ 'project.storefront.editor.preview.domainAvailable' | t }}</span>
+                    <button type="button">{{ 'project.storefront.editor.preview.connectDomain' | t }}</button>
                   }
                 </div>
               }
             </div>
     
             <div class="storefront-editor__preview-toolbar-right">
-              <div class="storefront-editor__mode-switch" aria-label="Preview size">
+              <div class="storefront-editor__mode-switch" [attr.aria-label]="'project.storefront.editor.preview.size' | t">
                 <button
                   type="button"
                   class="storefront-editor__mode-button"
                   [class.storefront-editor__mode-button--active]="viewport() === 'desktop'"
                   (click)="setViewport('desktop')"
-                  aria-label="Desktop mode"
-                  title="Desktop"
+                  [attr.aria-label]="'project.storefront.editor.preview.desktopMode' | t"
+                  [title]="t('project.storefront.editor.preview.desktop')"
                 >
                   <app-icon name="device-desktop" [size]="24"></app-icon>
                 </button>
@@ -6958,8 +6988,8 @@
                   class="storefront-editor__mode-button"
                   [class.storefront-editor__mode-button--active]="viewport() === 'tablet'"
                   (click)="setViewport('tablet')"
-                  aria-label="Tablet mode"
-                  title="Tablet"
+                  [attr.aria-label]="'project.storefront.editor.preview.tabletMode' | t"
+                  [title]="t('project.storefront.editor.preview.tablet')"
                 >
                   <app-icon name="device-tablet" [size]="24"></app-icon>
                 </button>
@@ -6968,8 +6998,8 @@
                   class="storefront-editor__mode-button"
                   [class.storefront-editor__mode-button--active]="viewport() === 'mobile'"
                   (click)="setViewport('mobile')"
-                  aria-label="Mobile mode"
-                  title="Mobile"
+                  [attr.aria-label]="'project.storefront.editor.preview.mobileMode' | t"
+                  [title]="t('project.storefront.editor.preview.mobile')"
                 >
                   <app-icon name="device-mobile" [size]="24"></app-icon>
                 </button>
@@ -7021,7 +7051,7 @@
                           (drop)="dropLibraryComponentIntoSection($event, section.id)"
                         >
                         @if (isSectionAttachTarget(section.id)) {
-                          <div class="storefront-editor__preview-section-attach-indicator">Attach to section</div>
+                          <div class="storefront-editor__preview-section-attach-indicator">{{ 'project.storefront.editor.preview.attachToSection' | t }}</div>
                         }
                         <div
                           class="storefront-editor__preview-section-surface"
@@ -7035,7 +7065,7 @@
                           @case ('announcement-bar') {
                             <section class="preview-announcement">
                               <div class="preview-announcement__inner">
-                                <span>{{ readStringProp(section, 'text') || 'Announcement text' }}</span>
+                                <span>{{ readStringProp(section, 'text') || t('project.storefront.editor.preview.announcementText') }}</span>
                                 @if (readStringProp(section, 'linkLabel')) {
                                   <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'linkLabel') }}</a>
                                 }
@@ -7047,12 +7077,12 @@
                               <section class="preview-blank-section"></section>
                             } @else {
                               <section class="preview-hero">
-                                <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Storefront' }}</p>
-                                <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || 'Your headline goes here' }}</h3>
-                                <p class="preview-hero__copy">{{ readStringProp(section, 'description') || 'Add a short value proposition for your store.' }}</p>
+                                <p class="preview-hero__eyebrow">{{ readStringProp(section, 'eyebrow') || t('project.storefront.editor.preview.storefront') }}</p>
+                                <h3 class="preview-hero__title">{{ readStringProp(section, 'title') || t('project.storefront.editor.preview.heroHeadline') }}</h3>
+                                <p class="preview-hero__copy">{{ readStringProp(section, 'description') || t('project.storefront.editor.preview.heroCopy') }}</p>
                                 <div class="preview-hero__actions">
-                                  <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || 'Primary action' }}</a>
-                                  <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || 'Secondary action' }}</button>
+                                  <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'primaryCtaLabel') || t('project.storefront.editor.preview.primaryAction') }}</a>
+                                  <button type="button">{{ readStringProp(section, 'secondaryCtaLabel') || t('project.storefront.editor.preview.secondaryAction') }}</button>
                                 </div>
                               </section>
                             }
@@ -7061,10 +7091,10 @@
                             <section class="preview-products" id="featured">
                               <div class="preview-products__head">
                                 <div>
-                                  <p class="preview-products__eyebrow">Catalog</p>
-                                  <h3 class="preview-products__title">{{ readStringProp(section, 'title') || 'Featured products' }}</h3>
+                                  <p class="preview-products__eyebrow">{{ 'project.storefront.editor.preview.catalog' | t }}</p>
+                                  <h3 class="preview-products__title">{{ readStringProp(section, 'title') || t('project.storefront.editor.preview.featuredProducts') }}</h3>
                                 </div>
-                                <span class="preview-products__helper">{{ featuredProductsPreview().length }} selected</span>
+                                <span class="preview-products__helper">{{ featuredProductsPreview().length }} {{ 'project.storefront.editor.preview.selected' | t }}</span>
                               </div>
 
                               @if (featuredProductsPreview().length) {
@@ -7075,37 +7105,37 @@
                                         @if (product.imageUrl) {
                                           <img [src]="product.imageUrl" [alt]="product.name" />
                                         } @else {
-                                          <span>No image</span>
+                                          <span>{{ 'project.storefront.editor.preview.noImage' | t }}</span>
                                         }
                                       </div>
                                       <div class="preview-products__body">
                                         <h4>{{ product.name }}</h4>
-                                        <p>{{ product.category || 'General' }}</p>
+                                        <p>{{ product.category || t('project.storefront.editor.preview.general') }}</p>
                                         <strong>{{ product.price | number: '1.2-2' }} TND</strong>
                                       </div>
                                     </article>
                                   }
                                 </div>
                               } @else {
-                                <div class="preview-products__empty">Choose products in the catalog to feature them here.</div>
+                                  <div class="preview-products__empty">{{ 'project.storefront.editor.preview.chooseProducts' | t }}</div>
                               }
                             </section>
                           }
                           @case ('contact') {
                             <section class="preview-contact">
                               <div class="preview-contact__copy">
-                                <p class="preview-contact__eyebrow">{{ readStringProp(section, 'eyebrow') || 'Contact' }}</p>
-                                <h3 class="preview-contact__title">{{ readStringProp(section, 'title') || 'Talk to our team' }}</h3>
-                                <p class="preview-contact__description">{{ readStringProp(section, 'description') || 'Add ways customers can reach your store.' }}</p>
-                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'ctaLabel') || 'Email us' }}</a>
+                                <p class="preview-contact__eyebrow">{{ readStringProp(section, 'eyebrow') || t('project.storefront.editor.preview.contact') }}</p>
+                                <h3 class="preview-contact__title">{{ readStringProp(section, 'title') || t('project.storefront.editor.preview.talkToTeam') }}</h3>
+                                <p class="preview-contact__description">{{ readStringProp(section, 'description') || t('project.storefront.editor.preview.contactCopy') }}</p>
+                                <a href="" (click)="$event.preventDefault()">{{ readStringProp(section, 'ctaLabel') || t('project.storefront.editor.preview.emailUs') }}</a>
                               </div>
                               <div class="preview-contact__details">
                                 <div>
-                                  <span>Email</span>
+                                  <span>{{ 'project.storefront.editor.preview.email' | t }}</span>
                                   <strong>{{ readStringProp(section, 'email') || 'hello@store.com' }}</strong>
                                 </div>
                                 <div>
-                                  <span>Phone</span>
+                                    <span>{{ 'project.storefront.editor.preview.phone' | t }}</span>
                                   <strong>{{ readStringProp(section, 'phone') || '+216 00 000 000' }}</strong>
                                 </div>
                                 <div>
@@ -7224,7 +7254,7 @@
                             [style.--storefront-editor-container-bg]="component.type === 'container' ? component.props.backgroundColor : null"
                           >
                           @if (component.type === 'container' && isContainerAttachTarget(section.id, component.id)) {
-                            <div class="storefront-editor__preview-component-attach-indicator">Attach to container</div>
+                          <div class="storefront-editor__preview-component-attach-indicator">{{ 'project.storefront.editor.preview.attachToContainer' | t }}</div>
                           }
                           <div class="storefront-editor__preview-component-content">
                           <app-storefront-editor-component-host
@@ -7431,13 +7461,13 @@
                                       <path d="M7 5.75c.294 0 .562.173.684.44l2.27 5a.75.75 0 0 1-1.366.62l-.425-.934a.753.753 0 0 1-.142.014H5.98a.756.756 0 0 1-.145-.014l-.423.934a.75.75 0 0 1-1.365-.62l2.27-5A.751.751 0 0 1 7 5.75Zm-.488 3.64h.977L7 8.313 6.512 9.39Z"></path>
                                       <path d="M15 3.5c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1h12ZM3.5 13h7V5h-7v8Zm8.5 0h2.5V9H12v4Zm0-5.5h2.5V5H12v2.5Z"></path>
                                     </svg>
-                                    <span>Choose a design</span>
+                                    <span>{{ 'project.storefront.editor.pages.chooseDesign' | t }}</span>
                                   </button>
                                   <button type="button" class="storefront-editor__add-page-menu-button" (click)="createBlankSection(section.id)">
                                     <svg viewBox="0 0 18 18" fill="currentColor" width="18" height="18" aria-hidden="true">
                                       <path d="M13.5 3c.83 0 1.5.68 1.5 1.5v9c0 .82-.67 1.5-1.5 1.5h-9c-.83 0-1.5-.68-1.5-1.5v-9C3 3.68 3.67 3 4.5 3h9Zm-9 1.5v9h9v-9h-9Z"></path>
                                     </svg>
-                                    <span>Blank section</span>
+                                    <span>{{ 'project.storefront.editor.sections.blank' | t }}</span>
                                   </button>
                                 </div>
                               }
@@ -7471,37 +7501,37 @@
                       <button
                         type="button"
                         class="storefront-editor__preview-section-rail-button"
-                        aria-label="Move section up"
+                        [attr.aria-label]="'project.storefront.editor.sections.moveUp' | t"
                         [disabled]="!canMoveSection(selectedSectionId, 'up')"
                         (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'up')"
                       >
                         <app-icon name="move-up" [size]="18"></app-icon>
                       </button>
-                      <div class="storefront-editor__preview-section-rail-tooltip">Move section up</div>
+                      <div class="storefront-editor__preview-section-rail-tooltip">{{ 'project.storefront.editor.sections.moveUp' | t }}</div>
                     </div>
                     <div class="storefront-editor__preview-section-rail-control">
                       <button
                         type="button"
                         class="storefront-editor__preview-section-rail-button"
-                        aria-label="Move section down"
+                        [attr.aria-label]="'project.storefront.editor.sections.moveDown' | t"
                         [disabled]="!canMoveSection(selectedSectionId, 'down')"
                         (click)="$event.stopPropagation(); moveSection(selectedSectionId, 'down')"
                       >
                         <app-icon name="move-down" [size]="18"></app-icon>
                       </button>
-                      <div class="storefront-editor__preview-section-rail-tooltip">Move section down</div>
+                      <div class="storefront-editor__preview-section-rail-tooltip">{{ 'project.storefront.editor.sections.moveDown' | t }}</div>
                     </div>
                   }
                   <div class="storefront-editor__preview-section-rail-control storefront-editor__preview-section-rail-more">
                     <button
                       type="button"
                       class="storefront-editor__preview-section-rail-button"
-                      aria-label="More options"
+                      [attr.aria-label]="'project.storefront.editor.common.moreOptions' | t"
                       (click)="$event.stopPropagation(); toggleSectionOptions(selectedSectionId, $event)"
                     >
                       <app-icon name="more-horizontal" [size]="20"></app-icon>
                     </button>
-                    <div class="storefront-editor__preview-section-rail-tooltip">More options</div>
+                    <div class="storefront-editor__preview-section-rail-tooltip">{{ 'project.storefront.editor.common.moreOptions' | t }}</div>
                   </div>
                 </div>
               }
@@ -7772,11 +7802,11 @@
         (click)="$event.stopPropagation()"
       >
         <div class="storefront-editor__section-library-head">
-          <h2>Add Page</h2>
+          <h2>{{ 'project.storefront.editor.pages.addPage' | t }}</h2>
           <button
             type="button"
             class="storefront-editor__pages-close"
-            aria-label="Close page design picker"
+            [attr.aria-label]="'project.storefront.editor.pages.closeDesignPicker' | t"
             (click)="closePageDesignPicker()"
           >
             <svg
@@ -7818,7 +7848,7 @@
               <button
                 type="button"
                 class="storefront-editor__section-library-icon-button storefront-editor__section-library-icon-button--left"
-                aria-label="Scroll categories left"
+                [attr.aria-label]="'project.storefront.editor.pages.scrollCategoriesLeft' | t"
                 (click)="scrollPageDesignTabs('left')"
               >
                 <svg fill="currentColor" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
@@ -7832,7 +7862,7 @@
               <button
                 type="button"
                 class="storefront-editor__section-library-icon-button storefront-editor__section-library-icon-button--right"
-                aria-label="Scroll categories right"
+                [attr.aria-label]="'project.storefront.editor.pages.scrollCategoriesRight' | t"
                 (click)="scrollPageDesignTabs('right')"
               >
                 <svg fill="currentColor" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
@@ -7856,7 +7886,7 @@
                 <span class="storefront-editor__page-design-template-label">{{ template.name }}</span>
                 <span class="storefront-editor__page-design-template-copy">{{ template.description }}</span>
                 <span class="storefront-editor__page-design-template-add-overlay">
-                  <span class="storefront-editor__page-design-template-add-pill">Add Page</span>
+                  <span class="storefront-editor__page-design-template-add-pill">{{ 'project.storefront.editor.pages.addPage' | t }}</span>
                 </span>
                 <span class="storefront-editor__page-design-template-art">
                   <span class="storefront-editor__page-design-template-art-bar"></span>
