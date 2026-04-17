@@ -1920,8 +1920,8 @@
     </button>
     <div
       class="storefront-editor__context-toolbar-shell"
-  [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible()"
-  [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible())"
+      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible()"
+      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible())"
       (mousedown)="preserveRichTextEditing($event)"
     >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
@@ -5887,11 +5887,6 @@
                           <p class="storefront-editor__product-feed-settings-kicker">No icons match your search.</p>
                         }
                       }
-                    </div>
-                    <div class="storefront-editor__icon-settings-section">
-                      <p class="storefront-editor__product-feed-settings-kicker">
-                        Built-in icons already on the canvas keep working. New picks now come from your icon library.
-                      </p>
                     </div>
                   </div>
                 }

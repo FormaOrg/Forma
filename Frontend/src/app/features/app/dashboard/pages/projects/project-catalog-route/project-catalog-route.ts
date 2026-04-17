@@ -272,8 +272,18 @@ export class ProjectCatalogRoute {
     request$
       .pipe(finalize(() => this.isSaving.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.toastService.success(existingProduct ? 'Product updated.' : 'Product created.');
+        next: (savedProduct) => {
+          if (existingProduct) {
+            this.toastService.success('Product updated.');
+          } else if (!this.matchesCurrentFilters(savedProduct)) {
+            this.searchValue.set('');
+            this.selectedStatus.set('ALL');
+            this.selectedCategory.set('ALL');
+            this.closeDropdowns();
+            this.toastService.success('Product created. Filters were cleared so the new product is visible.');
+          } else {
+            this.toastService.success('Product created.');
+          }
           window.clearTimeout(this.editorCloseTimeout);
           this.isEditorOpen.set(false);
           this.isEditorClosing.set(false);
@@ -457,6 +467,35 @@ export class ProjectCatalogRoute {
     return 'In stock';
   }
 
+  private matchesCurrentFilters(product: ProjectCatalogProduct): boolean {
+    const selectedStatus = this.selectedStatus();
+    const selectedCategory = this.selectedCategory();
+    const normalizedSearch = this.normalizeSearchableValue(this.searchValue());
+
+    const matchesStatus = selectedStatus === 'ALL' || product.status === selectedStatus;
+    const matchesCategory =
+      selectedCategory === 'ALL'
+      || this.normalizeSearchableValue(product.category) === this.normalizeSearchableValue(selectedCategory);
+
+    if (!normalizedSearch) {
+      return matchesStatus && matchesCategory;
+    }
+
+    const searchableValues = [
+      product.name,
+      product.sku,
+      product.category,
+      product.description,
+      ...product.tags,
+    ];
+
+    const matchesSearch = searchableValues.some((value) =>
+      this.normalizeSearchableValue(value).includes(normalizedSearch)
+    );
+
+    return matchesStatus && matchesCategory && matchesSearch;
+  }
+
   private buildPayload(): CreateProjectCatalogProductRequest | UpdateProjectCatalogProductRequest | null {
     const raw = this.productForm.getRawValue();
     const name = raw.name.trim();
@@ -501,6 +540,10 @@ export class ProjectCatalogRoute {
 
   private toDecimalString(value: number): string {
     return Number.isInteger(value) ? `${value}.00` : String(value);
+  }
+
+  private normalizeSearchableValue(value: string | null | undefined): string {
+    return value?.trim().toLowerCase() ?? '';
   }
 
   private readErrorMessage(error: unknown, fallback: string): string {

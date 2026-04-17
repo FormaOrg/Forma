@@ -2188,9 +2188,9 @@ effect(() => {
   this.productFeedTextColorValue.set(this.selectedProductFeedComponent()!.props.textColor);
 });
 
- effect(() => {
-   const selectedSectionId = this.selectedSectionId();
-      if (!selectedSectionId) {
+effect(() => {
+  const selectedSectionId = this.selectedSectionId();
+     if (!selectedSectionId) {
         this.isSelectedSectionRailVisible.set(false);
         return;
       }
