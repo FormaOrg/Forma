@@ -471,3 +471,76 @@ app-project-sales-orders-panel .orders-panel__empty p {
     width: 100%;
   }
 }
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-strip,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__toolbar,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__table-shell,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__pagination,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__empty,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-action,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__secondary-action,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-trigger,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-menu,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__search {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__title,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-value,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-count,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__empty h3 {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-label,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-delta,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-link,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-label,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-caret,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__search,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__search-icon,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__pagination-label,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__empty p {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__summary-action,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-link {
+  color: #9b90ff;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-value,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__search input,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__secondary-action,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-action,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-item,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__pagination-btn {
+  color: #eef2ff;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__primary-action {
+  background: #7566ff;
+  color: #ffffff;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-action--danger {
+  color: #ff9aa6;
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown.is-open .orders-panel__dropdown-trigger,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__search:focus-within {
+  border-color: rgba(117, 102, 255, 0.34);
+  box-shadow: 0 0 0 4px rgba(117, 102, 255, 0.14);
+}
+
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-item:hover,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__dropdown-item.is-selected,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__secondary-action:hover,
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__selection-action:hover:not(:disabled),
+:host-context(.theme-dark) app-project-sales-orders-panel .orders-panel__pagination-btn:hover:not(:disabled) {
+  background: rgba(117, 102, 255, 0.12);
+  color: #9b90ff;
+}

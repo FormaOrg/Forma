@@ -11,6 +11,7 @@ import {
 import { CreationMethod, Project, ProjectType, TemplateRecord } from '../models/project.model';
 import { AuthService } from './auth.service';
 import { ProjectService } from './project.service';
+import { ProjectWorkspaceContextService } from './project-workspace-context.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -25,7 +26,8 @@ export class DashboardDataService {
   constructor(
     private readonly http: HttpClient,
     private readonly projectService: ProjectService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly projectWorkspaceContextService: ProjectWorkspaceContextService
   ) {}
 
   getProjectsOverview(options?: { useCache?: boolean }): Observable<DashboardProjectItem[]> {
@@ -114,7 +116,13 @@ export class DashboardDataService {
 
   private fetchProjectsOverview(): Observable<DashboardProjectItem[]> {
     return this.projectService.getMyProjects().pipe(
-      map((projects) => projects.map((project) => this.toDashboardProject(project)))
+      map((projects) => {
+        this.projectWorkspaceContextService.setProjectTypes(
+          projects.map((project) => ({ id: project.id, type: project.type }))
+        );
+
+        return projects.map((project) => this.toDashboardProject(project));
+      })
     );
   }
 

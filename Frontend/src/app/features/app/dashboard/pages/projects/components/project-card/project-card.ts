@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 export type ProjectStatus = 'published' | 'draft';
@@ -30,4 +30,11 @@ export type ProjectCardItem = {
 export class ProjectCard {
   @Input({ required: true }) project!: ProjectCardItem;
   @Input() highlighted = false;
+  @Input() actionsOpen = false;
+  @Output() moreRequested = new EventEmitter<MouseEvent>();
+
+  requestMoreActions(event: MouseEvent): void {
+    event.stopPropagation();
+    this.moreRequested.emit(event);
+  }
 }

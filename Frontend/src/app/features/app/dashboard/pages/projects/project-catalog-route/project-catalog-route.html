@@ -153,6 +153,37 @@
         </div>
       }
     </div>
+
+    <div class="catalog-toolbar__view" [attr.data-view]="activeView()">
+      <span class="catalog-toolbar__view-pill" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="catalog-toolbar__view-button"
+        [class.catalog-toolbar__view-button--active]="activeView() === 'grid'"
+        (click)="updateView('grid')"
+        aria-label="Grid view"
+      >
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M4.5 4.5H8.5V8.5H4.5V4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M11.5 4.5H15.5V8.5H11.5V4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M4.5 11.5H8.5V15.5H4.5V11.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M11.5 11.5H15.5V15.5H11.5V11.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="catalog-toolbar__view-button"
+        [class.catalog-toolbar__view-button--active]="activeView() === 'rows'"
+        (click)="updateView('rows')"
+        aria-label="Row view"
+      >
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M4 5.25H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M4 10H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M4 14.75H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
   </section>
 
   @if (isLoading()) {
@@ -179,7 +210,7 @@
       <p>Try a different product name, SKU, category, tag, or status filter.</p>
       <button type="button" (click)="updateSearch(''); updateStatus('ALL'); updateCategory('ALL')">Clear filters</button>
     </section>
-  } @else {
+  } @else if (activeView() === 'grid') {
     <section class="catalog-grid">
       @for (product of products(); track trackByProduct($index, product)) {
         <article class="catalog-card">
@@ -285,6 +316,120 @@
                 </button>
               </div>
             </div>
+          </div>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="catalog-rows">
+      @for (product of products(); track trackByProduct($index, product)) {
+        <article class="catalog-row">
+          <div class="catalog-row__media" [class.catalog-row__media--empty]="!product.imageUrl">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            } @else {
+              <span>No image</span>
+            }
+          </div>
+
+          <div class="catalog-row__main">
+            <div class="catalog-row__topline">
+              <div class="catalog-row__identity">
+                <div class="catalog-card__badges">
+                  <span
+                    class="catalog-badge"
+                    [class.catalog-badge--active]="product.status === 'ACTIVE'"
+                    [class.catalog-badge--archived]="product.status === 'ARCHIVED'"
+                  >
+                    {{ product.status }}
+                  </span>
+                  <span class="catalog-badge catalog-badge--muted">{{ product.productType }}</span>
+                  @if (product.category) {
+                    <span class="catalog-badge catalog-badge--muted">{{ product.category }}</span>
+                  }
+                </div>
+                <div class="catalog-row__titleline">
+                  <h2>{{ product.name }}</h2>
+                  <span class="catalog-row__sku">{{ product.sku || 'No SKU yet' }}</span>
+                </div>
+              </div>
+
+              <div class="catalog-row__pricing">
+                <strong>{{ formatCurrency(product.price) }}</strong>
+                @if (product.compareAtPrice) {
+                  <span>{{ formatCurrency(product.compareAtPrice) }}</span>
+                }
+              </div>
+            </div>
+
+            <p class="catalog-row__description">
+              {{ product.description || 'Add a short product description to explain what makes this offer useful.' }}
+            </p>
+
+            <div class="catalog-row__stats">
+              <div class="catalog-row__stat">
+                <span>Inventory</span>
+                <strong>{{ product.inventoryQuantity }}</strong>
+              </div>
+              <div class="catalog-row__stat">
+                <span>Stock</span>
+                <strong>{{ lowStockLabel(product) }}</strong>
+              </div>
+              <div class="catalog-row__stat">
+                <span>Updated</span>
+                <strong>{{ formatDate(product.updatedAt) }}</strong>
+              </div>
+              <div class="catalog-row__stat">
+                <span>Ready</span>
+                <strong>{{ product.readyToPublish ? 'Ready to publish' : 'Needs attention' }}</strong>
+              </div>
+            </div>
+
+            @if (product.tags.length) {
+              <div class="catalog-card__tags">
+                @for (tag of product.tags; track tag) {
+                  <span>{{ tag }}</span>
+                }
+              </div>
+            }
+
+            @if (!product.readyToPublish) {
+              <div class="catalog-row__readiness">
+                <span class="catalog-row__readiness-title">Needs attention</span>
+                <ul>
+                  @for (issue of product.readinessIssues; track issue) {
+                    <li>{{ issue }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+
+          <div class="catalog-row__actions">
+            <button type="button" class="catalog-card__edit" (click)="openEditEditor(product)">
+              <span class="catalog-card__action-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <path d="M3.5 13.9L3.9 16.1L6.1 16.5L14.8 7.8L12.2 5.2L3.5 13.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                  <path d="M11.4 6L14 8.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+              </span>
+              Edit
+            </button>
+            <button
+              type="button"
+              class="catalog-card__delete"
+              [disabled]="isDeleting() === product.id"
+              (click)="deleteProduct(product)"
+            >
+              <span class="catalog-card__action-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <path d="M5.8 6.2L6.3 15.5H13.7L14.2 6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M4.8 5.2H15.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <path d="M8 5.2V3.9H12V5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              {{ isDeleting() === product.id ? 'Deleting...' : 'Delete' }}
+            </button>
           </div>
         </article>
       }

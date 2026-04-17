@@ -25,6 +25,7 @@ import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 
 type CatalogStatusFilter = 'ALL' | ProjectCatalogStatus;
+type CatalogView = 'grid' | 'rows';
 
 const trimmedRequired: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
@@ -66,6 +67,7 @@ export class ProjectCatalogRoute {
   readonly searchValue = signal('');
   readonly selectedStatus = signal<CatalogStatusFilter>('ALL');
   readonly selectedCategory = signal('ALL');
+  readonly activeView = signal<CatalogView>('grid');
   readonly categoryDropdownOpen = signal(false);
   readonly isEditorOpen = signal(false);
   readonly isEditorClosing = signal(false);
@@ -169,6 +171,10 @@ export class ProjectCatalogRoute {
     this.selectedCategory.set(category);
     this.categoryDropdownOpen.set(false);
     this.loadCatalog();
+  }
+
+  updateView(view: CatalogView): void {
+    this.activeView.set(view);
   }
 
   toggleCategoryDropdown(): void {

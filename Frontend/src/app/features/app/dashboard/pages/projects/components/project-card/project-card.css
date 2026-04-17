@@ -242,6 +242,12 @@ app-project-card .project-card__more:hover {
   background: var(--projects-surface-soft, #f7f7fb);
 }
 
+app-project-card .project-card__more--active {
+  color: var(--projects-accent, #7468ff);
+  border-color: var(--projects-border-strong, #dfdfeb);
+  background: color-mix(in srgb, var(--projects-accent, #7468ff) 10%, var(--projects-surface, #ffffff));
+}
+
 app-project-card .project-card__more svg {
   width: 16px;
   height: 16px;
@@ -351,6 +357,12 @@ app-project-card .project-card__action--ghost:hover {
   background: var(--projects-surface, #f4f5fa);
   border-color: var(--projects-border-strong, #dcddea);
   color: var(--projects-text-strong, #111111);
+}
+
+app-project-card .project-card__action--ghost-active {
+  color: var(--projects-accent, #7468ff);
+  border-color: var(--projects-border-strong, #dcddea);
+  background: color-mix(in srgb, var(--projects-accent, #7468ff) 10%, var(--projects-surface, #ffffff));
 }
 
 @media (max-width: 640px) {

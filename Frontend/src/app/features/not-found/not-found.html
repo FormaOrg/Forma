@@ -1,0 +1,58 @@
+<section class="not-found-page">
+  <div class="not-found-page__ambient not-found-page__ambient--violet" aria-hidden="true"></div>
+  <div class="not-found-page__ambient not-found-page__ambient--blue" aria-hidden="true"></div>
+
+  <article class="not-found-card">
+    <header class="not-found-card__header">
+      <a routerLink="/" class="not-found-card__brand" aria-label="Forma home">
+        <span class="not-found-card__brand-mark">
+          <img src="assets/Logo/FormaLogoOnly.svg" alt="" />
+        </span>
+        <span class="not-found-card__brand-wordmark">Forma</span>
+      </a>
+
+      <span class="not-found-card__badge">404</span>
+    </header>
+
+    <div class="not-found-card__content">
+      <div class="not-found-card__copy">
+        <p class="not-found-card__eyebrow">Lost in the workspace</p>
+        <h1 class="not-found-card__title">This page stepped out of frame.</h1>
+        <p class="not-found-card__description">
+          The link may be outdated, the page may have moved, or the URL may just not exist in your current Forma workspace.
+        </p>
+
+        <div class="not-found-card__actions">
+          <a [routerLink]="primaryLink()" class="not-found-card__action not-found-card__action--primary">
+            {{ primaryLabel() }}
+          </a>
+          <button type="button" class="not-found-card__action not-found-card__action--secondary" (click)="goBack()">
+            Go back
+          </button>
+        </div>
+
+        <div class="not-found-card__path">
+          <span class="not-found-card__path-label">Requested path</span>
+          <code>{{ requestedPath() }}</code>
+        </div>
+      </div>
+
+      <div class="not-found-card__visual" aria-hidden="true">
+        <div class="not-found-card__window">
+          <div class="not-found-card__window-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="not-found-card__window-stage">
+            <div class="not-found-card__window-glow"></div>
+            <div class="not-found-card__window-grid"></div>
+            <div class="not-found-card__window-number">404</div>
+            <div class="not-found-card__window-pill">Page not found</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>

@@ -254,3 +254,62 @@
     flex: 1 1 calc(50% - 5px);
   }
 }
+
+:host-context(.theme-dark) .sales-page__hero,
+:host-context(.theme-dark) .sales-feedback,
+:host-context(.theme-dark) .sales-skeleton__panel,
+:host-context(.theme-dark) .sales-skeleton__card,
+:host-context([data-theme='dark']) .sales-page__hero,
+:host-context([data-theme='dark']) .sales-feedback,
+:host-context([data-theme='dark']) .sales-skeleton__panel,
+:host-context([data-theme='dark']) .sales-skeleton__card {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  box-shadow: none;
+}
+
+:host-context(.theme-dark) .sales-page__title,
+:host-context(.theme-dark) .sales-feedback__title,
+:host-context([data-theme='dark']) .sales-page__title,
+:host-context([data-theme='dark']) .sales-feedback__title {
+  color: #f4f7ff;
+}
+
+:host-context(.theme-dark) .sales-page__subtitle,
+:host-context(.theme-dark) .sales-feedback__copy,
+:host-context([data-theme='dark']) .sales-page__subtitle,
+:host-context([data-theme='dark']) .sales-feedback__copy {
+  color: rgba(226, 231, 244, 0.68);
+}
+
+:host-context(.theme-dark) .sales-page__hero-action,
+:host-context(.theme-dark) .sales-feedback__action,
+:host-context([data-theme='dark']) .sales-page__hero-action,
+:host-context([data-theme='dark']) .sales-feedback__action {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  color: rgba(226, 231, 244, 0.82);
+}
+
+:host-context(.theme-dark) .sales-page__hero-action--active,
+:host-context(.theme-dark) .sales-page__hero-action:hover,
+:host-context(.theme-dark) .sales-feedback__action:hover,
+:host-context([data-theme='dark']) .sales-page__hero-action--active,
+:host-context([data-theme='dark']) .sales-page__hero-action:hover,
+:host-context([data-theme='dark']) .sales-feedback__action:hover {
+  border-color: rgba(117, 102, 255, 0.22);
+  background: rgba(117, 102, 255, 0.12);
+  color: #9b90ff;
+}
+
+:host-context(.theme-dark) .sales-feedback--error,
+:host-context([data-theme='dark']) .sales-feedback--error {
+  border-color: rgba(255, 118, 118, 0.2);
+}
+
+:host-context(.theme-dark) .sales-skeleton__card::after,
+:host-context(.theme-dark) .sales-skeleton__panel::after,
+:host-context([data-theme='dark']) .sales-skeleton__card::after,
+:host-context([data-theme='dark']) .sales-skeleton__panel::after {
+  background: linear-gradient(90deg, transparent, rgba(117, 102, 255, 0.12), transparent);
+}

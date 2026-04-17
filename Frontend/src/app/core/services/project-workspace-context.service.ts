@@ -30,6 +30,30 @@ export class ProjectWorkspaceContextService {
     });
   }
 
+  setProjectTypes(projects: Array<{ id: number; type: ProjectType }>): void {
+    this.projectTypes.update((current) => {
+      const next = { ...current };
+      let changed = false;
+
+      for (const project of projects) {
+        if (!Number.isFinite(project.id) || project.id <= 0) {
+          continue;
+        }
+
+        if (next[project.id] !== project.type) {
+          next[project.id] = project.type;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        this.storeProjectTypes(next);
+      }
+
+      return changed ? next : current;
+    });
+  }
+
   private loadStoredProjectTypes(): Record<number, ProjectType> {
     try {
       const raw = localStorage.getItem(this.storageKey);

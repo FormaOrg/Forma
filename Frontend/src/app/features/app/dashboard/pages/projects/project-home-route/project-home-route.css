@@ -493,9 +493,6 @@ app-project-home-route .project-home-page__state--error button {
 
 app-project-home-route .project-home-page__skeleton {
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.18), rgba(117, 102, 255, 0.08));
-  background-size: 200% 100%;
-  animation: project-home-page-shimmer 1.4s linear infinite;
 }
 
 app-project-home-route .project-home-page__skeleton-copy {
@@ -610,68 +607,91 @@ app-project-home-route .project-home-page__skeleton--suggested-icon {
   border-radius: 12px;
 }
 
-@keyframes project-home-page-shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-
+:root[data-theme='dark'] app-project-home-route .project-home-page__panel,
 .theme-dark app-project-home-route .project-home-page__panel,
+:root[data-theme='dark'] app-project-home-route .project-home-page__activity-row,
 .theme-dark app-project-home-route .project-home-page__activity-row,
+:root[data-theme='dark'] app-project-home-route .project-home-page__suggested-card,
 .theme-dark app-project-home-route .project-home-page__suggested-card,
+:root[data-theme='dark'] app-project-home-route .project-home-page__empty,
 .theme-dark app-project-home-route .project-home-page__empty,
+:root[data-theme='dark'] app-project-home-route .project-home-page__state,
 .theme-dark app-project-home-route .project-home-page__state {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;
   box-shadow: none;
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__title,
 .theme-dark app-project-home-route .project-home-page__title,
+:root[data-theme='dark'] app-project-home-route .project-home-page__section-head h2,
 .theme-dark app-project-home-route .project-home-page__section-head h2,
+:root[data-theme='dark'] app-project-home-route .project-home-page__metric-value,
 .theme-dark app-project-home-route .project-home-page__metric-value,
+:root[data-theme='dark'] app-project-home-route .project-home-page__activity-body h3,
 .theme-dark app-project-home-route .project-home-page__activity-body h3,
+:root[data-theme='dark'] app-project-home-route .project-home-page__suggested-body h3,
 .theme-dark app-project-home-route .project-home-page__suggested-body h3,
+:root[data-theme='dark'] app-project-home-route .project-home-page__empty h3,
 .theme-dark app-project-home-route .project-home-page__empty h3 {
   color: #f4f7ff;
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__subtitle,
 .theme-dark app-project-home-route .project-home-page__subtitle,
+:root[data-theme='dark'] app-project-home-route .project-home-page__section-head p,
 .theme-dark app-project-home-route .project-home-page__section-head p,
+:root[data-theme='dark'] app-project-home-route .project-home-page__metric-helper,
 .theme-dark app-project-home-route .project-home-page__metric-helper,
+:root[data-theme='dark'] app-project-home-route .project-home-page__metric-label,
 .theme-dark app-project-home-route .project-home-page__metric-label,
+:root[data-theme='dark'] app-project-home-route .project-home-page__activity-body p,
 .theme-dark app-project-home-route .project-home-page__activity-body p,
+:root[data-theme='dark'] app-project-home-route .project-home-page__activity-side span,
 .theme-dark app-project-home-route .project-home-page__activity-side span,
+:root[data-theme='dark'] app-project-home-route .project-home-page__suggested-body p,
 .theme-dark app-project-home-route .project-home-page__suggested-body p,
+:root[data-theme='dark'] app-project-home-route .project-home-page__status-pill,
 .theme-dark app-project-home-route .project-home-page__status-pill,
+:root[data-theme='dark'] app-project-home-route .project-home-page__empty p,
 .theme-dark app-project-home-route .project-home-page__empty p {
   color: rgba(226, 231, 244, 0.68);
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__status-pill,
 .theme-dark app-project-home-route .project-home-page__status-pill {
   background: #171e2a;
   border-color: rgba(226, 231, 244, 0.1);
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__activity-row:hover,
 .theme-dark app-project-home-route .project-home-page__activity-row:hover {
   border-color: rgba(117, 102, 255, 0.18);
   background: linear-gradient(180deg, #171e2a, #1a2231);
   box-shadow: 0 14px 28px rgba(5, 9, 16, 0.22);
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__section-head .project-home-page__view-all,
 .theme-dark app-project-home-route .project-home-page__section-head .project-home-page__view-all,
+:root[data-theme='dark'] app-project-home-route .project-home-page__section-head .project-home-page__view-all:visited,
 .theme-dark app-project-home-route .project-home-page__section-head .project-home-page__view-all:visited {
   background: #171e2a;
   border-color: rgba(226, 231, 244, 0.1);
   color: #f4f7ff;
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__hero-action,
 .theme-dark app-project-home-route .project-home-page__hero-action,
+:root[data-theme='dark'] app-project-home-route .project-home-page__hero-action:visited,
 .theme-dark app-project-home-route .project-home-page__hero-action:visited {
   background: rgba(117, 102, 255, 0.18);
   border-color: rgba(117, 102, 255, 0.16);
   color: #d8d3ff;
 }
 
+:root[data-theme='dark'] app-project-home-route .project-home-page__hero-action:hover,
 .theme-dark app-project-home-route .project-home-page__hero-action:hover,
+:root[data-theme='dark'] app-project-home-route .project-home-page__hero-action:focus-visible,
 .theme-dark app-project-home-route .project-home-page__hero-action:focus-visible {
   background: rgba(117, 102, 255, 0.26);
   border-color: rgba(117, 102, 255, 0.24);

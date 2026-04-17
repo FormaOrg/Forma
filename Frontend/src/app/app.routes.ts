@@ -81,6 +81,11 @@ export const routes: Routes = [
     path: 'contact',
     loadComponent: () => import('./features/support/contact/contact').then((m) => m.Contact)
   },
+  {
+    path: 'not-found',
+    data: { title: 'Not Found' },
+    loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFoundPage)
+  },
 
   { path: 'dashboard', redirectTo: '/app/home', pathMatch: 'full' },
 
@@ -279,7 +284,11 @@ export const routes: Routes = [
     ]
   },
 
-  { path: '**', redirectTo: '' }
+  {
+    path: '**',
+    data: { title: 'Not Found' },
+    loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFoundPage)
+  }
 ];
 
   

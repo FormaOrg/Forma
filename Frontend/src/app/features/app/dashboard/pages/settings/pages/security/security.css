@@ -92,6 +92,7 @@ app-settings-security .section-content {
     0 8px 24px rgba(17, 17, 17, 0.03);
 }
 
+:root[data-theme='dark'] app-settings-security .section-content,
 .theme-dark app-settings-security .section-content {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
@@ -105,9 +106,6 @@ app-settings-security .section-content {
 app-settings-security .security-skeleton-line,
 app-settings-security .security-skeleton-box {
   border-radius: 12px;
-  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
-  background-size: 220% 100%;
-  animation: securitySkeletonShimmer 1.25s linear infinite;
 }
 
 app-settings-security .security-skeleton-line {
@@ -144,11 +142,6 @@ app-settings-security .security-skeleton-box--button {
   width: 150px;
   height: 44px;
   margin-left: auto;
-}
-
-@keyframes securitySkeletonShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -20% 0; }
 }
 
 app-settings-security .section-intro {

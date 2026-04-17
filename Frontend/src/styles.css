@@ -43,7 +43,12 @@ body {
 .security-skeleton-line,
 .security-skeleton-box,
 .preferences-skeleton-line,
-.preferences-skeleton-box {
+.preferences-skeleton-box,
+.home-skeleton,
+.catalog-state__skeleton,
+.project-categories__skeleton,
+.customers-page__skeleton,
+.project-home-page__skeleton {
     position: relative;
     overflow: hidden;
     isolation: isolate;
@@ -57,7 +62,12 @@ body {
 .security-skeleton-line::after,
 .security-skeleton-box::after,
 .preferences-skeleton-line::after,
-.preferences-skeleton-box::after {
+.preferences-skeleton-box::after,
+.home-skeleton::after,
+.catalog-state__skeleton::after,
+.project-categories__skeleton::after,
+.customers-page__skeleton::after,
+.project-home-page__skeleton::after {
     content: "";
     position: absolute;
     inset: -1px;
@@ -87,7 +97,12 @@ body {
     .security-skeleton-line::after,
     .security-skeleton-box::after,
     .preferences-skeleton-line::after,
-    .preferences-skeleton-box::after {
+    .preferences-skeleton-box::after,
+    .home-skeleton::after,
+    .catalog-state__skeleton::after,
+    .project-categories__skeleton::after,
+    .customers-page__skeleton::after,
+    .project-home-page__skeleton::after {
         animation: none;
     }
 }

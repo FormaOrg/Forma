@@ -53,7 +53,15 @@
         <h3 class="project-card__title">{{ project.name }}</h3>
       </div>
 
-      <button type="button" class="project-card__more" aria-label="More actions">
+      <button
+        type="button"
+        class="project-card__more"
+        [class.project-card__more--active]="actionsOpen"
+        aria-label="More actions"
+        data-project-actions-trigger="true"
+        [attr.aria-expanded]="actionsOpen"
+        (click)="requestMoreActions($event)"
+      >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
             d="M12 6.75C12.6904 6.75 13.25 6.19036 13.25 5.5C13.25 4.80964 12.6904 4.25 12 4.25C11.3096 4.25 10.75 4.80964 10.75 5.5C10.75 6.19036 11.3096 6.75 12 6.75Z"
@@ -105,7 +113,16 @@
       } @else {
         <button type="button" class="project-card__action project-card__action--secondary" disabled>Preview</button>
       }
-      <button type="button" class="project-card__action project-card__action--ghost">More</button>
+      <button
+        type="button"
+        class="project-card__action project-card__action--ghost"
+        [class.project-card__action--ghost-active]="actionsOpen"
+        data-project-actions-trigger="true"
+        [attr.aria-expanded]="actionsOpen"
+        (click)="requestMoreActions($event)"
+      >
+        More
+      </button>
     </div>
   </div>
 </article>

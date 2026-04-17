@@ -43,7 +43,7 @@
     ></app-data-card>
   </div>
 
-  <section class="projects-toolbar" (click)="closeDropdowns()">
+  <section class="projects-toolbar" (click)="closeOverlays()">
     <div class="projects-toolbar__search">
       <span class="projects-toolbar__search-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
@@ -301,11 +301,20 @@
 
         <div class="projects-grid">
           @if (featuredProject(); as featuredCard) {
-            <app-project-card [project]="featuredCard" [highlighted]="true"></app-project-card>
+            <app-project-card
+              [project]="featuredCard"
+              [highlighted]="true"
+              [actionsOpen]="isProjectActionsOpen(featuredCard.id)"
+              (moreRequested)="toggleProjectActions(featuredCard, $event)"
+            ></app-project-card>
           }
 
           @for (project of secondaryProjects(); track trackByProject($index, project)) {
-            <app-project-card [project]="project"></app-project-card>
+            <app-project-card
+              [project]="project"
+              [actionsOpen]="isProjectActionsOpen(project.id)"
+              (moreRequested)="toggleProjectActions(project, $event)"
+            ></app-project-card>
           }
         </div>
       } @else {
@@ -368,8 +377,12 @@
                         <button
                           type="button"
                           class="projects-records__more"
+                          [class.projects-records__more--active]="isProjectActionsOpen(project.id)"
+                          data-project-actions-trigger="true"
                           [attr.aria-label]="'dashboard.projects.actions.moreActions' | t"
                           [attr.title]="'dashboard.projects.actions.moreActions' | t"
+                          [attr.aria-expanded]="isProjectActionsOpen(project.id)"
+                          (click)="toggleProjectActions(project, $event)"
                         >
                           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                             <circle cx="4" cy="10" r="1.5" fill="currentColor" />
@@ -388,4 +401,79 @@
       }
     }
   </section>
+
+  @if (activeProjectActionsProject(); as menuProject) {
+    <div
+      class="projects-project-menu"
+      [style.left.px]="projectActionsPosition().x"
+      [style.top.px]="projectActionsPosition().y"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="projects-project-menu__item"
+        [disabled]="isProjectActionBusy(menuProject.id, 'duplicate')"
+        (click)="duplicateProject(menuProject)"
+      >
+        <span>{{ 'common.duplicate' | t }}</span>
+        @if (isProjectActionBusy(menuProject.id, 'duplicate')) {
+          <small>{{ 'dashboard.projects.menu.processing' | t }}</small>
+        }
+      </button>
+
+      @if (menuProject.status !== 'published' && menuProject.status !== 'archived') {
+        <button
+          type="button"
+          class="projects-project-menu__item"
+          [disabled]="isProjectActionBusy(menuProject.id, 'publish')"
+          (click)="publishProject(menuProject)"
+        >
+          <span>{{ 'dashboard.projects.menu.publish' | t }}</span>
+          @if (isProjectActionBusy(menuProject.id, 'publish')) {
+            <small>{{ 'dashboard.projects.menu.processing' | t }}</small>
+          }
+        </button>
+      }
+
+      @if (menuProject.status === 'archived') {
+        <button
+          type="button"
+          class="projects-project-menu__item"
+          [disabled]="isProjectActionBusy(menuProject.id, 'restore')"
+          (click)="restoreProject(menuProject)"
+        >
+          <span>{{ 'dashboard.projects.menu.unarchive' | t }}</span>
+          @if (isProjectActionBusy(menuProject.id, 'restore')) {
+            <small>{{ 'dashboard.projects.menu.processing' | t }}</small>
+          }
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="projects-project-menu__item"
+          [disabled]="isProjectActionBusy(menuProject.id, 'archive')"
+          (click)="archiveProject(menuProject)"
+        >
+          <span>{{ 'dashboard.projects.menu.archive' | t }}</span>
+          @if (isProjectActionBusy(menuProject.id, 'archive')) {
+            <small>{{ 'dashboard.projects.menu.processing' | t }}</small>
+          }
+        </button>
+      }
+
+      <div class="projects-project-menu__divider"></div>
+
+      <button
+        type="button"
+        class="projects-project-menu__item projects-project-menu__item--danger"
+        [disabled]="isProjectActionBusy(menuProject.id, 'delete')"
+        (click)="deleteProject(menuProject)"
+      >
+        <span>{{ 'dashboard.projects.menu.delete' | t }}</span>
+        @if (isProjectActionBusy(menuProject.id, 'delete')) {
+          <small>{{ 'dashboard.projects.menu.processing' | t }}</small>
+        }
+      </button>
+    </div>
+  }
 </section>

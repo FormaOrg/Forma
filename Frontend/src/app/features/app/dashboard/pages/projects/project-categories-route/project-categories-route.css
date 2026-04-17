@@ -261,24 +261,21 @@
   width: 100%;
   height: 92px;
   border-radius: 18px;
-  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
-  background-size: 220% 100%;
-  animation: projectCategoriesShimmer 1.2s linear infinite;
 }
 
 .project-categories__skeleton + .project-categories__skeleton {
   margin-top: 12px;
 }
 
-@keyframes projectCategoriesShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -20% 0; }
-}
-
+:host-context([data-theme='dark']) .project-categories__panel,
 :host-context(.theme-dark) .project-categories__panel,
+:host-context([data-theme='dark']) .project-categories__state,
 :host-context(.theme-dark) .project-categories__state,
+:host-context([data-theme='dark']) .project-categories__summary-card,
 :host-context(.theme-dark) .project-categories__summary-card,
+:host-context([data-theme='dark']) .project-categories__detail-card,
 :host-context(.theme-dark) .project-categories__detail-card,
+:host-context([data-theme='dark']) .project-categories__row,
 :host-context(.theme-dark) .project-categories__row {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;

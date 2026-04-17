@@ -60,9 +60,6 @@ app-home .home-skeleton-action {
 
 app-home .home-skeleton {
   border-radius: 12px;
-  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
-  background-size: 220% 100%;
-  animation: homeSkeletonShimmer 1.25s linear infinite;
 }
 
 app-home .home-skeleton-hero {
@@ -291,15 +288,6 @@ app-home .home-skeleton-badges {
   flex-wrap: wrap;
 }
 
-@keyframes homeSkeletonShimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -20% 0;
-  }
-}
-
 app-home .home-page__stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -502,27 +490,30 @@ app-home .home-quick-actions__hint {
   }
 }
 
+:root[data-theme='dark'] app-home .home-skeleton-card,
 .theme-dark app-home .home-skeleton-card,
+:root[data-theme='dark'] app-home .home-skeleton-panel,
 .theme-dark app-home .home-skeleton-panel {
   background: #171d28;
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: none;
 }
 
+:root[data-theme='dark'] app-home .home-skeleton-row,
 .theme-dark app-home .home-skeleton-row,
+:root[data-theme='dark'] app-home .home-skeleton-template,
 .theme-dark app-home .home-skeleton-template,
+:root[data-theme='dark'] app-home .home-skeleton-check,
 .theme-dark app-home .home-skeleton-check,
+:root[data-theme='dark'] app-home .home-skeleton-activity,
 .theme-dark app-home .home-skeleton-activity,
+:root[data-theme='dark'] app-home .home-skeleton-action,
 .theme-dark app-home .home-skeleton-action {
   background: #111722;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-.theme-dark app-home .home-skeleton {
-  background: linear-gradient(90deg, rgba(33, 40, 56, 0.95) 0%, rgba(42, 50, 69, 1) 50%, rgba(33, 40, 56, 0.95) 100%);
-  background-size: 220% 100%;
-}
-
+:root[data-theme='dark'] app-home,
 .theme-dark app-home {
   --home-bg: #0f141d;
   --home-surface: #171e2a;

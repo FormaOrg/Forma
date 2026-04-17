@@ -342,9 +342,6 @@ app-project-customers-route .customers-page__state--loading {
 app-project-customers-route .customers-page__skeleton {
   height: 120px;
   border-radius: 16px;
-  background: linear-gradient(90deg, rgba(117, 102, 255, 0.08), rgba(117, 102, 255, 0.18), rgba(117, 102, 255, 0.08));
-  background-size: 200% 100%;
-  animation: customers-page-shimmer 1.4s linear infinite;
 }
 
 app-project-customers-route .customers-page__list {
@@ -574,54 +571,85 @@ app-project-customers-route .customers-page__editor-section-head p {
   line-height: 1.45;
 }
 
-@keyframes customers-page-shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-
+:root[data-theme='dark'] app-project-customers-route .customers-page__panel,
 .theme-dark app-project-customers-route .customers-page__panel,
+:root[data-theme='dark'] app-project-customers-route .customers-page__card,
 .theme-dark app-project-customers-route .customers-page__card,
+:root[data-theme='dark'] app-project-customers-route .customers-page__insight,
 .theme-dark app-project-customers-route .customers-page__insight,
+:root[data-theme='dark'] app-project-customers-route .customers-page__state,
 .theme-dark app-project-customers-route .customers-page__state,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor,
 .theme-dark app-project-customers-route .customers-page__editor,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor-section,
 .theme-dark app-project-customers-route .customers-page__editor-section,
+:root[data-theme='dark'] app-project-customers-route .customers-page__address,
 .theme-dark app-project-customers-route .customers-page__address {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;
   box-shadow: none;
 }
 
+:root[data-theme='dark'] app-project-customers-route .customers-page__title,
 .theme-dark app-project-customers-route .customers-page__title,
+:root[data-theme='dark'] app-project-customers-route .customers-page__section-head h2,
 .theme-dark app-project-customers-route .customers-page__section-head h2,
+:root[data-theme='dark'] app-project-customers-route .customers-page__card-title-group h3,
 .theme-dark app-project-customers-route .customers-page__card-title-group h3,
+:root[data-theme='dark'] app-project-customers-route .customers-page__state h2,
 .theme-dark app-project-customers-route .customers-page__state h2,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor-head h2,
 .theme-dark app-project-customers-route .customers-page__editor-head h2,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor-section-head h3,
 .theme-dark app-project-customers-route .customers-page__editor-section-head h3,
+:root[data-theme='dark'] app-project-customers-route .customers-page__stat strong,
 .theme-dark app-project-customers-route .customers-page__stat strong,
+:root[data-theme='dark'] app-project-customers-route .customers-page__insight strong,
 .theme-dark app-project-customers-route .customers-page__insight strong,
+:root[data-theme='dark'] app-project-customers-route .customers-page__meta dd,
 .theme-dark app-project-customers-route .customers-page__meta dd,
+:root[data-theme='dark'] app-project-customers-route .customers-page__footer-copy strong,
 .theme-dark app-project-customers-route .customers-page__footer-copy strong,
+:root[data-theme='dark'] app-project-customers-route .customers-page__search input,
 .theme-dark app-project-customers-route .customers-page__search input,
+:root[data-theme='dark'] app-project-customers-route .customers-page__zone select,
 .theme-dark app-project-customers-route .customers-page__zone select,
+:root[data-theme='dark'] app-project-customers-route .customers-page__form input,
 .theme-dark app-project-customers-route .customers-page__form input {
   color: #f4f7ff;
 }
 
+:root[data-theme='dark'] app-project-customers-route .customers-page__subtitle,
 .theme-dark app-project-customers-route .customers-page__subtitle,
+:root[data-theme='dark'] app-project-customers-route .customers-page__state p,
 .theme-dark app-project-customers-route .customers-page__state p,
+:root[data-theme='dark'] app-project-customers-route .customers-page__card-title-group p,
 .theme-dark app-project-customers-route .customers-page__card-title-group p,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor-subtitle,
 .theme-dark app-project-customers-route .customers-page__editor-subtitle,
+:root[data-theme='dark'] app-project-customers-route .customers-page__address,
 .theme-dark app-project-customers-route .customers-page__address,
+:root[data-theme='dark'] app-project-customers-route .customers-page__filter-summary span,
 .theme-dark app-project-customers-route .customers-page__filter-summary span,
+:root[data-theme='dark'] app-project-customers-route .customers-page__insight small,
 .theme-dark app-project-customers-route .customers-page__insight small,
+:root[data-theme='dark'] app-project-customers-route .customers-page__editor-section-head p,
 .theme-dark app-project-customers-route .customers-page__editor-section-head p,
+:root[data-theme='dark'] app-project-customers-route .customers-page__stat span,
 .theme-dark app-project-customers-route .customers-page__stat span,
+:root[data-theme='dark'] app-project-customers-route .customers-page__stat small,
 .theme-dark app-project-customers-route .customers-page__stat small,
+:root[data-theme='dark'] app-project-customers-route .customers-page__meta dt,
 .theme-dark app-project-customers-route .customers-page__meta dt,
+:root[data-theme='dark'] app-project-customers-route .customers-page__search span,
 .theme-dark app-project-customers-route .customers-page__search span,
+:root[data-theme='dark'] app-project-customers-route .customers-page__zone span,
 .theme-dark app-project-customers-route .customers-page__zone span,
+:root[data-theme='dark'] app-project-customers-route .customers-page__content-note,
 .theme-dark app-project-customers-route .customers-page__content-note,
+:root[data-theme='dark'] app-project-customers-route .customers-page__results-pill,
 .theme-dark app-project-customers-route .customers-page__results-pill,
+:root[data-theme='dark'] app-project-customers-route .customers-page__badges span,
 .theme-dark app-project-customers-route .customers-page__badges span {
   color: rgba(226, 231, 244, 0.68);
 }
@@ -652,6 +680,14 @@ app-project-customers-route .customers-page__editor-section-head p {
   box-shadow: 0 0 0 3px rgba(117, 102, 255, 0.14);
 }
 
+.theme-dark app-project-customers-route .customers-page__hero-action--secondary,
+.theme-dark app-project-customers-route .customers-page__state button,
+.theme-dark app-project-customers-route .customers-page__secondary {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+  color: rgba(226, 231, 244, 0.82);
+}
+
 .theme-dark app-project-customers-route .customers-page__hero-action--primary,
 .theme-dark app-project-customers-route .customers-page__primary {
   border-color: #7566ff;
@@ -673,6 +709,24 @@ app-project-customers-route .customers-page__editor-section-head p {
   border-color: rgba(255, 118, 118, 0.2);
   background: rgba(255, 118, 118, 0.1);
   color: #ff9898;
+}
+
+.theme-dark app-project-customers-route .customers-page__hero-action--secondary:hover,
+.theme-dark app-project-customers-route .customers-page__state button:hover,
+.theme-dark app-project-customers-route .customers-page__secondary:hover {
+  border-color: rgba(117, 102, 255, 0.22);
+  background: rgba(117, 102, 255, 0.12);
+  color: #9b90ff;
+}
+
+.theme-dark app-project-customers-route .customers-page__edit:hover {
+  border-color: rgba(117, 102, 255, 0.32);
+  background: rgba(117, 102, 255, 0.2);
+}
+
+.theme-dark app-project-customers-route .customers-page__danger:hover {
+  border-color: rgba(255, 118, 118, 0.28);
+  background: rgba(255, 118, 118, 0.16);
 }
 
 @media (max-width: 1100px) {

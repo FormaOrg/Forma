@@ -256,7 +256,7 @@ app-project-catalog-route .catalog-card__meta-subtle {
 app-project-catalog-route .catalog-toolbar {
   padding: 18px 20px;
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(260px, max-content);
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(220px, max-content) auto;
   gap: 14px;
   align-items: center;
   min-width: 0;
@@ -469,11 +469,230 @@ app-project-catalog-route .catalog-toolbar__dropdown-item.is-selected {
   font-weight: 600;
 }
 
+app-project-catalog-route .catalog-toolbar__view {
+  position: relative;
+  width: 98px;
+  min-width: 98px;
+  height: 42px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  background: #f7f8fb;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+app-project-catalog-route .catalog-toolbar__view-pill {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(17, 17, 17, 0.08),
+    0 6px 16px rgba(17, 17, 17, 0.06);
+  transition: transform 180ms ease;
+}
+
+app-project-catalog-route .catalog-toolbar__view[data-view='rows'] .catalog-toolbar__view-pill {
+  transform: translateX(100%);
+}
+
+app-project-catalog-route .catalog-toolbar__view-button {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: rgba(11, 11, 18, 0.46);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+app-project-catalog-route .catalog-toolbar__view-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+app-project-catalog-route .catalog-toolbar__view-button--active {
+  color: #111111;
+}
+
 app-project-catalog-route .catalog-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   min-width: 0;
+}
+
+app-project-catalog-route .catalog-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+app-project-catalog-route .catalog-row {
+  border: 1px solid rgba(215, 217, 223, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(17, 17, 17, 0.03);
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+app-project-catalog-route .catalog-row__media {
+  width: 136px;
+  height: 136px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: linear-gradient(180deg, #fcfcff, #f7f9fd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+app-project-catalog-route .catalog-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+app-project-catalog-route .catalog-row__media--empty {
+  color: rgba(11, 11, 18, 0.46);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+app-project-catalog-route .catalog-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+app-project-catalog-route .catalog-row__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+app-project-catalog-route .catalog-row__identity,
+app-project-catalog-route .catalog-row__titleline {
+  min-width: 0;
+}
+
+app-project-catalog-route .catalog-row__titleline {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+app-project-catalog-route .catalog-row__titleline h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 1.08rem;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+app-project-catalog-route .catalog-row__sku {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #7a818d;
+}
+
+app-project-catalog-route .catalog-row__pricing {
+  flex-shrink: 0;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+app-project-catalog-route .catalog-row__pricing strong {
+  color: #111111;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+app-project-catalog-route .catalog-row__pricing span {
+  color: #7a818d;
+  font-size: 0.82rem;
+}
+
+app-project-catalog-route .catalog-row__description {
+  margin: 0;
+  color: #6f7480;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+app-project-catalog-route .catalog-row__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+app-project-catalog-route .catalog-row__stat {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+app-project-catalog-route .catalog-row__stat span {
+  color: rgba(67, 80, 97, 0.95);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+app-project-catalog-route .catalog-row__stat strong,
+app-project-catalog-route .catalog-row__readiness-title {
+  color: #111111;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+app-project-catalog-route .catalog-row__readiness {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(225, 227, 236, 0.95);
+  background: #fcfcff;
+}
+
+app-project-catalog-route .catalog-row__readiness ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  color: rgba(11, 11, 18, 0.62);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+app-project-catalog-route .catalog-row__actions {
+  min-width: 136px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
 }
 
 app-project-catalog-route .catalog-card {
@@ -694,9 +913,6 @@ app-project-catalog-route .catalog-state button {
 app-project-catalog-route .catalog-state__skeleton {
   height: 82px;
   border-radius: 16px;
-  background: linear-gradient(90deg, rgba(233, 236, 243, 0.9) 0%, rgba(243, 245, 249, 1) 50%, rgba(233, 236, 243, 0.9) 100%);
-  background-size: 220% 100%;
-  animation: catalog-shimmer 1.25s linear infinite;
 }
 
 app-project-catalog-route .catalog-state__skeleton + .catalog-state__skeleton {
@@ -1059,16 +1275,6 @@ app-project-catalog-route .catalog-editor__footer {
   }
 }
 
-@keyframes catalog-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -20% 0;
-  }
-}
-
 @keyframes catalogDropdownFadeIn {
   from {
     opacity: 0;
@@ -1085,6 +1291,25 @@ app-project-catalog-route .catalog-editor__footer {
   app-project-catalog-route .catalog-stats,
   app-project-catalog-route .catalog-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  app-project-catalog-route .catalog-row {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  app-project-catalog-route .catalog-row__media {
+    width: 120px;
+    height: 120px;
+  }
+
+  app-project-catalog-route .catalog-row__actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  app-project-catalog-route .catalog-row__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   app-project-catalog-route .catalog-card {
@@ -1123,6 +1348,27 @@ app-project-catalog-route .catalog-editor__footer {
   app-project-catalog-route .catalog-grid,
   app-project-catalog-route .catalog-editor__split,
   app-project-catalog-route .catalog-editor__upload {
+    grid-template-columns: 1fr;
+  }
+
+  app-project-catalog-route .catalog-row {
+    grid-template-columns: 1fr;
+  }
+
+  app-project-catalog-route .catalog-row__media {
+    width: 100%;
+    height: 200px;
+  }
+
+  app-project-catalog-route .catalog-row__topline {
+    flex-direction: column;
+  }
+
+  app-project-catalog-route .catalog-row__pricing {
+    text-align: left;
+  }
+
+  app-project-catalog-route .catalog-row__stats {
     grid-template-columns: 1fr;
   }
 
@@ -1166,6 +1412,7 @@ app-project-catalog-route .catalog-editor__footer {
 .theme-dark app-project-catalog-route .catalog-toolbar,
 .theme-dark app-project-catalog-route .catalog-stat,
 .theme-dark app-project-catalog-route .catalog-card,
+.theme-dark app-project-catalog-route .catalog-row,
 .theme-dark app-project-catalog-route .catalog-state,
 .theme-dark app-project-catalog-route .catalog-editor,
 .theme-dark app-project-catalog-route .catalog-confirm {
@@ -1181,7 +1428,11 @@ app-project-catalog-route .catalog-editor__footer {
 .theme-dark app-project-catalog-route .catalog-card__meta strong,
 .theme-dark app-project-catalog-route .catalog-card__sku,
 .theme-dark app-project-catalog-route .catalog-card__readiness-title,
-.theme-dark app-project-catalog-route .catalog-stat__value {
+.theme-dark app-project-catalog-route .catalog-stat__value,
+.theme-dark app-project-catalog-route .catalog-row__titleline h2,
+.theme-dark app-project-catalog-route .catalog-row__pricing strong,
+.theme-dark app-project-catalog-route .catalog-row__stat strong,
+.theme-dark app-project-catalog-route .catalog-row__readiness-title {
   color: #f4f7ff;
 }
 
@@ -1194,6 +1445,9 @@ app-project-catalog-route .catalog-editor__footer {
 .theme-dark app-project-catalog-route .catalog-editor__form label,
 .theme-dark app-project-catalog-route .catalog-card__readiness ul,
 .theme-dark app-project-catalog-route .catalog-card__media--empty,
+.theme-dark app-project-catalog-route .catalog-row__description,
+.theme-dark app-project-catalog-route .catalog-row__media--empty,
+.theme-dark app-project-catalog-route .catalog-row__readiness ul,
 .theme-dark app-project-catalog-route .catalog-confirm__copy p,
 .theme-dark app-project-catalog-route .catalog-confirm__remember {
   color: rgba(226, 231, 244, 0.68);
@@ -1206,10 +1460,55 @@ app-project-catalog-route .catalog-editor__footer {
 .theme-dark app-project-catalog-route .catalog-editor__form select,
 .theme-dark app-project-catalog-route .catalog-editor__section,
 .theme-dark app-project-catalog-route .catalog-card__media,
-.theme-dark app-project-catalog-route .catalog-card__readiness {
+.theme-dark app-project-catalog-route .catalog-card__readiness,
+.theme-dark app-project-catalog-route .catalog-row__media,
+.theme-dark app-project-catalog-route .catalog-row__stat,
+.theme-dark app-project-catalog-route .catalog-row__readiness,
+.theme-dark app-project-catalog-route .catalog-toolbar__view {
   border-color: rgba(226, 231, 244, 0.1);
   background: #171e2a;
   color: #f4f7ff;
+}
+
+.theme-dark app-project-catalog-route .catalog-hero__action:not(.catalog-hero__action--primary),
+.theme-dark app-project-catalog-route .catalog-state button,
+.theme-dark app-project-catalog-route .catalog-editor__secondary,
+.theme-dark app-project-catalog-route .catalog-editor__close,
+.theme-dark app-project-catalog-route .catalog-editor__primary,
+.theme-dark app-project-catalog-route .catalog-toolbar__filter {
+  border-color: rgba(226, 231, 244, 0.1);
+  background: #171e2a;
+}
+
+.theme-dark app-project-catalog-route .catalog-hero__action--secondary,
+.theme-dark app-project-catalog-route .catalog-state button,
+.theme-dark app-project-catalog-route .catalog-editor__secondary,
+.theme-dark app-project-catalog-route .catalog-editor__close {
+  color: rgba(226, 231, 244, 0.82);
+}
+
+.theme-dark app-project-catalog-route .catalog-editor__primary,
+.theme-dark app-project-catalog-route .catalog-toolbar__filter {
+  color: #9b90ff;
+}
+
+.theme-dark app-project-catalog-route .catalog-toolbar__view-pill {
+  background: #202a3b;
+  box-shadow: none;
+}
+
+.theme-dark app-project-catalog-route .catalog-toolbar__view-button {
+  color: rgba(226, 231, 244, 0.48);
+}
+
+.theme-dark app-project-catalog-route .catalog-toolbar__view-button--active {
+  color: #f4f7ff;
+}
+
+.theme-dark app-project-catalog-route .catalog-row__sku,
+.theme-dark app-project-catalog-route .catalog-row__pricing span,
+.theme-dark app-project-catalog-route .catalog-row__stat span {
+  color: rgba(226, 231, 244, 0.68);
 }
 
 .theme-dark app-project-catalog-route .catalog-editor__section-head h3 {
@@ -1295,6 +1594,10 @@ app-project-catalog-route .catalog-editor__footer {
   color: #ffffff;
 }
 
+.theme-dark app-project-catalog-route .catalog-toolbar__filter {
+  color: rgba(226, 231, 244, 0.82);
+}
+
 .theme-dark app-project-catalog-route .catalog-toolbar__filter--active,
 .theme-dark app-project-catalog-route .catalog-hero__action:not(.catalog-hero__action--primary):hover,
 .theme-dark app-project-catalog-route .catalog-state button:hover,
@@ -1302,7 +1605,8 @@ app-project-catalog-route .catalog-editor__footer {
 .theme-dark app-project-catalog-route .catalog-card__delete:hover,
 .theme-dark app-project-catalog-route .catalog-editor__secondary:hover,
 .theme-dark app-project-catalog-route .catalog-editor__close:hover,
-.theme-dark app-project-catalog-route .catalog-editor__primary:hover {
+.theme-dark app-project-catalog-route .catalog-editor__primary:hover,
+.theme-dark app-project-catalog-route .catalog-toolbar__filter:hover {
   background: rgba(117, 102, 255, 0.12);
 }
 
