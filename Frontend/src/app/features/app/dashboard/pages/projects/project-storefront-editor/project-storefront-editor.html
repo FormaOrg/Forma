@@ -2355,7 +2355,7 @@
 
         @if (selectedTextComponent(); as textComponent) {
           <div
-            class="storefront-editor__context-toolbar"
+            class="storefront-editor__context-toolbar storefront-editor__text-toolbar"
             animate.enter="storefront-editor__context-toolbar-fade-enter"
           >
             <div class="storefront-editor__context-toolbar-floating-shell">
@@ -2428,7 +2428,12 @@
                 class="storefront-editor__context-toolbar-trigger"
                 (click)="toggleTextToolbarMenu('font-family')"
               >
-                <span [style.fontFamily]="textComponent.props.fontFamily">{{ textComponent.props.fontFamily }}</span>
+                <span
+                  class="storefront-editor__text-toolbar-font-family"
+                  [style.fontFamily]="textComponent.props.fontFamily"
+                >
+                  {{ textComponent.props.fontFamily }}
+                </span>
                 <app-icon name="chevron-down" [size]="14"></app-icon>
               </button>
 
@@ -2491,74 +2496,143 @@
                     </div>
                   </div>
                   <div class="storefront-editor__text-link-popup-tabs">
-                    <button type="button" class="storefront-editor__text-link-popup-tab storefront-editor__text-link-popup-tab--active">
-                      <app-icon name="layout-grid" [size]="15"></app-icon>
-                    </button>
-                    <button type="button" class="storefront-editor__text-link-popup-tab">
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
-                        <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
-                        <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
-                        <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+                    <button
+                      type="button"
+                      class="storefront-editor__text-link-popup-tab"
+                      [class.storefront-editor__text-link-popup-tab--active]="textLinkMode() === 'page'"
+                      (click)="setTextLinkMode('page')"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                        <path d="M14.25 11.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Zm0-3a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Z"></path>
+                        <path d="M16 5c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8ZM8 6.5c-.28 0-.5.22-.5.5v10c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V7c0-.28-.22-.5-.5-.5H8Z"></path>
                       </svg>
                     </button>
-                    <button type="button" class="storefront-editor__text-link-popup-tab">
-                      <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                        <path d="M10 2.5a7.5 7.5 0 1 0 0 15a7.5 7.5 0 0 0 0-15Zm5.74 6.75h-2.58a12.79 12.79 0 0 0-1.17-4.06a6.03 6.03 0 0 1 3.75 4.06ZM10 4.18c.65.87 1.28 2.6 1.56 5.07H8.44C8.72 6.78 9.35 5.05 10 4.18Zm-2.99 1a12.79 12.79 0 0 0-1.17 4.07H3.26a6.03 6.03 0 0 1 3.75-4.06ZM3.26 10.75h2.58c.1 1.44.5 2.82 1.17 4.06a6.03 6.03 0 0 1-3.75-4.06ZM10 15.82c-.65-.87-1.28-2.6-1.56-5.07h3.12c-.28 2.47-.91 4.2-1.56 5.07Zm1.99-1.01c.67-1.24 1.07-2.62 1.17-4.06h2.58a6.03 6.03 0 0 1-3.75 4.06Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <button
+                      type="button"
+                      class="storefront-editor__text-link-popup-tab"
+                      [class.storefront-editor__text-link-popup-tab--active]="textLinkMode() === 'section'"
+                      (click)="setTextLinkMode('section')"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                        <path d="M17.25 17.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5ZM16 8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h8ZM8 9.5c-.28 0-.5.22-.5.5v4c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5v-4c0-.28-.22-.5-.5-.5H8ZM17.25 5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5Z"></path>
                       </svg>
                     </button>
-                    <button type="button" class="storefront-editor__text-link-popup-tab">
-                      <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                        <rect x="6" y="2.75" width="8" height="14.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                        <path d="M8.5 5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                        <circle cx="10" cy="14.75" r="0.8" fill="currentColor"/>
-                      </svg>
-                    </button>
-                    <button type="button" class="storefront-editor__text-link-popup-tab">
-                      <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                        <circle cx="5" cy="10" r="1.35" fill="currentColor"/>
-                        <circle cx="10" cy="10" r="1.35" fill="currentColor"/>
-                        <circle cx="15" cy="10" r="1.35" fill="currentColor"/>
+                    <button
+                      type="button"
+                      class="storefront-editor__text-link-popup-tab"
+                      [class.storefront-editor__text-link-popup-tab--active]="textLinkMode() === 'url'"
+                      (click)="setTextLinkMode('url')"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                        <path d="M12 5c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7Zm-1.611 10c.463 1.637 1.223 2.5 1.611 2.5.388 0 1.148-.863 1.611-2.5H10.39Zm-2.993 0a5.544 5.544 0 0 0 2.103 1.895A9.14 9.14 0 0 1 8.838 15H7.396Zm7.766 0a9.133 9.133 0 0 1-.662 1.895A5.544 5.544 0 0 0 16.605 15h-1.443ZM6.71 10.5a5.474 5.474 0 0 0 0 3h1.871a13.837 13.837 0 0 1 0-3H6.71Zm3.383 0a12.288 12.288 0 0 0 0 3h3.814a12.288 12.288 0 0 0 0-3h-3.814Zm5.326 0a13.824 13.824 0 0 1 0 3h1.871a5.472 5.472 0 0 0 0-3h-1.871Zm-5.92-3.396A5.545 5.545 0 0 0 7.396 9h1.442a9.14 9.14 0 0 1 .661-1.896ZM12 6.5c-.388 0-1.148.863-1.611 2.5h3.222C13.148 7.363 12.388 6.5 12 6.5Zm2.5.604c.27.552.495 1.191.662 1.896h1.443A5.545 5.545 0 0 0 14.5 7.104Z"></path>
                       </svg>
                     </button>
                   </div>
 
-                  <label class="storefront-editor__text-link-popup-field">
-                    <span>Page</span>
-                    <select [value]="textLinkPageId()" (change)="setTextLinkPage($any($event.target).value)">
-                      <option value="" disabled>Select a page</option>
-                      @for (page of managedPages(); track page.id) {
-                        <option [value]="page.id">{{ page.name }}</option>
-                      }
-                    </select>
-                  </label>
+                  @if (textLinkMode() === 'page') {
+                    <label class="storefront-editor__text-link-popup-field">
+                      <span>Choose a page</span>
+                      <select [value]="textLinkPageId()" (change)="setTextLinkPage($any($event.target).value)">
+                        @for (page of managedPages(); track page.id) {
+                          <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                        }
+                      </select>
+                    </label>
 
-                  <div class="storefront-editor__text-link-popup-field">
-                    <span>Choose how it opens</span>
-                    <div class="storefront-editor__text-link-popup-toggle">
-                      <button
-                        type="button"
-                        [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'current'"
-                        class="storefront-editor__text-link-popup-toggle-button"
-                        (click)="setTextLinkOpenMode('current')"
-                      >
-                        Current tab
-                      </button>
-                      <button
-                        type="button"
-                        [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'new'"
-                        class="storefront-editor__text-link-popup-toggle-button"
-                        (click)="setTextLinkOpenMode('new')"
-                      >
-                        New tab
-                      </button>
+                    <div class="storefront-editor__text-link-popup-field">
+                      <span>Choose how it opens</span>
+                      <div class="storefront-editor__text-link-popup-toggle">
+                        <button
+                          type="button"
+                          [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'current'"
+                          class="storefront-editor__text-link-popup-toggle-button"
+                          (click)="setTextLinkOpenMode('current')"
+                        >
+                          Current tab
+                        </button>
+                        <button
+                          type="button"
+                          [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'new'"
+                          class="storefront-editor__text-link-popup-toggle-button"
+                          (click)="setTextLinkOpenMode('new')"
+                        >
+                          New tab
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  } @else if (textLinkMode() === 'section') {
+                    <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+                    <label class="storefront-editor__text-link-popup-field">
+                      <span>Choose a page</span>
+                      <select [value]="textLinkPageId()" (change)="setTextLinkPage($any($event.target).value)">
+                        @for (page of managedPages(); track page.id) {
+                          <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                        }
+                      </select>
+                    </label>
+                    <label class="storefront-editor__text-link-popup-field">
+                      <span>Choose a section</span>
+                      <select [value]="textLinkSectionId()" (change)="setTextLinkSection($any($event.target).value)">
+                        @for (section of availableSectionsForManagedPage(textLinkPageId()); track section.id) {
+                          <option [value]="section.id">{{ sectionLabel(section) }}</option>
+                        }
+                      </select>
+                    </label>
+                  } @else {
+                    <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+                    <label class="storefront-editor__text-link-popup-field">
+                      <span>Web address</span>
+                      <input
+                        type="text"
+                        [value]="textLinkUrl()"
+                        (input)="updateTextLinkUrl($any($event.target).value)"
+                        placeholder="e.g., www.example.com"
+                      />
+                    </label>
+
+                    <div class="storefront-editor__text-link-popup-field">
+                      <span>Choose how it opens</span>
+                      <div class="storefront-editor__text-link-popup-toggle">
+                        <button
+                          type="button"
+                          [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'current'"
+                          class="storefront-editor__text-link-popup-toggle-button"
+                          (click)="setTextLinkOpenMode('current')"
+                        >
+                          Current tab
+                        </button>
+                        <button
+                          type="button"
+                          [class.storefront-editor__text-link-popup-toggle-button--active]="textLinkOpenMode() === 'new'"
+                          class="storefront-editor__text-link-popup-toggle-button"
+                          (click)="setTextLinkOpenMode('new')"
+                        >
+                          New tab
+                        </button>
+                      </div>
+                    </div>
+
+                    <p class="storefront-editor__text-link-popup-helper">
+                      You can only open this link from your published site.
+                    </p>
+                  }
 
                   <div class="storefront-editor__text-link-popup-footer">
                     <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedTextLink()">Remove Link</button>
                     <div class="storefront-editor__text-link-popup-footer-actions">
                       <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="toggleTextToolbarMenu('link')">Cancel</button>
-                      <button type="button" class="storefront-editor__text-link-popup-primary" [disabled]="!textLinkPageId()" (click)="saveSelectedTextLink()">Done</button>
+                      <button
+                        type="button"
+                        class="storefront-editor__text-link-popup-primary"
+                        [disabled]="
+                          (textLinkMode() === 'page' && !textLinkPageId()) ||
+                          (textLinkMode() === 'section' && (!textLinkPageId() || !textLinkSectionId())) ||
+                          (textLinkMode() === 'url' && !textLinkUrl().trim())
+                        "
+                        (click)="saveSelectedTextLink()"
+                      >
+                        Done
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2919,60 +2993,115 @@
           </div>
 
           <div class="storefront-editor__text-link-popup-tabs">
-            <button type="button" class="storefront-editor__text-link-popup-tab storefront-editor__text-link-popup-tab--active">
-              <app-icon name="layout-grid" [size]="15"></app-icon>
-            </button>
-            <button type="button" class="storefront-editor__text-link-popup-tab">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
-                <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
-                <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
-                <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+            <button
+              type="button"
+              class="storefront-editor__text-link-popup-tab"
+              [class.storefront-editor__text-link-popup-tab--active]="imageLinkMode() === 'page'"
+              (click)="setImageLinkMode('page')"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                <path d="M14.25 11.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Zm0-3a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Z"></path>
+                <path d="M16 5c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8ZM8 6.5c-.28 0-.5.22-.5.5v10c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V7c0-.28-.22-.5-.5-.5H8Z"></path>
               </svg>
             </button>
-            <button type="button" class="storefront-editor__text-link-popup-tab">
-              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                <path d="M10 2.5a7.5 7.5 0 1 0 0 15a7.5 7.5 0 0 0 0-15Zm5.74 6.75h-2.58a12.79 12.79 0 0 0-1.17-4.06a6.03 6.03 0 0 1 3.75 4.06ZM10 4.18c.65.87 1.28 2.6 1.56 5.07H8.44C8.72 6.78 9.35 5.05 10 4.18Zm-2.99 1a12.79 12.79 0 0 0-1.17 4.07H3.26a6.03 6.03 0 0 1 3.75-4.06ZM3.26 10.75h2.58c.1 1.44.5 2.82 1.17 4.06a6.03 6.03 0 0 1-3.75-4.06ZM10 15.82c-.65-.87-1.28-2.6-1.56-5.07h3.12c-.28 2.47-.91 4.2-1.56 5.07Zm1.99-1.01c.67-1.24 1.07-2.62 1.17-4.06h2.58a6.03 6.03 0 0 1-3.75 4.06Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <button
+              type="button"
+              class="storefront-editor__text-link-popup-tab"
+              [class.storefront-editor__text-link-popup-tab--active]="imageLinkMode() === 'section'"
+              (click)="setImageLinkMode('section')"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                <path d="M17.25 17.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5ZM16 8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h8ZM8 9.5c-.28 0-.5.22-.5.5v4c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5v-4c0-.28-.22-.5-.5-.5H8ZM17.25 5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5Z"></path>
               </svg>
             </button>
-            <button type="button" class="storefront-editor__text-link-popup-tab">
-              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                <rect x="6" y="2.75" width="8" height="14.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M8.5 5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                <circle cx="10" cy="14.75" r="0.8" fill="currentColor"/>
-              </svg>
-            </button>
-            <button type="button" class="storefront-editor__text-link-popup-tab">
-              <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
-                <circle cx="5" cy="10" r="1.35" fill="currentColor"/>
-                <circle cx="10" cy="10" r="1.35" fill="currentColor"/>
-                <circle cx="15" cy="10" r="1.35" fill="currentColor"/>
+            <button
+              type="button"
+              class="storefront-editor__text-link-popup-tab"
+              [class.storefront-editor__text-link-popup-tab--active]="imageLinkMode() === 'url'"
+              (click)="setImageLinkMode('url')"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                <path d="M12 5c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7Zm-1.611 10c.463 1.637 1.223 2.5 1.611 2.5.388 0 1.148-.863 1.611-2.5H10.39Zm-2.993 0a5.544 5.544 0 0 0 2.103 1.895A9.14 9.14 0 0 1 8.838 15H7.396Zm7.766 0a9.133 9.133 0 0 1-.662 1.895A5.544 5.544 0 0 0 16.605 15h-1.443ZM6.71 10.5a5.474 5.474 0 0 0 0 3h1.871a13.837 13.837 0 0 1 0-3H6.71Zm3.383 0a12.288 12.288 0 0 0 0 3h3.814a12.288 12.288 0 0 0 0-3h-3.814Zm5.326 0a13.824 13.824 0 0 1 0 3h1.871a5.472 5.472 0 0 0 0-3h-1.871Zm-5.92-3.396A5.545 5.545 0 0 0 7.396 9h1.442a9.14 9.14 0 0 1 .661-1.896ZM12 6.5c-.388 0-1.148.863-1.611 2.5h3.222C13.148 7.363 12.388 6.5 12 6.5Zm2.5.604c.27.552.495 1.191.662 1.896h1.443A5.545 5.545 0 0 0 14.5 7.104Z"></path>
               </svg>
             </button>
           </div>
 
-          <label class="storefront-editor__text-link-popup-field">
-            <span>Page</span>
-            <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
-              <option value="" disabled>Select a page</option>
-              @for (page of managedPages(); track page.id) {
-                <option [value]="page.id">{{ page.name }}</option>
-              }
-            </select>
-          </label>
+          @if (imageLinkMode() === 'page') {
+            <label class="storefront-editor__text-link-popup-field">
+              <span>Choose a page</span>
+              <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
+                @for (page of managedPages(); track page.id) {
+                  <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                }
+              </select>
+            </label>
 
-          <div class="storefront-editor__text-link-popup-field">
-            <span>Choose how it opens</span>
-            <div class="storefront-editor__text-link-popup-toggle">
-              <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
-              <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+            <div class="storefront-editor__text-link-popup-field">
+              <span>Choose how it opens</span>
+              <div class="storefront-editor__text-link-popup-toggle">
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+              </div>
             </div>
-          </div>
+          } @else if (imageLinkMode() === 'section') {
+            <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+            <label class="storefront-editor__text-link-popup-field">
+              <span>Choose a page</span>
+              <select [value]="imageLinkPageId()" (change)="setImageLinkPage($any($event.target).value)">
+                @for (page of managedPages(); track page.id) {
+                  <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                }
+              </select>
+            </label>
+            <label class="storefront-editor__text-link-popup-field">
+              <span>Choose a section</span>
+              <select [value]="imageLinkSectionId()" (change)="setImageLinkSection($any($event.target).value)">
+                @for (section of availableSectionsForManagedPage(imageLinkPageId()); track section.id) {
+                  <option [value]="section.id">{{ sectionLabel(section) }}</option>
+                }
+              </select>
+            </label>
+          } @else {
+            <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+            <label class="storefront-editor__text-link-popup-field">
+              <span>Web address</span>
+              <input
+                type="text"
+                [value]="imageLinkUrl()"
+                (input)="updateImageLinkUrl($any($event.target).value)"
+                placeholder="e.g., www.example.com"
+              />
+            </label>
+
+            <div class="storefront-editor__text-link-popup-field">
+              <span>Choose how it opens</span>
+              <div class="storefront-editor__text-link-popup-toggle">
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'current'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('current')">Current tab</button>
+                <button type="button" [class.storefront-editor__text-link-popup-toggle-button--active]="imageLinkOpenMode() === 'new'" class="storefront-editor__text-link-popup-toggle-button" (click)="setImageLinkOpenMode('new')">New tab</button>
+              </div>
+            </div>
+
+            <p class="storefront-editor__text-link-popup-helper">
+              You can only open this link from your published site.
+            </p>
+          }
 
           <div class="storefront-editor__text-link-popup-footer">
             <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedImageLink()">Remove Link</button>
             <div class="storefront-editor__text-link-popup-footer-actions">
               <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeImageLinkPopups()">Cancel</button>
-              <button type="button" class="storefront-editor__text-link-popup-primary" [disabled]="!imageLinkPageId()" (click)="saveSelectedImageLink()">Done</button>
+              <button
+                type="button"
+                class="storefront-editor__text-link-popup-primary"
+                [disabled]="
+                  (imageLinkMode() === 'page' && !imageLinkPageId()) ||
+                  (imageLinkMode() === 'section' && (!imageLinkPageId() || !imageLinkSectionId())) ||
+                  (imageLinkMode() === 'url' && !imageLinkUrl().trim())
+                "
+                (click)="saveSelectedImageLink()"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
@@ -5419,55 +5548,143 @@
                       </div>
 
                       <div class="storefront-editor__text-link-popup-tabs">
-                        <button type="button" class="storefront-editor__text-link-popup-tab storefront-editor__text-link-popup-tab--active">
-                          <app-icon name="layout-grid" [size]="15"></app-icon>
+                        <button
+                          type="button"
+                          class="storefront-editor__text-link-popup-tab"
+                          [class.storefront-editor__text-link-popup-tab--active]="menuLinkMode() === 'page'"
+                          (click)="setMenuLinkMode('page')"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                            <path d="M14.25 11.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Zm0-3a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5h4.5Z"></path>
+                            <path d="M16 5c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8ZM8 6.5c-.28 0-.5.22-.5.5v10c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5V7c0-.28-.22-.5-.5-.5H8Z"></path>
+                          </svg>
                         </button>
-                        <button type="button" class="storefront-editor__text-link-popup-tab">
-                          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
-                            <path d="M7.47 10.472a.75.75 0 0 1 1.06 1.06l-.5.5a2.787 2.787 0 0 0 0 3.94 2.787 2.787 0 0 0 3.94 0l.5-.5a.75.75 0 0 1 1.06 1.06l-.5.5a4.287 4.287 0 0 1-6.06 0 4.287 4.287 0 0 1 0-6.06l.5-.5Z"></path>
-                            <path d="M13.47 9.472a.75.75 0 0 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06-1.06l4-4Z"></path>
-                            <path d="M14 5.713c1.093 0 2.195.424 3.03 1.26a4.287 4.287 0 0 1 0 6.06l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5a2.787 2.787 0 0 0 0-3.94 2.789 2.789 0 0 0-1.97-.82 2.79 2.79 0 0 0-1.97.82l-.5.5a.75.75 0 0 1-1.06-1.06l.5-.5A4.289 4.289 0 0 1 14 5.712Z"></path>
+                        <button
+                          type="button"
+                          class="storefront-editor__text-link-popup-tab"
+                          [class.storefront-editor__text-link-popup-tab--active]="menuLinkMode() === 'section'"
+                          (click)="setMenuLinkMode('section')"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                            <path d="M17.25 17.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5ZM16 8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h8ZM8 9.5c-.28 0-.5.22-.5.5v4c0 .28.22.5.5.5h8c.28 0 .5-.22.5-.5v-4c0-.28-.22-.5-.5-.5H8ZM17.25 5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1 0-1.5h10.5Z"></path>
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          class="storefront-editor__text-link-popup-tab"
+                          [class.storefront-editor__text-link-popup-tab--active]="menuLinkMode() === 'url'"
+                          (click)="setMenuLinkMode('url')"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                            <path d="M12 5c3.87 0 7 3.13 7 7s-3.13 7-7 7-7-3.13-7-7 3.13-7 7-7Zm-1.611 10c.463 1.637 1.223 2.5 1.611 2.5.388 0 1.148-.863 1.611-2.5H10.39Zm-2.993 0a5.544 5.544 0 0 0 2.103 1.895A9.14 9.14 0 0 1 8.838 15H7.396Zm7.766 0a9.133 9.133 0 0 1-.662 1.895A5.544 5.544 0 0 0 16.605 15h-1.443ZM6.71 10.5a5.474 5.474 0 0 0 0 3h1.871a13.837 13.837 0 0 1 0-3H6.71Zm3.383 0a12.288 12.288 0 0 0 0 3h3.814a12.288 12.288 0 0 0 0-3h-3.814Zm5.326 0a13.824 13.824 0 0 1 0 3h1.871a5.472 5.472 0 0 0 0-3h-1.871Zm-5.92-3.396A5.545 5.545 0 0 0 7.396 9h1.442a9.14 9.14 0 0 1 .661-1.896ZM12 6.5c-.388 0-1.148.863-1.611 2.5h3.222C13.148 7.363 12.388 6.5 12 6.5Zm2.5.604c.27.552.495 1.191.662 1.896h1.443A5.545 5.545 0 0 0 14.5 7.104Z"></path>
                           </svg>
                         </button>
                       </div>
 
-                      <label class="storefront-editor__text-link-popup-field">
-                        <span>Page</span>
-                        <select [value]="menuLinkPageId()" (change)="setMenuLinkPage($any($event.target).value)">
-                          <option value="">Select a page</option>
-                          @for (page of managedPages(); track page.id) {
-                            <option [value]="page.id">{{ page.name }}</option>
-                          }
-                        </select>
-                      </label>
+                      @if (menuLinkMode() === 'page') {
+                        <label class="storefront-editor__text-link-popup-field">
+                          <span>Choose a page</span>
+                          <select [value]="menuLinkPageId()" (change)="setMenuLinkPage($any($event.target).value)">
+                            @for (page of managedPages(); track page.id) {
+                              <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                            }
+                          </select>
+                        </label>
 
-                      <div class="storefront-editor__text-link-popup-field">
-                        <span>Choose how it opens</span>
-                        <div class="storefront-editor__text-link-popup-toggle">
-                          <button
-                            type="button"
-                            [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'current'"
-                            class="storefront-editor__text-link-popup-toggle-button"
-                            (click)="setMenuLinkOpenMode('current')"
-                          >
-                            Current tab
-                          </button>
-                          <button
-                            type="button"
-                            [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'new'"
-                            class="storefront-editor__text-link-popup-toggle-button"
-                            (click)="setMenuLinkOpenMode('new')"
-                          >
-                            New tab
-                          </button>
+                        <div class="storefront-editor__text-link-popup-field">
+                          <span>Choose how it opens</span>
+                          <div class="storefront-editor__text-link-popup-toggle">
+                            <button
+                              type="button"
+                              [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'current'"
+                              class="storefront-editor__text-link-popup-toggle-button"
+                              (click)="setMenuLinkOpenMode('current')"
+                            >
+                              Current tab
+                            </button>
+                            <button
+                              type="button"
+                              [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'new'"
+                              class="storefront-editor__text-link-popup-toggle-button"
+                              (click)="setMenuLinkOpenMode('new')"
+                            >
+                              New tab
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      } @else if (menuLinkMode() === 'section') {
+                        <div class="storefront-editor__text-link-popup-mode-title">Section</div>
+                        <label class="storefront-editor__text-link-popup-field">
+                          <span>Choose a page</span>
+                          <select [value]="menuLinkPageId()" (change)="setMenuLinkPage($any($event.target).value)">
+                            @for (page of managedPages(); track page.id) {
+                              <option [value]="page.id">{{ managedPageOptionLabel(page.id) }}</option>
+                            }
+                          </select>
+                        </label>
+                        <label class="storefront-editor__text-link-popup-field">
+                          <span>Choose a section</span>
+                          <select [value]="menuLinkSectionId()" (change)="setMenuLinkSection($any($event.target).value)">
+                            @for (section of availableSectionsForManagedPage(menuLinkPageId()); track section.id) {
+                              <option [value]="section.id">{{ sectionLabel(section) }}</option>
+                            }
+                          </select>
+                        </label>
+                      } @else {
+                        <div class="storefront-editor__text-link-popup-mode-title">Web address</div>
+                        <label class="storefront-editor__text-link-popup-field">
+                          <span>Web address</span>
+                          <input
+                            type="text"
+                            [value]="menuLinkUrl()"
+                            (input)="updateMenuLinkUrl($any($event.target).value)"
+                            placeholder="e.g., www.example.com"
+                          />
+                        </label>
+
+                        <div class="storefront-editor__text-link-popup-field">
+                          <span>Choose how it opens</span>
+                          <div class="storefront-editor__text-link-popup-toggle">
+                            <button
+                              type="button"
+                              [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'current'"
+                              class="storefront-editor__text-link-popup-toggle-button"
+                              (click)="setMenuLinkOpenMode('current')"
+                            >
+                              Current tab
+                            </button>
+                            <button
+                              type="button"
+                              [class.storefront-editor__text-link-popup-toggle-button--active]="menuLinkOpenMode() === 'new'"
+                              class="storefront-editor__text-link-popup-toggle-button"
+                              (click)="setMenuLinkOpenMode('new')"
+                            >
+                              New tab
+                            </button>
+                          </div>
+                        </div>
+
+                        <p class="storefront-editor__text-link-popup-helper">
+                          You can only open this link from your published site.
+                        </p>
+                      }
 
                       <div class="storefront-editor__text-link-popup-footer">
                         <button type="button" class="storefront-editor__text-link-popup-remove" (click)="removeSelectedMenuItemLink(item.id)">Remove Link</button>
                         <div class="storefront-editor__text-link-popup-footer-actions">
                           <button type="button" class="storefront-editor__text-link-popup-secondary" (click)="closeMenuItemLinkEditor()">Cancel</button>
-                          <button type="button" class="storefront-editor__text-link-popup-primary" [disabled]="!menuLinkPageId()" (click)="saveSelectedMenuItemLink()">Done</button>
+                          <button
+                            type="button"
+                            class="storefront-editor__text-link-popup-primary"
+                            [disabled]="
+                              (menuLinkMode() === 'page' && !menuLinkPageId()) ||
+                              (menuLinkMode() === 'section' && (!menuLinkPageId() || !menuLinkSectionId())) ||
+                              (menuLinkMode() === 'url' && !menuLinkUrl().trim())
+                            "
+                            (click)="saveSelectedMenuItemLink()"
+                          >
+                            Done
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -6767,8 +6984,6 @@
             <div
             class="storefront-editor__preview-stage"
             [style.width.px]="previewStageWidth()"
-            [style.minHeight.px]="previewStageLogicalHeight()"
-            [style.height.px]="previewStageLogicalHeight()"
             [style.maxHeight.px]="previewStageLogicalHeight()"
             [style.paddingBottom.px]="previewStageScrollCompensation()"
             [style.zoom]="previewZoomScale()"
