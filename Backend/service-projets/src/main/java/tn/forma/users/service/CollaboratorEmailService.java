@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class CollaboratorEmailService {
 
     @Async
     public void sendCollaboratorInviteEmail(String toEmail, String inviterName, String projectName, String role, String invitationToken) {
-        String appUrl = frontendUrl + "/accept-invitation?token=" + invitationToken + "&email=" + toEmail;
+        String appUrl = frontendUrl + "/accept-invitation?token=" + invitationToken + "&email=" + URLEncoder.encode(toEmail, StandardCharsets.UTF_8);
         String roleLabel = "EDITOR".equalsIgnoreCase(role) ? "Editor" : "Viewer";
 
         String html = """

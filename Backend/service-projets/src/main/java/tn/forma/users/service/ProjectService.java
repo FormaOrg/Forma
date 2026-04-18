@@ -2,8 +2,10 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.CreateProjectRequest;
 import tn.forma.users.dto.ProjectDto;
 import tn.forma.users.dto.UpdateProjectRequest;
@@ -78,7 +80,7 @@ public class ProjectService {
         if (request.getName() != null) {
             String trimmedName = blankToNull(request.getName());
             if (trimmedName == null) {
-                throw new RuntimeException("Project name is required");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project name is required");
             }
             project.setName(trimmedName);
         }
@@ -208,13 +210,13 @@ public class ProjectService {
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     private Project getOwnedProject(String email, Long projectId) {
         User user = getUserByEmail(email);
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied"));
     }
 
     private Project getAccessibleProject(String email, Long projectId) {
@@ -222,7 +224,7 @@ public class ProjectService {
         return projectRepository.findByIdAndUserId(projectId, user.getId())
                 .orElseGet(() -> projectRepository.findById(projectId)
                         .filter(project -> projectCollaboratorService.hasAcceptedAccess(projectId, user.getId()))
-                        .orElseThrow(() -> new RuntimeException("Project not found")));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")));
     }
 
     private ProjectDto mapToDto(Project project) {

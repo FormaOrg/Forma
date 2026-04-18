@@ -56,8 +56,9 @@ foreach ($service in $services) {
         if ($existingPid) {
             $existingProcess = Get-Process -Id $existingPid -ErrorAction SilentlyContinue
             if ($existingProcess) {
-                Write-Host "$($service.Name) is already running with PID $existingPid on port $($service.Port)." -ForegroundColor Yellow
-                continue
+                Write-Host "Stopping $($service.Name) (PID $existingPid) before restart..." -ForegroundColor Yellow
+                Stop-Process -Id $existingPid -Force -ErrorAction SilentlyContinue
+                Start-Sleep -Milliseconds 500
             }
         }
         Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
@@ -70,7 +71,7 @@ foreach ($service in $services) {
 
     $process = Start-Process `
         -FilePath $mavenWrapper `
-        -ArgumentList "spring-boot:run" `
+        -ArgumentList "clean spring-boot:run" `
         -WorkingDirectory $serviceDir `
         -RedirectStandardOutput $stdoutLog `
         -RedirectStandardError $stderrLog `
