@@ -6,7 +6,7 @@ import { ProjectHomePage } from '../models/project-home.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectHomeService {
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.projectsApiUrl}/projects`;
 
   constructor(private readonly http: HttpClient) {}
 

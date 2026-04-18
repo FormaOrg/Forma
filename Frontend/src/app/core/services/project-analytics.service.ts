@@ -6,7 +6,7 @@ import { AnalyticsRangePreset, ProjectAnalyticsPageResponse } from '../models/pr
 
 @Injectable({ providedIn: 'root' })
 export class ProjectAnalyticsService {
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.projectsApiUrl}/projects`;
 
   constructor(private readonly http: HttpClient) {}
 

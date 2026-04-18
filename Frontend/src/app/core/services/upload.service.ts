@@ -28,6 +28,7 @@ export interface ValidationResult {
 @Injectable({ providedIn: 'root' })
 export class UploadService {
   private readonly apiUrl = `${environment.apiUrl}/upload`;
+  private readonly projectsApiUrl = `${environment.projectsApiUrl}/projects`;
 
   private readonly MAX_AVATAR_SIZE  = 5  * 1024 * 1024; // 5 MB
   private readonly MAX_MEDIA_SIZE   = 10 * 1024 * 1024; // 10 MB
@@ -55,7 +56,7 @@ export class UploadService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http
-      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${environment.apiUrl}/projects/${projectId}/media`, formData)
+      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${this.projectsApiUrl}/${projectId}/media`, formData)
       .pipe(
         map((response) => ({
           ...response,
@@ -89,7 +90,7 @@ export class UploadService {
     payload: { sourceUrl: string; fileName?: string }
   ): Observable<ProjectMediaUploadResponse> {
     return this.http
-      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${environment.apiUrl}/projects/${projectId}/media/import`, payload)
+      .post<Omit<ProjectMediaUploadResponse, 'url' | 'message'>>(`${this.projectsApiUrl}/${projectId}/media/import`, payload)
       .pipe(
         map((response) => ({
           ...response,

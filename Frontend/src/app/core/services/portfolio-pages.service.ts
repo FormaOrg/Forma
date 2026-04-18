@@ -6,7 +6,7 @@ import { PortfolioPagesPage } from '../models/portfolio-pages.model';
 
 @Injectable({ providedIn: 'root' })
 export class PortfolioPagesService {
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.projectsApiUrl}/projects`;
 
   constructor(private readonly http: HttpClient) {}
 

@@ -16,7 +16,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PublicStorefrontService {
   private readonly baseUrl = `${environment.apiUrl}/public/projects`;
-  private readonly previewBaseUrl = `${environment.apiUrl}/projects`;
+  private readonly previewBaseUrl = `${environment.projectsApiUrl}/projects`;
   private readonly editorPreviewStoragePrefix = 'forma_storefront_preview_';
 
   constructor(private readonly http: HttpClient) {}
