@@ -35,86 +35,9 @@
 
  :: Spring Boot ::                (v4.0.3)
 
-2026-04-18T20:22:36.974+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 1048 (G:\Coding\Forma\Backend\service-analytics\target\classes started by MSI in G:\Coding\Forma\Backend\service-analytics)
-2026-04-18T20:22:37.017+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
-2026-04-18T20:22:37.102+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-04-18T20:22:37.103+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-04-18T20:22:38.674+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-04-18T20:22:38.843+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 154 ms. Found 15 JPA repository interfaces.
-2026-04-18T20:22:40.456+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8084 (http)
-2026-04-18T20:22:40.478+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-18T20:22:40.479+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
-2026-04-18T20:22:40.679+02:00  INFO 1048 --- [service-analytics] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3571 ms
-2026-04-18T20:22:41.133+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-04-18T20:22:41.225+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
-2026-04-18T20:22:42.562+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-04-18T20:22:42.635+02:00  WARN 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-04-18T20:22:42.671+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
-	Database JDBC URL [undefined/unknown]
-	Database driver: undefined/unknown
-	Database dialect: PostgreSQLDialect
-	Database version: 13.0
-	Default catalog/schema: unknown/unknown
-	Autocommit mode: undefined/unknown
-	Isolation level: <unknown>
-	JDBC fetch size: undefined/unknown
-	Pool: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-04-18T20:22:47.196+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-04-18T20:22:47.252+02:00  INFO 1048 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-04-18T20:22:48.635+02:00  INFO 1048 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-04-18T20:22:53.787+02:00  INFO 1048 --- [service-analytics] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-04-18T20:22:53.924+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-04-18T20:22:55.326+02:00  INFO 1048 --- [service-analytics] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2026-04-18T20:22:55.327+02:00  WARN 1048 --- [service-analytics] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-04-18T20:22:56.035+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
-2026-04-18T20:22:56.041+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Started Application in 19.7 seconds (process running for 20.843)
-2026-04-18T21:07:49.871+02:00  INFO 1048 --- [service-analytics] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
-2026-04-18T21:07:49.889+02:00  INFO 1048 --- [service-analytics] [       Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-2026-04-18T21:07:49.928+02:00  INFO 1048 --- [service-analytics] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-2026-04-18T21:07:50.031+02:00  INFO 1048 --- [service-analytics] [       Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-04-18T21:07:50.075+02:00  INFO 1048 --- [service-analytics] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-04-18T21:07:50.090+02:00  INFO 1048 --- [service-analytics] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
-
- :: Spring Boot ::                (v4.0.3)
-
-2026-04-18T21:07:50.972+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 1048 (G:\Coding\Forma\Backend\service-analytics\target\classes started by MSI in G:\Coding\Forma\Backend\service-analytics)
-2026-04-18T21:07:50.974+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
-2026-04-18T21:07:59.480+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-04-18T21:07:59.676+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 184 ms. Found 15 JPA repository interfaces.
-2026-04-18T21:08:00.362+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8084 (http)
-2026-04-18T21:08:00.370+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-18T21:08:00.371+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
-2026-04-18T21:08:00.513+02:00  INFO 1048 --- [service-analytics] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 9503 ms
-2026-04-18T21:08:00.760+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-04-18T21:08:00.911+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-04-18T21:08:00.920+02:00  WARN 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-04-18T21:08:00.922+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
-	Database JDBC URL [undefined/unknown]
-	Database driver: undefined/unknown
-	Database dialect: PostgreSQLDialect
-	Database version: 13.0
-	Default catalog/schema: unknown/unknown
-	Autocommit mode: undefined/unknown
-	Isolation level: <unknown>
-	JDBC fetch size: undefined/unknown
-	Pool: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-04-18T21:08:02.252+02:00  INFO 1048 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-04-18T21:08:02.257+02:00  INFO 1048 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
-2026-04-18T21:08:03.115+02:00  INFO 1048 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
-2026-04-18T21:08:09.297+02:00  INFO 1048 --- [service-analytics] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-04-18T21:08:10.160+02:00  INFO 1048 --- [service-analytics] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2026-04-18T21:08:10.260+02:00  WARN 1048 --- [service-analytics] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-04-18T21:08:10.938+02:00  INFO 1048 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
-2026-04-18T21:08:10.943+02:00  INFO 1048 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Started Application in 20.381 seconds (process running for 2735.745)
-2026-04-18T21:08:11.088+02:00  INFO 1048 --- [service-analytics] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T23:23:34.225+02:00  INFO 21708 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 21708 (G:\Coding\Forma\Backend\service-analytics\target\classes started by MSI in G:\Coding\Forma\Backend\service-analytics)
+2026-04-18T23:23:34.231+02:00  INFO 21708 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T23:23:34.327+02:00  INFO 21708 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-18T23:23:34.357+02:00  INFO 21708 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-18T23:23:35.715+02:00  INFO 21708 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T23:23:35.841+02:00  INFO 21708 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 112 ms. Found 15 JPA repository interfaces.
