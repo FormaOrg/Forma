@@ -10,7 +10,7 @@ app-project-catalog-route .catalog-page {
   max-width: 1360px;
   width: min(100%, 1360px);
   min-width: 0;
-  padding: 24px 24px 30px;
+  padding: 28px 32px 36px;
   display: flex;
   flex-direction: column;
   gap: 14px;

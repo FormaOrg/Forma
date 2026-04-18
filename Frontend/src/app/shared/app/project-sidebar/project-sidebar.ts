@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, computed, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppIcon, AppIconName } from '../icons/app-icon';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -23,6 +23,7 @@ type ProjectSidebarItem = SidebarItem & { path: string };
   imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './project-sidebar.html',
   styleUrl: './project-sidebar.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProjectSidebar implements OnChanges {
   @Input({ required: true }) projectId!: string;

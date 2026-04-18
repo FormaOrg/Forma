@@ -312,11 +312,11 @@ app-app-header .app-header__dropdown {
 @keyframes app-header-dropdown-in {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.98);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -398,9 +398,22 @@ app-app-header .app-header__dropdown-row {
 
 app-app-header .app-header__dropdown-ic {
   display: flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
   color: rgba(0, 0, 0, 0.45);
   flex-shrink: 0;
   transition: color var(--dur) var(--ease);
+}
+
+app-app-header .app-header__dropdown-ic app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+app-app-header .app-header__dropdown-ic app-icon svg {
+  display: block;
 }
 
 app-app-header .app-header__dropdown-row:hover {

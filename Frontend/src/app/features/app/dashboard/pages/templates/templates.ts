@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
@@ -21,6 +21,7 @@ type TemplateSort = 'featured' | 'popular' | 'newest' | 'name';
   imports: [CommonModule, FormsModule, RouterLink, DataCard, TemplateCard, TranslatePipe],
   templateUrl: './templates.html',
   styleUrl: './templates.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class Templates implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);

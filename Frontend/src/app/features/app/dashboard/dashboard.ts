@@ -9,6 +9,7 @@ import { ProjectSidebar } from '../../../shared/app/project-sidebar/project-side
 import { SettingsSidebar } from '../../../shared/app/settings-sidebar/settings-sidebar';
 import { SidebarStateService } from '../../../core/services/sidebar-state.service';
 import { AppBootstrapService } from '../../../core/services/app-bootstrap.service';
+import { RoutePreloadService } from '../../../core/services/route-preload.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class Dashboard implements OnInit {
   private document = inject(DOCUMENT);
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private routePreloadService = inject(RoutePreloadService);
   readonly appBootstrapService = inject(AppBootstrapService);
   isSettingsRoute = false;
   isImmersiveRoute = false;
@@ -63,6 +65,11 @@ export class Dashboard implements OnInit {
   }
 
   ngOnInit(): void {
+    this.routePreloadService.preloadDashboardRoutes();
+    if (this.isProjectRoute) {
+      this.routePreloadService.preloadProjectWorkspaceRoutes();
+    }
+
     void this.appBootstrapService.ensureInitialized().finally(() => {
       this.tryMarkAppReady();
     });
@@ -104,6 +111,10 @@ export class Dashboard implements OnInit {
     this.isProjectRoute = this.checkIsProjectRoute(url);
     this.currentProjectId = this.isProjectRoute ? this.readProjectId(url) : '';
     this.isImmersiveRoute = this.readDeepestRouteDataFlag('immersive');
+
+    if (this.isProjectRoute) {
+      this.routePreloadService.preloadProjectWorkspaceRoutes();
+    }
   }
 
   private readDeepestRouteDataFlag(key: string): boolean {

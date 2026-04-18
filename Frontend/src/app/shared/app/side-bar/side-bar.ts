@@ -6,6 +6,7 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
+  ViewEncapsulation,
   inject
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,6 +23,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SideBar implements OnChanges {
   @Input() collapsed = false;

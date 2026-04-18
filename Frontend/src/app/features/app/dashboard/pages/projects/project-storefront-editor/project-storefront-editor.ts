@@ -25,6 +25,7 @@ import { PublicStorefrontService } from '../../../../../../core/services/public-
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
+import { AppRouteLoadingOverlayService } from '../../../../../../core/services/app-route-loading-overlay.service';
 import { AppIcon, AppIconName } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
 import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
@@ -475,7 +476,8 @@ export class ProjectStorefrontEditor {
 private readonly route = inject(ActivatedRoute);
 private readonly router = inject(Router);
 private readonly destroyRef = inject(DestroyRef);
-private readonly authService = inject(AuthService);
+  private readonly authService = inject(AuthService);
+  private readonly appRouteLoadingOverlayService = inject(AppRouteLoadingOverlayService);
   private readonly i18n = inject(I18nService);
   private readonly projectService = inject(ProjectService);
   private readonly projectCatalogService = inject(ProjectCatalogService);
@@ -3253,10 +3255,12 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
   }
 
   loadEditor(): void {
+    const releaseRouteLoadingOverlay = this.appRouteLoadingOverlayService.begin();
     const projectId = this.projectId();
     if (!projectId) {
       this.errorMessage.set('Project not found.');
       this.isLoading.set(false);
+      releaseRouteLoadingOverlay();
       return;
     }
 
@@ -3286,7 +3290,10 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
             projectMedia: this.projectService.getProjectMedia(projectId).pipe(catchError(() => of([]))),
           });
         }),
-        finalize(() => this.isLoading.set(false)),
+        finalize(() => {
+          this.isLoading.set(false);
+          releaseRouteLoadingOverlay();
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
