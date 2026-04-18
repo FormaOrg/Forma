@@ -2,8 +2,10 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.InviteCollaboratorRequest;
 import tn.forma.users.dto.ProjectCollaboratorDto;
 import tn.forma.users.dto.UpdateCollaboratorRoleRequest;
@@ -45,11 +47,11 @@ public class ProjectCollaboratorService {
         String inviteEmail = request.getEmail().trim().toLowerCase();
 
         if (inviteEmail.equalsIgnoreCase(ownerEmail)) {
-            throw new RuntimeException("You cannot invite yourself as a collaborator");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot invite yourself as a collaborator");
         }
 
         if (collaboratorRepository.findByProjectIdAndInviteEmail(projectId, inviteEmail).isPresent()) {
-            throw new RuntimeException("An invitation has already been sent to this email");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "An invitation has already been sent to this email");
         }
 
         Optional<User> inviteeUser = userRepository.findByEmail(inviteEmail);
@@ -83,7 +85,7 @@ public class ProjectCollaboratorService {
     public void removeCollaborator(String ownerEmail, Long projectId, Long collaboratorId) {
         getOwnedProject(ownerEmail, projectId);
         ProjectCollaborator collaborator = collaboratorRepository.findByIdAndProjectId(collaboratorId, projectId)
-                .orElseThrow(() -> new RuntimeException("Collaborator not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found"));
         collaboratorRepository.delete(collaborator);
         log.info("Collaborator {} removed from project {}", collaboratorId, projectId);
     }
@@ -92,7 +94,7 @@ public class ProjectCollaboratorService {
     public ProjectCollaboratorDto updateCollaboratorRole(String ownerEmail, Long projectId, Long collaboratorId, UpdateCollaboratorRoleRequest request) {
         getOwnedProject(ownerEmail, projectId);
         ProjectCollaborator collaborator = collaboratorRepository.findByIdAndProjectId(collaboratorId, projectId)
-                .orElseThrow(() -> new RuntimeException("Collaborator not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found"));
         collaborator.setRole(request.getRole());
         return mapToDto(collaboratorRepository.save(collaborator));
     }
@@ -106,15 +108,15 @@ public class ProjectCollaboratorService {
     public ProjectCollaboratorDto acceptInvitation(String inviteeEmail, String token) {
         User invitee = getUserByEmail(inviteeEmail);
         ProjectCollaborator collaborator = collaboratorRepository.findByInvitationToken(token)
-                .orElseThrow(() -> new RuntimeException("Invitation not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found"));
 
         if (!collaborator.getInviteEmail().equalsIgnoreCase(invitee.getEmail())) {
-            throw new RuntimeException("This invitation was sent to a different email address");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This invitation was sent to a different email address");
         }
 
         User linkedUser = collaborator.getUser();
         if (linkedUser != null && !Objects.equals(linkedUser.getId(), invitee.getId())) {
-            throw new RuntimeException("This invitation is already linked to another account");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This invitation is already linked to another account");
         }
 
         if (collaborator.getStatus() == CollaboratorStatus.ACCEPTED && linkedUser != null) {
@@ -122,7 +124,7 @@ public class ProjectCollaboratorService {
         }
 
         if (!collaborator.isInvitationTokenValid()) {
-            throw new RuntimeException("Invitation link has expired");
+            throw new ResponseStatusException(HttpStatus.GONE, "Invitation link has expired");
         }
 
         collaborator.setUser(invitee);
@@ -155,12 +157,12 @@ public class ProjectCollaboratorService {
 
     private Project getOwnedProjectForUser(User user, Long projectId) {
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied"));
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Transactional(readOnly = true)

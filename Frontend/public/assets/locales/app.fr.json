@@ -1052,6 +1052,8 @@
   "project.storefront.editor.collaborators.empty": "Aucun collaborateur pour l'instant. Invitez quelqu'un pour commencer.",
   "project.storefront.editor.collaborators.inviteError": "Échec de l'envoi de l'invitation. Veuillez réessayer.",
   "project.storefront.editor.collaborators.loadError": "Impossible de charger les collaborateurs.",
+  "project.storefront.editor.collaborators.removeError": "Impossible de retirer le collaborateur. Veuillez réessayer.",
+  "project.storefront.editor.collaborators.updateRoleError": "Impossible de modifier le rôle. Veuillez réessayer.",
   "project.storefront.editor.pages.sitePages": "Pages du site",
   "project.storefront.editor.pages.switchToRows": "Passer à l'affichage en lignes",
   "project.storefront.editor.pages.switchToGrid": "Passer à l'affichage en grille",

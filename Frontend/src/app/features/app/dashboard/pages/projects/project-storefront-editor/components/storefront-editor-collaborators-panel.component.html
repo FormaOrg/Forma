@@ -65,6 +65,10 @@
     <p class="collaborators-panel__error">{{ sendError() }}</p>
   }
 
+  @if (actionError()) {
+    <p class="collaborators-panel__error">{{ actionError()! | t }}</p>
+  }
+
   <div class="collaborators-panel__divider"></div>
 
   <!-- List -->

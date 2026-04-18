@@ -42,6 +42,7 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   readonly openCollaboratorRoleMenuId = signal<number | null>(null);
   readonly isSending = signal(false);
   readonly sendError = signal<string | null>(null);
+  readonly actionError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadCollaborators();
@@ -75,7 +76,7 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
         this.isSending.set(false);
       },
       error: (err) => {
-        const message = err?.error?.message || null;
+        const message = err?.error?.message || 'project.storefront.editor.collaborators.inviteError';
         this.sendError.set(message);
         this.isSending.set(false);
       },
@@ -83,23 +84,29 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   }
 
   remove(collaboratorId: number): void {
+    this.actionError.set(null);
     this.projectService.removeCollaborator(this.projectId(), collaboratorId).subscribe({
       next: () => {
         this.collaborators.update((list) => list.filter((c) => c.id !== collaboratorId));
       },
-      error: () => {},
+      error: () => {
+        this.actionError.set('project.storefront.editor.collaborators.removeError');
+      },
     });
   }
 
   updateRole(collaborator: ProjectCollaborator, role: CollaboratorRole): void {
     this.openCollaboratorRoleMenuId.set(null);
+    this.actionError.set(null);
     this.projectService.updateCollaboratorRole(this.projectId(), collaborator.id, { role }).subscribe({
       next: (updated) => {
         this.collaborators.update((list) =>
           list.map((c) => (c.id === updated.id ? updated : c))
         );
       },
-      error: () => {},
+      error: () => {
+        this.actionError.set('project.storefront.editor.collaborators.updateRoleError');
+      },
     });
   }
 
