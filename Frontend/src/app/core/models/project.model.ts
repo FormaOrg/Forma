@@ -145,6 +145,7 @@ export interface ProjectCollaborator {
   acceptedAt?: string;
   userName?: string;
   userAvatarUrl?: string;
+  invitationToken?: string;
 }
 
 export interface InviteCollaboratorRequest {

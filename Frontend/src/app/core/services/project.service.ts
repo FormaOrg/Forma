@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -183,6 +183,12 @@ export class ProjectService {
   inviteCollaborator(projectId: number, data: InviteCollaboratorRequest): Observable<ProjectCollaborator> {
     return this.http.post<ProjectCollaborator>(`${this.projectsBaseUrl}/${projectId}/collaborators`, data).pipe(
       catchError(this.handleError)
+    );
+  }
+
+  getMyPendingInvitation(projectId: number): Observable<ProjectCollaborator | null> {
+    return this.http.get<ProjectCollaborator>(`${this.projectsBaseUrl}/${projectId}/collaborators/my-invitation`).pipe(
+      catchError(() => of(null))
     );
   }
 

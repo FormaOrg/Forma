@@ -20,4 +20,5 @@ public class ProjectCollaboratorDto {
     private String acceptedAt;
     private String userName;
     private String userAvatarUrl;
+    private String invitationToken;
 }
