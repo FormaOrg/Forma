@@ -16,8 +16,8 @@
     </dl>
 
     <div class="storefront-success__actions">
-      <a [routerLink]="['/store', projectId()]" [queryParams]="previewQueryParams()">Back to storefront</a>
-      <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Browse more products</a>
+      <a [routerLink]="homePath()">Back to storefront</a>
+      <a [routerLink]="productsPath()">Browse more products</a>
     </div>
   </div>
 </section>

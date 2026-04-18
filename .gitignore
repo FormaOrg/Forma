@@ -3,3 +3,4 @@ launch-frontend.cmd
 launch-forma.cmd
 .claude
 .run
+.vercel

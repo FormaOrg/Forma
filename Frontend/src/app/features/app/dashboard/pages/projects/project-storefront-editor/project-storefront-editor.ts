@@ -845,19 +845,19 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   });
   readonly selectedTextComponent = computed<StorefrontEditorTextNode | null>(() => {
     const component = this.selectedComponent();
-    return component?.type === 'text' ? component : null;
+    return component?.type === 'text' ? this.resolveResponsiveComponentNode(component) : null;
   });
   readonly selectedImageComponent = computed<StorefrontEditorImageNode | null>(() => {
     const component = this.selectedComponent();
-    return component?.type === 'image' ? component : null;
+    return component?.type === 'image' ? this.resolveResponsiveComponentNode(component) : null;
   });
   readonly selectedButtonComponent = computed<StorefrontEditorButtonNode | null>(() => {
     const component = this.selectedComponent();
-    return component?.type === 'button' ? component : null;
+    return component?.type === 'button' ? this.resolveResponsiveComponentNode(component) : null;
   });
   readonly selectedIconComponent = computed<StorefrontEditorIconNode | null>(() => {
     const component = this.selectedComponent();
-    return component?.type === 'icon' ? component : null;
+    return component?.type === 'icon' ? this.resolveResponsiveComponentNode(component) : null;
   });
   readonly selectedMenuComponent = computed<StorefrontEditorMenuNode | null>(() => {
     const component = this.selectedComponent();
@@ -865,15 +865,15 @@ readonly hasComponentSelection = computed(() => this.selectedComponentIds().leng
   });
 readonly selectedAccountComponent = computed<StorefrontEditorAccountNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'account' ? component : null;
+  return component?.type === 'account' ? this.resolveResponsiveComponentNode(component) : null;
 });
 readonly selectedTestimonialsComponent = computed<StorefrontEditorTestimonialsNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'testimonials' ? component : null;
+  return component?.type === 'testimonials' ? this.resolveResponsiveComponentNode(component) : null;
 });
 readonly selectedCartComponent = computed<StorefrontEditorCartNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'cart' ? component : null;
+  return component?.type === 'cart' ? this.resolveResponsiveComponentNode(component) : null;
 });
 readonly selectedSearchComponent = computed<StorefrontEditorSearchNode | null>(() => {
   const component = this.selectedComponent();
@@ -885,19 +885,19 @@ readonly selectedSocialLinksComponent = computed<StorefrontEditorSocialLinksNode
 });
 readonly selectedContainerComponent = computed<StorefrontEditorContainerNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'container' ? component : null;
+  return component?.type === 'container' ? this.resolveResponsiveComponentNode(component) : null;
   });
 readonly selectedProductFeedComponent = computed<StorefrontEditorProductFeedNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'product-feed' ? component : null;
+  return component?.type === 'product-feed' ? this.resolveResponsiveComponentNode(component) : null;
 });
 readonly selectedProductDetailsComponent = computed<StorefrontEditorProductDetailsNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'product-details' ? component : null;
+  return component?.type === 'product-details' ? this.resolveResponsiveComponentNode(component) : null;
 });
 readonly selectedCartContentComponent = computed<StorefrontEditorCartContentNode | null>(() => {
   const component = this.selectedComponent();
-  return component?.type === 'cart-content' ? component : null;
+  return component?.type === 'cart-content' ? this.resolveResponsiveComponentNode(component) : null;
 });
   readonly isSectionToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedSection() !== null && !this.hasComponentSelection()
@@ -1770,8 +1770,32 @@ readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['pr
   readonly projectDisplayName = computed(
     () => this.project()?.name?.trim() || this.storeName() || 'Project'
   );
+  readonly liveStorefrontUrl = computed(() => {
+    const defaultDomain = this.project()?.defaultDomain?.trim();
+    if (defaultDomain) {
+      return `https://${defaultDomain}`;
+    }
+
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}/store/${this.projectId()}`;
+    }
+
+    return `/store/${this.projectId()}`;
+  });
   readonly previewDomain = computed(
-    () => this.project()?.defaultDomain?.trim() || 'domain.forma.tn'
+    () => {
+      const defaultDomain = this.project()?.defaultDomain?.trim();
+      if (defaultDomain) {
+        return defaultDomain;
+      }
+
+      try {
+        return new URL(this.liveStorefrontUrl(), typeof window !== 'undefined' ? window.location.origin : 'https://forma.local').host
+          + new URL(this.liveStorefrontUrl(), typeof window !== 'undefined' ? window.location.origin : 'https://forma.local').pathname;
+      } catch {
+        return this.liveStorefrontUrl();
+      }
+    }
   );
   readonly hasUnsavedChanges = computed(() => {
     const original = this.storefront();
@@ -6812,31 +6836,41 @@ updateSelectedContainerShadow(value: StorefrontEditorButtonNode['props']['shadow
     }
 
     this.updateSectionLayoutStructure(sectionId, (section) => {
-      const nextProps: Record<string, unknown> = {
-        ...section.props,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY]: preset.id,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY]: preset.columns,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY]: preset.rows,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
-          preset.id,
-          'column',
-          preset.columns
-        ),
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
-          preset.id,
-          'row',
-          preset.rows
-        ),
-      };
+      let nextSection = this.writeResponsiveSectionProp(
+        section,
+        ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY,
+        preset.id
+      );
+      nextSection = this.writeResponsiveSectionProp(
+        nextSection,
+        ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY,
+        preset.columns
+      );
+      nextSection = this.writeResponsiveSectionProp(
+        nextSection,
+        ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY,
+        preset.rows
+      );
+      nextSection = this.writeResponsiveSectionProp(
+        nextSection,
+        ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY,
+        this.getDefaultSectionLayoutTrackSizes(preset.id, 'column', preset.columns)
+      );
+      nextSection = this.writeResponsiveSectionProp(
+        nextSection,
+        ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY,
+        this.getDefaultSectionLayoutTrackSizes(preset.id, 'row', preset.rows)
+      );
 
       if (preset.id === 'none') {
-        nextProps[ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY] = [];
+        nextSection = this.writeResponsiveSectionProp(
+          nextSection,
+          ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY,
+          []
+        );
       }
 
-      return {
-        ...section,
-        props: nextProps,
-      };
+      return nextSection;
     });
   }
 
@@ -6849,18 +6883,17 @@ updateSelectedContainerShadow(value: StorefrontEditorButtonNode['props']['shadow
     const nextValue = Math.max(1, Math.min(6, this.sectionLayoutColumns(section) + delta));
     const sectionId = section.id;
     const presetId = this.sectionLayoutPresetId(section);
-    this.updateSectionLayoutStructure(sectionId, (current) => ({
-      ...current,
-      props: {
-        ...current.props,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY]: nextValue,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
-          presetId,
-          'column',
+    this.updateSectionLayoutStructure(sectionId, (current) =>
+      this.writeResponsiveSectionProp(
+        this.writeResponsiveSectionProp(
+          current,
+          ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY,
           nextValue
         ),
-      },
-    }));
+        ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY,
+        this.getDefaultSectionLayoutTrackSizes(presetId, 'column', nextValue)
+      )
+    );
   }
 
   adjustSelectedSectionLayoutRows(delta: number): void {
@@ -6872,18 +6905,17 @@ updateSelectedContainerShadow(value: StorefrontEditorButtonNode['props']['shadow
     const nextValue = Math.max(1, Math.min(6, this.sectionLayoutRows(section) + delta));
     const sectionId = section.id;
     const presetId = this.sectionLayoutPresetId(section);
-    this.updateSectionLayoutStructure(sectionId, (current) => ({
-      ...current,
-      props: {
-        ...current.props,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY]: nextValue,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: this.getDefaultSectionLayoutTrackSizes(
-          presetId,
-          'row',
+    this.updateSectionLayoutStructure(sectionId, (current) =>
+      this.writeResponsiveSectionProp(
+        this.writeResponsiveSectionProp(
+          current,
+          ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY,
           nextValue
         ),
-      },
-    }));
+        ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY,
+        this.getDefaultSectionLayoutTrackSizes(presetId, 'row', nextValue)
+      )
+    );
   }
 
   beginSectionLayoutResize(
@@ -9795,7 +9827,7 @@ updatePageDesignTabScrollState(): void {
         next: (response) => {
           const snapshot = this.normalizeStorefront(response.storefront);
           this.applyPersistedStorefront(snapshot, { resetHistory: true });
-          this.toastService.success(`Storefront published on ${this.previewDomain()}.`);
+          this.toastService.success(`Storefront published at ${this.liveStorefrontUrl()}.`);
         },
         error: () => this.toastService.error('Unable to publish the storefront right now.'),
       });
@@ -10007,14 +10039,20 @@ updatePageDesignTabScrollState(): void {
       return component.props;
     }
 
-    const override = component.responsiveProps?.[viewport];
-    if (!override) {
-      return component.props;
+    const tabletOverride = component.responsiveProps?.['tablet'] ?? {};
+    const mobileOverride = component.responsiveProps?.['mobile'] ?? {};
+
+    if (viewport === 'tablet') {
+      return {
+        ...component.props,
+        ...tabletOverride,
+      } as T['props'];
     }
 
     return {
       ...component.props,
-      ...override,
+      ...tabletOverride,
+      ...mobileOverride,
     } as T['props'];
   }
 
@@ -10111,6 +10149,101 @@ updatePageDesignTabScrollState(): void {
     return Math.max(1, Math.round(desktopHeight * scale));
   }
 
+  private getResponsiveSectionPropKey(baseKey: string, viewport: StorefrontEditorViewport): string {
+    if (viewport === 'tablet') {
+      return `${baseKey}Tablet`;
+    }
+
+    if (viewport === 'mobile') {
+      return `${baseKey}Mobile`;
+    }
+
+    return baseKey;
+  }
+
+  private readResponsiveSectionProp(
+    section: StorefrontHomepageSection | null,
+    baseKey: string,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): unknown {
+    const props = section?.props as Record<string, unknown> | undefined;
+    if (!props) {
+      return undefined;
+    }
+
+    const candidateKeys =
+      viewport === 'desktop'
+        ? [baseKey]
+        : viewport === 'tablet'
+          ? [this.getResponsiveSectionPropKey(baseKey, 'tablet'), baseKey]
+          : [
+              this.getResponsiveSectionPropKey(baseKey, 'mobile'),
+              this.getResponsiveSectionPropKey(baseKey, 'tablet'),
+              baseKey,
+            ];
+
+    for (const key of candidateKeys) {
+      if (props[key] !== undefined) {
+        return props[key];
+      }
+    }
+
+    return undefined;
+  }
+
+  private readResponsiveSectionStringProp(
+    section: StorefrontHomepageSection | null,
+    baseKey: string,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): string {
+    const value = this.readResponsiveSectionProp(section, baseKey, viewport);
+    return typeof value === 'string' ? value : '';
+  }
+
+  private readResponsiveSectionBooleanProp(
+    section: StorefrontHomepageSection | null,
+    baseKey: string,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): boolean {
+    return this.readResponsiveSectionProp(section, baseKey, viewport) === true;
+  }
+
+  private readResponsiveSectionNumberProp(
+    section: StorefrontHomepageSection | null,
+    baseKey: string,
+    fallback = 0,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): number {
+    const value = this.readResponsiveSectionProp(section, baseKey, viewport);
+    return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  }
+
+  private readResponsiveSectionNumberArrayProp(
+    section: StorefrontHomepageSection | null,
+    baseKey: string,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): number[] {
+    const value = this.readResponsiveSectionProp(section, baseKey, viewport);
+    return Array.isArray(value)
+      ? value.filter((item: unknown): item is number => typeof item === 'number')
+      : [];
+  }
+
+  private writeResponsiveSectionProp(
+    section: StorefrontHomepageSection,
+    baseKey: string,
+    value: unknown,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): StorefrontHomepageSection {
+    return {
+      ...section,
+      props: {
+        ...section.props,
+        [this.getResponsiveSectionPropKey(baseKey, viewport)]: value,
+      },
+    };
+  }
+
   readStringProp(section: StorefrontHomepageSection | null, key: string): string {
     const value = (section?.props as Record<string, unknown> | undefined)?.[key];
     return typeof value === 'string' ? value : '';
@@ -10134,9 +10267,10 @@ updatePageDesignTabScrollState(): void {
   }
 
   readSectionLayoutAssignments(section: StorefrontHomepageSection | null): StorefrontEditorSectionLayoutAssignment[] {
-    const value = (section?.props as Record<string, unknown> | undefined)?.[
+    const value = this.readResponsiveSectionProp(
+      section,
       ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY
-    ];
+    );
 
     if (!Array.isArray(value)) {
       return [];
@@ -10180,11 +10314,14 @@ updatePageDesignTabScrollState(): void {
   }
 
   isBlankSection(section: StorefrontHomepageSection | null): boolean {
-    return this.readBooleanProp(section, ProjectStorefrontEditor.SECTION_BLANK_PROP_KEY);
+    return this.readResponsiveSectionBooleanProp(section, ProjectStorefrontEditor.SECTION_BLANK_PROP_KEY);
   }
 
   sectionLayoutPresetId(section: StorefrontHomepageSection | null): StorefrontEditorSectionLayoutPresetId {
-    const value = this.readStringProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY) as StorefrontEditorSectionLayoutPresetId;
+    const value = this.readResponsiveSectionStringProp(
+      section,
+      ProjectStorefrontEditor.SECTION_LAYOUT_PROP_KEY
+    ) as StorefrontEditorSectionLayoutPresetId;
     return this.sectionLayoutPresets.some((preset) => preset.id === value) ? value : 'none';
   }
 
@@ -10194,7 +10331,14 @@ updatePageDesignTabScrollState(): void {
       return 0;
     }
 
-    return Math.max(1, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY, preset.columns));
+    return Math.max(
+      1,
+      this.readResponsiveSectionNumberProp(
+        section,
+        ProjectStorefrontEditor.SECTION_LAYOUT_COLUMNS_PROP_KEY,
+        preset.columns
+      )
+    );
   }
 
   sectionLayoutRows(section: StorefrontHomepageSection | null): number {
@@ -10203,7 +10347,14 @@ updatePageDesignTabScrollState(): void {
       return 0;
     }
 
-    return Math.max(1, this.readNumberProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY, preset.rows));
+    return Math.max(
+      1,
+      this.readResponsiveSectionNumberProp(
+        section,
+        ProjectStorefrontEditor.SECTION_LAYOUT_ROWS_PROP_KEY,
+        preset.rows
+      )
+    );
   }
 
   sectionShowsLayoutControls(section: StorefrontHomepageSection | null): boolean {
@@ -10214,7 +10365,7 @@ updatePageDesignTabScrollState(): void {
     const columns = this.sectionLayoutColumns(section);
     const presetId = this.sectionLayoutPresetId(section);
     return this.normalizeSectionLayoutTrackSizes(
-      this.readNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY),
+      this.readResponsiveSectionNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY),
       columns,
       this.getDefaultSectionLayoutTrackSizes(presetId, 'column', columns)
     );
@@ -10224,7 +10375,7 @@ updatePageDesignTabScrollState(): void {
     const rows = this.sectionLayoutRows(section);
     const presetId = this.sectionLayoutPresetId(section);
     return this.normalizeSectionLayoutTrackSizes(
-      this.readNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY),
+      this.readResponsiveSectionNumberArrayProp(section, ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY),
       rows,
       this.getDefaultSectionLayoutTrackSizes(presetId, 'row', rows)
     );
@@ -10882,7 +11033,10 @@ private updateSelectedSection(
       props: {
         ...section.props,
         [ProjectStorefrontEditor.SECTION_COMPONENTS_PROP_KEY]: components,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY]: nextAssignments,
+        [this.getResponsiveSectionPropKey(
+          ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY,
+          this.viewport()
+        )]: nextAssignments,
       },
     };
   }
@@ -12074,13 +12228,7 @@ private updateComponentTree(
 
     this.updateComponentNode(sectionId, component.id, (current) =>
       current.type === 'text'
-        ? {
-            ...current,
-            props: {
-              ...current.props,
-              ...patch,
-            },
-          }
+        ? this.writeComponentProps(current, patch)
         : current
   );
 }
@@ -12231,13 +12379,7 @@ private updateImageComponentProps(
 ): void {
   this.updateComponentNode(sectionId, componentId, (current) =>
     current.type === 'image'
-      ? {
-          ...current,
-          props: {
-            ...current.props,
-            ...patch,
-          },
-        }
+      ? this.writeComponentProps(current, patch)
       : current,
     options
   );
@@ -12357,13 +12499,7 @@ private updateSelectedButtonProps(
 
     this.updateComponentNode(sectionId, component.id, (current) =>
       current.type === 'button'
-        ? {
-            ...current,
-            props: {
-              ...current.props,
-              ...patch,
-            },
-          }
+        ? this.writeComponentProps(current, patch)
         : current,
       options
   );
@@ -12397,7 +12533,7 @@ private updateSelectedAccountProps(
 
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'account'
-      ? { ...current, props: { ...current.props, ...patch } }
+      ? this.writeComponentProps(current, patch)
       : current,
     options
   );
@@ -12475,7 +12611,7 @@ private updateSelectedTestimonialsProps(patch: Partial<StorefrontEditorTestimoni
   if (!sectionId || !component) { return; }
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'testimonials'
-      ? { ...current, props: { ...current.props, ...patch } }
+      ? this.writeComponentProps(current, patch)
       : current
   );
 }
@@ -12492,13 +12628,7 @@ private updateSelectedCartProps(
 
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'cart'
-      ? {
-          ...current,
-          props: {
-            ...current.props,
-            ...patch,
-          },
-        }
+      ? this.writeComponentProps(current, patch)
       : current,
  options
  );
@@ -12586,13 +12716,7 @@ private updateSelectedContainerProps(
 
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'container'
-      ? {
-          ...current,
-          props: {
-            ...current.props,
-            ...patch,
-          },
-        }
+      ? this.writeComponentProps(current, patch)
       : current,
     options
   );
@@ -12660,13 +12784,7 @@ private updateSelectedProductFeedProps(
 
   this.updateComponentNode(sectionId, component.id, (current) =>
     current.type === 'product-feed'
-      ? {
-          ...current,
-          props: {
-            ...current.props,
-            ...patch,
-          },
-        }
+      ? this.writeComponentProps(current, patch)
       : current
   );
 }
@@ -13207,13 +13325,11 @@ private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['sha
       });
     }
 
-    return {
-      ...section,
-      props: {
-        ...section.props,
-        [ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY]: Array.from(uniqueAssignments.values()),
-      },
-    };
+    return this.writeResponsiveSectionProp(
+      section,
+      ProjectStorefrontEditor.SECTION_LAYOUT_ASSIGNMENTS_PROP_KEY,
+      Array.from(uniqueAssignments.values())
+    );
   }
 
   private getSectionContentDimensions(sectionId: string): { width: number; height: number } | null {
@@ -14439,15 +14555,18 @@ isSectionAttachTarget(sectionId: string): boolean {
     nextSizes[leftIndex] = state.startSizes[leftIndex] + clampedDelta;
     nextSizes[rightIndex] = state.startSizes[rightIndex] - clampedDelta;
 
-    this.updateSectionLayoutStructure(state.sectionId, (section) => ({
-      ...section,
-      props: {
-        ...section.props,
-        [state.axis === 'column'
-          ? ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY
-          : ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY]: nextSizes,
-      },
-    }), { syncRail: false });
+    this.updateSectionLayoutStructure(
+      state.sectionId,
+      (section) =>
+        this.writeResponsiveSectionProp(
+          section,
+          state.axis === 'column'
+            ? ProjectStorefrontEditor.SECTION_LAYOUT_COLUMN_SIZES_PROP_KEY
+            : ProjectStorefrontEditor.SECTION_LAYOUT_ROW_SIZES_PROP_KEY,
+          nextSizes
+        ),
+      { syncRail: false }
+    );
   }
 
   private finalizeDraggedComponentsLayoutSnap(): void {

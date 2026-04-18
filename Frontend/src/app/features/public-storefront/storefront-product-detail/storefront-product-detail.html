@@ -9,10 +9,15 @@
   </section>
 } @else if (product(); as product) {
   <div class="storefront-product">
-    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+    <app-storefront-public-header
+      [storefront]="storefront()"
+      [projectId]="projectId()"
+      [isEditorPreview]="isEditorPreview()"
+      [isDomainRoute]="isDomainRoute()"
+    />
 
     <main class="storefront-product__content">
-      <a class="storefront-product__back" [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">
+      <a class="storefront-product__back" [routerLink]="productsPath()" [queryParams]="previewQueryParams()">
         Back to products
       </a>
 

@@ -13,7 +13,12 @@
 
     <div class="storefront-preview">
       <div class="storefront-preview__canvas" [style.zoom]="previewScale()">
-        <app-storefront-public-header [storefront]="home" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+        <app-storefront-public-header
+          [storefront]="home"
+          [projectId]="projectId()"
+          [isEditorPreview]="isEditorPreview()"
+          [isDomainRoute]="isDomainRoute()"
+        />
 
         @for (section of previewBodySections(); track trackSection($index, section)) {
           <div
@@ -82,7 +87,12 @@
   } @else {
 
     <div class="storefront-home">
-      <app-storefront-public-header [storefront]="home" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+      <app-storefront-public-header
+        [storefront]="home"
+        [projectId]="projectId()"
+        [isEditorPreview]="isEditorPreview()"
+        [isDomainRoute]="isDomainRoute()"
+      />
 
       <main class="storefront-home__content">
         @for (section of sections(); track trackSection($index, section)) {
@@ -136,7 +146,7 @@
                     <span>Catalog spotlight</span>
                     <h2>{{ readStringProp(section, 'title') || 'Featured products' }}</h2>
                   </div>
-                  <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">View all products</a>
+                  <a [routerLink]="productsPath()" [queryParams]="previewQueryParams()">View all products</a>
                 </div>
 
                 @if (featuredProducts().length) {

@@ -664,6 +664,16 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
           { componentId: 'image-a5ab948c-8f33-4cee-b724-50501d9004cb', column: 2, row: 1 },
           { componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359', column: 2, row: 1 },
         ],
+        editorLayoutAssignmentsTablet: [
+          { componentId: 'image-3b4889bc-a25c-420e-8dfc-d1de8142027e', column: 2, row: 1 },
+          { componentId: 'image-a5ab948c-8f33-4cee-b724-50501d9004cb', column: 2, row: 1 },
+          { componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359', column: 2, row: 1 },
+        ],
+        editorLayoutAssignmentsMobile: [
+          { componentId: 'image-3b4889bc-a25c-420e-8dfc-d1de8142027e', column: 2, row: 1 },
+          { componentId: 'image-a5ab948c-8f33-4cee-b724-50501d9004cb', column: 2, row: 1 },
+          { componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359', column: 2, row: 1 },
+        ],
         editorLayoutColumnSizes: [33.333333333333336, 33.333333333333336, 33.333333333333336],
         editorComponents: [
           {
@@ -758,7 +768,7 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
               text: 'The Latestin Streetwear Fashion',
               align: 'center',
               color: '#091b2f',
-              fontSize: 24,
+              fontSize: 36,
               fontStyle: 'normal',
               textStyle: 'Heading 2',
               fontFamily: 'DM Serif Display',
@@ -777,6 +787,9 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             responsiveFrames: {
               mobile: { x: 46, y: 584, width: 299, height: 73 },
               tablet: { x: 458, y: 48, width: 280, height: 168 },
+            },
+            responsiveProps: {
+              mobile: { fontSize: 24 },
             },
             parentContainerId: null,
           },
@@ -874,9 +887,10 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
         editorHeight: 1136,
         editorBlankSection: true,
         editorMobileHeight: 734,
-        editorTabletHeight: 1088,
+        editorTabletHeight: 898,
         editorBackgroundColor: '#f8fafc',
         editorLayoutAssignments: [],
+        editorLayoutAssignmentsTablet: [],
         editorComponents: [
           {
             id: 'text-a1370d33-5eb0-48d7-af86-ba3ed04d2df1',
@@ -937,7 +951,7 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             isVisible: true,
             responsiveFrames: {
               mobile: { x: 0, y: 128, width: 390, height: 510 },
-              tablet: { x: 31.5, y: 120, width: 705, height: 834 },
+              tablet: { x: 32, y: 120, width: 705, height: 667 },
             },
           },
           {
@@ -979,7 +993,7 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             isVisible: true,
             responsiveFrames: {
               mobile: { x: 110, y: 648, width: 170, height: 48 },
-              tablet: { x: 299, y: 992, width: 170, height: 48 },
+              tablet: { x: 299, y: 800, width: 170, height: 48 },
             },
             parentContainerId: null,
           },
@@ -1008,6 +1022,22 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
         editorLayoutRowSizes: [100],
         editorBackgroundColor: '#e7e7e7',
         editorLayoutAssignments: [
+          { row: 1, column: 2, componentId: 'text-813b2921-acd9-4279-b6b7-9707356d3168' },
+          { row: 1, column: 2, componentId: 'icon-68d1ee1d-29b1-42ec-92d1-3179d3b43965' },
+          { row: 1, column: 2, componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359' },
+          { row: 1, column: 2, componentId: 'text-ca57e50c-fc15-4af0-acfe-878dff59d971' },
+          { row: 1, column: 1, componentId: 'image-62743d67-cece-499f-8af6-b4aa21f7498e' },
+          { row: 1, column: 3, componentId: 'image-064108ea-ae15-459e-bbaf-8195906a1c6a' },
+        ],
+        editorLayoutAssignmentsTablet: [
+          { row: 1, column: 2, componentId: 'text-813b2921-acd9-4279-b6b7-9707356d3168' },
+          { row: 1, column: 2, componentId: 'icon-68d1ee1d-29b1-42ec-92d1-3179d3b43965' },
+          { row: 1, column: 2, componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359' },
+          { row: 1, column: 2, componentId: 'text-ca57e50c-fc15-4af0-acfe-878dff59d971' },
+          { row: 1, column: 1, componentId: 'image-62743d67-cece-499f-8af6-b4aa21f7498e' },
+          { row: 1, column: 3, componentId: 'image-064108ea-ae15-459e-bbaf-8195906a1c6a' },
+        ],
+        editorLayoutAssignmentsMobile: [
           { row: 1, column: 2, componentId: 'text-813b2921-acd9-4279-b6b7-9707356d3168' },
           { row: 1, column: 2, componentId: 'icon-68d1ee1d-29b1-42ec-92d1-3179d3b43965' },
           { row: 1, column: 2, componentId: 'button-21c3e3b1-6111-4fce-8dc5-ee6db44fc359' },
@@ -1084,8 +1114,8 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
               sourceHeight: 462,
               cropOuterWidth: 516.05,
               cropOuterHeight: 631.79,
-              cropOuterOffsetX: -50.52,
-              cropOuterOffsetY: -11.67,
+              cropOuterOffsetX: -50.51848889257292,
+              cropOuterOffsetY: -11.666576704545452,
             },
             zIndex: 14,
             children: [],
@@ -1164,15 +1194,19 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             id: 'icon-68d1ee1d-29b1-42ec-92d1-3179d3b43965',
             name: 'Icon',
             type: 'icon',
-            frame: { x: 564, y: 120, width: 72, height: 72 },
+            frame: { x: 564, y: 117, width: 72, height: 72 },
             props: {
               color: '#000000',
               radius: 20,
-              iconName: 'package',
-              iconSize: 40,
+              iconName: 'discount-8571b152',
+              iconSize: 60,
               borderColor: 'rgba(53, 92, 255, 0.16)',
               borderWidth: 0,
               backgroundColor: 'transparent',
+              iconSource: 'library',
+              iconLibraryId: '80e283c5-ee86-4ba9-866b-8b6c9665a170',
+              iconLibrarySlug: 'discount-8571b152',
+              iconLibraryUrl: 'https://yyymdmrkljemigmmptds.supabase.co/storage/v1/object/public/icon/243629_discount.svg',
             },
             zIndex: 18,
             children: [],
@@ -1180,8 +1214,12 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             rotation: 0,
             isVisible: true,
             responsiveFrames: {
-              tablet: { x: 136, y: 120, width: 72, height: 72 },
+              tablet: { x: 136, y: 118, width: 72, height: 72 },
               mobile: { x: 159, y: 24, width: 72, height: 72 },
+            },
+            responsiveProps: {
+              mobile: { iconSize: 40 },
+              tablet: { iconSize: 50 },
             },
           },
           {
