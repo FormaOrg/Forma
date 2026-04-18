@@ -32,7 +32,7 @@ export class ProjectService {
   // ── Projects CRUD ──────────────────────────────────────
 
   getMyProjects(): Observable<Project[]> {
-    return this.http.get<Project[]>(this.baseUrl).pipe(
+    return this.http.get<Project[]>(this.projectsBaseUrl).pipe(
       catchError(this.handleError)
     );
   }
