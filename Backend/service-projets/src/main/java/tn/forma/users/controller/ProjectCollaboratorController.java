@@ -21,6 +21,15 @@ public class ProjectCollaboratorController {
 
     private final ProjectCollaboratorService collaboratorService;
 
+    @GetMapping("/my-invitation")
+    public ResponseEntity<ProjectCollaboratorDto> getMyInvitation(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long projectId) {
+        return collaboratorService.getMyPendingInvitation(userDetails.getUsername(), projectId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public ResponseEntity<List<ProjectCollaboratorDto>> getCollaborators(
             @AuthenticationPrincipal UserDetails userDetails,

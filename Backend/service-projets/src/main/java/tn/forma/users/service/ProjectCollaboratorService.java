@@ -163,6 +163,14 @@ public class ProjectCollaboratorService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    @Transactional(readOnly = true)
+    public Optional<ProjectCollaboratorDto> getMyPendingInvitation(String email, Long projectId) {
+        String normalizedEmail = email.trim().toLowerCase();
+        return collaboratorRepository.findByProjectIdAndInviteEmail(projectId, normalizedEmail)
+                .filter(c -> c.getStatus() == CollaboratorStatus.PENDING)
+                .map(this::mapToDto);
+    }
+
     private ProjectCollaboratorDto mapToDto(ProjectCollaborator c) {
         User invitee = c.getUser();
         return ProjectCollaboratorDto.builder()
@@ -176,6 +184,7 @@ public class ProjectCollaboratorService {
                 .acceptedAt(Objects.toString(c.getAcceptedAt(), null))
                 .userName(invitee != null ? buildFullName(invitee) : null)
                 .userAvatarUrl(invitee != null ? invitee.getAvatarUrl() : null)
+                .invitationToken(c.getStatus() == CollaboratorStatus.PENDING ? c.getInvitationToken() : null)
                 .build();
     }
 

@@ -65,12 +65,21 @@ export class ProjectWorkspaceGuard implements CanActivateChild {
           getProjectWorkspaceDefaultPath(project.type),
         ]);
       }),
-      catchError(() => {
-        const requestedSuffix = requestedPath ? `/${requestedPath}` : '';
-        return of(this.router.createUrlTree(['/not-found'], {
-          queryParams: { from: `/app/projects/${projectId}${requestedSuffix}` },
-        }));
-      })
+      catchError(() =>
+        this.projectService.getMyPendingInvitation(projectId).pipe(
+          map((invitation) => {
+            if (invitation?.invitationToken) {
+              return this.router.createUrlTree(['/accept-invitation'], {
+                queryParams: { token: invitation.invitationToken, email: invitation.inviteEmail },
+              });
+            }
+            const requestedSuffix = requestedPath ? `/${requestedPath}` : '';
+            return this.router.createUrlTree(['/not-found'], {
+              queryParams: { from: `/app/projects/${projectId}${requestedSuffix}` },
+            });
+          })
+        )
+      )
     );
   }
 
