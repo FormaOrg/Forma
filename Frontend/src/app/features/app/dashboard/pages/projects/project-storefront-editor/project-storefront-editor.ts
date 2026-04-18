@@ -23,6 +23,7 @@ import { ProjectStorefrontService } from '../../../../../../core/services/projec
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { PublicStorefrontService } from '../../../../../../core/services/public-storefront.service';
+import { ProjectEditorRealtimeService } from '../../../../../../core/services/project-editor-realtime.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
@@ -430,7 +431,6 @@ type SectionLibraryTemplate = {
 export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
-  private static readonly PRESENCE_HEARTBEAT_MS = 8000;
   private static readonly MIN_SUPPORTED_VIEWPORT_WIDTH = 900;
   private static readonly COMPONENT_MIN_SIZE = 20;
   private static readonly COMPONENT_RESIZE_STEP = 1;
@@ -486,6 +486,7 @@ private readonly destroyRef = inject(DestroyRef);
   private readonly projectStorefrontService = inject(ProjectStorefrontService);
   private readonly projectWorkspaceContextService = inject(ProjectWorkspaceContextService);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly projectEditorRealtimeService = inject(ProjectEditorRealtimeService);
   private readonly toastService = inject(ToastService);
   private readonly uploadService = inject(UploadService);
 
@@ -498,7 +499,6 @@ private readonly destroyRef = inject(DestroyRef);
   });
 
 private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
-private presenceHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private iconLibrarySearchRequestId = 0;
@@ -2248,9 +2248,6 @@ effect(() => {
       if (this.autosaveTimer) {
         clearTimeout(this.autosaveTimer);
       }
-      if (this.presenceHeartbeatTimer) {
-        clearInterval(this.presenceHeartbeatTimer);
-      }
       if (this.addElementsPanelCloseTimer) {
         clearTimeout(this.addElementsPanelCloseTimer);
       }
@@ -2263,7 +2260,21 @@ effect(() => {
    if (this.pageDesignPickerCloseTimer) {
      clearTimeout(this.pageDesignPickerCloseTimer);
    }
+   this.stopPresenceHeartbeat();
  });
+
+    this.projectEditorRealtimeService.events$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event.projectId !== this.projectId()) {
+          return;
+        }
+
+        this.editorSession.update((session) => ({
+          ...session,
+          activeEditors: this.normalizeActiveEditors(event.activeEditors),
+        }));
+      });
     this.loadEditor();
   }
 
@@ -14727,7 +14738,6 @@ isSectionAttachTarget(sectionId: string): boolean {
       redoStack: [],
       managedPages,
       selectedManagedPageId: this.selectedManagedPageId(),
-      activeEditors: this.editorSession().activeEditors ?? [],
     };
   }
 
@@ -14763,52 +14773,21 @@ isSectionAttachTarget(sectionId: string): boolean {
   }
 
   private startPresenceHeartbeat(): void {
-    this.stopPresenceHeartbeat();
-    this.syncPresenceHeartbeat();
-    this.presenceHeartbeatTimer = setInterval(() => {
-      this.syncPresenceHeartbeat();
-    }, ProjectStorefrontEditor.PRESENCE_HEARTBEAT_MS);
-  }
-
-  private stopPresenceHeartbeat(): void {
-    if (this.presenceHeartbeatTimer) {
-      clearInterval(this.presenceHeartbeatTimer);
-      this.presenceHeartbeatTimer = null;
-    }
-  }
-
-  private syncPresenceHeartbeat(): void {
     const projectId = this.projectId();
     if (!projectId || !this.currentUser()) {
       return;
     }
 
-    const payload = this.buildPersistedEditorSession();
-    this.projectStorefrontService
-      .updateStorefront(projectId, {
-        editorSession: payload,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (storefront) => {
-          const activeEditors = this.normalizeEditorSession(storefront.editorSession, storefront.draftHomepage).activeEditors ?? [];
-          this.editorSession.update((session) => ({
-            ...session,
-            activeEditors,
-          }));
-          this.storefront.update((current) => current
-            ? ({
-                ...current,
-                editorSession: current.editorSession
-                  ? { ...current.editorSession, activeEditors }
-                  : { ...this.createDefaultEditorSession(), activeEditors },
-              })
-            : current);
-        },
-        error: () => {
-          // Presence should fail quietly so editing is never interrupted.
-        },
-      });
+    this.projectEditorRealtimeService.connect();
+    this.projectEditorRealtimeService.joinProject(projectId);
+  }
+
+  private stopPresenceHeartbeat(): void {
+    const projectId = this.projectId();
+    if (projectId) {
+      this.projectEditorRealtimeService.leaveProject(projectId);
+    }
+    this.projectEditorRealtimeService.disconnect();
   }
 
   collaboratorPresenceInitial(editor: StorefrontActiveEditor): string {
