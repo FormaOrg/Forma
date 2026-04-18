@@ -14,6 +14,7 @@ import { NgStyle } from '@angular/common';
   standalone: true,
   imports: [NgStyle],
   templateUrl: './forma-process-showcase.html',
+  styleUrl: './forma-process-showcase.css',
 })
 export class FormaProcessShowcaseComponent implements AfterViewInit {
   @ViewChild('showcase', { static: true }) showcaseRef!: ElementRef<HTMLElement>;

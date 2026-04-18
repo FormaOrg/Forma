@@ -21,6 +21,7 @@ type ProjectView = 'cards' | 'rows';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, DataCard, ProjectCard, TranslatePipe],
   templateUrl: './projects.live.html',
+  styleUrl: './projects.css',
 })
 export class Projects implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);

@@ -44,6 +44,7 @@ const SALES_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ProjectSalesPageComponent],
   templateUrl: './project-sales-route.html',
+  styleUrl: './project-sales-route.css',
 })
 export class ProjectSalesRoute implements OnInit {
   private static readonly orderEditorTransitionMs = 220;

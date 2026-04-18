@@ -35,6 +35,7 @@ Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearS
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   templateUrl: './project-analytics-route.html',
+  styleUrl: './project-analytics-route.css',
 })
 export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);

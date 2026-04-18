@@ -21,6 +21,7 @@ import { HomeActivityItem, HomeRecentProject, HomeRecentTemplateItem, HomeSetupS
   selector: 'app-home',
   imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates, RouterLink, TranslatePipe],
   templateUrl: './home.html',
+  styleUrl: './home.css',
 })
 export class Home implements OnInit {
   private readonly userService = inject(UserService);

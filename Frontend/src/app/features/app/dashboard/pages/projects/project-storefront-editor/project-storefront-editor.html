@@ -7231,6 +7231,7 @@
                             [class.storefront-editor__preview-component--grouped]="!!component.groupId"
                             [class.storefront-editor__preview-component--dragging]="draggedComponentId() === component.id"
                             [class.storefront-editor__preview-component--button]="component.type === 'button' || component.type === 'cart'"
+                            [class.storefront-editor__preview-component--container]="component.type === 'container'"
                             [class.storefront-editor__preview-component--text]="component.type === 'text'"
                             [class.storefront-editor__preview-component--image]="component.type === 'image'"
                             [class.storefront-editor__preview-component--image-cropping]="isImageCropModeForComponent(component.id)"

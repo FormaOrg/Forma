@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 
 import { ProjectCatalogProduct } from '../../../../../../../../core/models/project-catalog.model';
+import { AppIcon } from '../../../../../../../../shared/app/icons/app-icon';
 import { StorefrontEditorProductFeedNode } from '../storefront-editor-component.model';
 
 type ProductFeedBadgeTone = 'dark' | 'light';
@@ -156,7 +157,7 @@ const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
 @Component({
   selector: 'app-storefront-editor-block-product-feed',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIcon],
   template: `
     <div class="storefront-editor-block-product-feed" [ngClass]="'storefront-editor-block-product-feed--' + node().props.designPreset">
       @if (node().props.showFilters) {
@@ -176,7 +177,7 @@ const MOCK_PRODUCTS: ProjectCatalogProduct[] = [
           <div class="storefront-editor-block-product-feed__sort-row">
             <div class="storefront-editor-block-product-feed__sort-trigger">
               <span>Sort by</span>
-              <span class="storefront-editor-block-product-feed__sort-trigger-caret">⌄</span>
+              <app-icon class="storefront-editor-block-product-feed__sort-trigger-caret" name="chevron-down" [size]="14" />
             </div>
           </div>
         }

@@ -9,7 +9,6 @@ import { ProjectSidebar } from '../../../shared/app/project-sidebar/project-side
 import { SettingsSidebar } from '../../../shared/app/settings-sidebar/settings-sidebar';
 import { SidebarStateService } from '../../../core/services/sidebar-state.service';
 import { AppBootstrapService } from '../../../core/services/app-bootstrap.service';
-import { BootstrapLoader } from '../../../shared/app/bootstrap-loader/bootstrap-loader';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
@@ -20,8 +19,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     AppHeader,
     SideBar,
     ProjectSidebar,
-    SettingsSidebar,
-    BootstrapLoader
+    SettingsSidebar
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -38,10 +36,15 @@ export class Dashboard implements OnInit {
   isProjectRoute = false;
   currentProjectId = '';
   sidebarMotionReady = false;
+  private hasChildRouteActivated = false;
+  private hasNavigationSettled = false;
+  private hasMarkedAppReady = false;
+  private revealTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.ensureDashboardStylesheet();
     this.syncShellRouteState(this.router.url);
+    this.hasNavigationSettled = this.router.navigated;
 
     this.router.events
       .pipe(
@@ -50,6 +53,8 @@ export class Dashboard implements OnInit {
       )
       .subscribe((event) => {
         this.syncShellRouteState(event.urlAfterRedirects);
+        this.hasNavigationSettled = true;
+        this.tryMarkAppReady();
       });
   }
 
@@ -58,10 +63,17 @@ export class Dashboard implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.appBootstrapService.ensureInitialized();
+    void this.appBootstrapService.ensureInitialized().finally(() => {
+      this.tryMarkAppReady();
+    });
     setTimeout(() => {
       this.sidebarMotionReady = true;
     }, 0);
+  }
+
+  onChildRouteActivated(): void {
+    this.hasChildRouteActivated = true;
+    this.tryMarkAppReady();
   }
 
   toggleSidebar(): void {
@@ -114,5 +126,25 @@ export class Dashboard implements OnInit {
     link.rel = 'stylesheet';
     link.href = '/dashboard-overrides.css';
     this.document.head.appendChild(link);
+  }
+
+  private tryMarkAppReady(): void {
+    if (
+      this.hasMarkedAppReady ||
+      !this.hasChildRouteActivated ||
+      !this.hasNavigationSettled ||
+      this.appBootstrapService.isLoading()
+    ) {
+      return;
+    }
+
+    this.hasMarkedAppReady = true;
+    this.revealTimeoutId = setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.document.documentElement.classList.add('forma-app-ready');
+        });
+      });
+    }, 700);
   }
 }

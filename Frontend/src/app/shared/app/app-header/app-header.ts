@@ -45,6 +45,7 @@ interface CommandPaletteItem {
   standalone: true,
   imports: [CommonModule, RouterModule, AppIcon, FormsModule, TranslatePipe],
   templateUrl: './app-header.html',
+  styleUrl: './app-header.css',
 })
 export class AppHeader {
   @Input() sidebarCollapsed = false;

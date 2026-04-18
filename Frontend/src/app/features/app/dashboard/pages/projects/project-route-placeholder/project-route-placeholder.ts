@@ -21,6 +21,7 @@ import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
   standalone: true,
   imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './project-route-placeholder.html',
+  styleUrl: './project-route-placeholder.css',
 })
 export class ProjectRoutePlaceholder {
   private readonly route = inject(ActivatedRoute);

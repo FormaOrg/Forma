@@ -20,6 +20,7 @@ import { ProjectSalesOrdersTableComponent } from './project-sales-orders-table.c
   standalone: true,
   imports: [CommonModule, AppIcon, ProjectSalesOrdersTableComponent],
   templateUrl: './project-sales-orders-panel.component.html',
+  styleUrl: './project-sales-orders-panel.component.css',
 })
 export class ProjectSalesOrdersPanelComponent {
   @Input({ required: true }) kpis: ReadonlyArray<SalesKpiCard> = [];

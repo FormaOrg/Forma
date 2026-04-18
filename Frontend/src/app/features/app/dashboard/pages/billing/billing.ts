@@ -20,6 +20,7 @@ import {
   standalone: true,
   imports: [CommonModule, RouterLink, DataCard, TranslatePipe],
   templateUrl: './billing.polished.html',
+  styleUrl: './billing.css',
 })
 export class Billing implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);

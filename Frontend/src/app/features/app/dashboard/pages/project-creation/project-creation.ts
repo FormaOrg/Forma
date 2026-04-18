@@ -96,6 +96,7 @@ const CUSTOMIZING_HOLD_DURATION = 3200;
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './project-creation.html',
+  styleUrl: './project-creation.css',
 })
 export class ProjectCreation implements OnDestroy {
   private readonly router = inject(Router);

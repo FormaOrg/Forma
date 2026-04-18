@@ -1,10 +1,8 @@
 @if (appBootstrapService.isLoading()) {
-  <div class="dashboard-boot">
-    <app-bootstrap-loader></app-bootstrap-loader>
-  </div>
+  <div class="dashboard-boot" aria-hidden="true"></div>
 } @else if (isImmersiveRoute) {
   <div class="dashboard-immersive">
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onChildRouteActivated()"></router-outlet>
   </div>
 } @else {
   <div
@@ -58,7 +56,7 @@
       ></app-app-header>
 
       <div class="dashboard-content">
-        <router-outlet></router-outlet>
+        <router-outlet (activate)="onChildRouteActivated()"></router-outlet>
       </div>
     </div>
   </div>

@@ -29,6 +29,7 @@ interface BlogSubscriberItem {
   standalone: true,
   imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './project-subscribers-route.html',
+  styleUrl: './project-subscribers-route.css',
 })
 export class ProjectSubscribersRoute {
   private readonly route = inject(ActivatedRoute);

@@ -101,15 +101,15 @@ const MOCK_PRODUCT: ProjectCatalogProduct = {
     </article>
   `,
   styles: [`
-    :host { display:block; width:100%; height:100%; }
+    :host { display:block; width:100%; height:100%; container-type:inline-size; }
     .storefront-editor-product-details {
-      display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(320px, .95fr); gap:32px;
+      display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(0, .95fr); gap:32px;
       width:100%; height:100%; padding:24px; box-sizing:border-box; background:#fff; color:#0f172a;
     }
     .storefront-editor-product-details__media { border-radius:24px; background:#f8fafc; overflow:hidden; min-height:320px; display:flex; align-items:center; justify-content:center; }
     .storefront-editor-product-details__media img { width:100%; height:100%; object-fit:cover; display:block; }
     .storefront-editor-product-details__placeholder { font:600 72px/1 Poppins,sans-serif; color:#cbd5e1; }
-    .storefront-editor-product-details__content { display:flex; flex-direction:column; gap:18px; }
+    .storefront-editor-product-details__content { display:flex; flex-direction:column; gap:18px; min-width:0; }
     .storefront-editor-product-details__eyebrow { font:600 12px/1.2 Poppins,sans-serif; letter-spacing:.14em; text-transform:uppercase; color:#64748b; }
     .storefront-editor-product-details__content h2 { margin:0; font:600 42px/1.02 Poppins,sans-serif; letter-spacing:-.04em; }
     .storefront-editor-product-details__price-row { display:flex; align-items:baseline; gap:12px; }
@@ -132,8 +132,75 @@ const MOCK_PRODUCT: ProjectCatalogProduct = {
     .storefront-editor-product-details__actions button { min-height:50px; border-radius:999px; border:1px solid #111827; padding:0 24px; background:#111827; color:#fff; font:600 15px/1 Poppins,sans-serif; }
     .storefront-editor-product-details__actions button[disabled] { cursor:not-allowed; opacity:.45; }
     .storefront-editor-product-details__buy-now { background:#fff !important; color:#111827 !important; }
-    @media (max-width: 860px) {
-      .storefront-editor-product-details { grid-template-columns:1fr; }
+    @container (max-width: 980px) {
+      .storefront-editor-product-details {
+        grid-template-columns:minmax(0, .9fr) minmax(0, 1.1fr);
+        gap:20px;
+        padding:18px;
+      }
+      .storefront-editor-product-details__media {
+        min-height:220px;
+        max-height:320px;
+        border-radius:20px;
+      }
+      .storefront-editor-product-details__content {
+        gap:14px;
+      }
+      .storefront-editor-product-details__content h2 {
+        font-size:32px;
+      }
+      .storefront-editor-product-details__price-row strong {
+        font-size:24px;
+      }
+      .storefront-editor-product-details__price-row span {
+        font-size:16px;
+      }
+      .storefront-editor-product-details__facts {
+        grid-template-columns:1fr;
+      }
+      .storefront-editor-product-details__actions {
+        flex-direction:column;
+        margin-top:0;
+      }
+      .storefront-editor-product-details__actions button {
+        width:100%;
+      }
+    }
+    @container (max-width: 680px) {
+      .storefront-editor-product-details {
+        grid-template-columns:1fr;
+        gap:16px;
+        padding:14px;
+        height:auto;
+      }
+      .storefront-editor-product-details__media {
+        min-height:180px;
+        max-height:260px;
+        aspect-ratio:4 / 3;
+        border-radius:16px;
+      }
+      .storefront-editor-product-details__content {
+        gap:12px;
+      }
+      .storefront-editor-product-details__content h2 {
+        font-size:26px;
+      }
+      .storefront-editor-product-details__price-row strong {
+        font-size:22px;
+      }
+      .storefront-editor-product-details__price-row span {
+        font-size:15px;
+      }
+      .storefront-editor-product-details__facts {
+        grid-template-columns:1fr;
+      }
+      .storefront-editor-product-details__stepper {
+        gap:18px;
+        padding:9px 14px;
+      }
+      .storefront-editor-product-details__stepper span {
+        font-size:17px;
+      }
     }
   `],
 })

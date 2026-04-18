@@ -183,26 +183,19 @@ function buildProductsManagedPageDocument(
   const block = createStorefrontEditorComponentNode('product-feed');
 
   block.name = 'Products grid';
-  block.frame = { x: 88, y: 96, width: 1024, height: 760 };
+  block.frame = { x: 88, y: 24, width: 1024, height: 1540 };
 
   const contentSection: StorefrontHomepageSection = {
     ...contentBase,
-    id: 'products-content',
+    id: 'hero-l3jty1o3',
     type: contentBase.type,
     props: {
       ...contentBase.props,
-      editorLabel: 'Products',
-      editorBlankSection: false,
-      editorHeight: 920,
-      editorTabletHeight: 920,
-      editorMobileHeight: 1180,
-      editorBackgroundColor: '#f8fafc',
-      editorBorderWidth: 0,
-      editorBorderStyle: 'none',
-      editorBorderColor: 'transparent',
-      editorRadius: 0,
-      editorShadow: 'none',
-      editorOpacity: 100,
+      editorLabel: 'Blank section',
+      editorBlankSection: true,
+      editorHeight: 1627,
+      editorTabletHeight: 1307,
+      editorMobileHeight: 1182,
       editorComponents: [
         {
           ...block,
@@ -227,11 +220,14 @@ function buildProductsManagedPageDocument(
             imageRadius: 0,
           },
           responsiveFrames: {
-            tablet: { x: 24, y: 88, width: 720, height: 900 },
-            mobile: { x: 16, y: 72, width: 328, height: 1000 },
+            tablet: { x: 24, y: 24, width: 720, height: 1231 },
+            mobile: { x: 31, y: 32, width: 328, height: 1087 },
           },
         },
       ],
+      editorLayoutAssignments: [],
+      editorLayoutAssignmentsMobile: [],
+      editorLayoutAssignmentsTablet: [],
     },
   };
 
@@ -281,7 +277,7 @@ function buildProductDetailsManagedPageDocument(
     showCompareAtPrice: true,
   };
   block.responsiveFrames = {
-    tablet: { x: 24, y: 24, width: 720, height: 592 },
+    tablet: { x: 24, y: 24, width: 720, height: 675 },
     mobile: { x: 17, y: 24, width: 360, height: 608 },
   };
 
@@ -294,9 +290,18 @@ function buildProductDetailsManagedPageDocument(
       editorLabel: 'Blank section',
       editorBlankSection: true,
       editorHeight: 659,
+      editorTabletHeight: 737,
+      editorMobileHeight: 935,
+      editorLayoutRows: 0,
+      editorLayoutPreset: 'none',
+      editorLayoutColumns: 0,
+      editorLayoutRowSizes: [],
       editorBackgroundColor: '#f8fafc',
       editorComponents: [block],
       editorLayoutAssignments: [],
+      editorLayoutAssignmentsTablet: [],
+      editorLayoutAssignmentsMobile: [],
+      editorLayoutColumnSizes: [],
     },
   };
 

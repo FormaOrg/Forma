@@ -14,6 +14,7 @@ import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslatePipe],
   templateUrl: './security.html',
+  styleUrl: './security.css',
 })
 export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   private readonly sensitiveVerificationKey = 'forma_security_settings_verified';

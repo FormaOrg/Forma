@@ -14,6 +14,7 @@ import { ActivityRealtimeService } from '../../../../../../../core/services/acti
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './activity.html',
+  styleUrl: './activity.css',
 })
 export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;

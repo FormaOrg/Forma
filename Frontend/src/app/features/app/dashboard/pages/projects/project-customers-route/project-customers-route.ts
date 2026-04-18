@@ -20,6 +20,7 @@ import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './project-customers-route.html',
+  styleUrl: './project-customers-route.css',
 })
 export class ProjectCustomersRoute {
   private static readonly editorTransitionMs = 220;

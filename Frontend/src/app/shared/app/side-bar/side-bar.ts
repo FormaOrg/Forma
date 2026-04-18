@@ -21,6 +21,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   standalone: true,
   imports: [CommonModule, RouterModule, AppIcon, TranslatePipe],
   templateUrl: './side-bar.html',
+  styleUrl: './side-bar.css',
 })
 export class SideBar implements OnChanges {
   @Input() collapsed = false;

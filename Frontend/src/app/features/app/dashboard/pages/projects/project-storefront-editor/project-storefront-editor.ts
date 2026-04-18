@@ -2576,6 +2576,12 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
       }
     }
 
+    if (this.isSectionLibraryOpen()) {
+      if (!target.closest('.storefront-editor__section-library-modal, .storefront-editor__add-page-menu--section')) {
+        this.closeSectionLibrary();
+      }
+    }
+
     if (this.pageCardMenuId()) {
       if (!target.closest('.storefront-editor__page-card-menu, .storefront-editor__page-card-more')) {
         this.pageCardMenuId.set(null);
@@ -3312,6 +3318,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     if (this.isEditingComponentText()) {
       this.finishEditingComponentText();
     }
+    this.closeSectionInsertionUi();
     this.sidebarMode.set('structure');
     this.selectedSectionId.set(sectionId);
     this.selectedComponentId.set(null);
@@ -4028,6 +4035,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     }
 
     event?.stopPropagation();
+    this.closeSectionInsertionUi();
     if (this.isEditingComponentText() && this.editingComponentTextId() !== componentId) {
       this.finishEditingComponentText();
     }
@@ -4333,6 +4341,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return;
     }
 
+    this.closeSectionInsertionUi();
+
     if (sectionId) {
       this.selectedSectionId.set(sectionId);
       this.syncEditorSessionState({ selectedSectionId: sectionId }, false);
@@ -4359,6 +4369,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       }
 
     event.preventDefault();
+    this.closeSectionInsertionUi();
     this.selectedSectionId.set(sectionId);
     this.selectedComponentId.set(null);
     this.selectedComponentIds.set([]);
@@ -5037,6 +5048,13 @@ finishEditingComponentText(): void {
       this.canScrollSectionLibraryTabsRight.set(false);
       this.sectionLibraryCloseTimer = null;
     }, ProjectStorefrontEditor.SECTION_LIBRARY_CLOSE_MS);
+  }
+
+  private closeSectionInsertionUi(): void {
+    this.sectionAddMenuSectionId.set(null);
+    if (this.isSectionLibraryOpen()) {
+      this.closeSectionLibrary();
+    }
   }
 
   setSectionLibraryCategory(category: SectionLibraryCategory): void {
