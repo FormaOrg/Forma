@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ViewEncapsulation,
   inject
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -26,6 +27,7 @@ import { GoogleLinkOauthService } from '../../../../../../../core/services/googl
   imports: [CommonModule, ReactiveFormsModule, AppIcon, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SettingsProfile implements OnInit, AfterViewInit, OnDestroy {
   private fb = inject(FormBuilder);

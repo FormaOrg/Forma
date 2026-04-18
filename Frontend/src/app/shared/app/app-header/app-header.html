@@ -7,10 +7,42 @@
       [attr.aria-label]="sidebarCollapsed ? ('app.header.sidebar.expand' | t) : ('app.header.sidebar.collapse' | t)"
     >
       @if (sidebarCollapsed == true) {
-        <img src="assets/Logo/collapse.svg" alt="collapse" style="height: 20px;"/>
+        <svg
+          class="app-header__toggle-icon"
+          width="25"
+          height="22"
+          viewBox="0 0 25 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M10.1562 20.3125V1.5625H2.34375V20.3125H10.1562Z" fill="currentColor" />
+          <path
+            d="M4.6875 0C2.11792 0 0 2.11792 0 4.6875V17.1875C0 19.7571 2.11792 21.875 4.6875 21.875H20.3125C22.8821 21.875 25 19.7571 25 17.1875V4.6875C25 2.11792 22.8821 0 20.3125 0H4.6875ZM4.6875 3.125H20.3125C21.2036 3.125 21.875 3.79639 21.875 4.6875V17.1875C21.875 18.0786 21.2036 18.75 20.3125 18.75H4.6875C3.79639 18.75 3.125 18.0786 3.125 17.1875V4.6875C3.125 3.79639 3.79639 3.125 4.6875 3.125Z"
+            fill="currentColor"
+          />
+          <path d="M9.375 1.5625H10.9375V20.3125H9.375V1.5625Z" fill="currentColor" />
+        </svg>
       }
       @else {
-        <img src="assets/Logo/expand.svg" alt="expand"  style="height: 20px;"/>
+        <svg
+          class="app-header__toggle-icon"
+          width="25"
+          height="22"
+          viewBox="0 0 25 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M14.8438 20.3125V1.5625H22.6562V20.3125H14.8438Z" fill="currentColor" />
+          <path
+            d="M20.3125 0C22.8821 0 25 2.11792 25 4.6875V17.1875C25 19.7571 22.8821 21.875 20.3125 21.875H4.6875C2.11792 21.875 0 19.7571 0 17.1875V4.6875C0 2.11792 2.11792 0 4.6875 0H20.3125ZM20.3125 3.125H4.6875C3.79639 3.125 3.125 3.79639 3.125 4.6875V17.1875C3.125 18.0786 3.79639 18.75 4.6875 18.75H20.3125C21.2036 18.75 21.875 18.0786 21.875 17.1875V4.6875C21.875 3.79639 21.2036 3.125 20.3125 3.125Z"
+            fill="currentColor"
+          />
+          <path d="M15.625 1.5625H14.0625V20.3125H15.625V1.5625Z" fill="currentColor" />
+        </svg>
       }
 
       <!-- <app-icon [name]="sidebarCollapsed ? 'menu' : 'panel-left'" [size]="iconSize" /> -->

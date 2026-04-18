@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -15,6 +15,7 @@ import { AuthService } from '../../../../../../../core/services/auth.service';
   imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './preferences.html',
   styleUrl: './preferences.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SettingsPreferences implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { ActivityRealtimeService } from '../../../../../../../core/services/acti
   imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './activity.html',
   styleUrl: './activity.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SettingsActivity implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('headerSentinel', { static: true }) headerSentinel?: ElementRef<HTMLDivElement>;

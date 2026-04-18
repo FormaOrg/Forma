@@ -64,6 +64,12 @@ app-app-header .app-header__icon-btn {
     border-color var(--dur) var(--ease);
 }
 
+app-app-header .app-header__toggle-icon {
+  width: 25px;
+  height: 22px;
+  display: block;
+}
+
 app-app-header .app-header__icon-btn img {
   filter: none;
   transition: filter var(--dur) var(--ease), opacity var(--dur) var(--ease);

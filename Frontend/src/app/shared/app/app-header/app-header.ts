@@ -9,7 +9,8 @@ import {
   Input,
   Output,
   signal,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
@@ -46,6 +47,7 @@ interface CommandPaletteItem {
   imports: [CommonModule, RouterModule, AppIcon, FormsModule, TranslatePipe],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AppHeader {
   @Input() sidebarCollapsed = false;

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -15,6 +15,7 @@ import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
   imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslatePipe],
   templateUrl: './security.html',
   styleUrl: './security.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SettingsSecurity implements OnInit, AfterViewInit, OnDestroy {
   private readonly sensitiveVerificationKey = 'forma_security_settings_verified';
