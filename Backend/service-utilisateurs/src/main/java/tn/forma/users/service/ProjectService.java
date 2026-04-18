@@ -13,6 +13,7 @@ import tn.forma.users.model.Template;
 import tn.forma.users.model.User;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.UserRepository;
+import tn.forma.users.util.ProjectDomainNormalizer;
 
 import java.util.List;
 import java.util.Objects;
@@ -101,7 +102,7 @@ public class ProjectService {
         }
 
         if (request.getDefaultDomain() != null) {
-            project.setDefaultDomain(blankToNull(request.getDefaultDomain()));
+            project.setDefaultDomain(normalizeProjectDomain(request.getDefaultDomain()));
         }
 
         if (request.getMetaDescription() != null) {
@@ -250,6 +251,19 @@ public class ProjectService {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private String normalizeProjectDomain(String value) {
+        String normalized = ProjectDomainNormalizer.normalize(value);
+        if (normalized != null) {
+            return normalized;
+        }
+
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+
+        throw new RuntimeException("Default domain must be a valid host name");
     }
 
     private String buildDuplicateName(String sourceName, Long userId) {

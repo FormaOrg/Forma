@@ -11,11 +11,16 @@
   <section class="storefront-checkout__state storefront-checkout__state--empty">
     <h1>Your cart is empty</h1>
     <p>Add products before starting checkout.</p>
-    <a [routerLink]="['/store', projectId(), 'products']">Browse products</a>
+    <a [routerLink]="productsPath()" [queryParams]="previewQueryParams()">Browse products</a>
   </section>
 } @else {
   <div class="storefront-checkout">
-    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+    <app-storefront-public-header
+      [storefront]="storefront()"
+      [projectId]="projectId()"
+      [isEditorPreview]="isEditorPreview()"
+      [isDomainRoute]="isDomainRoute()"
+    />
 
     <main class="storefront-checkout__layout">
       <section class="storefront-checkout__form-card">

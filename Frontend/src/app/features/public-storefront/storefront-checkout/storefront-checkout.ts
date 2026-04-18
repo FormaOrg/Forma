@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -24,6 +25,7 @@ export class StorefrontCheckout {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storefrontRouteService = inject(PublicStorefrontRouteService);
   private readonly storeCartService = inject(StoreCartService);
   private readonly storefrontCustomerSessionService = inject(StorefrontCustomerSessionService);
   private readonly toastService = inject(ToastService);
@@ -34,11 +36,13 @@ export class StorefrontCheckout {
   readonly queryParamMap = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
-  readonly projectId = computed(() => {
-    const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
-    return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
-  });
+  readonly projectIdParam = computed(() => this.projectParamMap()?.get('projectId'));
+  readonly routeMode = computed<StorefrontRouteMode>(() => this.storefrontRouteService.resolveRouteMode(this.projectIdParam()));
+  readonly isDomainRoute = computed(() => this.routeMode() === 'domain');
+  readonly projectId = computed(() => this.storefrontRouteService.resolveProjectId(this.projectIdParam()));
   readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
+  readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
+  readonly productsPath = computed(() => this.storefrontRouteService.buildPath(this.projectId(), this.routeMode(), 'products'));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
@@ -127,14 +131,19 @@ export class StorefrontCheckout {
       .subscribe({
         next: (response) => {
           this.storeCartService.clear(this.projectId());
-          void this.router.navigate(['/store', this.projectId(), 'checkout', 'success'], {
-            queryParams: {
-              ...(this.isEditorPreview() ? { preview: 'editor' } : {}),
-              orderNumber: response.orderNumber,
-              total: response.total,
-              currency: response.currencyCode,
-            },
-          });
+          void this.router.navigateByUrl(
+            this.storefrontRouteService.buildUrl(
+              this.projectId(),
+              this.routeMode(),
+              'checkout/success',
+              {
+                ...(this.previewQueryParams() ?? {}),
+                orderNumber: response.orderNumber,
+                total: response.total,
+                currency: response.currencyCode,
+              }
+            )
+          );
         },
         error: () => {
           this.isSubmitting.set(false);

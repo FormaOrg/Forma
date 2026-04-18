@@ -39,6 +39,9 @@ public class SecurityConfig {
     @Value("${application.allowed-origins:}")
     private String allowedOrigins;
 
+    @Value("${application.allowed-origin-patterns:}")
+    private String allowedOriginPatterns;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -48,7 +51,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/templates/public", "/uploads/**", "/ws/**", "/api/public/projects/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/templates/public", "/uploads/**", "/ws/**", "/api/public/**").permitAll()
                         .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -80,14 +83,33 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/public/**", buildPublicCorsConfiguration());
+        source.registerCorsConfiguration("/**", buildAuthenticatedCorsConfiguration());
+        return source;
+    }
+
+    private CorsConfiguration buildPublicCorsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(resolveAllowedOrigins());
-        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(false);
+        return config;
+    }
+
+    private CorsConfiguration buildAuthenticatedCorsConfiguration() {
+        CorsConfiguration config = new CorsConfiguration();
+        List<String> originPatterns = resolveAllowedOriginPatterns();
+        if (!originPatterns.isEmpty()) {
+            config.setAllowedOriginPatterns(originPatterns);
+        } else {
+            config.setAllowedOrigins(resolveAllowedOrigins());
+        }
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+        return config;
     }
 
     private List<String> resolveAllowedOrigins() {
@@ -96,6 +118,18 @@ public class SecurityConfig {
         }
 
         return Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .distinct()
+                .toList();
+    }
+
+    private List<String> resolveAllowedOriginPatterns() {
+        if (allowedOriginPatterns == null || allowedOriginPatterns.isBlank()) {
+            return List.of();
+        }
+
+        return Arrays.stream(allowedOriginPatterns.split(","))
                 .map(String::trim)
                 .filter(origin -> !origin.isEmpty())
                 .distinct()

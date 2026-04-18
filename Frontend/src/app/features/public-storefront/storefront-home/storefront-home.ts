@@ -8,6 +8,7 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
 import { ProjectCatalogProduct } from '../../../core/models/project-catalog.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
@@ -83,6 +84,7 @@ export class StorefrontHome {
   private readonly destroyRef = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storefrontRouteService = inject(PublicStorefrontRouteService);
   private readonly analyticsService = inject(StorefrontAnalyticsService);
   private readonly storeCartService = inject(StoreCartService);
 
@@ -92,12 +94,17 @@ export class StorefrontHome {
   readonly queryParamMap = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
-  readonly projectId = computed(() => {
-    const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
-    return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
-  });
+  readonly projectIdParam = computed(() => this.projectParamMap()?.get('projectId'));
+  readonly routeMode = computed<StorefrontRouteMode>(() =>
+    this.storefrontRouteService.resolveRouteMode(this.projectIdParam())
+  );
+  readonly isDomainRoute = computed(() => this.routeMode() === 'domain');
+  readonly projectId = computed(() => this.storefrontRouteService.resolveProjectId(this.projectIdParam()));
   readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
   readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
+  readonly productsPath = computed(() =>
+    this.storefrontRouteService.buildPath(this.projectId(), this.routeMode(), 'products')
+  );
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly isLoading = signal(true);
@@ -157,11 +164,7 @@ export class StorefrontHome {
           if (this.isEditorPreview()) {
             this.loadPreviewExtras(projectId);
           } else {
-            this.analyticsService.trackPageView(
-              projectId,
-              window.location.pathname,
-              storefront.storeName,
-            );
+            this.analyticsService.trackPageView(projectId, window.location.pathname, storefront.storeName);
           }
         },
         error: () => {
@@ -211,7 +214,12 @@ export class StorefrontHome {
     const projectId = this.projectId();
 
     if (!href) {
-      return `/store/${projectId}/products`;
+      return this.storefrontRouteService.buildUrl(
+        projectId,
+        this.routeMode(),
+        'products',
+        this.previewQueryParams() ?? undefined
+      );
     }
     if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#')) {
       return href;
@@ -219,15 +227,21 @@ export class StorefrontHome {
     if (href.startsWith('/store/')) {
       return this.appendPreviewQuery(href);
     }
-    if (href.startsWith('/')) {
-      return this.appendPreviewQuery(`/store/${projectId}${href}`);
-    }
-
-    return this.appendPreviewQuery(`/store/${projectId}/${href.replace(/^\/+/, '')}`);
+    return this.storefrontRouteService.buildUrl(
+      projectId,
+      this.routeMode(),
+      href,
+      this.previewQueryParams() ?? undefined
+    );
   }
 
   productRoute(productId: number): string {
-    return this.appendPreviewQuery(`/store/${this.projectId()}/products/${productId}`);
+    return this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      `products/${productId}`,
+      this.previewQueryParams() ?? undefined
+    );
   }
 
   private appendPreviewQuery(url: string): string {

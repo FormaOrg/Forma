@@ -1760,8 +1760,32 @@ readonly buttonShadowOptions: ReadonlyArray<{ id: StorefrontEditorButtonNode['pr
   readonly projectDisplayName = computed(
     () => this.project()?.name?.trim() || this.storeName() || 'Project'
   );
+  readonly liveStorefrontUrl = computed(() => {
+    const defaultDomain = this.project()?.defaultDomain?.trim();
+    if (defaultDomain) {
+      return `https://${defaultDomain}`;
+    }
+
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}/store/${this.projectId()}`;
+    }
+
+    return `/store/${this.projectId()}`;
+  });
   readonly previewDomain = computed(
-    () => this.project()?.defaultDomain?.trim() || 'domain.forma.tn'
+    () => {
+      const defaultDomain = this.project()?.defaultDomain?.trim();
+      if (defaultDomain) {
+        return defaultDomain;
+      }
+
+      try {
+        return new URL(this.liveStorefrontUrl(), typeof window !== 'undefined' ? window.location.origin : 'https://forma.local').host
+          + new URL(this.liveStorefrontUrl(), typeof window !== 'undefined' ? window.location.origin : 'https://forma.local').pathname;
+      } catch {
+        return this.liveStorefrontUrl();
+      }
+    }
   );
   readonly hasUnsavedChanges = computed(() => {
     const original = this.storefront();
@@ -9625,7 +9649,7 @@ updatePageDesignTabScrollState(): void {
         next: (response) => {
           const snapshot = this.normalizeStorefront(response.storefront);
           this.applyPersistedStorefront(snapshot, { resetHistory: true });
-          this.toastService.success(`Storefront published on ${this.previewDomain()}.`);
+          this.toastService.success(`Storefront published at ${this.liveStorefrontUrl()}.`);
         },
         error: () => this.toastService.error('Unable to publish the storefront right now.'),
       });
