@@ -19,14 +19,38 @@
       (input)="inviteEmail.set($any($event.target).value)"
       (keydown.enter)="invite()"
     />
-    <select
-      class="collaborators-panel__role-select"
-      [value]="inviteRole()"
-      (change)="inviteRole.set($any($event.target).value)"
-    >
-      <option value="EDITOR">{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</option>
-      <option value="VIEWER">{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</option>
-    </select>
+    <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu">
+      <button
+        type="button"
+        class="collaborators-panel__role-trigger"
+        (click)="toggleInviteRoleMenu()"
+        [attr.aria-expanded]="isInviteRoleMenuOpen()"
+      >
+        <span>{{ roleLabel(inviteRole()) }}</span>
+        <app-icon name="chevron-down" [size]="12" />
+      </button>
+
+      @if (isInviteRoleMenuOpen()) {
+        <div class="collaborators-panel__menu">
+          <button
+            type="button"
+            class="collaborators-panel__menu-row"
+            [class.collaborators-panel__menu-row--active]="inviteRole() === 'EDITOR'"
+            (click)="selectInviteRole('EDITOR')"
+          >
+            <span>{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</span>
+          </button>
+          <button
+            type="button"
+            class="collaborators-panel__menu-row"
+            [class.collaborators-panel__menu-row--active]="inviteRole() === 'VIEWER'"
+            (click)="selectInviteRole('VIEWER')"
+          >
+            <span>{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</span>
+          </button>
+        </div>
+      }
+    </div>
     <button
       type="button"
       class="collaborators-panel__invite-btn"
@@ -64,19 +88,43 @@
             }
           </div>
           <div class="collaborators-panel__info">
-            <span class="collaborators-panel__name">{{ collaboratorLabel(c) }}</span>
+            <span class="collaborators-panel__name" [title]="collaboratorLabel(c)">{{ collaboratorLabel(c) }}</span>
             @if (c.status === 'PENDING') {
               <span class="collaborators-panel__badge">{{ 'project.storefront.editor.collaborators.statusPending' | t }}</span>
             }
           </div>
-          <select
-            class="collaborators-panel__role-select collaborators-panel__role-select--inline"
-            [value]="c.role"
-            (change)="updateRole(c, $any($event.target).value)"
-          >
-            <option value="EDITOR">{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</option>
-            <option value="VIEWER">{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</option>
-          </select>
+          <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu">
+            <button
+              type="button"
+              class="collaborators-panel__role-trigger collaborators-panel__role-trigger--inline"
+              (click)="toggleCollaboratorRoleMenu(c.id)"
+              [attr.aria-expanded]="isCollaboratorRoleMenuOpen(c.id)"
+            >
+              <span>{{ roleLabel(c.role) }}</span>
+              <app-icon name="chevron-down" [size]="12" />
+            </button>
+
+            @if (isCollaboratorRoleMenuOpen(c.id)) {
+              <div class="collaborators-panel__menu collaborators-panel__menu--inline">
+                <button
+                  type="button"
+                  class="collaborators-panel__menu-row"
+                  [class.collaborators-panel__menu-row--active]="c.role === 'EDITOR'"
+                  (click)="updateRole(c, 'EDITOR')"
+                >
+                  <span>{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="collaborators-panel__menu-row"
+                  [class.collaborators-panel__menu-row--active]="c.role === 'VIEWER'"
+                  (click)="updateRole(c, 'VIEWER')"
+                >
+                  <span>{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</span>
+                </button>
+              </div>
+            }
+          </div>
           <button
             type="button"
             class="collaborators-panel__remove"
