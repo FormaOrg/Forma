@@ -4,8 +4,42 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { GuestGuard } from './core/guards/guest.guard';
 import { ProjectWorkspaceGuard } from './core/guards/project-workspace.guard';
 import { RootRedirectGuard } from './core/guards/root-redirect.guard';
+import { tenantStorefrontCanMatch } from './core/guards/tenant-storefront.guard';
 
 export const routes: Routes = [
+  {
+    path: 'checkout/success',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-checkout-success/storefront-checkout-success').then((m) => m.StorefrontCheckoutSuccess)
+  },
+  {
+    path: 'checkout',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () => import('./features/public-storefront/storefront-checkout/storefront-checkout').then((m) => m.StorefrontCheckout)
+  },
+  {
+    path: 'cart',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () => import('./features/public-storefront/storefront-cart/storefront-cart').then((m) => m.StorefrontCart)
+  },
+  {
+    path: 'products/:productId',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-product-detail/storefront-product-detail').then((m) => m.StorefrontProductDetail)
+  },
+  {
+    path: 'products',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () => import('./features/public-storefront/storefront-products/storefront-products').then((m) => m.StorefrontProducts)
+  },
+  {
+    path: '',
+    pathMatch: 'full',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () => import('./features/public-storefront/storefront-home/storefront-home').then((m) => m.StorefrontHome)
+  },
   {
     path: '',
     canActivate: [RootRedirectGuard],
@@ -34,6 +68,11 @@ export const routes: Routes = [
   {
     path: 'landing-page-website',
     loadComponent: () => import('./features/templates-pages/landing-showcase/landing-showcase').then((m) => m.LandingShowcase)
+  },
+  {
+    path: 'store/:projectId/collections/:collectionSlug',
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-collection/storefront-collection').then((m) => m.StorefrontCollection)
   },
   {
     path: 'store/:projectId/products/:productId',
@@ -97,6 +136,10 @@ export const routes: Routes = [
         path: 'login',
         canActivate: [GuestGuard],
         loadComponent: () => import('./features/auth/components/login/login').then((m) => m.LoginComponent)
+      },
+      {
+        path: 'accept-invitation',
+        loadComponent: () => import('./features/auth/components/accept-invitation/accept-invitation').then((m) => m.AcceptInvitationComponent)
       },
       {
         path: 'login-verification',

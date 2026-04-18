@@ -9,7 +9,12 @@
   </section>
 } @else {
   <div class="storefront-cart">
-    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+    <app-storefront-public-header
+      [storefront]="storefront()"
+      [projectId]="projectId()"
+      [isEditorPreview]="isEditorPreview()"
+      [isDomainRoute]="isDomainRoute()"
+    />
 
     <main class="storefront-cart__content">
       <section class="storefront-cart__summary-card">
@@ -55,7 +60,7 @@
               <strong>{{ subtotal() | currency:'TND':'symbol':'1.0-2' }}</strong>
             </div>
             <p>Shipping and payment are handled manually after checkout confirmation.</p>
-            <a class="storefront-cart__checkout" [routerLink]="['/store', projectId(), 'checkout']" [queryParams]="previewQueryParams()">
+            <a class="storefront-cart__checkout" [routerLink]="checkoutPath()" [queryParams]="previewQueryParams()">
               Continue to checkout
             </a>
           </aside>
@@ -64,7 +69,7 @@
         <section class="storefront-cart__empty">
           <h2>Your cart is empty</h2>
           <p>Add a few products from the live catalog to start a checkout.</p>
-          <a [routerLink]="['/store', projectId(), 'products']" [queryParams]="previewQueryParams()">Browse products</a>
+          <a [routerLink]="productsPath()" [queryParams]="previewQueryParams()">Browse products</a>
         </section>
       }
     </main>

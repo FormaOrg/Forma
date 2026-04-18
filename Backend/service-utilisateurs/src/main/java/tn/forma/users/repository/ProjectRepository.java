@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findAllByUserIdOrderByUpdatedAtDesc(Long userId);
     Optional<Project> findByIdAndUserId(Long id, Long userId);
+    Optional<Project> findByDefaultDomainIgnoreCaseAndPublishedTrue(String defaultDomain);
     long countByUserId(Long userId);
     long countByUserIdAndStatus(Long userId, tn.forma.users.model.ProjectStatus status);
 }

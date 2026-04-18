@@ -130,6 +130,32 @@ export interface TemplateRecord {
   updatedAt?: string | null;
 }
 
+// ── Collaborators ─────────────────────────────────────────
+export type CollaboratorRole = 'EDITOR' | 'VIEWER';
+export type CollaboratorStatus = 'PENDING' | 'ACCEPTED';
+
+export interface ProjectCollaborator {
+  id: number;
+  projectId: number;
+  userId?: number;
+  inviteEmail: string;
+  role: CollaboratorRole;
+  status: CollaboratorStatus;
+  invitedAt: string;
+  acceptedAt?: string;
+  userName?: string;
+  userAvatarUrl?: string;
+}
+
+export interface InviteCollaboratorRequest {
+  email: string;
+  role: CollaboratorRole;
+}
+
+export interface UpdateCollaboratorRoleRequest {
+  role: CollaboratorRole;
+}
+
 // ── Request DTOs ───────────────────────────────────────────
 export interface CreateProjectRequest {
   name: string;

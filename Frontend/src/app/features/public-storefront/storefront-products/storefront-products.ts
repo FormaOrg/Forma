@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 
 import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -22,6 +23,7 @@ export class StorefrontProducts {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storefrontRouteService = inject(PublicStorefrontRouteService);
   private readonly analyticsService = inject(StorefrontAnalyticsService);
   private readonly storeCartService = inject(StoreCartService);
   private readonly toastService = inject(ToastService);
@@ -32,10 +34,12 @@ export class StorefrontProducts {
   readonly queryParamMap = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
-  readonly projectId = computed(() => {
-    const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
-    return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
-  });
+  readonly projectIdParam = computed(() => this.projectParamMap()?.get('projectId'));
+  readonly routeMode = computed<StorefrontRouteMode>(() =>
+    this.storefrontRouteService.resolveRouteMode(this.projectIdParam())
+  );
+  readonly isDomainRoute = computed(() => this.routeMode() === 'domain');
+  readonly projectId = computed(() => this.storefrontRouteService.resolveProjectId(this.projectIdParam()));
   readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
   readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
 
@@ -74,7 +78,7 @@ export class StorefrontProducts {
             this.analyticsService.trackPageView(
               projectId,
               window.location.pathname,
-              `Products – ${storefront.storeName}`,
+              `Products - ${storefront.storeName}`
             );
           }
         },
@@ -90,9 +94,12 @@ export class StorefrontProducts {
   trackProduct = (_: number, product: PublicStorefrontProduct): number => product.id;
 
   productRoute(productId: number): string {
-    return this.isEditorPreview()
-      ? `/store/${this.projectId()}/products/${productId}?preview=editor`
-      : `/store/${this.projectId()}/products/${productId}`;
+    return this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      `products/${productId}`,
+      this.previewQueryParams() ?? undefined
+    );
   }
 
   addToCart(product: PublicStorefrontProduct): void {

@@ -35,21 +35,21 @@
 
  :: Spring Boot ::                (v4.0.3)
 
-2026-04-18T11:35:52.594+02:00  INFO 19368 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 19368 (G:\Coding\Forma\Backend\service-commerce\target\classes started by MSI in G:\Coding\Forma\Backend\service-commerce)
-2026-04-18T11:35:52.605+02:00  INFO 19368 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
-2026-04-18T11:35:52.750+02:00  INFO 19368 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-04-18T11:35:52.751+02:00  INFO 19368 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-04-18T11:35:55.090+02:00  INFO 19368 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-04-18T11:35:55.354+02:00  INFO 19368 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 240 ms. Found 15 JPA repository interfaces.
-2026-04-18T11:35:57.046+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8083 (http)
-2026-04-18T11:35:57.074+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-18T11:35:57.076+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
-2026-04-18T11:35:57.183+02:00  INFO 19368 --- [service-commerce] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4426 ms
-2026-04-18T11:35:57.502+02:00  INFO 19368 --- [service-commerce] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-04-18T11:35:57.610+02:00  INFO 19368 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
-2026-04-18T11:35:58.557+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-04-18T11:35:58.620+02:00  WARN 19368 --- [service-commerce] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-04-18T11:35:58.650+02:00  INFO 19368 --- [service-commerce] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-04-18T20:22:41.302+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 19676 (G:\Coding\Forma\Backend\service-commerce\target\classes started by MSI in G:\Coding\Forma\Backend\service-commerce)
+2026-04-18T20:22:41.314+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:22:41.465+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-18T20:22:41.466+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-18T20:22:44.059+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:22:44.500+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 176 ms. Found 15 JPA repository interfaces.
+2026-04-18T20:22:46.515+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8083 (http)
+2026-04-18T20:22:46.606+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:22:46.611+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:22:46.796+02:00  INFO 19676 --- [service-commerce] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5328 ms
+2026-04-18T20:22:47.346+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:22:47.446+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-18T20:22:48.574+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:22:48.667+02:00  WARN 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:22:48.695+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [undefined/unknown]
 	Database driver: undefined/unknown
 	Database dialect: PostgreSQLDialect
@@ -61,12 +61,60 @@
 	Pool: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-04-18T11:36:03.104+02:00  INFO 19368 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-04-18T11:36:03.153+02:00  INFO 19368 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-04-18T11:36:04.990+02:00  INFO 19368 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-04-18T11:36:11.649+02:00  INFO 19368 --- [service-commerce] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-04-18T11:36:11.757+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-04-18T11:36:13.345+02:00  INFO 19368 --- [service-commerce] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2026-04-18T11:36:13.347+02:00  WARN 19368 --- [service-commerce] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-04-18T11:36:14.240+02:00  INFO 19368 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8083 (http) with context path '/'
-2026-04-18T11:36:14.900+02:00  INFO 19368 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Started Application in 23.084 seconds (process running for 25.753)
+2026-04-18T20:22:51.619+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:22:51.730+02:00  INFO 19676 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-18T20:22:52.930+02:00  INFO 19676 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-18T20:22:57.829+02:00  INFO 19676 --- [service-commerce] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:22:57.909+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-18T20:22:59.744+02:00  INFO 19676 --- [service-commerce] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:22:59.746+02:00  WARN 19676 --- [service-commerce] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:23:00.519+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8083 (http) with context path '/'
+2026-04-18T20:23:00.527+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Started Application in 20.167 seconds (process running for 21.346)
+2026-04-18T21:07:50.360+02:00  INFO 19676 --- [service-commerce] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T21:07:50.480+02:00  INFO 19676 --- [service-commerce] [       Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T21:07:51.007+02:00  INFO 19676 --- [service-commerce] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T21:07:51.155+02:00  INFO 19676 --- [service-commerce] [       Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T21:07:51.182+02:00  INFO 19676 --- [service-commerce] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-18T21:07:51.190+02:00  INFO 19676 --- [service-commerce] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T21:07:51.709+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 19676 (G:\Coding\Forma\Backend\service-commerce\target\classes started by MSI in G:\Coding\Forma\Backend\service-commerce)
+2026-04-18T21:07:51.710+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T21:08:02.436+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T21:08:02.575+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 134 ms. Found 15 JPA repository interfaces.
+2026-04-18T21:08:03.303+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8083 (http)
+2026-04-18T21:08:03.307+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T21:08:03.308+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T21:08:03.392+02:00  INFO 19676 --- [service-commerce] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 11664 ms
+2026-04-18T21:08:03.672+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T21:08:03.775+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T21:08:03.782+02:00  WARN 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T21:08:03.784+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T21:08:05.410+02:00  INFO 19676 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T21:08:05.415+02:00  INFO 19676 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-04-18T21:08:06.065+02:00  INFO 19676 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-04-18T21:08:12.555+02:00  INFO 19676 --- [service-commerce] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T21:08:13.774+02:00  INFO 19676 --- [service-commerce] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T21:08:13.775+02:00  WARN 19676 --- [service-commerce] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T21:08:14.760+02:00  INFO 19676 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8083 (http) with context path '/'
+2026-04-18T21:08:14.771+02:00  INFO 19676 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Started Application in 23.238 seconds (process running for 2735.59)
+2026-04-18T21:08:14.903+02:00  INFO 19676 --- [service-commerce] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged

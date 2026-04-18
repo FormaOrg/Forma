@@ -22,11 +22,12 @@ type ManagedPageHelpers = {
 };
 
 const REQUIRED_MANAGED_PAGES = [
-  { id: 'home', name: 'Home', kind: 'home' as const, designId: null as string | null },
-  { id: 'products', name: 'Products', kind: 'designed' as const, designId: null as string | null },
-  { id: 'product-details', name: 'Product Details', kind: 'designed' as const, designId: null as string | null },
-  { id: 'cart', name: 'Cart', kind: 'designed' as const, designId: null as string | null },
-  { id: 'checkout', name: 'Checkout', kind: 'designed' as const, designId: null as string | null },
+  { id: 'home', name: 'Home', kind: 'home' as const, designId: null as string | null, routeSlug: null as string | null },
+  { id: 'products', name: 'Products', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
+  { id: 'collection', name: 'Collection', kind: 'designed' as const, designId: null as string | null, routeSlug: 'all' as string | null },
+  { id: 'product-details', name: 'Product Details', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
+  { id: 'cart', name: 'Cart', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
+  { id: 'checkout', name: 'Checkout', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
 ] as const;
 
 const DESIGNED_DEFAULT_HOMEPAGE_SECTION_IDS = [
@@ -52,6 +53,7 @@ export function buildDefaultManagedPages(
     name: page.name,
     kind: page.kind,
     designId: page.designId,
+    routeSlug: page.routeSlug,
     draftDocument:
       page.id === 'home'
         ? cloneStorefrontHomepageDocument(homeDraftDocument ?? buildDefaultHomepageDocument('Storefront'))
@@ -71,6 +73,10 @@ export function buildDefaultManagedPageDocument(
 ): StorefrontHomepageDocument {
   if (safeManagedPageId(pageName) === 'products') {
     return buildProductsManagedPageDocument(pageName, kind, designId, helpers);
+  }
+
+  if (safeManagedPageId(pageName) === 'collection') {
+    return buildCollectionManagedPageDocument(pageName, kind, designId, helpers);
   }
 
   if (safeManagedPageId(pageName) === 'product-details') {
@@ -228,6 +234,89 @@ function buildProductsManagedPageDocument(
       editorLayoutAssignments: [],
       editorLayoutAssignmentsMobile: [],
       editorLayoutAssignmentsTablet: [],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
+}
+
+function buildCollectionManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+  const block = createStorefrontEditorComponentNode('product-feed');
+
+  block.name = 'Collection grid';
+  block.frame = { x: 88, y: 96, width: 1024, height: 760 };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'collection-content',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Collection',
+      editorBlankSection: false,
+      editorHeight: 920,
+      editorTabletHeight: 920,
+      editorMobileHeight: 1180,
+      editorBackgroundColor: '#f8fafc',
+      editorBorderWidth: 0,
+      editorBorderStyle: 'none',
+      editorBorderColor: 'transparent',
+      editorRadius: 0,
+      editorShadow: 'none',
+      editorOpacity: 100,
+      editorComponents: [
+        {
+          ...block,
+          props: {
+            ...block.props,
+            title: 'Collection',
+            source: 'catalog',
+            category: 'all',
+            limit: 12,
+            columns: 3,
+            designPreset: 'grid-gallery',
+            showBadges: true,
+            showCompareAtPrice: true,
+            showAddToCart: false,
+            showFilters: true,
+            showSort: true,
+            showColorDots: false,
+            quickAddStyle: 'none',
+            textColor: '#202124',
+            badgeTextColor: '#ffffff',
+            badgeBackgroundColor: '#111111',
+            imageRadius: 0,
+          },
+          responsiveFrames: {
+            tablet: { x: 24, y: 88, width: 720, height: 900 },
+            mobile: { x: 16, y: 72, width: 328, height: 1000 },
+          },
+        },
+      ],
     },
   };
 
@@ -464,6 +553,8 @@ export function normalizeManagedPages(
         name,
         kind,
         designId: nextDesignId,
+        routeSlug:
+          typeof page.routeSlug === 'string' && page.routeSlug.trim() ? page.routeSlug.trim() : null,
         draftDocument: normalizeManagedPageDocument(page.draftDocument, name, kind, nextDesignId, helpers),
       });
     }
@@ -480,6 +571,7 @@ export function normalizeManagedPages(
         name: required.name,
         kind: required.kind,
         designId: required.designId,
+        routeSlug: required.routeSlug,
         draftDocument:
           required.id === 'home'
             ? cloneStorefrontHomepageDocument(normalizedHomeDraft)

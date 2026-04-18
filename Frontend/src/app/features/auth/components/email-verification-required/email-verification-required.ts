@@ -7,6 +7,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   selector: 'app-email-verification-required',
   standalone: true,
   templateUrl: './email-verification-required.html',
+  styleUrls: ['./email-verification-required.scss'],
   imports: [NgIf, RouterModule]
 })
 export class EmailVerificationRequiredComponent implements OnInit {

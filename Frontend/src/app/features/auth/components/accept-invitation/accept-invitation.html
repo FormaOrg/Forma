@@ -1,0 +1,16 @@
+<div class="logo-section">
+  <div class="logo-icon">
+    <img src="assets/Logo/FormaLogo.svg" alt="Forma logo">
+  </div>
+</div>
+
+<div class="login-header">
+  <h2 *ngIf="loading">Accepting Invitation</h2>
+  <h2 *ngIf="!loading && success">Invitation Accepted</h2>
+  <h2 *ngIf="!loading && !success">Invitation Issue</h2>
+  <p>{{ message }}</p>
+</div>
+
+<div class="signup-link" *ngIf="!loading && !success">
+  <a routerLink="/login"><strong>Sign in with another account</strong></a>
+</div>

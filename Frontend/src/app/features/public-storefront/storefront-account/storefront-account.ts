@@ -105,6 +105,9 @@ export class StorefrontAccount {
   }
 
   submitRegister(): void {
+    if (this.isEditorPreview()) {
+      return;
+    }
     if (this.registerForm.invalid || this.isSubmitting()) {
       this.registerForm.markAllAsTouched();
       return;
@@ -137,6 +140,9 @@ export class StorefrontAccount {
   }
 
   submitLogin(): void {
+    if (this.isEditorPreview()) {
+      return;
+    }
     if (this.loginForm.invalid || this.isSubmitting()) {
       this.loginForm.markAllAsTouched();
       return;
@@ -168,7 +174,7 @@ export class StorefrontAccount {
     const projectId = this.projectId();
     const token = this.storefrontSessionService.getSessionToken(projectId);
 
-    if (!token) {
+    if (!token || this.isEditorPreview()) {
       this.storefrontSessionService.clearSession(projectId);
       this.account.set(null);
       return;
@@ -199,7 +205,7 @@ export class StorefrontAccount {
 
   private hydrateSession(projectId: number): void {
     const token = this.storefrontSessionService.getSessionToken(projectId);
-    if (!token) {
+    if (!token || this.isEditorPreview()) {
       this.account.set(null);
       this.isLoading.set(false);
       return;

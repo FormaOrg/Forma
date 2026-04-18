@@ -991,7 +991,7 @@ export function createStorefrontEditorComponentNode(
           items: [
             createStorefrontEditorMenuItem('Home', '/'),
             createStorefrontEditorMenuItem('Shop', '/products'),
-            createStorefrontEditorMenuItem('Contact', '/contact'),
+            createStorefrontEditorMenuItem('Contact', ''),
           ],
           displayMode: 'menu-bar',
           orientation: 'horizontal',

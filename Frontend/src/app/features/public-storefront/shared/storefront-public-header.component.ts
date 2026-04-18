@@ -1,10 +1,11 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { Component, DestroyRef, HostListener, computed, effect, inject, input, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 
 import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
+import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
@@ -30,12 +31,14 @@ export class StorefrontPublicHeaderComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storefrontRouteService = inject(PublicStorefrontRouteService);
   private readonly storeCartService = inject(StoreCartService);
   private readonly storefrontCustomerSessionService = inject(StorefrontCustomerSessionService);
 
   readonly storefront = input<PublicStorefrontHome | null>(null);
   readonly projectId = input.required<number>();
   readonly isEditorPreview = input(false);
+  readonly isDomainRoute = input(false);
 
   readonly isCartDrawerOpen = signal(false);
   readonly isSearchOpen = signal(false);
@@ -126,6 +129,7 @@ export class StorefrontPublicHeaderComponent {
 
     return suggestions;
   });
+  readonly routeMode = computed<StorefrontRouteMode>(() => (this.isDomainRoute() ? 'domain' : 'path'));
 
   constructor() {
     effect(() => {
@@ -169,9 +173,7 @@ export class StorefrontPublicHeaderComponent {
     event.stopPropagation();
 
     if (this.cartOpenMode() === 'page') {
-      void this.router.navigate(['/store', this.projectId(), 'cart'], {
-        queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
-      });
+      void this.router.navigateByUrl(this.buildStorefrontUrl('cart'));
       return;
     }
 
@@ -199,9 +201,7 @@ export class StorefrontPublicHeaderComponent {
 
   openProductFromSearch(productId: number): void {
     this.closeSearchOverlay();
-    void this.router.navigate(['/store', this.projectId(), 'products', productId], {
-      queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
-    });
+    void this.router.navigateByUrl(this.buildStorefrontUrl(`products/${productId}`));
   }
 
   closeCartDrawer(): void {
@@ -214,9 +214,7 @@ export class StorefrontPublicHeaderComponent {
       event.stopPropagation();
     }
 
-    void this.router.navigate(['/store', this.projectId(), 'account'], {
-      queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
-    });
+    void this.router.navigateByUrl(this.buildStorefrontUrl('account'));
   }
 
   increaseQuantity(productId: number, quantity: number): void {
@@ -233,17 +231,13 @@ export class StorefrontPublicHeaderComponent {
 
   goToFullCart(): void {
     this.isCartDrawerOpen.set(false);
-    void this.router.navigate(['/store', this.projectId(), 'cart'], {
-      queryParams: this.isEditorPreview() ? { preview: 'editor' } : undefined,
-    });
+    void this.router.navigateByUrl(this.buildStorefrontUrl('cart'));
   }
 
   resolveLinkHref(value: string): string {
     const href = value.trim();
-    const projectId = this.projectId();
-
-    if (!href) {
-      return `/store/${projectId}${this.isEditorPreview() ? '?preview=editor' : ''}`;
+    if (!href || href === '/') {
+      return this.buildStorefrontUrl();
     }
 
     if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#')) {
@@ -251,14 +245,15 @@ export class StorefrontPublicHeaderComponent {
     }
 
     if (href.startsWith('/store/')) {
-      return this.appendPreviewQuery(href);
+      return this.isEditorPreview() ? this.appendPreviewQuery(href) : href;
     }
 
-    if (href.startsWith('/')) {
-      return this.appendPreviewQuery(`/store/${projectId}${href}`);
-    }
-
-    return this.appendPreviewQuery(`/store/${projectId}/${href.replace(/^\/+/, '')}`);
+    return this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      href,
+      this.isEditorPreview() ? { preview: 'editor' } : undefined
+    );
   }
 
   private appendPreviewQuery(url: string): string {
@@ -266,6 +261,12 @@ export class StorefrontPublicHeaderComponent {
       return url;
     }
 
+    const hashIndex = url.indexOf('#');
+    if (hashIndex !== -1) {
+      const base = url.slice(0, hashIndex);
+      const hash = url.slice(hashIndex);
+      return `${base}${base.includes('?') ? '&' : '?'}preview=editor${hash}`;
+    }
     return `${url}${url.includes('?') ? '&' : '?'}preview=editor`;
   }
 
@@ -322,5 +323,14 @@ export class StorefrontPublicHeaderComponent {
     }
 
     return component;
+  }
+
+  private buildStorefrontUrl(path = ''): string {
+    return this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      path,
+      this.isEditorPreview() ? { preview: 'editor' } : undefined
+    );
   }
 }
