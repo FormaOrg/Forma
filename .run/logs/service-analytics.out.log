@@ -1,97 +1,0 @@
-[INFO] Scanning for projects...
-Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/maven-metadata.xml
-Downloading from central: https://repo.maven.apache.org/maven2/org/cyclonedx/maven-metadata.xml
-Downloading from central: https://repo.maven.apache.org/maven2/io/github/git-commit-id/maven-metadata.xml
-Downloading from central: https://repo.maven.apache.org/maven2/org/flywaydb/maven-metadata.xml
-Progress (1): 255 BProgress (2): 255 B | 234 BProgress (3): 255 B | 234 B | 243 B                                   Downloaded from central: https://repo.maven.apache.org/maven2/io/github/git-commit-id/maven-metadata.xml (255 B at 256 B/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/jooq/maven-metadata.xml
-Progress (3): 234 B | 243 B | 249 B                                   Downloaded from central: https://repo.maven.apache.org/maven2/org/cyclonedx/maven-metadata.xml (243 B at 235 B/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/maven-metadata.xml
-Downloaded from central: https://repo.maven.apache.org/maven2/org/flywaydb/maven-metadata.xml (234 B at 225 B/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/liquibase/maven-metadata.xml
-Progress (2): 249 B | 398 B                           Downloaded from central: https://repo.maven.apache.org/maven2/org/jooq/maven-metadata.xml (398 B at 8.0 kB/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/graalvm/buildtools/maven-metadata.xml
-Progress (2): 249 B | 394 BProgress (3): 249 B | 394 B | 242 BProgress (4): 249 B | 394 B | 242 B | 375 B                                           Downloaded from central: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/maven-metadata.xml (375 B at 2.5 kB/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-metadata.xml
-Downloaded from central: https://repo.maven.apache.org/maven2/org/liquibase/maven-metadata.xml (394 B at 2.3 kB/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/maven-metadata.xml
-Downloaded from central: https://repo.maven.apache.org/maven2/org/graalvm/buildtools/maven-metadata.xml (242 B at 1.3 kB/s)
-Progress (2): 249 B | 4.6 kBProgress (2): 249 B | 9.7 kBProgress (2): 249 B | 14 kB                            Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-metadata.xml (14 kB at 157 kB/s)
-Progress (2): 249 B | 3.1 kBProgress (2): 249 B | 7.7 kBProgress (2): 249 B | 12 kB Progress (2): 249 B | 17 kBProgress (2): 249 B | 20 kBProgress (2): 249 B | 21 kB                           Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/maven-metadata.xml (249 B at 199 B/s)
-Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/maven-metadata.xml (21 kB at 193 kB/s)
-[INFO] 
-[INFO] ---------------------< tn.forma:service-analytics >---------------------
-[INFO] Building service-analytics 0.0.1-SNAPSHOT
-[INFO]   from pom.xml
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-[INFO] --- clean:3.5.0:clean (default-clean) @ service-analytics ---
-[INFO] Deleting G:\Coding\Forma\Backend\service-analytics\target
-[INFO] 
-[INFO] >>> spring-boot:4.0.3:run (default-cli) > test-compile @ service-analytics >>>
-[INFO] 
-[INFO] --- resources:3.3.1:resources (default-resources) @ service-analytics ---
-[INFO] Copying 1 resource from src\main\resources to target\classes
-[INFO] Copying 0 resource from src\main\resources to target\classes
-[INFO] 
-[INFO] --- compiler:3.14.1:compile (default-compile) @ service-analytics ---
-[INFO] Recompiling the module because of changed source code.
-[INFO] Compiling 169 source files with javac [debug parameters release 17] to target\classes
-[INFO] 
-[INFO] --- resources:3.3.1:testResources (default-testResources) @ service-analytics ---
-[INFO] skip non existing resourceDirectory G:\Coding\Forma\Backend\service-analytics\src\test\resources
-[INFO] 
-[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ service-analytics ---
-[INFO] Recompiling the module because of changed dependency.
-[INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
-[INFO] 
-[INFO] <<< spring-boot:4.0.3:run (default-cli) < test-compile @ service-analytics <<<
-[INFO] 
-[INFO] 
-[INFO] --- spring-boot:4.0.3:run (default-cli) @ service-analytics ---
-[INFO] Attaching agents: []
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
-
- :: Spring Boot ::                (v4.0.3)
-
-2026-04-19T00:30:36.128+02:00  INFO 20940 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20940 (G:\Coding\Forma\Backend\service-analytics\target\classes started by MSI in G:\Coding\Forma\Backend\service-analytics)
-2026-04-19T00:30:36.140+02:00  INFO 20940 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
-2026-04-19T00:30:36.361+02:00  INFO 20940 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-04-19T00:30:36.362+02:00  INFO 20940 --- [service-analytics] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-04-19T00:30:38.271+02:00  INFO 20940 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-04-19T00:30:38.653+02:00  INFO 20940 --- [service-analytics] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 222 ms. Found 15 JPA repository interfaces.
-2026-04-19T00:30:39.846+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8084 (http)
-2026-04-19T00:30:39.869+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-19T00:30:39.871+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
-2026-04-19T00:30:39.978+02:00  INFO 20940 --- [service-analytics] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3614 ms
-2026-04-19T00:30:40.230+02:00  INFO 20940 --- [service-analytics] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-04-19T00:30:40.317+02:00  INFO 20940 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
-2026-04-19T00:30:41.020+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-04-19T00:30:41.066+02:00  WARN 20940 --- [service-analytics] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-04-19T00:30:41.088+02:00  INFO 20940 --- [service-analytics] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
-	Database JDBC URL [undefined/unknown]
-	Database driver: undefined/unknown
-	Database dialect: PostgreSQLDialect
-	Database version: 13.0
-	Default catalog/schema: unknown/unknown
-	Autocommit mode: undefined/unknown
-	Isolation level: <unknown>
-	JDBC fetch size: undefined/unknown
-	Pool: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-04-19T00:30:42.924+02:00  INFO 20940 --- [service-analytics] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-04-19T00:30:42.962+02:00  INFO 20940 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-04-19T00:30:44.405+02:00  INFO 20940 --- [service-analytics] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-04-19T00:30:49.637+02:00  INFO 20940 --- [service-analytics] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-04-19T00:30:49.721+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-04-19T00:30:50.618+02:00  INFO 20940 --- [service-analytics] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2026-04-19T00:30:51.320+02:00  WARN 20940 --- [service-analytics] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-04-19T00:30:52.248+02:00  INFO 20940 --- [service-analytics] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
-2026-04-19T00:30:52.254+02:00  INFO 20940 --- [service-analytics] [  restartedMain] tn.forma.users.Application               : Started Application in 16.897 seconds (process running for 18.503)

@@ -142,14 +142,6 @@
 					<excludes>
 						<exclude>**/controller/AuthController.java</exclude>
 						<exclude>**/controller/BillingController.java</exclude>
-						<exclude>**/controller/ProjectAnalyticsController.java</exclude>
-						<exclude>**/controller/ProjectCatalogController.java</exclude>
-						<exclude>**/controller/ProjectCustomerController.java</exclude>
-						<exclude>**/controller/ProjectHomeController.java</exclude>
-						<exclude>**/controller/ProjectSalesController.java</exclude>
-						<exclude>**/controller/ProjectStorefrontController.java</exclude>
-						<exclude>**/controller/PublicProjectAnalyticsController.java</exclude>
-						<exclude>**/controller/PublicStorefrontController.java</exclude>
 						<exclude>**/controller/UserController.java</exclude>
 						<exclude>**/config/WebSocketConfig.java</exclude>
 						<exclude>**/service/ActivityService.java</exclude>
@@ -158,15 +150,6 @@
 						<exclude>**/service/EmailService.java</exclude>
 						<exclude>**/service/GoogleIdentityService.java</exclude>
 						<exclude>**/service/GoogleLinkOauthService.java</exclude>
-						<exclude>**/service/ProjectAnalyticsService.java</exclude>
-						<exclude>**/service/ProjectAnalyticsTrackingService.java</exclude>
-						<exclude>**/service/ProjectCatalogService.java</exclude>
-						<exclude>**/service/ProjectCustomerService.java</exclude>
-						<exclude>**/service/ProjectHomeService.java</exclude>
-						<exclude>**/service/ProjectSalesService.java</exclude>
-						<exclude>**/service/ProjectStorefrontService.java</exclude>
-						<exclude>**/service/PublicCheckoutService.java</exclude>
-						<exclude>**/service/PublicStorefrontService.java</exclude>
 						<exclude>**/service/UserService.java</exclude>
 						<exclude>**/websocket/*.java</exclude>
 					</excludes>
