@@ -8,6 +8,7 @@ import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/mod
 import { StorefrontHomepageSection } from '../../../core/models/project-storefront.model';
 import { ProjectCatalogProduct } from '../../../core/models/project-catalog.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 import { StorefrontEditorComponentHostComponent } from '../../app/dashboard/pages/projects/project-storefront-editor/components/storefront-editor-component-host.component';
@@ -82,6 +83,7 @@ export class StorefrontHome {
   private readonly destroyRef = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly analyticsService = inject(StorefrontAnalyticsService);
   private readonly storeCartService = inject(StoreCartService);
 
   readonly projectParamMap = toSignal(this.route.paramMap, {
@@ -154,6 +156,12 @@ export class StorefrontHome {
           this.isLoading.set(false);
           if (this.isEditorPreview()) {
             this.loadPreviewExtras(projectId);
+          } else {
+            this.analyticsService.trackPageView(
+              projectId,
+              window.location.pathname,
+              storefront.storeName,
+            );
           }
         },
         error: () => {

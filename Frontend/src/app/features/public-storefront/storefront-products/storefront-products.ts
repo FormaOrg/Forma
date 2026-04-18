@@ -6,6 +6,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
@@ -21,6 +22,7 @@ export class StorefrontProducts {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly analyticsService = inject(StorefrontAnalyticsService);
   private readonly storeCartService = inject(StoreCartService);
   private readonly toastService = inject(ToastService);
 
@@ -68,6 +70,13 @@ export class StorefrontProducts {
           this.storefront.set(storefront);
           this.products.set(products);
           this.isLoading.set(false);
+          if (!this.isEditorPreview()) {
+            this.analyticsService.trackPageView(
+              projectId,
+              window.location.pathname,
+              `Products – ${storefront.storeName}`,
+            );
+          }
         },
         error: () => {
           this.storefront.set(null);
