@@ -9,6 +9,7 @@ import { ProjectCatalogProduct } from '../../../../../../core/models/project-cat
 import { ProjectIconLibraryItem } from '../../../../../../core/models/project-icon-library.model';
 import {
   ProjectStorefront,
+  StorefrontActiveEditor,
   StorefrontHomepageDocument,
   StorefrontEditorManagedPage,
   StorefrontEditorSession,
@@ -429,6 +430,7 @@ type SectionLibraryTemplate = {
 export class ProjectStorefrontEditor {
   private static readonly HISTORY_LIMIT = 20;
   private static readonly AUTOSAVE_DELAY_MS = 900;
+  private static readonly PRESENCE_HEARTBEAT_MS = 8000;
   private static readonly MIN_SUPPORTED_VIEWPORT_WIDTH = 900;
   private static readonly COMPONENT_MIN_SIZE = 20;
   private static readonly COMPONENT_RESIZE_STEP = 1;
@@ -496,6 +498,7 @@ private readonly destroyRef = inject(DestroyRef);
   });
 
 private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+private presenceHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
 private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private iconLibrarySearchRequestId = 0;
@@ -1880,6 +1883,10 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     const source = this.currentUser()?.firstName?.trim() || this.currentUserName();
     return source.charAt(0).toUpperCase() || 'F';
   });
+  readonly otherActiveEditors = computed(() => {
+    const currentUserId = this.currentUser()?.id ?? null;
+    return (this.editorSession().activeEditors ?? []).filter((editor) => editor.userId !== currentUserId);
+  });
   readonly autosaveTooltip = computed(() => {
     const updatedAt = this.storefront()?.updatedAt;
     if (this.isAutosaving()) {
@@ -2240,6 +2247,9 @@ effect(() => {
     this.destroyRef.onDestroy(() => {
       if (this.autosaveTimer) {
         clearTimeout(this.autosaveTimer);
+      }
+      if (this.presenceHeartbeatTimer) {
+        clearInterval(this.presenceHeartbeatTimer);
       }
       if (this.addElementsPanelCloseTimer) {
         clearTimeout(this.addElementsPanelCloseTimer);
@@ -3305,6 +3315,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
             this.storefront.set(null);
             this.workingStorefront.set(null);
             this.editorSession.set(this.createDefaultEditorSession());
+            this.stopPresenceHeartbeat();
             this.undoStack.set([]);
             this.redoStack.set([]);
             this.selectedSectionId.set(null);
@@ -3316,6 +3327,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           const editorSession = this.normalizeEditorSession(snapshot.editorSession, snapshot.draftHomepage);
           this.editorSession.set(editorSession);
+          this.startPresenceHeartbeat();
           this.loadSelectedManagedPageIntoWorkingStorefront(editorSession.selectedManagedPageId ?? 'home', editorSession.managedPages ?? []);
           this.undoStack.set([]);
           this.redoStack.set([]);
@@ -3328,6 +3340,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           this.project.set(null);
           this.storefront.set(null);
           this.workingStorefront.set(null);
+            this.stopPresenceHeartbeat();
             this.editorSession.set(this.createDefaultEditorSession());
             this.undoStack.set([]);
               this.redoStack.set([]);
@@ -14675,6 +14688,7 @@ isSectionAttachTarget(sectionId: string): boolean {
       redoStack: [],
       managedPages: this.buildDefaultManagedPages(defaultHomepage),
       selectedManagedPageId: 'home',
+      activeEditors: [],
     };
   }
 
@@ -14699,6 +14713,7 @@ isSectionAttachTarget(sectionId: string): boolean {
         session?.selectedManagedPageId && managedPages.some((page) => page.id === session.selectedManagedPageId)
           ? session.selectedManagedPageId
           : 'home',
+      activeEditors: this.normalizeActiveEditors(session?.activeEditors),
     };
   }
 
@@ -14712,7 +14727,97 @@ isSectionAttachTarget(sectionId: string): boolean {
       redoStack: [],
       managedPages,
       selectedManagedPageId: this.selectedManagedPageId(),
+      activeEditors: this.editorSession().activeEditors ?? [],
     };
+  }
+
+  private normalizeActiveEditors(activeEditors: StorefrontActiveEditor[] | null | undefined): StorefrontActiveEditor[] {
+    if (!Array.isArray(activeEditors)) {
+      return [];
+    }
+
+    const deduped = new Map<string, StorefrontActiveEditor>();
+    for (const editor of activeEditors) {
+      if (!editor || typeof editor.userName !== 'string' || typeof editor.lastSeenAt !== 'string') {
+        continue;
+      }
+
+      const normalized: StorefrontActiveEditor = {
+        userId: typeof editor.userId === 'number' ? editor.userId : null,
+        email: typeof editor.email === 'string' ? editor.email : null,
+        userName: editor.userName.trim() || 'Forma user',
+        avatarUrl: typeof editor.avatarUrl === 'string' ? editor.avatarUrl : null,
+        lastSeenAt: editor.lastSeenAt,
+      };
+      const key = normalized.userId != null
+        ? `user:${normalized.userId}`
+        : `email:${(normalized.email ?? normalized.userName).toLowerCase()}`;
+      deduped.set(key, normalized);
+    }
+
+    return [...deduped.values()].sort((left, right) => {
+      const leftTime = Date.parse(left.lastSeenAt);
+      const rightTime = Date.parse(right.lastSeenAt);
+      return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+    });
+  }
+
+  private startPresenceHeartbeat(): void {
+    this.stopPresenceHeartbeat();
+    this.syncPresenceHeartbeat();
+    this.presenceHeartbeatTimer = setInterval(() => {
+      this.syncPresenceHeartbeat();
+    }, ProjectStorefrontEditor.PRESENCE_HEARTBEAT_MS);
+  }
+
+  private stopPresenceHeartbeat(): void {
+    if (this.presenceHeartbeatTimer) {
+      clearInterval(this.presenceHeartbeatTimer);
+      this.presenceHeartbeatTimer = null;
+    }
+  }
+
+  private syncPresenceHeartbeat(): void {
+    const projectId = this.projectId();
+    if (!projectId || !this.currentUser()) {
+      return;
+    }
+
+    const payload = this.buildPersistedEditorSession();
+    this.projectStorefrontService
+      .updateStorefront(projectId, {
+        editorSession: payload,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (storefront) => {
+          const activeEditors = this.normalizeEditorSession(storefront.editorSession, storefront.draftHomepage).activeEditors ?? [];
+          this.editorSession.update((session) => ({
+            ...session,
+            activeEditors,
+          }));
+          this.storefront.update((current) => current
+            ? ({
+                ...current,
+                editorSession: current.editorSession
+                  ? { ...current.editorSession, activeEditors }
+                  : { ...this.createDefaultEditorSession(), activeEditors },
+              })
+            : current);
+        },
+        error: () => {
+          // Presence should fail quietly so editing is never interrupted.
+        },
+      });
+  }
+
+  collaboratorPresenceInitial(editor: StorefrontActiveEditor): string {
+    return (editor.userName.trim().charAt(0) || editor.email?.trim().charAt(0) || 'F').toUpperCase();
+  }
+
+  collaboratorPresenceLabel(editor: StorefrontActiveEditor): string {
+    const relative = this.formatRelativeTime(editor.lastSeenAt);
+    return relative ? `${editor.userName} active ${relative}` : `${editor.userName} is active`;
   }
 
   private createEditorSnapshot(

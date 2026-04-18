@@ -183,6 +183,30 @@
           }
         </div>
 
+        @if (otherActiveEditors().length) {
+          <div class="storefront-editor__presence-strip" aria-label="Active collaborators in the editor">
+            @for (editor of otherActiveEditors(); track editor.userId ?? editor.email ?? editor.userName) {
+              <div
+                class="storefront-editor__presence-avatar-wrap"
+                [attr.aria-label]="collaboratorPresenceLabel(editor)"
+                [title]="collaboratorPresenceLabel(editor)"
+              >
+                @if (editor.avatarUrl) {
+                  <img
+                    [src]="editor.avatarUrl"
+                    [alt]="editor.userName"
+                    class="storefront-editor__presence-avatar"
+                  />
+                } @else {
+                  <span class="storefront-editor__presence-fallback">
+                    {{ collaboratorPresenceInitial(editor) }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+
         @if (isCollaboratorsPanelOpen()) {
           <app-storefront-editor-collaborators-panel
             [projectId]="project()!.id"

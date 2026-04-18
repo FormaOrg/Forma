@@ -97,6 +97,14 @@ export interface StorefrontEditorSnapshot {
   selectedManagedPageId?: string | null;
 }
 
+export interface StorefrontActiveEditor {
+  userId?: number | null;
+  email?: string | null;
+  userName: string;
+  avatarUrl?: string | null;
+  lastSeenAt: string;
+}
+
 export interface StorefrontEditorSession {
   selectedSectionId: string | null;
   viewport: StorefrontEditorViewport;
@@ -105,6 +113,7 @@ export interface StorefrontEditorSession {
   redoStack: StorefrontEditorSnapshot[];
   managedPages?: StorefrontEditorManagedPage[];
   selectedManagedPageId?: string | null;
+  activeEditors?: StorefrontActiveEditor[];
 }
 
 export interface ProjectStorefront {
