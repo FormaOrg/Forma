@@ -38,6 +38,8 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly inviteEmail = signal('');
   readonly inviteRole = signal<CollaboratorRole>('EDITOR');
+  readonly isInviteRoleMenuOpen = signal(false);
+  readonly openCollaboratorRoleMenuId = signal<number | null>(null);
   readonly isSending = signal(false);
   readonly sendError = signal<string | null>(null);
 
@@ -63,6 +65,7 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   invite(): void {
     const email = this.inviteEmail().trim();
     if (!email) return;
+    this.isInviteRoleMenuOpen.set(false);
     this.isSending.set(true);
     this.sendError.set(null);
     this.projectService.inviteCollaborator(this.projectId(), { email, role: this.inviteRole() }).subscribe({
@@ -89,6 +92,7 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   }
 
   updateRole(collaborator: ProjectCollaborator, role: CollaboratorRole): void {
+    this.openCollaboratorRoleMenuId.set(null);
     this.projectService.updateCollaboratorRole(this.projectId(), collaborator.id, { role }).subscribe({
       next: (updated) => {
         this.collaborators.update((list) =>
@@ -108,7 +112,32 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
     return c.userName || c.inviteEmail;
   }
 
+  roleLabel(role: CollaboratorRole): string {
+    return role === 'EDITOR' ? 'Editor' : 'Viewer';
+  }
+
+  toggleInviteRoleMenu(): void {
+    this.isInviteRoleMenuOpen.update((open) => !open);
+    this.openCollaboratorRoleMenuId.set(null);
+  }
+
+  selectInviteRole(role: CollaboratorRole): void {
+    this.inviteRole.set(role);
+    this.isInviteRoleMenuOpen.set(false);
+  }
+
+  toggleCollaboratorRoleMenu(collaboratorId: number): void {
+    this.openCollaboratorRoleMenuId.update((openId) => openId === collaboratorId ? null : collaboratorId);
+    this.isInviteRoleMenuOpen.set(false);
+  }
+
+  isCollaboratorRoleMenuOpen(collaboratorId: number): boolean {
+    return this.openCollaboratorRoleMenuId() === collaboratorId;
+  }
+
   close(): void {
+    this.isInviteRoleMenuOpen.set(false);
+    this.openCollaboratorRoleMenuId.set(null);
     this.closed.emit();
   }
 }

@@ -49,21 +49,9 @@ export class ProjectWorkspaceGuard implements CanActivateChild {
       ]));
     }
 
-    return this.projectService.getMyProjects().pipe(
-      map((projects) => {
-        this.projectWorkspaceContextService.setProjectTypes(
-          projects.map((project) => ({ id: project.id, type: project.type }))
-        );
-
-        const project = projects.find((candidate) => candidate.id === projectId);
-        if (!project) {
-          const requestedSuffix = requestedPath ? `/${requestedPath}` : '';
-          return this.router.createUrlTree(['/not-found'], {
-            queryParams: {
-              from: `/app/projects/${projectId}${requestedSuffix}`,
-            },
-          });
-        }
+    return this.projectService.getProjectById(projectId).pipe(
+      map((project) => {
+        this.projectWorkspaceContextService.setProjectType(projectId, project.type);
 
         const allowedPaths = getProjectWorkspaceAllowedPaths(project.type);
 
@@ -77,7 +65,12 @@ export class ProjectWorkspaceGuard implements CanActivateChild {
           getProjectWorkspaceDefaultPath(project.type),
         ]);
       }),
-      catchError(() => of(this.router.createUrlTree(['/app/projects'])))
+      catchError(() => {
+        const requestedSuffix = requestedPath ? `/${requestedPath}` : '';
+        return of(this.router.createUrlTree(['/not-found'], {
+          queryParams: { from: `/app/projects/${projectId}${requestedSuffix}` },
+        }));
+      })
     );
   }
 

@@ -522,32 +522,37 @@
           </button>
         </div>
 
-        @if (isBrandKitCustomizerOpen()) {
-          <div class="storefront-editor__brand-kit-customizer">
+        <div
+          class="storefront-editor__brand-kit-customizer"
+          [class.storefront-editor__brand-kit-customizer--open]="isBrandKitCustomizerOpen()"
+        >
             <div class="storefront-editor__brand-kit-customizer-head">
               <div>
                 <strong>Choose a Brand Kit</strong>
                 <span>Pick a preset to refresh your fonts, palette, and button look.</span>
               </div>
-              <button
-                type="button"
-                class="storefront-editor__brand-kit-icon"
-                aria-label="Close brand kit presets"
-                (click)="closeBrandKitCustomizer()"
-              >
-                <svg
-                  class="storefront-editor__pages-close-icon"
-                  fill="currentColor"
-                  viewBox="0 0 8 8"
-                  width="12"
-                  height="12"
-                  aria-hidden="true"
+              <div class="storefront-editor__brand-kit-header-actions">
+                <button
+                  type="button"
+                  class="storefront-editor__brand-kit-icon"
+                  aria-label="Close brand kit presets"
+                  (click)="closeBrandKitCustomizer()"
                 >
-                  <g>
-                    <path d="M6.636.246a.775.775 0 0 1 1.097 0 .778.778 0 0 1 0 1.1L5.101 3.98l2.672 2.692a.778.778 0 0 1 0 1.1.775.775 0 0 1-1.098 0L4.003 5.08 1.325 7.764a.775.775 0 0 1-1.098 0 .778.778 0 0 1 0-1.1l2.679-2.683L.292 1.327a.778.778 0 0 1 0-1.1.775.775 0 0 1 1.098 0l2.613 2.655L6.636.246Z"></path>
-                  </g>
-                </svg>
-              </button>
+                  <svg
+                    class="storefront-editor__pages-close-icon"
+                    fill="currentColor"
+                    viewBox="0 0 8 8"
+                    width="12"
+                    height="12"
+                    data-hook="close-large"
+                    aria-hidden="true"
+                  >
+                    <g>
+                      <path d="M6.636.246a.775.775 0 0 1 1.097 0 .778.778 0 0 1 0 1.1L5.101 3.98l2.672 2.692a.778.778 0 0 1 0 1.1.775.775 0 0 1-1.098 0L4.003 5.08 1.325 7.764a.775.775 0 0 1-1.098 0 .778.778 0 0 1 0-1.1l2.679-2.683L.292 1.327a.778.778 0 0 1 0-1.1.775.775 0 0 1 1.098 0l2.613 2.655L6.636.246Z"></path>
+                    </g>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div class="storefront-editor__brand-kit-preset-grid">
@@ -580,7 +585,6 @@
               }
             </div>
           </div>
-        }
       </aside>
     </div>
 
