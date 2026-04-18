@@ -21,6 +21,7 @@ import {
   UpdateProjectCatalogProductRequest,
 } from '../../../../../../core/models/project-catalog.model';
 import { ProjectCatalogService } from '../../../../../../core/services/project-catalog.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 
@@ -48,6 +49,7 @@ export class ProjectCatalogRoute {
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectCatalogService = inject(ProjectCatalogService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly uploadService = inject(UploadService);
   private readonly toastService = inject(ToastService);
 
@@ -141,7 +143,14 @@ export class ProjectCatalogRoute {
       return;
     }
 
-    this.isLoading.set(true);
+    const cacheKey = this.buildCacheKey(projectId);
+    const cachedPage = this.pageCache.get<ProjectCatalogPage>(cacheKey);
+    if (cachedPage) {
+      this.catalogPage.set(cachedPage);
+      this.isLoading.set(false);
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.projectCatalogService
@@ -152,10 +161,15 @@ export class ProjectCatalogRoute {
       })
       .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => this.catalogPage.set(page),
+        next: (page) => {
+          this.catalogPage.set(page);
+          this.pageCache.set(cacheKey, page);
+        },
         error: (error) => {
-          this.catalogPage.set(null);
-          this.errorMessage.set(this.readErrorMessage(error, 'Unable to load the catalog right now.'));
+          if (!cachedPage) {
+            this.catalogPage.set(null);
+            this.errorMessage.set(this.readErrorMessage(error, 'Unable to load the catalog right now.'));
+          }
         },
       });
   }
@@ -596,5 +610,9 @@ export class ProjectCatalogRoute {
 
     window.clearTimeout(this.editorCloseTimeout);
     this.isEditorClosing.set(false);
+  }
+
+  private buildCacheKey(projectId: number): string {
+    return `${projectId}:workspace:catalog`;
   }
 }

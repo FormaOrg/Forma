@@ -11,6 +11,7 @@ import {
   UpdateProjectCustomerRequest,
 } from '../../../../../../core/models/project-customers.model';
 import { ProjectCustomersService } from '../../../../../../core/services/project-customers.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
 import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
@@ -28,6 +29,7 @@ export class ProjectCustomersRoute {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly projectCustomersService = inject(ProjectCustomersService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly toastService = inject(ToastService);
   private readonly i18n = inject(I18nService);
 
@@ -129,7 +131,14 @@ export class ProjectCustomersRoute {
       return;
     }
 
-    this.isLoading.set(true);
+    const cacheKey = this.buildCacheKey(projectId);
+    const cachedPage = this.pageCache.get<ProjectCustomersPage>(cacheKey);
+    if (cachedPage) {
+      this.page.set(cachedPage);
+      this.isLoading.set(false);
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.projectCustomersService.getCustomersPage(projectId, {
@@ -138,10 +147,15 @@ export class ProjectCustomersRoute {
     })
       .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => this.page.set(page),
+        next: (page) => {
+          this.page.set(page);
+          this.pageCache.set(cacheKey, page);
+        },
         error: () => {
-          this.page.set(null);
-          this.errorMessage.set(this.i18n.t('project.customers.errors.load'));
+          if (!cachedPage) {
+            this.page.set(null);
+            this.errorMessage.set(this.i18n.t('project.customers.errors.load'));
+          }
         },
       });
   }
@@ -320,5 +334,9 @@ export class ProjectCustomersRoute {
 
     window.clearTimeout(this.editorCloseTimeout);
     this.isEditorClosing.set(false);
+  }
+
+  private buildCacheKey(projectId: number): string {
+    return `${projectId}:workspace:customers`;
   }
 }

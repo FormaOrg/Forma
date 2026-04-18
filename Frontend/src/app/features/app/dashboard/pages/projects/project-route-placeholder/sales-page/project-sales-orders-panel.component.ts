@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, ViewEncapsulation } from '@angular/core';
 
 import { AppIcon } from '../../../../../../../shared/app/icons/app-icon';
 import {
@@ -21,6 +21,7 @@ import { ProjectSalesOrdersTableComponent } from './project-sales-orders-table.c
   imports: [CommonModule, AppIcon, ProjectSalesOrdersTableComponent],
   templateUrl: './project-sales-orders-panel.component.html',
   styleUrl: './project-sales-orders-panel.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProjectSalesOrdersPanelComponent {
   @Input({ required: true }) kpis: ReadonlyArray<SalesKpiCard> = [];

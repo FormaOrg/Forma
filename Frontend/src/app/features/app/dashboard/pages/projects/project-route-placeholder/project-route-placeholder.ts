@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
   imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './project-route-placeholder.html',
   styleUrl: './project-route-placeholder.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProjectRoutePlaceholder {
   private readonly route = inject(ActivatedRoute);

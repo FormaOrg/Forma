@@ -19,6 +19,7 @@ import {
   ProjectAnalyticsPageResponse
 } from '../../../../../../core/models/project-analytics.model';
 import { ProjectAnalyticsService } from '../../../../../../core/services/project-analytics.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
 import { TranslatePipe } from '../../../../../landing-page/i18n/translate.pipe';
 
@@ -40,6 +41,7 @@ Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearS
 export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly analyticsService = inject(ProjectAnalyticsService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject(I18nService);
   private trendChart?: Chart;
@@ -119,8 +121,20 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const cacheKey = this.buildCacheKey(projectId, this.selectedRange());
+    const cachedAnalytics = this.pageCache.get<ProjectAnalyticsPageResponse>(cacheKey);
     const requestToken = ++this.analyticsRequestToken;
-    this.isLoading.set(true);
+    if (cachedAnalytics) {
+      this.analytics.set(cachedAnalytics);
+      this.isLoading.set(false);
+      const availableMetrics = cachedAnalytics.metricOptions.map((option) => option.key);
+      if (!availableMetrics.includes(this.selectedMetric())) {
+        this.selectedMetric.set(availableMetrics[0] ?? '');
+      }
+      this.renderTrendChart();
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.analyticsService
@@ -133,6 +147,7 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
           }
 
           this.analytics.set(response);
+          this.pageCache.set(cacheKey, response);
           const currentMetric = this.selectedMetric();
           const availableMetrics = response.metricOptions.map((option) => option.key);
           if (!availableMetrics.includes(currentMetric)) {
@@ -146,10 +161,12 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
           if (requestToken !== this.analyticsRequestToken) {
             return;
           }
-          this.analytics.set(null);
+          if (!cachedAnalytics) {
+            this.analytics.set(null);
+            this.errorMessage.set(this.i18n.t('project.analytics.errors.load'));
+            this.renderTrendChart();
+          }
           this.isLoading.set(false);
-          this.errorMessage.set(this.i18n.t('project.analytics.errors.load'));
-          this.renderTrendChart();
         }
       });
   }
@@ -316,5 +333,9 @@ export class ProjectAnalyticsRoute implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return `${this.formatInteger(value)} ${metric.label.toLowerCase()}`;
+  }
+
+  private buildCacheKey(projectId: number, range: AnalyticsRangePreset): string {
+    return `${projectId}:workspace:analytics:${range}`;
   }
 }

@@ -8,6 +8,7 @@ import { finalize, map, merge } from 'rxjs';
 import { Project, ProjectStatus, UpdateProjectRequest } from '../../../../../../core/models/project.model';
 import { DashboardDataService } from '../../../../../../core/services/dashboard-data.service';
 import { ProjectService } from '../../../../../../core/services/project.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 
@@ -40,6 +41,7 @@ export class ProjectSettingsRoute {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly projectService = inject(ProjectService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly dashboardDataService = inject(DashboardDataService);
   private readonly toastService = inject(ToastService);
   private readonly uploadService = inject(UploadService);
@@ -138,7 +140,15 @@ export class ProjectSettingsRoute {
       return;
     }
 
-    this.isLoading.set(true);
+    const cacheKey = this.buildCacheKey(projectId);
+    const cachedProject = this.pageCache.get<Project>(cacheKey);
+    if (cachedProject) {
+      this.project.set(cachedProject);
+      this.applyProjectToForm(cachedProject);
+      this.isLoading.set(false);
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.projectService.getProjectById(projectId)
@@ -146,12 +156,15 @@ export class ProjectSettingsRoute {
       .subscribe({
         next: (project) => {
           this.project.set(project);
+          this.pageCache.set(cacheKey, project);
           this.applyProjectToForm(project);
           this.closeDangerModal();
         },
         error: () => {
-          this.project.set(null);
-          this.errorMessage.set('Unable to load project settings right now.');
+          if (!cachedProject) {
+            this.project.set(null);
+            this.errorMessage.set('Unable to load project settings right now.');
+          }
         },
       });
   }
@@ -405,5 +418,9 @@ export class ProjectSettingsRoute {
 
   private formatStatus(value: ProjectStatus): string {
     return value === 'PUBLISHED' ? 'Published' : value === 'ARCHIVED' ? 'Archived' : 'Draft';
+  }
+
+  private buildCacheKey(projectId: number): string {
+    return `${projectId}:workspace:settings`;
   }
 }
