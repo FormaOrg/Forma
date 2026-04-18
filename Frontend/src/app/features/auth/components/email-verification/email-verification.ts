@@ -23,6 +23,7 @@ export class EmailVerificationComponent implements OnInit {
   resendError = '';
 
   private userEmail = '';
+  private returnUrl = '/app/home';
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +33,7 @@ export class EmailVerificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.userEmail = localStorage.getItem('pendingVerificationEmail') ?? '';
+    this.returnUrl = localStorage.getItem('pendingVerificationReturnUrl') ?? '/app/home';
 
     const token = this.route.snapshot.queryParamMap.get('token');
 
@@ -50,8 +52,14 @@ export class EmailVerificationComponent implements OnInit {
         this.message = response.message || 'Email verified successfully!';
         this.canResend = false;
         localStorage.removeItem('pendingVerificationEmail');
+        localStorage.removeItem('pendingVerificationReturnUrl');
 
-        setTimeout(() => this.router.navigate(['/dashboard']), 3000);
+        setTimeout(() => this.router.navigate(['/login'], {
+          queryParams: {
+            returnUrl: this.returnUrl,
+            ...(this.userEmail ? { email: this.userEmail } : {})
+          }
+        }), 3000);
       },
       error: (err: { status: number; error?: { message?: string } }) => {
         this.loading = false;
@@ -62,7 +70,12 @@ export class EmailVerificationComponent implements OnInit {
           this.success = true; // already verified — treat as success
           this.message = 'Your email is already verified.';
           this.canResend = false;
-          setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+          setTimeout(() => this.router.navigate(['/login'], {
+            queryParams: {
+              returnUrl: this.returnUrl,
+              ...(this.userEmail ? { email: this.userEmail } : {})
+            }
+          }), 2000);
         } else if (err.status === 400) {
           this.message = 'This verification link has expired or is invalid.';
         } else {

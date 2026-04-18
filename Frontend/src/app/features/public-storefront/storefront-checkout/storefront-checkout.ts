@@ -147,6 +147,9 @@ export class StorefrontCheckout {
   }
 
   private prefillFromAccountSession(): void {
+    if (this.isEditorPreview()) {
+      return;
+    }
     const projectId = this.projectId();
     const token = this.storefrontCustomerSessionService.getSessionToken(projectId);
     if (!token) {

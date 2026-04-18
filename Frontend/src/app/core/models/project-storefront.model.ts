@@ -83,6 +83,7 @@ export interface StorefrontEditorManagedPage {
   name: string;
   kind: StorefrontEditorManagedPageKind;
   designId: string | null;
+  routeSlug?: string | null;
   draftDocument?: StorefrontHomepageDocument | null;
 }
 

@@ -1,0 +1,60 @@
+@if (isLoading()) {
+  <section class="storefront-collection__state">
+    <p>Loading collection...</p>
+  </section>
+} @else if (errorMessage()) {
+  <section class="storefront-collection__state storefront-collection__state--error">
+    <h1>Collection unavailable</h1>
+    <p>{{ errorMessage() }}</p>
+  </section>
+} @else {
+  <div class="storefront-collection">
+    <app-storefront-public-header [storefront]="storefront()" [projectId]="projectId()" [isEditorPreview]="isEditorPreview()" />
+
+    <main class="storefront-collection__content">
+      <section class="storefront-collection__hero">
+        <span>Collection</span>
+        <h1>{{ collectionTitle() }}</h1>
+        <p>{{ collectionSummary() }}</p>
+      </section>
+
+      @if (products().length) {
+        <section class="storefront-collection__grid">
+          @for (product of products(); track trackProduct($index, product)) {
+            <article class="storefront-collection__card">
+              <a [attr.href]="productRoute(product.id)">
+                <div class="storefront-collection__media">
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" />
+                  } @else {
+                    <div class="storefront-collection__placeholder">{{ product.name.slice(0, 1) }}</div>
+                  }
+                </div>
+
+                <div class="storefront-collection__copy">
+                  <p class="storefront-collection__category">{{ product.category || 'Catalog item' }}</p>
+                  <h2>{{ product.name }}</h2>
+                  @if (product.description) {
+                    <p class="storefront-collection__description">{{ product.description }}</p>
+                  }
+                  <div class="storefront-collection__meta">
+                    <strong>{{ product.price | currency:'TND':'symbol':'1.0-2' }}</strong>
+                    <span>{{ product.inventoryQuantity }} in stock</span>
+                  </div>
+                </div>
+              </a>
+              <button type="button" class="storefront-collection__add" (click)="addToCart(product)">
+                Add to cart
+              </button>
+            </article>
+          }
+        </section>
+      } @else {
+        <section class="storefront-collection__empty">
+          <h2>No products in this collection yet</h2>
+          <p>This collection is live, but it does not currently match any active products in the storefront catalog.</p>
+        </section>
+      }
+    </main>
+  </div>
+}

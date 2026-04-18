@@ -84,6 +84,7 @@ import {
 import { StorefrontEditorComponentHostComponent } from './components/storefront-editor-component-host.component';
 import { StorefrontEditorBlockAccountComponent } from './components/blocks/storefront-editor-block-account.component';
 import { StorefrontEditorBlockCartComponent } from './components/blocks/storefront-editor-block-cart.component';
+import { StorefrontEditorCollaboratorsPanelComponent } from './components/storefront-editor-collaborators-panel.component';
 import {
   buildStorefrontMediaManagerAssets,
   describeStorefrontMediaAsset,
@@ -420,7 +421,7 @@ type SectionLibraryTemplate = {
 @Component({
   selector: 'app-project-storefront-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockAccountComponent, StorefrontEditorBlockCartComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, AppIcon, ProjectStorefrontMediaManager, StorefrontEditorComponentHostComponent, StorefrontEditorBlockAccountComponent, StorefrontEditorBlockCartComponent, TranslatePipe, StorefrontEditorCollaboratorsPanelComponent],
   templateUrl: './project-storefront-editor.html',
   styleUrl: './project-storefront-editor.css',
 })
@@ -643,6 +644,7 @@ private activeResize:
   readonly sidebarMode = signal<EditorSidebarMode>('structure');
 readonly isFormaMenuOpen = signal(false);
 readonly isAccountMenuOpen = signal(false);
+readonly isCollaboratorsPanelOpen = signal(false);
 readonly isZoomMenuOpen = signal(false);
 readonly isBrandKitPopupOpen = signal(false);
 readonly isBrandKitCustomizerOpen = signal(false);
@@ -722,6 +724,9 @@ readonly canScrollPageDesignTabsRight = signal(false);
   readonly isEditingPageName = signal(false);
   readonly editingPageNameId = signal<string | null>(null);
   readonly editingPageNameValue = signal('');
+  readonly isEditingPageSlug = signal(false);
+  readonly editingPageSlugId = signal<string | null>(null);
+  readonly editingPageSlugValue = signal('');
   readonly isEditingComponentText = signal(false);
   readonly editingComponentTextId = signal<string | null>(null);
 readonly editingComponentTextValue = signal('');
@@ -766,6 +771,11 @@ readonly viewportWidth = signal(
 
     return this.managedPages().filter((page) => page.name.toLowerCase().includes(query));
   });
+  readonly collectionManagedPageIds = computed(() =>
+    this.managedPages()
+      .filter((page) => page.routeSlug !== null && page.routeSlug !== undefined)
+      .map((page) => page.id)
+  );
   readonly pageSettingsSelected = computed(() => this.selectedSectionId() === null);
 readonly selectedSection = computed<StorefrontHomepageSection | null>(
   () => this.sections().find((section) => section.id === this.selectedSectionId()) ?? null
@@ -3538,6 +3548,15 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.isAccountMenuOpen.set(next);
   }
 
+  openCollaboratorsPanel(): void {
+    this.closeFloatingUi();
+    this.isCollaboratorsPanelOpen.set(true);
+  }
+
+  closeCollaboratorsPanel(): void {
+    this.isCollaboratorsPanelOpen.set(false);
+  }
+
   toggleZoomMenu(): void {
     const next = !this.isZoomMenuOpen();
     this.closeFloatingUi();
@@ -5421,50 +5440,23 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
   }
 
   openPublicPreview(): void {
-  const projectId = this.projectId();
-  const workingStorefront = this.workingStorefront();
-  const project = this.project();
-  if (!projectId) {
-    return;
-  }
+    const projectId = this.projectId();
+    const workingStorefront = this.workingStorefront();
+    const project = this.project();
+    if (!projectId) {
+      return;
+    }
 
-  if (workingStorefront && workingStorefront.draftHomepage) {
-    const previewProducts = this.products()
-      .filter(
-        (product) =>
-          product.status !== 'ARCHIVED' &&
-          !!product.name?.trim() &&
-          product.price != null &&
-          Number(product.price) > 0
-      )
-      .map((product) => ({
-        id: product.id,
-        name: product.name,
-        description: product.description ?? null,
-        sku: product.sku ?? null,
-        category: product.category ?? null,
-        productType: product.productType ?? null,
-        price: product.price,
-        compareAtPrice: product.compareAtPrice ?? null,
-        inventoryQuantity: product.inventoryQuantity ?? 0,
-        imageUrl: product.imageUrl ?? null,
-        tags: Array.isArray(product.tags) ? product.tags : [],
-        createdAt: product.createdAt ?? null,
-        updatedAt: product.updatedAt ?? null,
-      }));
-
-    this.publicStorefrontService.saveEditorPreviewSnapshot(projectId, {
-      savedAt: new Date().toISOString(),
-      storefront: {
-        projectId,
-        storeName:
-          workingStorefront.storeName?.trim() ||
-          project?.storeTitle?.trim() ||
-          project?.name?.trim() ||
-          'Storefront',
-        themeKey: workingStorefront.themeKey ?? null,
-        homepage: structuredClone(workingStorefront.draftHomepage),
-        featuredProducts: this.featuredProductsPreview().map((product) => ({
+    if (workingStorefront && workingStorefront.draftHomepage) {
+      const previewProducts = this.products()
+        .filter(
+          (product) =>
+            product.status !== 'ARCHIVED' &&
+            !!product.name?.trim() &&
+            product.price != null &&
+            Number(product.price) > 0
+        )
+        .map((product) => ({
           id: product.id,
           name: product.name,
           description: product.description ?? null,
@@ -5478,14 +5470,42 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
           tags: Array.isArray(product.tags) ? product.tags : [],
           createdAt: product.createdAt ?? null,
           updatedAt: product.updatedAt ?? null,
-        })),
-      },
-      products: previewProducts,
-    });
-  }
+        }));
 
-  window.open(`/store/${projectId}?preview=editor`, '_blank', 'noopener');
-}
+      this.publicStorefrontService.saveEditorPreviewSnapshot(projectId, {
+        savedAt: new Date().toISOString(),
+        storefront: {
+          projectId,
+          storeName:
+            workingStorefront.storeName?.trim() ||
+            project?.storeTitle?.trim() ||
+            project?.name?.trim() ||
+            'Storefront',
+          themeKey: workingStorefront.themeKey ?? null,
+          homepage: structuredClone(workingStorefront.draftHomepage),
+          featuredProducts: this.featuredProductsPreview().map((product) => ({
+            id: product.id,
+            name: product.name,
+            description: product.description ?? null,
+            sku: product.sku ?? null,
+            category: product.category ?? null,
+            productType: product.productType ?? null,
+            price: product.price,
+            compareAtPrice: product.compareAtPrice ?? null,
+            inventoryQuantity: product.inventoryQuantity ?? 0,
+            imageUrl: product.imageUrl ?? null,
+            tags: Array.isArray(product.tags) ? product.tags : [],
+            createdAt: product.createdAt ?? null,
+            updatedAt: product.updatedAt ?? null,
+          })),
+        },
+        products: previewProducts,
+      });
+    }
+
+    const previewHref = this.buildEditorPreviewHref(this.selectedManagedPageId());
+    window.open(previewHref || `/store/${projectId}?preview=editor`, '_blank', 'noopener');
+  }
 
   updateSelectedParagraphFontFamily(value: string): void {
     this.updateSelectedParagraphProps({ fontFamily: value });
@@ -6344,20 +6364,86 @@ private buildManagedPageHref(pageId: string): string {
   }
 
   const page = this.managedPages().find((item) => item.id === pageId);
+
+  if (pageId === 'products') {
+    return '/products';
+  }
+
+  if (page?.routeSlug !== null && page?.routeSlug !== undefined) {
+    const routeSlug = this.slugifyManagedPageValue(page?.routeSlug || 'all');
+    return `/collections/${routeSlug || 'all'}`;
+  }
+
+  if (pageId === 'product-details') {
+    const firstProductId = this.products().find((product) => product.status !== 'ARCHIVED')?.id;
+    return firstProductId ? `/products/${firstProductId}` : '/products';
+  }
+
+  if (pageId === 'cart') {
+    return '/cart';
+  }
+
+  if (pageId === 'checkout') {
+    return '/checkout';
+  }
+
   if (!page) {
     return '';
   }
 
-    const slug = page.name
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    return slug ? `/${slug}` : '/';
+  const slug = this.slugifyManagedPageValue(page.name);
+  return slug ? `/${slug}` : '/';
   }
+
+private buildEditorPreviewHref(pageId: string): string {
+  const projectId = this.projectId();
+  if (!projectId) {
+    return '';
+  }
+
+  const path = this.buildManagedPageHref(pageId) || '/';
+  if (path === '/') {
+    return `/store/${projectId}?preview=editor`;
+  }
+
+  const [pathname, hash = ''] = path.split('#');
+  const querySeparator = pathname.includes('?') ? '&' : '?';
+  const previewPath = `${pathname}${querySeparator}preview=editor`;
+  return `/store/${projectId}${previewPath}${hash ? `#${hash}` : ''}`;
+}
+
+private slugifyManagedPageValue(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+private createUniqueManagedPageRouteSlug(baseSlug: string, ignorePageId: string | null = null): string {
+  const normalizedBase = this.slugifyManagedPageValue(baseSlug) || 'all';
+  const existing = new Set(
+    this.managedPages()
+      .filter((page) => page.id !== ignorePageId && this.isManagedPageCollection(page.id))
+      .map((page) => this.slugifyManagedPageValue(page.routeSlug || 'all'))
+      .filter(Boolean)
+  );
+
+  if (!existing.has(normalizedBase)) {
+    return normalizedBase;
+  }
+
+  let suffix = 2;
+  let candidate = `${normalizedBase}-${suffix}`;
+  while (existing.has(candidate)) {
+    suffix += 1;
+    candidate = `${normalizedBase}-${suffix}`;
+  }
+
+  return candidate;
+}
 
 private buildManagedSectionHref(pageId: string, sectionId: string): string {
   const pageHref = this.buildManagedPageHref(pageId);
@@ -8984,6 +9070,7 @@ updatePageDesignTabScrollState(): void {
       kind: page.kind === 'home' ? 'designed' : page.kind,
       name: page.name,
       designId: page.designId,
+      routeSlug: page.routeSlug,
       draftDocument: page.draftDocument ?? this.buildDefaultManagedPageDocument(page.name, page.kind, page.designId),
     });
   }
@@ -9061,6 +9148,12 @@ updatePageDesignTabScrollState(): void {
   }
 
   openManagedPageSettings(): void {
+    const pageId = this.pageCardMenuId();
+    if (pageId && this.isManagedPageCollection(pageId)) {
+      this.startEditingManagedPageSlug(pageId);
+      return;
+    }
+
     this.pageCardMenuId.set(null);
     this.toastService.info('Page settings are coming soon.');
   }
@@ -9091,6 +9184,91 @@ updatePageDesignTabScrollState(): void {
     this.isEditingPageName.set(false);
     this.editingPageNameId.set(null);
     this.editingPageNameValue.set('');
+  }
+
+  startEditingManagedPageSlug(pageId: string): void {
+    const page = this.managedPages().find((item) => item.id === pageId);
+    if (!page || !this.isManagedPageCollection(pageId)) {
+      return;
+    }
+
+    this.isEditingPageSlug.set(true);
+    this.editingPageSlugId.set(pageId);
+    this.editingPageSlugValue.set(page.routeSlug ?? 'all');
+    this.pageCardMenuId.set(null);
+    setTimeout(() => {
+      const input = document.querySelector(
+        `.storefront-editor__page-slug-input[data-page-slug-input-id="${pageId}"]`
+      );
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  finishEditingManagedPageSlug(): void {
+    const pageId = this.editingPageSlugId();
+    if (!pageId) {
+      this.cancelManagedPageSlugEditing();
+      return;
+    }
+
+    const nextSlug = this.createUniqueManagedPageRouteSlug(this.editingPageSlugValue(), pageId);
+    const nextPages = this.managedPages().map((page) =>
+      page.id === pageId
+        ? {
+            ...page,
+            routeSlug: nextSlug,
+          }
+        : page
+    );
+
+    this.updateEditorSessionPages(nextPages, this.selectedManagedPageId());
+    this.cancelManagedPageSlugEditing();
+  }
+
+  cancelManagedPageSlugEditing(): void {
+    this.isEditingPageSlug.set(false);
+    this.editingPageSlugId.set(null);
+    this.editingPageSlugValue.set('');
+  }
+
+  onPageSlugInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.finishEditingManagedPageSlug();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelManagedPageSlugEditing();
+    }
+  }
+
+  isManagedPageCollection(pageId: string): boolean {
+    const page = this.managedPages().find((entry) => entry.id === pageId);
+    return page?.routeSlug !== null && page?.routeSlug !== undefined;
+  }
+
+  managedPageRoutePreview(pageId: string): string {
+    return this.buildManagedPageHref(pageId);
+  }
+
+  managedPageCardCopy(pageId: string): string {
+    if (this.isManagedPageCollection(pageId)) {
+      return `Collection route: ${this.managedPageRoutePreview(pageId)}`;
+    }
+
+    const page = this.managedPages().find((entry) => entry.id === pageId);
+    if (!page) {
+      return '';
+    }
+
+    return page.kind === 'blank'
+      ? this.i18n.t('project.storefront.editor.pages.copy.blank')
+      : this.i18n.t('project.storefront.editor.pages.copy.designed');
   }
 
   onPageNameInputKeydown(event: KeyboardEvent): void {
@@ -9808,14 +9986,16 @@ updatePageDesignTabScrollState(): void {
     viewport: Exclude<StorefrontEditorViewport, 'desktop'>
   ): StorefrontEditorComponentNode['frame'] {
     const baseFrame = component.frame;
+    const desktopWidth = this.getViewportBaseWidth('desktop');
     const viewportWidth = this.getViewportBaseWidth(viewport);
-    const clampedWidth = Math.min(baseFrame.width, viewportWidth);
-    const centeredX = Math.max(0, Math.round((viewportWidth - clampedWidth) / 2));
+    const scale = viewportWidth / desktopWidth;
 
     return {
       ...baseFrame,
-      x: centeredX,
-      width: clampedWidth,
+      x: Math.max(0, Math.round(baseFrame.x * scale)),
+      y: Math.round(baseFrame.y * scale),
+      width: Math.max(1, Math.round(baseFrame.width * scale)),
+      height: Math.max(1, Math.round(baseFrame.height * scale)),
     };
   }
 
@@ -9922,7 +10102,13 @@ updatePageDesignTabScrollState(): void {
       return viewportHeight;
     }
 
-    return this.readNumberProp(section, ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY, 0);
+    const desktopHeight = this.readNumberProp(section, ProjectStorefrontEditor.SECTION_HEIGHT_PROP_KEY, 0);
+    if (viewport === 'desktop' || desktopHeight === 0) {
+      return desktopHeight;
+    }
+
+    const scale = this.getViewportBaseWidth(viewport) / this.getViewportBaseWidth('desktop');
+    return Math.max(1, Math.round(desktopHeight * scale));
   }
 
   readStringProp(section: StorefrontHomepageSection | null, key: string): string {
@@ -14790,6 +14976,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     kind: 'blank' | 'designed';
     name: string;
     designId: string | null;
+    routeSlug?: string | null;
     draftDocument?: StorefrontHomepageDocument | null;
   }): void {
     const pageName = this.createUniquePageName(config.name);
@@ -14798,6 +14985,10 @@ isSectionAttachTarget(sectionId: string): boolean {
       name: pageName,
       kind: config.kind,
       designId: config.designId,
+      routeSlug:
+        config.routeSlug !== undefined && config.routeSlug !== null
+          ? this.createUniqueManagedPageRouteSlug(config.routeSlug)
+          : null,
       draftDocument: this.cloneHomepageDocument(
         config.draftDocument ?? this.buildDefaultManagedPageDocument(pageName, config.kind, config.designId)
       ),

@@ -36,6 +36,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/templates-pages/landing-showcase/landing-showcase').then((m) => m.LandingShowcase)
   },
   {
+    path: 'store/:projectId/collections/:collectionSlug',
+    loadComponent: () =>
+      import('./features/public-storefront/storefront-collection/storefront-collection').then((m) => m.StorefrontCollection)
+  },
+  {
     path: 'store/:projectId/products/:productId',
     loadComponent: () =>
       import('./features/public-storefront/storefront-product-detail/storefront-product-detail').then((m) => m.StorefrontProductDetail)
@@ -97,6 +102,10 @@ export const routes: Routes = [
         path: 'login',
         canActivate: [GuestGuard],
         loadComponent: () => import('./features/auth/components/login/login').then((m) => m.LoginComponent)
+      },
+      {
+        path: 'accept-invitation',
+        loadComponent: () => import('./features/auth/components/accept-invitation/accept-invitation').then((m) => m.AcceptInvitationComponent)
       },
       {
         path: 'login-verification',

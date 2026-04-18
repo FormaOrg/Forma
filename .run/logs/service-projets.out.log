@@ -35,21 +35,21 @@
 
  :: Spring Boot ::                (v4.0.3)
 
-2026-04-18T11:35:50.141+02:00  INFO 12124 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 12124 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
-2026-04-18T11:35:50.150+02:00  INFO 12124 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
-2026-04-18T11:35:50.319+02:00  INFO 12124 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-04-18T11:35:50.320+02:00  INFO 12124 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-04-18T11:35:53.371+02:00  INFO 12124 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-04-18T11:35:53.670+02:00  INFO 12124 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 282 ms. Found 16 JPA repository interfaces.
-2026-04-18T11:35:55.351+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
-2026-04-18T11:35:55.385+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-18T11:35:55.387+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
-2026-04-18T11:35:55.488+02:00  INFO 12124 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5165 ms
-2026-04-18T11:35:55.887+02:00  INFO 12124 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-04-18T11:35:55.982+02:00  INFO 12124 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
-2026-04-18T11:35:57.166+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-04-18T11:35:57.228+02:00  WARN 12124 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-04-18T11:35:57.257+02:00  INFO 12124 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-04-18T20:22:44.397+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:22:44.407+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:22:44.507+02:00  INFO 20352 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-18T20:22:44.510+02:00  INFO 20352 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-18T20:22:47.229+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:22:47.459+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 216 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:22:49.391+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:22:49.421+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:22:49.422+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:22:49.516+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5003 ms
+2026-04-18T20:22:49.763+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:22:49.829+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-18T20:22:50.822+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:22:50.865+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:22:50.881+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [undefined/unknown]
 	Database driver: undefined/unknown
 	Database dialect: PostgreSQLDialect
@@ -61,12 +61,2216 @@
 	Pool: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-04-18T11:36:00.619+02:00  INFO 12124 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-04-18T11:36:00.700+02:00  INFO 12124 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-04-18T11:36:05.047+02:00  INFO 12124 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-04-18T11:36:11.589+02:00  INFO 12124 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-04-18T11:36:11.716+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-04-18T11:36:12.594+02:00  INFO 12124 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2026-04-18T11:36:12.596+02:00  WARN 12124 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-04-18T11:36:14.243+02:00  INFO 12124 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
-2026-04-18T11:36:14.900+02:00  INFO 12124 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 26.201 seconds (process running for 27.132)
+2026-04-18T20:22:53.123+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:22:53.162+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-18T20:22:54.354+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-18T20:22:58.847+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:22:58.959+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-18T20:23:00.223+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:23:00.224+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:23:01.372+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:23:01.377+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 18.245 seconds (process running for 19.702)
+2026-04-18T20:23:03.681+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-18T20:23:03.686+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-18T20:23:03.690+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.id=? 
+        and pc1_0.project_id=?
+2026-04-18T20:23:04.621+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-2] t.f.u.s.ProjectCollaboratorService       : Collaborator 2 removed from project 79
+Hibernate: 
+    delete 
+    from
+        project_collaborators 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        pc1_0.role,
+        pc1_0.status,
+        pc1_0.user_id 
+    from
+        project_collaborators pc1_0 
+    where
+        pc1_0.project_id=? 
+        and pc1_0.invite_email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    insert 
+    into
+        project_collaborators
+        (accepted_at, invite_email, invited_at, project_id, role, status, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-04-18T20:23:06.232+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-4] t.f.u.s.ProjectCollaboratorService       : Collaborator invited: iskanderboughnimi@gmail.com to project 79 as EDITOR
+2026-04-18T20:23:07.651+02:00  INFO 20352 --- [service-projets] [         task-1] t.f.u.service.CollaboratorEmailService   : Collaborator invite email sent to iskanderboughnimi@gmail.com
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.project_id=?
+2026-04-18T20:26:23.165+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T20:26:23.557+02:00  INFO 20352 --- [service-projets] [       Thread-1] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:26:23.583+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:26:23.594+02:00  INFO 20352 --- [service-projets] [       Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:23.598+02:00  INFO 20352 --- [service-projets] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-18T20:26:23.600+02:00  INFO 20352 --- [service-projets] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:26:23.790+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:26:23.792+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:26:24.284+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:26:24.398+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 107 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:26:24.718+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:26:24.726+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:26:24.727+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:26:24.795+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1000 ms
+2026-04-18T20:26:24.928+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:26:24.982+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:26:24.987+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:26:24.989+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:26:25.560+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:26:25.563+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-04-18T20:26:26.207+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-04-18T20:26:31.279+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:33.847+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:26:33.849+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:26:34.901+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:26:34.911+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 11.179 seconds (process running for 233.235)
+2026-04-18T20:26:35.058+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:26:36.325+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T20:26:36.327+02:00  INFO 20352 --- [service-projets] [       Thread-5] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:26:36.345+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:26:36.348+02:00  INFO 20352 --- [service-projets] [       Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:36.349+02:00  INFO 20352 --- [service-projets] [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-04-18T20:26:36.399+02:00  INFO 20352 --- [service-projets] [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:26:36.567+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:26:36.568+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:26:36.928+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:26:36.981+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 50 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:26:37.173+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:26:37.175+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:26:37.176+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:26:37.234+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 658 ms
+2026-04-18T20:26:37.327+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:26:37.377+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:26:37.379+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:26:37.380+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:26:37.779+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:26:37.780+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-04-18T20:26:38.344+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-04-18T20:26:42.552+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:43.205+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:26:43.214+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:26:44.189+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:26:44.284+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 7.753 seconds (process running for 242.608)
+2026-04-18T20:26:44.750+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:26:45.605+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T20:26:45.607+02:00  INFO 20352 --- [service-projets] [       Thread-9] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:26:45.626+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:26:45.629+02:00  INFO 20352 --- [service-projets] [       Thread-9] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:45.630+02:00  INFO 20352 --- [service-projets] [       Thread-9] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-04-18T20:26:45.678+02:00  INFO 20352 --- [service-projets] [       Thread-9] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:26:45.768+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:26:45.769+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:26:46.064+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:26:46.111+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 43 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:26:46.253+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:26:46.255+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:26:46.256+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:26:46.296+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 525 ms
+2026-04-18T20:26:46.359+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:26:46.392+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:26:46.394+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:26:46.395+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:26:46.671+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:26:46.674+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-04-18T20:26:47.203+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-04-18T20:26:51.454+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:26:51.901+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:26:51.904+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:26:52.428+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:26:52.432+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.688 seconds (process running for 250.756)
+2026-04-18T20:26:52.546+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:55:25.098+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 0 deletions, 2 modifications)
+2026-04-18T20:55:25.102+02:00  INFO 20352 --- [service-projets] [      Thread-13] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:55:25.125+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:55:25.131+02:00  INFO 20352 --- [service-projets] [      Thread-13] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:25.133+02:00  INFO 20352 --- [service-projets] [      Thread-13] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2026-04-18T20:55:25.134+02:00  INFO 20352 --- [service-projets] [      Thread-13] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:25.377+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:25.377+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:55:27.643+02:00  WARN 20352 --- [service-projets] [  restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to read candidate component class: file [G:\Coding\Forma\Backend\service-projets\target\classes\tn\forma\users\dto\SalesOrderSort.class]
+2026-04-18T20:55:27.663+02:00 ERROR 20352 --- [service-projets] [  restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to read candidate component class: file [G:\Coding\Forma\Backend\service-projets\target\classes\tn\forma\users\dto\SalesOrderSort.class]
+	at org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider.scanCandidateComponents(ClassPathScanningCandidateComponentProvider.java:504) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider.findCandidateComponents(ClassPathScanningCandidateComponentProvider.java:321) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:276) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:347) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:283) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:206) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:174) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:446) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:310) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:795) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:603) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.0.3.jar:4.0.3]
+	at tn.forma.users.Application.main(Application.java:12) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.0.3.jar:4.0.3]
+Caused by: java.nio.file.AccessDeniedException: G:\Coding\Forma\Backend\service-projets\target\classes\tn\forma\users\dto\SalesOrderSort.class
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:89) ~[na:na]
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103) ~[na:na]
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108) ~[na:na]
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.newByteChannel(WindowsFileSystemProvider.java:231) ~[na:na]
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:357) ~[na:na]
+	at java.base/java.nio.file.Files.newByteChannel(Files.java:399) ~[na:na]
+	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:371) ~[na:na]
+	at java.base/java.nio.file.Files.newInputStream(Files.java:154) ~[na:na]
+	at org.springframework.core.io.FileSystemResource.getInputStream(FileSystemResource.java:193) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.type.classreading.ClassFileMetadataReader.parseClassModel(ClassFileMetadataReader.java:49) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.type.classreading.ClassFileMetadataReader.<init>(ClassFileMetadataReader.java:45) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.type.classreading.ClassFileMetadataReaderFactory.getMetadataReader(ClassFileMetadataReaderFactory.java:62) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.type.classreading.CachingMetadataReaderFactory.getMetadataReader(CachingMetadataReaderFactory.java:127) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider.scanCandidateComponents(ClassPathScanningCandidateComponentProvider.java:464) ~[spring-context-7.0.5.jar:7.0.5]
+	... 23 common frames omitted
+
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:29.502+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:29.502+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:55:29.636+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:55:29.641+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 JPA repository interfaces.
+2026-04-18T20:55:29.765+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-04-18T20:55:29.767+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:55:29.768+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:55:29.801+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 297 ms
+2026-04-18T20:55:29.844+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-04-18T20:55:30.339+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection org.postgresql.jdbc.PgConnection@7ec9caaf
+2026-04-18T20:55:30.341+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-04-18T20:55:30.344+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:55:30.371+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:55:30.789+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 17.6
+	Default catalog/schema: postgres/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:55:30.813+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:55:30.814+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:30.853+02:00  WARN 20352 --- [service-projets] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-18T20:55:31.159+02:00  WARN 20352 --- [service-projets] [  restartedMain] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 4eedabf3-8163-41d6-8db8-f1657cb4cc9f
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-18T20:55:31.198+02:00  INFO 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-04-18T20:55:31.264+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-04-18T20:55:31.268+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 1.787 seconds (process running for 1969.592)
+2026-04-18T20:55:32.601+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 280 class path changes (280 additions, 0 deletions, 0 modifications)
+2026-04-18T20:55:32.603+02:00  INFO 20352 --- [service-projets] [      Thread-17] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:55:32.621+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:55:32.625+02:00  INFO 20352 --- [service-projets] [      Thread-17] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:32.631+02:00  INFO 20352 --- [service-projets] [      Thread-17] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown initiated...
+2026-04-18T20:55:32.939+02:00  INFO 20352 --- [service-projets] [      Thread-17] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:33.029+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:33.030+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:55:33.395+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:55:33.440+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 41 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:55:33.609+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-04-18T20:55:33.613+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:55:33.613+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:55:33.647+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 614 ms
+2026-04-18T20:55:33.667+02:00 ERROR 20352 --- [service-projets] [  restartedMain] t.s.DeferredServletContainerInitializers : Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'jwtAuthFilter' defined in file [G:\Coding\Forma\Backend\service-projets\target\classes\tn\forma\users\security\JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jwtService': Injection of autowired dependencies failed
+2026-04-18T20:55:33.672+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-04-18T20:55:33.677+02:00  WARN 20352 --- [service-projets] [  restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2026-04-18T20:55:33.681+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-18T20:55:33.684+02:00 ERROR 20352 --- [service-projets] [  restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:167) ~[spring-boot-web-server-4.0.3.jar:4.0.3]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:615) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.0.3.jar:4.0.3]
+	at tn.forma.users.Application.main(Application.java:12) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.0.3.jar:4.0.3]
+Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
+	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:150) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	at org.springframework.boot.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:110) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:408) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:166) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:190) ~[spring-boot-web-server-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:164) ~[spring-boot-web-server-4.0.3.jar:4.0.3]
+	... 11 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'jwtAuthFilter' defined in file [G:\Coding\Forma\Backend\service-projets\target\classes\tn\forma\users\security\JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jwtService': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1382) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1221) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:231) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:185) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:180) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:165) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:97) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.web.context.servlet.WebApplicationContextInitializer.initialize(WebApplicationContextInitializer.java:53) ~[spring-boot-4.0.3.jar:4.0.3]
+	at org.springframework.boot.tomcat.servlet.DeferredServletContainerInitializers.onStartup(DeferredServletContainerInitializers.java:55) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4416) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:780) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) ~[na:na]
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149) ~[na:na]
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:201) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:864) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:435) ~[tomcat-embed-core-11.0.18.jar:11.0.18]
+	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:131) ~[spring-boot-tomcat-4.0.3.jar:4.0.3]
+	... 16 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jwtService': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:499) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1446) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:602) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1704) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-7.0.5.jar:7.0.5]
+	... 56 common frames omitted
+Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'application.jwt.secret' in value "${application.jwt.secret}"
+	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:296) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:129) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:96) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:286) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:257) ~[spring-core-7.0.5.jar:7.0.5]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:184) ~[spring-context-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:959) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1672) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:764) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:748) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-7.0.5.jar:7.0.5]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:493) ~[spring-beans-7.0.5.jar:7.0.5]
+	... 68 common frames omitted
+
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:35.151+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:35.152+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:55:35.420+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:55:35.486+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 63 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:55:35.595+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:55:35.597+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:55:35.597+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:55:35.623+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 469 ms
+2026-04-18T20:55:35.665+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:55:35.692+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:55:35.694+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:55:35.695+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:55:36.042+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:55:36.044+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Starting...
+2026-04-18T20:55:36.601+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Start completed.
+Hibernate: 
+    alter table if exists project_collaborators 
+       add column invitation_token varchar(120)
+Hibernate: 
+    alter table if exists project_collaborators 
+       add column invitation_token_expiry timestamp(6)
+Hibernate: 
+    alter table if exists project_collaborators 
+       drop constraint if exists UKrlsa9a1psgfhw4e42sv52ofbn
+2026-04-18T20:55:40.871+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jdbc.warn              : HHH000247: ErrorCode: 0, SQLState: 00000
+2026-04-18T20:55:40.872+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jdbc.warn              : constraint "ukrlsa9a1psgfhw4e42sv52ofbn" of relation "project_collaborators" does not exist, skipping
+Hibernate: 
+    alter table if exists project_collaborators 
+       add constraint UKrlsa9a1psgfhw4e42sv52ofbn unique (invitation_token)
+2026-04-18T20:55:41.088+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:41.553+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:55:41.554+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:55:42.003+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:55:42.062+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.929 seconds (process running for 1980.387)
+2026-04-18T20:55:42.332+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:55:43.463+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 0 deletions, 2 modifications)
+2026-04-18T20:55:43.466+02:00  INFO 20352 --- [service-projets] [      Thread-23] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:55:43.484+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:55:43.487+02:00  INFO 20352 --- [service-projets] [      Thread-23] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:43.488+02:00  INFO 20352 --- [service-projets] [      Thread-23] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown initiated...
+2026-04-18T20:55:43.543+02:00  INFO 20352 --- [service-projets] [      Thread-23] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:43.625+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:43.626+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:55:43.838+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:55:43.876+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 35 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:55:43.974+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:55:43.976+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:55:43.976+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:55:44.001+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 372 ms
+2026-04-18T20:55:44.048+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:55:44.081+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:55:44.082+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:55:44.083+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:55:44.497+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:55:44.500+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Starting...
+2026-04-18T20:55:45.100+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Start completed.
+2026-04-18T20:55:49.398+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:49.755+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:55:49.756+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:55:50.084+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:55:50.086+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.48 seconds (process running for 1988.411)
+2026-04-18T20:55:50.211+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:55:59.741+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T20:55:59.745+02:00  INFO 20352 --- [service-projets] [      Thread-30] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:55:59.765+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:55:59.769+02:00  INFO 20352 --- [service-projets] [      Thread-30] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:55:59.770+02:00  INFO 20352 --- [service-projets] [      Thread-30] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown initiated...
+2026-04-18T20:55:59.821+02:00  INFO 20352 --- [service-projets] [      Thread-30] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:55:59.917+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:55:59.918+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:56:00.198+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:56:00.255+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:56:00.390+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:56:00.391+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:56:00.392+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:56:00.417+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 497 ms
+2026-04-18T20:56:00.460+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:56:00.522+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:56:00.528+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:56:00.530+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:56:00.841+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:56:00.842+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Starting...
+2026-04-18T20:56:01.453+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Start completed.
+2026-04-18T20:56:05.600+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:56:05.973+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:56:05.974+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:56:06.508+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:56:06.515+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.62 seconds (process running for 2004.84)
+2026-04-18T20:56:06.633+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:56:15.103+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (1 addition, 0 deletions, 0 modifications)
+2026-04-18T20:56:15.106+02:00  INFO 20352 --- [service-projets] [      Thread-34] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:56:15.126+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:56:15.131+02:00  INFO 20352 --- [service-projets] [      Thread-34] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:56:15.132+02:00  INFO 20352 --- [service-projets] [      Thread-34] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown initiated...
+2026-04-18T20:56:15.184+02:00  INFO 20352 --- [service-projets] [      Thread-34] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:56:15.299+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:56:15.300+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:56:15.565+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:56:15.610+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 43 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:56:15.724+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:56:15.726+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:56:15.726+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:56:15.757+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 453 ms
+2026-04-18T20:56:15.825+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:56:15.876+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:56:15.879+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:56:15.879+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:56:16.137+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:56:16.139+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Starting...
+2026-04-18T20:56:16.687+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Start completed.
+2026-04-18T20:56:20.747+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:56:21.122+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:56:21.123+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:56:21.490+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:56:21.497+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.241 seconds (process running for 2019.822)
+2026-04-18T20:56:21.604+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T20:57:08.477+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-04-18T20:57:08.481+02:00  INFO 20352 --- [service-projets] [      Thread-38] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T20:57:08.509+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T20:57:08.514+02:00  INFO 20352 --- [service-projets] [      Thread-38] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:57:08.515+02:00  INFO 20352 --- [service-projets] [      Thread-38] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Shutdown initiated...
+2026-04-18T20:57:08.567+02:00  INFO 20352 --- [service-projets] [      Thread-38] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T20:57:08.691+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T20:57:08.691+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T20:57:09.052+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T20:57:09.098+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 44 ms. Found 17 JPA repository interfaces.
+2026-04-18T20:57:09.245+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T20:57:09.246+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T20:57:09.247+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T20:57:09.288+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 594 ms
+2026-04-18T20:57:09.368+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T20:57:09.429+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T20:57:09.431+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T20:57:09.431+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T20:57:09.638+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T20:57:09.639+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Starting...
+2026-04-18T20:57:10.198+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Start completed.
+2026-04-18T20:57:14.155+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T20:57:14.581+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T20:57:14.583+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T20:57:14.890+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T20:57:14.892+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 6.229 seconds (process running for 2073.217)
+2026-04-18T20:57:14.996+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T21:01:14.189+02:00  INFO 20352 --- [service-projets] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 278 class path changes (2 additions, 0 deletions, 276 modifications)
+2026-04-18T21:01:14.192+02:00  INFO 20352 --- [service-projets] [      Thread-42] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-18T21:01:14.213+02:00  INFO 20352 --- [service-projets] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-18T21:01:14.218+02:00  INFO 20352 --- [service-projets] [      Thread-42] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T21:01:14.220+02:00  INFO 20352 --- [service-projets] [      Thread-42] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown initiated...
+2026-04-18T21:01:14.223+02:00  INFO 20352 --- [service-projets] [      Thread-42] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-18T21:01:14.389+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 20352 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-18T21:01:14.390+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-18T21:01:14.933+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-18T21:01:14.995+02:00  INFO 20352 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 59 ms. Found 17 JPA repository interfaces.
+2026-04-18T21:01:15.268+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-18T21:01:15.273+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-18T21:01:15.274+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-18T21:01:15.314+02:00  INFO 20352 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 920 ms
+2026-04-18T21:01:15.408+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-18T21:01:15.468+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-18T21:01:15.473+02:00  WARN 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-18T21:01:15.474+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-18T21:01:15.927+02:00  INFO 20352 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-18T21:01:15.930+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Starting...
+2026-04-18T21:01:16.509+02:00  INFO 20352 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Start completed.
+2026-04-18T21:01:20.698+02:00  INFO 20352 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-18T21:01:21.443+02:00  INFO 20352 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-18T21:01:21.447+02:00  WARN 20352 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-18T21:01:22.258+02:00  INFO 20352 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-18T21:01:22.261+02:00  INFO 20352 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 7.933 seconds (process running for 2320.586)
+2026-04-18T21:01:22.378+02:00  INFO 20352 --- [service-projets] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-04-18T21:04:23.947+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-18T21:04:23.948+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-18T21:04:23.955+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 6 ms
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invitation_token,
+        pc1_0.invitation_token_expiry,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invitation_token,
+        pc1_0.invitation_token_expiry,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.id=? 
+        and pc1_0.project_id=?
+2026-04-18T21:04:26.480+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-3] t.f.u.s.ProjectCollaboratorService       : Collaborator 3 removed from project 79
+Hibernate: 
+    delete 
+    from
+        project_collaborators 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invitation_token,
+        pc1_0.invitation_token_expiry,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        pc1_0.role,
+        pc1_0.status,
+        pc1_0.user_id 
+    from
+        project_collaborators pc1_0 
+    where
+        pc1_0.project_id=? 
+        and pc1_0.invite_email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    insert 
+    into
+        project_collaborators
+        (accepted_at, invitation_token, invitation_token_expiry, invite_email, invited_at, project_id, role, status, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-04-18T21:04:34.938+02:00  INFO 20352 --- [service-projets] [nio-8082-exec-5] t.f.u.s.ProjectCollaboratorService       : Collaborator invited: iskanderboughnimi@gmail.com to project 79 as EDITOR
+2026-04-18T21:04:36.589+02:00  INFO 20352 --- [service-projets] [         task-1] t.f.u.service.CollaboratorEmailService   : Collaborator invite email sent to iskanderboughnimi@gmail.com

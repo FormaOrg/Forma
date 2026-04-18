@@ -1,0 +1,92 @@
+<div class="collaborators-panel__backdrop" (click)="close()"></div>
+
+<div class="collaborators-panel">
+  <!-- Header -->
+  <div class="collaborators-panel__header">
+    <h3 class="collaborators-panel__title">{{ 'project.storefront.editor.collaborators.title' | t }}</h3>
+    <button type="button" class="collaborators-panel__close" (click)="close()" aria-label="Close">
+      <app-icon name="x" [size]="16" />
+    </button>
+  </div>
+
+  <!-- Invite form -->
+  <div class="collaborators-panel__invite">
+    <input
+      class="collaborators-panel__email-input"
+      type="email"
+      [placeholder]="'project.storefront.editor.collaborators.emailPlaceholder' | t"
+      [value]="inviteEmail()"
+      (input)="inviteEmail.set($any($event.target).value)"
+      (keydown.enter)="invite()"
+    />
+    <select
+      class="collaborators-panel__role-select"
+      [value]="inviteRole()"
+      (change)="inviteRole.set($any($event.target).value)"
+    >
+      <option value="EDITOR">{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</option>
+      <option value="VIEWER">{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</option>
+    </select>
+    <button
+      type="button"
+      class="collaborators-panel__invite-btn"
+      [disabled]="isSending() || !inviteEmail().trim()"
+      (click)="invite()"
+    >
+      {{ 'project.storefront.editor.collaborators.invite' | t }}
+    </button>
+  </div>
+
+  @if (sendError()) {
+    <p class="collaborators-panel__error">{{ sendError() }}</p>
+  }
+
+  <div class="collaborators-panel__divider"></div>
+
+  <!-- List -->
+  @if (isLoading()) {
+    <div class="collaborators-panel__loading">
+      <span class="collaborators-panel__spinner"></span>
+    </div>
+  } @else if (error()) {
+    <p class="collaborators-panel__error">{{ error()! | t }}</p>
+  } @else if (collaborators().length === 0) {
+    <p class="collaborators-panel__empty">{{ 'project.storefront.editor.collaborators.empty' | t }}</p>
+  } @else {
+    <ul class="collaborators-panel__list">
+      @for (c of collaborators(); track c.id) {
+        <li class="collaborators-panel__item">
+          <div class="collaborators-panel__avatar">
+            @if (c.userAvatarUrl) {
+              <img [src]="c.userAvatarUrl" [alt]="collaboratorLabel(c)" class="collaborators-panel__avatar-img" />
+            } @else {
+              <span class="collaborators-panel__avatar-fallback">{{ collaboratorInitial(c) }}</span>
+            }
+          </div>
+          <div class="collaborators-panel__info">
+            <span class="collaborators-panel__name">{{ collaboratorLabel(c) }}</span>
+            @if (c.status === 'PENDING') {
+              <span class="collaborators-panel__badge">{{ 'project.storefront.editor.collaborators.statusPending' | t }}</span>
+            }
+          </div>
+          <select
+            class="collaborators-panel__role-select collaborators-panel__role-select--inline"
+            [value]="c.role"
+            (change)="updateRole(c, $any($event.target).value)"
+          >
+            <option value="EDITOR">{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</option>
+            <option value="VIEWER">{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</option>
+          </select>
+          <button
+            type="button"
+            class="collaborators-panel__remove"
+            [title]="'project.storefront.editor.collaborators.removeTooltip' | t"
+            (click)="remove(c.id)"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

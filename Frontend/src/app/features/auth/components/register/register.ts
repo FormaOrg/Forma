@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -38,16 +38,26 @@ export class RegisterComponent implements OnInit {
   isGoogleLoading = false;
   error = '';
   successMessage = '';
+  returnUrl = '/app/home';
+  loginQueryParams: Record<string, string> = {};
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private googleAuthPopupService: GoogleAuthPopupService
   ) {}
 
   ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/app/home';
+    this.model.email = this.route.snapshot.queryParamMap.get('email') ?? '';
+    this.loginQueryParams = {
+      returnUrl: this.returnUrl,
+      ...(this.model.email ? { email: this.model.email } : {})
+    };
+
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigateByUrl(this.returnUrl);
     }
   }
 
@@ -100,9 +110,16 @@ export class RegisterComponent implements OnInit {
         console.log('✅ Registered:', response.user.email);
         this.successMessage = 'Account created successfully! Redirecting to login...';
 
+        localStorage.setItem('pendingVerificationEmail', this.model.email);
+        localStorage.setItem('pendingVerificationReturnUrl', this.returnUrl);
+
         setTimeout(() => {
           this.router.navigate(['/login'], {
-            queryParams: { registered: 'true', email: this.model.email }
+            queryParams: {
+              registered: 'true',
+              email: this.model.email,
+              returnUrl: this.returnUrl
+            }
           });
         }, 3000);
       },
@@ -134,7 +151,7 @@ export class RegisterComponent implements OnInit {
     this.isGoogleLoading = true;
 
     try {
-      const response = await this.googleAuthPopupService.start(true, '/app/home');
+      const response = await this.googleAuthPopupService.start(true, this.returnUrl);
       this.isGoogleLoading = false;
 
       if (response.requiresLoginVerification && response.loginVerificationToken) {
@@ -143,13 +160,13 @@ export class RegisterComponent implements OnInit {
           email: response.user.email,
           message: response.message,
           rememberMe: true,
-          returnUrl: '/app/home'
+          returnUrl: this.returnUrl
         });
         await this.router.navigate(['/login-verification']);
         return;
       }
 
-      await this.router.navigate(['/app/home']);
+      await this.router.navigateByUrl(this.returnUrl);
     } catch (error: any) {
       this.isGoogleLoading = false;
       this.error = error?.message ?? 'Google sign-up failed. Please try again.';

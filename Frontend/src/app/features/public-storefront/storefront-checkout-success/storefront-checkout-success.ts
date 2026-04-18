@@ -24,6 +24,8 @@ export class StorefrontCheckoutSuccess {
     const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
     return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
   });
+  readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
+  readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
   readonly orderNumber = computed(() => this.queryParamMap()?.get('orderNumber') ?? 'Pending confirmation');
   readonly total = computed(() => Number(this.queryParamMap()?.get('total') ?? '0'));
   readonly currency = computed(() => this.queryParamMap()?.get('currency') ?? 'TND');

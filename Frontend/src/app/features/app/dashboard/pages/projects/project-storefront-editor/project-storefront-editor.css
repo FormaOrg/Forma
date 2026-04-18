@@ -8152,6 +8152,23 @@
   line-height: 1.15;
 }
 
+.storefront-editor__page-card-meta {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.storefront-editor__page-card-slug {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(17, 24, 39, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
 .storefront-editor__page-name-input {
   width: 100%;
   min-width: 0;
@@ -8169,6 +8186,22 @@
 
 .storefront-editor__page-name-input--manager {
   max-width: 320px;
+}
+
+.storefront-editor__page-slug-input {
+  width: 100%;
+  min-width: 0;
+  max-width: 320px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(53, 92, 255, 0.35);
+  border-radius: 10px;
+  outline: 0;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 500;
 }
 
 .storefront-editor__page-card-home {

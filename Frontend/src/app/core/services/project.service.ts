@@ -15,11 +15,15 @@ import {
   Media,
   TemplateRecord,
   Theme,
+  ProjectCollaborator,
+  InviteCollaboratorRequest,
+  UpdateCollaboratorRoleRequest,
 } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly projectsBaseUrl = `${environment.projectsApiUrl}/projects`;
   private readonly legacyIconBucketSegment = '/storage/v1/object/public/icons/';
   private readonly currentIconBucketSegment = '/storage/v1/object/public/icon/';
 
@@ -164,6 +168,38 @@ export class ProjectService {
 
   deleteMedia(projectId: number, mediaId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/media/${mediaId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // ── Collaborators ─────────────────────────────────────
+
+  getCollaborators(projectId: number): Observable<ProjectCollaborator[]> {
+    return this.http.get<ProjectCollaborator[]>(`${this.projectsBaseUrl}/${projectId}/collaborators`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  inviteCollaborator(projectId: number, data: InviteCollaboratorRequest): Observable<ProjectCollaborator> {
+    return this.http.post<ProjectCollaborator>(`${this.projectsBaseUrl}/${projectId}/collaborators`, data).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  acceptCollaboratorInvitation(token: string): Observable<ProjectCollaborator> {
+    return this.http.post<ProjectCollaborator>(`${environment.projectsApiUrl}/projects/invitations/accept`, { token }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  removeCollaborator(projectId: number, collaboratorId: number): Observable<void> {
+    return this.http.delete<void>(`${this.projectsBaseUrl}/${projectId}/collaborators/${collaboratorId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updateCollaboratorRole(projectId: number, collaboratorId: number, data: UpdateCollaboratorRoleRequest): Observable<ProjectCollaborator> {
+    return this.http.patch<ProjectCollaborator>(`${this.projectsBaseUrl}/${projectId}/collaborators/${collaboratorId}/role`, data).pipe(
       catchError(this.handleError)
     );
   }

@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   password     = '';
   rememberMe   = false;
   showPassword = false;
+  registerQueryParams: Record<string, string> = {};
 
   private returnUrl = '/app/home';
 
@@ -37,6 +38,11 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/app/home';
+    this.email = this.route.snapshot.queryParamMap.get('email') ?? '';
+    this.registerQueryParams = {
+      returnUrl: this.returnUrl,
+      ...(this.email ? { email: this.email } : {})
+    };
   }
 
   onSubmit(event: Event): void {

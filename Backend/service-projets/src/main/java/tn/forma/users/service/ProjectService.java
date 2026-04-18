@@ -16,6 +16,7 @@ import tn.forma.users.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -28,17 +29,18 @@ public class ProjectService {
     private final FileUploadService fileUploadService;
     private final PortfolioPageService portfolioPageService;
     private final PortfolioInquiryService portfolioInquiryService;
+    private final ProjectCollaboratorService projectCollaboratorService;
 
     public List<ProjectDto> getMyProjects(String email) {
         User user = getUserByEmail(email);
-        return projectRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId())
+        return mergeOwnedAndCollaboratorProjects(user)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
     }
 
     public ProjectDto getProjectById(String email, Long projectId) {
-        return mapToDto(getOwnedProject(email, projectId));
+        return mapToDto(getAccessibleProject(email, projectId));
     }
 
     public void ensureProjectOwnership(String email, Long projectId) {
@@ -146,6 +148,7 @@ public class ProjectService {
     public void deleteProject(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
         String logoPublicId = blankToNull(project.getLogoPublicId());
+        projectCollaboratorService.deleteAllForProject(projectId);
         portfolioPageService.deletePagesForProject(projectId);
         portfolioInquiryService.deleteInquiriesForProject(projectId);
         projectRepository.delete(project);
@@ -214,6 +217,14 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 
+    private Project getAccessibleProject(String email, Long projectId) {
+        User user = getUserByEmail(email);
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(project -> projectCollaboratorService.hasAcceptedAccess(projectId, user.getId()))
+                        .orElseThrow(() -> new RuntimeException("Project not found")));
+    }
+
     private ProjectDto mapToDto(Project project) {
         return ProjectDto.builder()
                 .id(project.getId())
@@ -247,6 +258,22 @@ public class ProjectService {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private List<Project> mergeOwnedAndCollaboratorProjects(User user) {
+        return java.util.stream.Stream.concat(
+                        projectRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId()).stream(),
+                        projectCollaboratorService.getAcceptedCollaboratorProjects(user).stream()
+                )
+                .collect(java.util.stream.Collectors.toMap(
+                        Project::getId,
+                        project -> project,
+                        (left, right) -> left
+                ))
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Project::getUpdatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList();
     }
 
     private String buildDuplicateName(String sourceName, Long userId) {

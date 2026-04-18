@@ -248,7 +248,7 @@
 
               <div class="storefront-editor__menu-divider"></div>
 
-              <button type="button" class="storefront-editor__menu-row">
+              <button type="button" class="storefront-editor__menu-row" (click)="openCollaboratorsPanel()">
                 <span class="storefront-editor__menu-icon">
                   <app-icon name="invite-plus" [size]="18"></app-icon>
                 </span>
@@ -257,6 +257,13 @@
             </div>
           }
         </div>
+
+        @if (isCollaboratorsPanelOpen()) {
+          <app-storefront-editor-collaborators-panel
+            [projectId]="project()!.id"
+            (closed)="closeCollaboratorsPanel()"
+          />
+        }
 
         <button type="button" class="storefront-editor__topbar-select">
           <span>{{ projectDisplayName() }}</span>
@@ -886,11 +893,7 @@
                       <span class="storefront-editor__pages-card-preview" [attr.data-accent]="page.designId || page.kind">
                         <span class="storefront-editor__pages-card-preview-title">{{ page.name }}</span>
                         <span class="storefront-editor__pages-card-preview-copy">
-                          {{
-                            page.kind === 'blank'
-                              ? ('project.storefront.editor.pages.copy.blank' | t)
-                              : ('project.storefront.editor.pages.copy.designed' | t)
-                          }}
+                          {{ managedPageCardCopy(page.id) }}
                         </span>
                       </span>
                     </span>
@@ -912,6 +915,23 @@
                       />
                     } @else {
                       <span class="storefront-editor__page-card-title">{{ page.name }}</span>
+                    }
+                    @if (isManagedPageCollection(page.id)) {
+                      @if (isEditingPageSlug() && editingPageSlugId() === page.id) {
+                        <input
+                          type="text"
+                          class="storefront-editor__page-slug-input"
+                          [attr.data-page-slug-input-id]="page.id"
+                          [ngModel]="editingPageSlugValue()"
+                          (ngModelChange)="editingPageSlugValue.set($event)"
+                          (click)="$event.stopPropagation()"
+                          (mousedown)="$event.stopPropagation()"
+                          (blur)="finishEditingManagedPageSlug()"
+                          (keydown)="onPageSlugInputKeydown($event)"
+                        />
+                      } @else {
+                        <span class="storefront-editor__page-card-slug">{{ managedPageRoutePreview(page.id) }}</span>
+                      }
                     }
                   </span>
                   <span class="storefront-editor__page-card-actions">
@@ -956,6 +976,11 @@
         <button type="button" class="storefront-editor__page-card-menu-button" (click)="duplicateManagedPage(pageMenuId)">
           Duplicate
         </button>
+        @if (isManagedPageCollection(pageMenuId)) {
+          <button type="button" class="storefront-editor__page-card-menu-button" (click)="startEditingManagedPageSlug(pageMenuId)">
+            Edit collection slug
+          </button>
+        }
         <button
           type="button"
           class="storefront-editor__page-card-menu-button"

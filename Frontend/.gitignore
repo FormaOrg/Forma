@@ -49,3 +49,7 @@ Thumbs.db
 
 # Angular environment files with local secrets
 /src/environments/environment*.ts
+
+
+#Logs
+.run

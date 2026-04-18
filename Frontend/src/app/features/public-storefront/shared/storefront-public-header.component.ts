@@ -242,7 +242,7 @@ export class StorefrontPublicHeaderComponent {
     const href = value.trim();
     const projectId = this.projectId();
 
-    if (!href) {
+    if (!href || href === '/') {
       return `/store/${projectId}${this.isEditorPreview() ? '?preview=editor' : ''}`;
     }
 
@@ -266,6 +266,12 @@ export class StorefrontPublicHeaderComponent {
       return url;
     }
 
+    const hashIndex = url.indexOf('#');
+    if (hashIndex !== -1) {
+      const base = url.slice(0, hashIndex);
+      const hash = url.slice(hashIndex);
+      return `${base}${base.includes('?') ? '&' : '?'}preview=editor${hash}`;
+    }
     return `${url}${url.includes('?') ? '&' : '?'}preview=editor`;
   }
 

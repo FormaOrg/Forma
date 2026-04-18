@@ -210,8 +210,8 @@ export class StorefrontHome {
     const href = value.trim();
     const projectId = this.projectId();
 
-    if (!href) {
-      return `/store/${projectId}/products`;
+    if (!href || href === '/') {
+      return this.appendPreviewQuery(`/store/${projectId}`);
     }
     if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('#')) {
       return href;
@@ -235,6 +235,12 @@ export class StorefrontHome {
       return url;
     }
 
+    const hashIndex = url.indexOf('#');
+    if (hashIndex !== -1) {
+      const base = url.slice(0, hashIndex);
+      const hash = url.slice(hashIndex);
+      return `${base}${base.includes('?') ? '&' : '?'}preview=editor${hash}`;
+    }
     return `${url}${url.includes('?') ? '&' : '?'}preview=editor`;
   }
 
