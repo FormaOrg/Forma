@@ -102,16 +102,34 @@
       />
     </label>
 
-    <div class="catalog-toolbar__filters" role="tablist" aria-label="Catalog filters">
-      @for (filter of statusFilters; track filter.value) {
-        <button
-          type="button"
-          class="catalog-toolbar__filter"
-          [class.catalog-toolbar__filter--active]="selectedStatus() === filter.value"
-          (click)="updateStatus(filter.value)"
-        >
-          {{ filter.label }}
-        </button>
+    <div
+      class="catalog-toolbar__dropdown catalog-toolbar__dropdown--status"
+      [class.is-open]="statusDropdownOpen()"
+      (click)="$event.stopPropagation()"
+    >
+      <button type="button" class="catalog-toolbar__dropdown-trigger" (click)="toggleStatusDropdown()">
+        <span class="catalog-toolbar__dropdown-label">Status</span>
+        <span class="catalog-toolbar__dropdown-value">{{ selectedStatusLabel() }}</span>
+        <span class="catalog-toolbar__dropdown-caret" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
+
+      @if (statusDropdownOpen()) {
+        <div class="catalog-toolbar__dropdown-menu">
+          @for (filter of statusFilters; track filter.value) {
+            <button
+              type="button"
+              class="catalog-toolbar__dropdown-item"
+              [class.is-selected]="selectedStatus() === filter.value"
+              (click)="updateStatus(filter.value)"
+            >
+              {{ filter.label }}
+            </button>
+          }
+        </div>
       }
     </div>
 

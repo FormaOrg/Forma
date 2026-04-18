@@ -256,7 +256,7 @@ app-project-catalog-route .catalog-card__meta-subtle {
 app-project-catalog-route .catalog-toolbar {
   padding: 18px 20px;
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(220px, max-content) auto;
+  grid-template-columns: minmax(280px, 1.45fr) minmax(200px, 240px) minmax(220px, 320px) 98px;
   gap: 14px;
   align-items: center;
   min-width: 0;
@@ -314,38 +314,21 @@ app-project-catalog-route .catalog-toolbar__search-icon {
   transform: translateY(-50%);
 }
 
-app-project-catalog-route .catalog-toolbar__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-app-project-catalog-route .catalog-toolbar__filter {
-  min-height: 34px;
-  padding: 0 13px;
-  border: 1px solid rgba(117, 102, 255, 0.16);
-  background: #ffffff;
-  color: #7566ff;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-app-project-catalog-route .catalog-toolbar__filter--active {
-  border-color: rgba(117, 102, 255, 0.3);
-  background: #f7f6ff;
-}
-
 app-project-catalog-route .catalog-toolbar__dropdown {
   position: relative;
   min-width: 0;
+}
+
+app-project-catalog-route .catalog-toolbar__dropdown--status {
+  width: 100%;
+  min-width: 200px;
+  max-width: 240px;
 }
 
 app-project-catalog-route .catalog-toolbar__dropdown--category {
   width: 100%;
   min-width: 260px;
   max-width: 340px;
-  justify-self: end;
 }
 
 app-project-catalog-route .catalog-toolbar__dropdown-trigger,
@@ -481,6 +464,7 @@ app-project-catalog-route .catalog-toolbar__view {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
+  justify-self: end;
 }
 
 app-project-catalog-route .catalog-toolbar__view-pill {

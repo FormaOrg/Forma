@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { ProjectService } from './project.service';
 import { ProjectWorkspaceContextService } from './project-workspace-context.service';
 import { environment } from '../../../environments/environment';
+import { parseServerDateToTimestamp } from '../utils/server-date.util';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardDataService {
@@ -326,7 +327,7 @@ export class DashboardDataService {
   }
 
   private toTimestamp(value: string | null | undefined): number {
-    const parsed = value ? Date.parse(value) : Number.NaN;
+    const parsed = parseServerDateToTimestamp(value);
     return Number.isFinite(parsed) ? parsed : Date.now();
   }
 

@@ -68,6 +68,7 @@ export class ProjectCatalogRoute {
   readonly selectedStatus = signal<CatalogStatusFilter>('ALL');
   readonly selectedCategory = signal('ALL');
   readonly activeView = signal<CatalogView>('grid');
+  readonly statusDropdownOpen = signal(false);
   readonly categoryDropdownOpen = signal(false);
   readonly isEditorOpen = signal(false);
   readonly isEditorClosing = signal(false);
@@ -119,6 +120,9 @@ export class ProjectCatalogRoute {
   readonly selectedCategoryLabel = computed(() =>
     this.selectedCategory() === 'ALL' ? 'All categories' : this.selectedCategory()
   );
+  readonly selectedStatusLabel = computed(() =>
+    this.statusFilters.find((filter) => filter.value === this.selectedStatus())?.label ?? 'All'
+  );
   readonly editorTitle = computed(() => {
     const product = this.editingProduct();
     return product ? `Edit ${product.name}` : 'Add product';
@@ -163,7 +167,7 @@ export class ProjectCatalogRoute {
 
   updateStatus(status: CatalogStatusFilter): void {
     this.selectedStatus.set(status);
-    this.closeDropdowns();
+    this.statusDropdownOpen.set(false);
     this.loadCatalog();
   }
 
@@ -178,10 +182,17 @@ export class ProjectCatalogRoute {
   }
 
   toggleCategoryDropdown(): void {
+    this.statusDropdownOpen.set(false);
     this.categoryDropdownOpen.update((value) => !value);
   }
 
+  toggleStatusDropdown(): void {
+    this.categoryDropdownOpen.set(false);
+    this.statusDropdownOpen.update((value) => !value);
+  }
+
   closeDropdowns(): void {
+    this.statusDropdownOpen.set(false);
     this.categoryDropdownOpen.set(false);
   }
 

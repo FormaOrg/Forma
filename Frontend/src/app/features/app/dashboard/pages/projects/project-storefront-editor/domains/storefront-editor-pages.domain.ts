@@ -74,15 +74,7 @@ export function buildDefaultManagedPageDocument(
   }
 
   if (safeManagedPageId(pageName) === 'product-details') {
-    return buildManagedDocumentWithSingleComponent(
-      pageName,
-      kind,
-      designId,
-      helpers,
-      'product-details',
-      'Product Details',
-      640
-    );
+    return buildProductDetailsManagedPageDocument(pageName, kind, designId, helpers);
   }
 
   if (safeManagedPageId(pageName) === 'cart') {
@@ -240,6 +232,71 @@ function buildProductsManagedPageDocument(
           },
         },
       ],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
+}
+
+function buildProductDetailsManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+
+  const block = createStorefrontEditorComponentNode('product-details');
+  block.frame = { x: 60, y: 32, width: 1080, height: 568 };
+  block.props = {
+    ...block.props,
+    showTags: true,
+    skuLabel: 'SKU',
+    showFacts: true,
+    buyNowLabel: 'Buy it now',
+    inStockLabel: 'In stock',
+    showCategory: true,
+    quantityLabel: 'Quantity',
+    addToCartLabel: 'Add to Cart',
+    outOfStockLabel: 'Out of stock',
+    showDescription: true,
+    showCompareAtPrice: true,
+  };
+  block.responsiveFrames = {
+    tablet: { x: 24, y: 24, width: 720, height: 592 },
+    mobile: { x: 17, y: 24, width: 360, height: 608 },
+  };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'product-details-content',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Blank section',
+      editorBlankSection: true,
+      editorHeight: 659,
+      editorBackgroundColor: '#f8fafc',
+      editorComponents: [block],
+      editorLayoutAssignments: [],
     },
   };
 
@@ -488,7 +545,7 @@ export function captureManagedPagesWithDraft(
   managedPages: StorefrontEditorManagedPage[],
   helpers: ManagedPageHelpers
 ): StorefrontEditorManagedPage[] {
-  return normalizeManagedPages(managedPages, storefront.draftHomepage, helpers).map((page) =>
+  const normalizedPages = normalizeManagedPages(managedPages, storefront.draftHomepage, helpers).map((page) =>
     page.id === selectedManagedPageId
       ? {
           ...page,
@@ -502,6 +559,50 @@ export function captureManagedPagesWithDraft(
           ),
         }
   );
+  const sharedStableSections = getSharedStableSections(storefront.draftHomepage, helpers);
+
+  return normalizedPages.map((page) => ({
+    ...page,
+    draftDocument: applySharedStableSections(page.draftDocument, sharedStableSections, helpers),
+  }));
+}
+
+function getSharedStableSections(
+  document: StorefrontHomepageDocument,
+  helpers: ManagedPageHelpers
+): Partial<Record<'header' | 'footer', StorefrontHomepageSection>> {
+  const normalizedDocument = normalizeManagedPageDocument(document, 'Home', 'home', null, helpers);
+  const header = normalizedDocument.sections.find((section) => section.type === 'header');
+  const footer = normalizedDocument.sections.find((section) => section.type === 'footer');
+
+  return {
+    header: header ? cloneStorefrontHomepageDocument({ ...normalizedDocument, sections: [header] }).sections[0] : undefined,
+    footer: footer ? cloneStorefrontHomepageDocument({ ...normalizedDocument, sections: [footer] }).sections[0] : undefined,
+  };
+}
+
+function applySharedStableSections(
+  document: StorefrontHomepageDocument | null | undefined,
+  sharedSections: Partial<Record<'header' | 'footer', StorefrontHomepageSection>>,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const normalizedDocument = normalizeManagedPageDocument(document, 'Home', 'home', null, helpers);
+  const contentSections = normalizedDocument.sections.filter(
+    (section) => section.type !== 'header' && section.type !== 'footer'
+  );
+
+  return {
+    ...normalizedDocument,
+    sections: [
+      sharedSections.header
+        ? cloneStorefrontHomepageDocument({ ...normalizedDocument, sections: [sharedSections.header] }).sections[0]
+        : normalizedDocument.sections.find((section) => section.type === 'header')!,
+      ...contentSections.map((section) => cloneStorefrontHomepageDocument({ ...normalizedDocument, sections: [section] }).sections[0]),
+      sharedSections.footer
+        ? cloneStorefrontHomepageDocument({ ...normalizedDocument, sections: [sharedSections.footer] }).sections[0]
+        : normalizedDocument.sections.find((section) => section.type === 'footer')!,
+    ],
+  };
 }
 
 export function resolveManagedPageDocument(

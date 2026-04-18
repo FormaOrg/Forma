@@ -20,11 +20,19 @@ import { StorefrontEditorMenuNode } from '../storefront-editor-component.model';
           class="storefront-editor-block-menu__hamburger"
           [class.storefront-editor-block-menu__hamburger--active]="isDropdownOpen()"
           [ngStyle]="itemStyles()"
+          [style.width.px]="hamburgerButtonSize()"
+          [style.height.px]="hamburgerButtonSize()"
           (click)="toggleDropdown($event)"
           [attr.aria-expanded]="isDropdownOpen()"
           aria-label="Toggle menu"
         >
-          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            [attr.width]="hamburgerIconSize()"
+            [attr.height]="hamburgerIconSize()"
+            aria-hidden="true"
+          >
             <path d="M5 7.25A.75.75 0 0 1 5.75 6.5h12.5a.75.75 0 0 1 0 1.5H5.75A.75.75 0 0 1 5 7.25Zm0 4.75a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H5.75A.75.75 0 0 1 5 12Zm0 4.75a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H5.75A.75.75 0 0 1 5 16.75Z"></path>
           </svg>
         </button>
@@ -195,6 +203,13 @@ export class StorefrontEditorBlockMenuComponent {
     fontWeight: String(this.node().props.fontWeight),
     color: this.node().props.textColor,
   }));
+
+  readonly hamburgerIconSize = computed(() => {
+    const fontSize = this.node().props.fontSize;
+    return Math.max(14, Math.min(48, Math.round(fontSize * 1.1)));
+  });
+
+  readonly hamburgerButtonSize = computed(() => Math.max(32, this.hamburgerIconSize() + 16));
 
   readonly showDropdown = computed(() => this.node().props.displayMode === 'hamburger' && this.isDropdownOpen());
 

@@ -429,6 +429,7 @@ export class ProjectStorefrontEditor {
   private static readonly AUTOSAVE_DELAY_MS = 900;
   private static readonly MIN_SUPPORTED_VIEWPORT_WIDTH = 900;
   private static readonly COMPONENT_MIN_SIZE = 20;
+  private static readonly COMPONENT_RESIZE_STEP = 1;
   private static readonly ADD_ELEMENTS_PANEL_CLOSE_MS = 220;
   private static readonly ADD_ELEMENTS_LIBRARY_MODAL_CLOSE_MS = 180;
   private static readonly PAGES_MANAGER_CLOSE_MS = 180;
@@ -505,6 +506,7 @@ private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
     | {
         sectionId: string;
         sourceContainerId: string | null;
+        viewport: StorefrontEditorViewport;
         pointerOffsetX: number;
         pointerOffsetY: number;
         components: Array<{
@@ -542,15 +544,16 @@ private pagesPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
       }
     | null = null;
 private activeResize:
-  | {
-      sectionId: string;
-      componentId: string;
-      handle: string;
+    | {
+        sectionId: string;
+        componentId: string;
+        handle: string;
+        viewport: StorefrontEditorViewport;
         startX: number;
         startY: number;
-      startFrame: StorefrontEditorComponentNode['frame'];
-      startRotation: number;
-      preserveAspectRatio: boolean;
+        startFrame: StorefrontEditorComponentNode['frame'];
+        startRotation: number;
+        preserveAspectRatio: boolean;
       startAspectRatio: number;
       contentBounds: { left: number; right: number; top: number; bottom: number } | null;
     }
@@ -2977,7 +2980,8 @@ if (this.activeSocialLinksToolbarMenu()) {
       containerDimensions.width,
       containerDimensions.height,
       previewVisibleHeight,
-      { transient: true, syncRail: false }
+      { transient: true, syncRail: false },
+      this.activeComponentDrag.viewport
     );
   }
 
@@ -3176,6 +3180,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.activeComponentDrag = {
       sectionId: pendingDrag.sectionId,
       sourceContainerId: component.parentContainerId ?? null,
+      viewport: this.viewport(),
       pointerOffsetX: pendingDrag.clientX - (containerRect.left + dragBounds.x * scale),
       pointerOffsetY: pendingDrag.clientY - (containerRect.top + dragBounds.y * scale),
       components: orderedComponents.map((item) => {
@@ -4622,16 +4627,17 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.selectComponent(sectionId, componentId, event);
     this.removeSectionLayoutAssignments(sectionId, [componentId], { selectedSectionId: sectionId, syncRail: false });
     this.activeResize = {
-      sectionId,
-      componentId,
-      handle,
-      startX: event.clientX,
-      startY: event.clientY,
-      startFrame: { ...this.getComponentFrame(component) },
-      startRotation: component.rotation ?? 0,
-      preserveAspectRatio: component.type === 'image' && /[ns]/.test(handle) && /[ew]/.test(handle),
+        sectionId,
+        componentId,
+        handle,
+        viewport: this.viewport(),
+        startX: event.clientX,
+        startY: event.clientY,
+        startFrame: { ...this.getComponentFrame(component) },
+        startRotation: component.rotation ?? 0,
+        preserveAspectRatio: component.type === 'image' && /[ns]/.test(handle) && /[ew]/.test(handle),
       startAspectRatio: component.frame.width > 0 && component.frame.height > 0 ? component.frame.width / component.frame.height : 1,
-      contentBounds: component.type === 'container' ? this.getContainerContentLocalBounds(section, component) : null,
+      contentBounds: this.getComponentResizeContentLocalBounds(section, component),
     };
     this.isResizingComponent.set(true);
     this.closeComponentContextMenu();
@@ -9788,13 +9794,29 @@ updatePageDesignTabScrollState(): void {
 
   private getComponentFrame(
     component: StorefrontEditorComponentNode,
-    viewport: StorefrontEditorViewport = this.viewport()
+    viewport: StorefrontEditorViewport = this.getActiveFrameViewport()
   ): StorefrontEditorComponentNode['frame'] {
     if (viewport === 'desktop') {
       return component.frame;
     }
 
-    return component.responsiveFrames?.[viewport] ?? component.frame;
+    return component.responsiveFrames?.[viewport] ?? this.getCenteredViewportFallbackFrame(component, viewport);
+  }
+
+  private getCenteredViewportFallbackFrame(
+    component: StorefrontEditorComponentNode,
+    viewport: Exclude<StorefrontEditorViewport, 'desktop'>
+  ): StorefrontEditorComponentNode['frame'] {
+    const baseFrame = component.frame;
+    const viewportWidth = this.getViewportBaseWidth(viewport);
+    const clampedWidth = Math.min(baseFrame.width, viewportWidth);
+    const centeredX = Math.max(0, Math.round((viewportWidth - clampedWidth) / 2));
+
+    return {
+      ...baseFrame,
+      x: centeredX,
+      width: clampedWidth,
+    };
   }
 
   private getComponentProps<T extends StorefrontEditorComponentNode>(
@@ -9861,7 +9883,7 @@ updatePageDesignTabScrollState(): void {
   private writeComponentFrame(
     component: StorefrontEditorComponentNode,
     frame: StorefrontEditorComponentNode['frame'],
-    viewport: StorefrontEditorViewport = this.viewport()
+    viewport: StorefrontEditorViewport = this.getActiveFrameViewport()
   ): StorefrontEditorComponentNode {
     if (viewport === 'desktop') {
       return {
@@ -9877,6 +9899,10 @@ updatePageDesignTabScrollState(): void {
         [viewport]: frame,
       },
     };
+  }
+
+  private getActiveFrameViewport(): StorefrontEditorViewport {
+    return this.activeComponentDrag?.viewport ?? this.activeResize?.viewport ?? this.viewport();
   }
 
   private getSectionHeightPropKey(viewport: StorefrontEditorViewport = this.viewport()): string {
@@ -10699,7 +10725,8 @@ private updateSelectedSection(
     containerWidth: number,
     containerHeight: number,
     maxVisibleHeight = containerHeight,
-    options: { transient?: boolean; syncRail?: boolean } = {}
+    options: { transient?: boolean; syncRail?: boolean } = {},
+    viewport: StorefrontEditorViewport = this.viewport()
   ): void {
     const positionsById = new Map(positions.map((position) => [position.componentId, position]));
     this.applyStorefrontMutation((storefront) => ({
@@ -10726,7 +10753,7 @@ private updateSelectedSection(
               ...frame,
               x: Math.max(minX, Math.min(nextPosition.x, maxX)),
               y: Math.max(minY, Math.min(nextPosition.y, maxY)),
-            });
+            }, viewport);
           });
 
           return this.writeSectionComponents(section, components);
@@ -11063,6 +11090,11 @@ private expandPositionUpdatesForAttachedDescendants(
     return Math.round(value / step) * step;
   }
 
+  private roundToResizeStep(value: number): number {
+    const step = ProjectStorefrontEditor.COMPONENT_RESIZE_STEP;
+    return Math.round(value / step) * step;
+  }
+
   private getAlignmentTargets(
     sectionId: string,
     excludedComponentIds: readonly string[],
@@ -11176,21 +11208,21 @@ private expandPositionUpdatesForAttachedDescendants(
       return frame;
     }
 
-    const snappedWidth = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToSnapStep(frame.width));
-    const snappedHeight = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToSnapStep(frame.height));
+    const snappedWidth = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToResizeStep(frame.width));
+    const snappedHeight = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.roundToResizeStep(frame.height));
     let nextX = frame.x;
     let nextY = frame.y;
 
     if (handle.includes('w') && !handle.includes('e')) {
       nextX = frame.x + (frame.width - snappedWidth);
     } else {
-      nextX = this.roundToSnapStep(frame.x);
+      nextX = this.roundToResizeStep(frame.x);
     }
 
     if (handle.includes('n') && !handle.includes('s')) {
       nextY = frame.y + (frame.height - snappedHeight);
     } else {
-      nextY = this.roundToSnapStep(frame.y);
+      nextY = this.roundToResizeStep(frame.y);
     }
 
     return {
@@ -11199,6 +11231,28 @@ private expandPositionUpdatesForAttachedDescendants(
       width: snappedWidth,
       height: snappedHeight,
     };
+  }
+
+  private clampResizedFrameToSection(
+    sectionId: string,
+    frame: StorefrontEditorComponentNode['frame']
+  ): StorefrontEditorComponentNode['frame'] {
+    const dimensions = this.getSectionContentDimensions(sectionId);
+    const container = document.querySelector(
+      `.storefront-editor__preview-section-content[data-section-content-id="${sectionId}"]`
+    );
+    if (!dimensions || !(container instanceof HTMLElement)) {
+      return frame;
+    }
+
+    const maxWidth = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, dimensions.width);
+    const maxHeight = Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, this.getPreviewVisibleHeightForSection(container));
+    const width = Math.min(Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, frame.width), maxWidth);
+    const height = Math.min(Math.max(ProjectStorefrontEditor.COMPONENT_MIN_SIZE, frame.height), maxHeight);
+    const x = this.clamp(frame.x, 0, Math.max(0, maxWidth - width));
+    const y = this.clamp(frame.y, 0, Math.max(0, maxHeight - height));
+
+    return { x, y, width, height };
   }
 
   private cloneComponentsForBatchInsert(
@@ -11496,24 +11550,25 @@ private expandPositionUpdatesForAttachedDescendants(
     const nextHeight = bottom - top;
     const nextCenterX = startCenterX + worldCenterOffset.x;
     const nextCenterY = startCenterY + worldCenterOffset.y;
-    const nextFrame = {
-      x: nextCenterX - nextWidth / 2,
-      y: nextCenterY - nextHeight / 2,
-      width: nextWidth,
-      height: nextHeight,
-    };
+      const nextFrame = {
+        x: nextCenterX - nextWidth / 2,
+        y: nextCenterY - nextHeight / 2,
+        width: nextWidth,
+        height: nextHeight,
+      };
     const snappedFrame = this.snapResizeFrameToGrid(nextFrame, this.activeResize.handle);
+    const clampedFrame = this.clampResizedFrameToSection(this.activeResize.sectionId, snappedFrame);
     this.setSnapGuides(this.activeResize.sectionId, this.snapToGridEnabled()
-      ? [
-          { orientation: 'vertical', offset: snappedFrame.x, kind: 'grid' },
-          { orientation: 'horizontal', offset: snappedFrame.y, kind: 'grid' },
-        ]
-      : []);
+        ? [
+            { orientation: 'vertical', offset: clampedFrame.x, kind: 'grid' },
+            { orientation: 'horizontal', offset: clampedFrame.y, kind: 'grid' },
+          ]
+        : []);
 
     this.updateSectionComponentTransform(this.activeResize.sectionId, this.activeResize.componentId, {
-      frame: snappedFrame,
-    });
-  }
+        frame: clampedFrame,
+      }, this.activeResize.viewport);
+    }
 
   private updateRotatingComponent(event: MouseEvent): void {
     if (!this.activeRotation) {
@@ -11545,14 +11600,15 @@ private expandPositionUpdatesForAttachedDescendants(
   }
 
   private updateSectionComponentTransform(
-    sectionId: string,
-    componentId: string,
-    patch: Partial<Pick<StorefrontEditorComponentNode, 'rotation' | 'frame'>>
-  ): void {
-    this.applyStorefrontMutation((storefront) => ({
-      ...storefront,
-      draftHomepage: {
-        ...storefront.draftHomepage,
+      sectionId: string,
+      componentId: string,
+      patch: Partial<Pick<StorefrontEditorComponentNode, 'rotation' | 'frame'>>,
+      viewport: StorefrontEditorViewport = this.viewport()
+    ): void {
+      this.applyStorefrontMutation((storefront) => ({
+        ...storefront,
+        draftHomepage: {
+          ...storefront.draftHomepage,
         sections: storefront.draftHomepage.sections.map((section) => {
           if (section.id !== sectionId) {
             return section;
@@ -11564,16 +11620,16 @@ private expandPositionUpdatesForAttachedDescendants(
               component.id === componentId
                 ? (() => {
                     if (patch.frame !== undefined && component.type === 'image') {
-                      const scaleX = component.frame.width > 0 ? patch.frame.width / component.frame.width : 1;
-                      const scaleY = component.frame.height > 0 ? patch.frame.height / component.frame.height : 1;
-                      const currentOuterWidth = Number(component.props.cropOuterWidth ?? component.frame.width);
-                      const currentOuterHeight = Number(component.props.cropOuterHeight ?? component.frame.height);
+                      const currentFrame = this.getComponentFrame(component, viewport);
+                      const scaleX = currentFrame.width > 0 ? patch.frame.width / currentFrame.width : 1;
+                      const scaleY = currentFrame.height > 0 ? patch.frame.height / currentFrame.height : 1;
+                      const currentOuterWidth = Number(component.props.cropOuterWidth ?? currentFrame.width);
+                      const currentOuterHeight = Number(component.props.cropOuterHeight ?? currentFrame.height);
                       const currentOffsetX = Number(component.props.cropOuterOffsetX ?? 0);
                       const currentOffsetY = Number(component.props.cropOuterOffsetY ?? 0);
 
                       const nextImageComponent: StorefrontEditorImageNode = {
-                        ...component,
-                        frame: patch.frame,
+                        ...(this.writeComponentFrame(component, patch.frame, viewport) as StorefrontEditorImageNode),
                         props: {
                           ...component.props,
                           cropOuterWidth: Math.max(patch.frame.width, currentOuterWidth * scaleX),
@@ -11584,15 +11640,15 @@ private expandPositionUpdatesForAttachedDescendants(
                         ...(patch.rotation !== undefined ? { rotation: patch.rotation } : {}),
                       };
                       return nextImageComponent;
-                    }
+                      }
 
-                    const nextComponent =
-                      patch.frame !== undefined ? this.writeComponentFrame(component, patch.frame) : component;
-                    return {
-                      ...nextComponent,
-                      ...(patch.rotation !== undefined ? { rotation: patch.rotation } : {}),
-                    };
-                  })()
+                      const nextComponent =
+                        patch.frame !== undefined ? this.writeComponentFrame(component, patch.frame, viewport) : component;
+                      return {
+                        ...nextComponent,
+                        ...(patch.rotation !== undefined ? { rotation: patch.rotation } : {}),
+                      };
+                    })()
                 : component
             )
           );
@@ -13619,6 +13675,57 @@ private getContainerContentLocalBounds(
   }
 
   return { left, right, top, bottom };
+}
+
+private getComponentResizeContentLocalBounds(
+  section: StorefrontHomepageSection,
+  component: StorefrontEditorComponentNode
+): { left: number; right: number; top: number; bottom: number } | null {
+  if (component.type === 'container') {
+    return this.getContainerContentLocalBounds(section, component);
+  }
+
+  if (component.type === 'product-feed') {
+    return this.getProductFeedContentLocalBounds(component);
+  }
+
+  return null;
+}
+
+private getProductFeedContentLocalBounds(
+  component: StorefrontEditorProductFeedNode
+): { left: number; right: number; top: number; bottom: number } {
+  const props = component.props;
+  const columns = Math.max(1, props.columns ?? 1);
+  const visibleItems = Math.max(1, props.limit ?? 1);
+  const rows = Math.max(1, Math.ceil(visibleItems / columns));
+
+  const cardMinWidth =
+    props.quickAddStyle === 'button' ? 176 :
+    props.showColorDots ? 164 :
+    props.showCompareAtPrice ? 156 :
+    148;
+  const cardContentHeight =
+    58 +
+    (props.showColorDots ? 20 : 0) +
+    (props.showAddToCart && props.quickAddStyle === 'button' ? 42 : 0);
+  const cardHeight = cardMinWidth + cardContentHeight;
+
+  const gridWidth = columns * cardMinWidth + Math.max(0, columns - 1) * 14;
+  const gridHeight = rows * cardHeight + Math.max(0, rows - 1) * 16;
+
+  const filtersWidth = props.showFilters ? 128 + 20 : 0;
+  const sortHeight = props.showSort ? 34 + 14 : 0;
+  const noteHeight = 44;
+  const totalWidth = gridWidth + filtersWidth;
+  const totalHeight = gridHeight + sortHeight + noteHeight;
+
+  return {
+    left: -totalWidth / 2,
+    right: totalWidth / 2,
+    top: -totalHeight / 2,
+    bottom: totalHeight / 2,
+  };
 }
 
 private isPointInsideFrame(

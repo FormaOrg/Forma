@@ -5,6 +5,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { ProjectHomePage } from '../../../../../../core/models/project-home.model';
 import { ProjectHomeService } from '../../../../../../core/services/project-home.service';
+import { parseServerDateToTimestamp } from '../../../../../../core/utils/server-date.util';
 import {
   getProjectWorkspaceConfig,
   normalizeProjectWorkspaceType,
@@ -160,7 +161,7 @@ export class ProjectHomeRoute {
   }
 
   formatOccurredAt(value: string): string {
-    const parsed = Date.parse(value);
+    const parsed = parseServerDateToTimestamp(value);
     if (!Number.isFinite(parsed)) {
       return value;
     }

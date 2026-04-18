@@ -5,6 +5,7 @@
 }
 
 .sales-page {
+  box-sizing: border-box;
   max-width: 1400px;
   width: 100%;
   padding: 24px 28px 30px;
