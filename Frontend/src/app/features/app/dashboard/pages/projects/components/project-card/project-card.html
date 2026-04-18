@@ -42,14 +42,21 @@
   <div class="project-card__body">
     <div class="project-card__top">
       <div class="project-card__title-wrap">
-        <span
-          class="project-card__status"
-          [class.project-card__status--published]="project.status === 'published'"
-          [class.project-card__status--draft]="project.status === 'draft'"
-          [class.project-card__status--archived]="project.status === 'archived'"
-        >
-          {{ project.statusLabel }}
-        </span>
+        <div class="project-card__badges">
+          <span
+            class="project-card__status"
+            [class.project-card__status--published]="project.status === 'published'"
+            [class.project-card__status--draft]="project.status === 'draft'"
+            [class.project-card__status--archived]="project.status === 'archived'"
+          >
+            {{ project.statusLabel }}
+          </span>
+          @if (project.badgeLabel) {
+            <span class="project-card__badge" [class.project-card__badge--shared]="project.isShared">
+              {{ project.badgeLabel }}
+            </span>
+          }
+        </div>
         <h3 class="project-card__title">{{ project.name }}</h3>
       </div>
 

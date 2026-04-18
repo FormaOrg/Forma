@@ -145,12 +145,16 @@ export class DashboardDataService {
     const createdAt = this.toTimestamp(project.createdAt);
     const updatedAt = this.toTimestamp(project.updatedAt ?? project.createdAt);
     const status = this.toProjectStatus(project.status);
+    const currentUserId = this.authService.currentUserValue?.id ?? null;
+    const isShared = currentUserId != null && project.ownerId !== currentUserId;
 
     return {
       id: String(project.id),
       backendId: project.id,
       name: project.name?.trim() || 'Untitled project',
       description: project.description?.trim() || `${this.toProjectTypeLabel(project.type)} project`,
+      badgeLabel: isShared ? 'Shared' : undefined,
+      isShared,
       status,
       statusLabel: this.toProjectStatusLabel(status),
       domain: undefined,

@@ -1,12 +1,15 @@
 package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.ProjectHomeActionDto;
 import tn.forma.users.dto.ProjectHomeActivityDto;
 import tn.forma.users.dto.ProjectHomeMetricDto;
 import tn.forma.users.dto.ProjectHomePageDto;
+import tn.forma.users.model.CollaboratorStatus;
 import tn.forma.users.model.PortfolioPage;
 import tn.forma.users.model.ProjectAnalyticsEvent;
 import tn.forma.users.model.ProjectAnalyticsEventType;
@@ -17,6 +20,7 @@ import tn.forma.users.model.ProjectProduct;
 import tn.forma.users.model.ProjectType;
 import tn.forma.users.model.User;
 import tn.forma.users.repository.ProjectAnalyticsEventRepository;
+import tn.forma.users.repository.ProjectCollaboratorRepository;
 import tn.forma.users.repository.ProjectCustomerRepository;
 import tn.forma.users.repository.ProjectOrderRepository;
 import tn.forma.users.repository.ProjectProductRepository;
@@ -43,9 +47,10 @@ public class ProjectHomeService {
     private final PortfolioPageService portfolioPageService;
     private final ProjectAnalyticsEventRepository projectAnalyticsEventRepository;
     private final UserRepository userRepository;
+    private final ProjectCollaboratorRepository collaboratorRepository;
 
     public ProjectHomePageDto getHomePage(String email, Long projectId) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<ProjectProduct> products = projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId());
         List<ProjectCustomer> customers = projectCustomerRepository.findAllByProjectIdOrderByCreatedAtDesc(project.getId());
         List<ProjectOrder> orders = projectOrderRepository.findAllByProjectIdOrderByPlacedAtDesc(project.getId());
@@ -358,11 +363,15 @@ public class ProjectHomeService {
         return Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
     }
 
-    private Project getOwnedProject(String email, Long projectId) {
+    private Project getAccessibleProject(String email, Long projectId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(p -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")));
     }
 
     private String displayName(User user) {

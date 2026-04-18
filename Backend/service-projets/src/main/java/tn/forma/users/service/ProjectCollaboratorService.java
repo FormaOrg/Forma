@@ -150,6 +150,14 @@ public class ProjectCollaboratorService {
                 .isPresent();
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasAcceptedEditorAccess(Long projectId, Long userId) {
+        return collaboratorRepository.findByProjectIdAndUserIdAndStatus(projectId, userId, CollaboratorStatus.ACCEPTED)
+                .map(ProjectCollaborator::getRole)
+                .filter(role -> role == CollaboratorRole.EDITOR)
+                .isPresent();
+    }
+
     private Project getOwnedProject(String email, Long projectId) {
         User user = getUserByEmail(email);
         return getOwnedProjectForUser(user, projectId);

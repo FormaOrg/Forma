@@ -7,6 +7,8 @@ export type ProjectStatus = 'published' | 'draft';
 export type ProjectCardItem = {
   id: string;
   name: string;
+  badgeLabel?: string;
+  isShared?: boolean;
   status: ProjectStatus | 'archived';
   statusLabel: string;
   domain?: string;

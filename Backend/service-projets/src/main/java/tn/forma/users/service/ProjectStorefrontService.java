@@ -5,17 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.ProjectStorefrontDto;
 import tn.forma.users.dto.PublishProjectStorefrontResponse;
 import tn.forma.users.dto.UpdateProjectStorefrontRequest;
+import tn.forma.users.model.CollaboratorStatus;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectStatus;
 import tn.forma.users.model.ProjectStorefront;
 import tn.forma.users.model.ProjectType;
 import tn.forma.users.model.StorefrontStatus;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectCollaboratorRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.ProjectStorefrontRepository;
 import tn.forma.users.repository.UserRepository;
@@ -33,16 +37,17 @@ public class ProjectStorefrontService {
     private final ProjectStorefrontRepository projectStorefrontRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectCollaboratorRepository collaboratorRepository;
     private final ObjectMapper objectMapper;
 
     public ProjectStorefrontDto getStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateAccessibleStorefront(email, projectId);
         return mapToDto(storefront);
     }
 
     @Transactional
     public ProjectStorefrontDto updateStorefront(String email, Long projectId, UpdateProjectStorefrontRequest request) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
 
         if (request.getStoreName() != null) {
             storefront.setStoreName(blankToNull(request.getStoreName()));
@@ -70,7 +75,7 @@ public class ProjectStorefrontService {
 
     @Transactional
     public PublishProjectStorefrontResponse publishStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
         storefront.setPublishedHomepageJson(storefront.getDraftHomepageJson() != null
                 ? storefront.getDraftHomepageJson().deepCopy()
                 : null);
@@ -89,7 +94,7 @@ public class ProjectStorefrontService {
 
     @Transactional
     public ProjectStorefrontDto unpublishStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
         storefront.setStoreStatus(StorefrontStatus.DRAFT);
         storefront.setPublishedHomepageJson(null);
         storefront.setPublishedAt(null);
@@ -106,17 +111,58 @@ public class ProjectStorefrontService {
                 .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
     }
 
+    private ProjectStorefront getOrCreateAccessibleStorefront(String email, Long projectId) {
+        Project project = getAccessibleProject(email, projectId);
+        ensureEcommerceProject(project);
+
+        return projectStorefrontRepository.findByProjectId(project.getId())
+                .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
+    }
+
+    private ProjectStorefront getOrCreateEditableStorefront(String email, Long projectId) {
+        Project project = getEditableProject(email, projectId);
+        ensureEcommerceProject(project);
+
+        return projectStorefrontRepository.findByProjectId(project.getId())
+                .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
+    }
+
     private Project getOwnedProject(String email, Long projectId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied"));
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(project -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")));
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(project -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .filter(collaborator -> collaborator.getRole() == tn.forma.users.model.CollaboratorRole.EDITOR)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied")));
     }
 
     private void ensureEcommerceProject(Project project) {
         if (project.getType() != ProjectType.ECOMMERCE) {
-            throw new RuntimeException("Storefront editing is only available for ecommerce projects");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Storefront editing is only available for ecommerce projects");
         }
     }
 

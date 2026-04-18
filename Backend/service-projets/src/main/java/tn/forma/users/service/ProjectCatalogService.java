@@ -1,18 +1,23 @@
 package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.CreateProjectProductRequest;
 import tn.forma.users.dto.ProjectCatalogPageDto;
 import tn.forma.users.dto.ProjectCatalogProductDto;
 import tn.forma.users.dto.ProjectCatalogSummaryDto;
 import tn.forma.users.dto.UpdateProjectProductRequest;
+import tn.forma.users.model.CollaboratorRole;
+import tn.forma.users.model.CollaboratorStatus;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectProduct;
 import tn.forma.users.model.ProjectProductStatus;
 import tn.forma.users.model.ProjectProductType;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectCollaboratorRepository;
 import tn.forma.users.repository.ProjectOrderRepository;
 import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
@@ -35,6 +40,7 @@ public class ProjectCatalogService {
     private final ProjectProductRepository projectProductRepository;
     private final ProjectOrderRepository projectOrderRepository;
     private final UserRepository userRepository;
+    private final ProjectCollaboratorRepository collaboratorRepository;
 
     public ProjectCatalogPageDto getCatalogPage(
             String email,
@@ -43,7 +49,7 @@ public class ProjectCatalogService {
             String status,
             String category
     ) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<ProjectProduct> allProducts = projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId());
         List<ProjectCatalogProductDto> mappedProducts = allProducts.stream()
                 .map(this::mapToDto)
@@ -78,7 +84,7 @@ public class ProjectCatalogService {
 
     @Transactional
     public ProjectCatalogProductDto createProduct(String email, Long projectId, CreateProjectProductRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
 
         ProjectProduct product = ProjectProduct.builder()
                 .project(project)
@@ -106,7 +112,7 @@ public class ProjectCatalogService {
             Long productId,
             UpdateProjectProductRequest request
     ) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectProduct product = getOwnedProduct(projectId, productId);
 
         if (request.getName() != null) {
@@ -163,7 +169,7 @@ public class ProjectCatalogService {
 
     @Transactional
     public void deleteProduct(String email, Long projectId, Long productId) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectProduct product = getOwnedProduct(projectId, productId);
         projectOrderRepository.deleteAll(projectOrderRepository.findAllByProjectIdAndProductId(projectId, productId));
         projectProductRepository.delete(product);
@@ -295,9 +301,32 @@ public class ProjectCatalogService {
 
     private Project getOwnedProject(String email, Long projectId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied"));
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(project -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")));
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(project -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .filter(collaborator -> collaborator.getRole() == CollaboratorRole.EDITOR)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied")));
     }
 
     private ProjectProduct getOwnedProduct(Long projectId, Long productId) {

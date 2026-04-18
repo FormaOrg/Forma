@@ -8,6 +8,8 @@ export interface DashboardProjectItem {
   backendId: number;
   name: string;
   description: string;
+  badgeLabel?: string;
+  isShared?: boolean;
   status: DashboardProjectStatus;
   statusLabel: string;
   domain?: string;

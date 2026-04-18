@@ -2,16 +2,21 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.FileUploadResponse;
 import tn.forma.users.dto.ImportProjectMediaRequest;
 import tn.forma.users.dto.ProjectMediaDto;
+import tn.forma.users.model.CollaboratorRole;
+import tn.forma.users.model.CollaboratorStatus;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectMedia;
 import tn.forma.users.model.ProjectMediaType;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectCollaboratorRepository;
 import tn.forma.users.repository.ProjectMediaRepository;
 import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.UserRepository;
@@ -29,10 +34,11 @@ public class ProjectMediaService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final ProjectCollaboratorRepository collaboratorRepository;
 
     @Transactional(readOnly = true)
     public List<ProjectMediaDto> getProjectMedia(String email, Long projectId) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         return projectMediaRepository.findAllByProjectIdOrderByUploadedAtDesc(project.getId())
                 .stream()
                 .map(this::mapToDto)
@@ -41,7 +47,7 @@ public class ProjectMediaService {
 
     @Transactional
     public ProjectMediaDto uploadProjectMedia(String email, Long projectId, MultipartFile file) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
         FileUploadResponse upload = fileUploadService.uploadProjectMedia(file);
 
         ProjectMedia saved = projectMediaRepository.save(ProjectMedia.builder()
@@ -59,7 +65,7 @@ public class ProjectMediaService {
 
     @Transactional
     public ProjectMediaDto importProjectMedia(String email, Long projectId, ImportProjectMediaRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
         String sourceUrl = request.getSourceUrl().trim();
         if (sourceUrl.isEmpty()) {
             throw new RuntimeException("Source URL is required");
@@ -87,7 +93,7 @@ public class ProjectMediaService {
 
     @Transactional
     public void deleteProjectMedia(String email, Long projectId, Long mediaId) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectMedia media = projectMediaRepository.findByIdAndProjectId(mediaId, projectId)
                 .orElseThrow(() -> new RuntimeException("Media not found"));
 
@@ -113,9 +119,32 @@ public class ProjectMediaService {
 
     private Project getOwnedProject(String email, Long projectId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied"));
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(p -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")));
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return projectRepository.findByIdAndUserId(projectId, user.getId())
+                .orElseGet(() -> projectRepository.findById(projectId)
+                        .filter(p -> collaboratorRepository
+                                .findByProjectIdAndUserIdAndStatus(projectId, user.getId(), CollaboratorStatus.ACCEPTED)
+                                .filter(collaborator -> collaborator.getRole() == CollaboratorRole.EDITOR)
+                                .isPresent())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Project not found or access denied")));
     }
 
     private String resolveFileName(String originalFilename, String publicId) {
