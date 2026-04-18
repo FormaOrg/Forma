@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 
 import {
   ProjectSalesQuery,
@@ -37,7 +37,8 @@ import { ProjectSalesProductsPanelComponent } from './project-sales-products-pan
     ProjectSalesFocusPanelComponent
   ],
   templateUrl: './project-sales-page.component.html',
-  styleUrl: './project-sales-page.component.css'
+  styleUrl: './project-sales-page.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProjectSalesPageComponent {
   @Input({ required: true }) rangeOptions: ReadonlyArray<SalesOption<SalesRangePreset>> = [];

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -21,6 +21,7 @@ import { ProjectCustomer } from '../../../../../../core/models/project-customers
 import { ProjectCatalogService } from '../../../../../../core/services/project-catalog.service';
 import { ProjectCustomersService } from '../../../../../../core/services/project-customers.service';
 import { ProjectSalesService } from '../../../../../../core/services/project-sales.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { ProjectSalesPageComponent } from '../project-route-placeholder/sales-page/project-sales-page.component';
 import { buildProjectSalesPreviewResponse } from './project-sales-preview-data';
@@ -39,12 +40,18 @@ const SALES_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2
 });
 
+interface CachedProjectSalesState {
+  response: ProjectSalesPageResponse;
+  orders: ProjectSalesPageResponse['orders']['allItems'];
+}
+
 @Component({
   selector: 'app-project-sales-route',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ProjectSalesPageComponent],
   templateUrl: './project-sales-route.html',
   styleUrl: './project-sales-route.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ProjectSalesRoute implements OnInit {
   private static readonly orderEditorTransitionMs = 220;
@@ -53,6 +60,7 @@ export class ProjectSalesRoute implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly projectSalesService = inject(ProjectSalesService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly projectCustomersService = inject(ProjectCustomersService);
   private readonly projectCatalogService = inject(ProjectCatalogService);
   private readonly toastService = inject(ToastService);
@@ -333,9 +341,18 @@ export class ProjectSalesRoute implements OnInit {
         switchMap((query) => {
           const previousQuery = this.salesQuery();
           const requestToken = ++this.salesRequestToken;
+          const projectId = Number(this.projectId());
+          const cacheKey = this.buildCacheKey(projectId, query);
+          const cachedState = this.pageCache.get<CachedProjectSalesState>(cacheKey);
           this.salesQuery.set(query);
           this.salesSearchValue.set(query.search ?? '');
           this.salesErrorMessage.set('');
+
+          if (cachedState) {
+            this.salesResponse.set(cachedState.response);
+            this.cachedSalesOrders.set(cachedState.orders);
+            this.hasLoadedSales.set(true);
+          }
 
           if (this.hasLoadedSales() && !this.isSalesDataQueryChanged(previousQuery, query)) {
             this.selectedOrderIds.set([]);
@@ -344,7 +361,6 @@ export class ProjectSalesRoute implements OnInit {
 
           this.isSalesLoading.set(true);
 
-          const projectId = Number(this.projectId());
           if (!projectId) {
             return of({ data: null, error: 'Project not found.', query, requestToken, skipFetch: false });
           }
@@ -367,20 +383,26 @@ export class ProjectSalesRoute implements OnInit {
           return;
         }
 
-        if (data) {
-          const hydrated = this.hydrateSalesPreviewData(data, query);
-          this.salesResponse.set(hydrated);
-          if (!skipFetch) {
-            this.cachedSalesOrders.set(hydrated.orders.allItems ?? []);
+          if (data) {
+            const hydrated = this.hydrateSalesPreviewData(data, query);
+            this.salesResponse.set(hydrated);
+            if (!skipFetch) {
+              this.cachedSalesOrders.set(hydrated.orders.allItems ?? []);
+              this.pageCache.set(this.buildCacheKey(Number(this.projectId()), query), {
+                response: hydrated,
+                orders: hydrated.orders.allItems ?? []
+              });
+            }
+            this.selectedOrderIds.set([]);
+            return;
           }
-          this.selectedOrderIds.set([]);
-          return;
-        }
 
-        this.salesResponse.set(null);
-        this.cachedSalesOrders.set([]);
-        this.salesErrorMessage.set(error || 'Something went wrong while loading sales data.');
-      });
+          if (!this.hasLoadedSales()) {
+            this.salesResponse.set(null);
+            this.cachedSalesOrders.set([]);
+            this.salesErrorMessage.set(error || 'Something went wrong while loading sales data.');
+          }
+        });
   }
 
   retrySalesLoad(): void {
@@ -701,6 +723,7 @@ export class ProjectSalesRoute implements OnInit {
     }
 
     const requestToken = ++this.salesRequestToken;
+    const cacheKey = this.buildCacheKey(projectId, query);
     this.salesQuery.set(query);
     this.salesErrorMessage.set('');
     this.isSalesLoading.set(true);
@@ -723,15 +746,21 @@ export class ProjectSalesRoute implements OnInit {
           const hydrated = this.hydrateSalesPreviewData(data, query);
           this.salesResponse.set(hydrated);
           this.cachedSalesOrders.set(hydrated.orders.allItems ?? []);
+          this.pageCache.set(cacheKey, {
+            response: hydrated,
+            orders: hydrated.orders.allItems ?? []
+          });
           this.selectedOrderIds.set([]);
         },
         error: (error) => {
           if (requestToken !== this.salesRequestToken) {
             return;
           }
-          this.salesErrorMessage.set(this.toSalesErrorMessage(error));
-          this.salesResponse.set(null);
-          this.cachedSalesOrders.set([]);
+          if (!this.hasLoadedSales()) {
+            this.salesErrorMessage.set(this.toSalesErrorMessage(error));
+            this.salesResponse.set(null);
+            this.cachedSalesOrders.set([]);
+          }
         }
       });
   }
@@ -1018,6 +1047,10 @@ export class ProjectSalesRoute implements OnInit {
     anchor.download = filename;
     anchor.click();
     URL.revokeObjectURL(objectUrl);
+  }
+
+  private buildCacheKey(projectId: number, query: ProjectSalesQuery): string {
+    return `${projectId}:workspace:sales:${query.range}:${query.compare}`;
   }
 
   @HostListener('document:keydown.escape')

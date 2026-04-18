@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { PortfolioPageItem, PortfolioPagesPage } from '../../../../../../core/models/portfolio-pages.model';
 import { PortfolioPagesService } from '../../../../../../core/services/portfolio-pages.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 
 @Component({
   selector: 'app-project-pages-route',
@@ -16,6 +17,7 @@ import { PortfolioPagesService } from '../../../../../../core/services/portfolio
 export class ProjectPagesRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly portfolioPagesService = inject(PortfolioPagesService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
 
   readonly projectId = toSignal(
     this.route.parent!.paramMap.pipe(map((params) => Number(params.get('projectId') ?? '0'))),
@@ -48,7 +50,15 @@ export class ProjectPagesRoute {
       return;
     }
 
-    this.isLoading.set(true);
+    const cacheKey = this.buildCacheKey(projectId);
+    const cachedPage = this.pageCache.get<PortfolioPagesPage>(cacheKey);
+    if (cachedPage) {
+      this.page.set(cachedPage);
+      this.selectedPageId.set(cachedPage.pages[0]?.id ?? null);
+      this.isLoading.set(false);
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.portfolioPagesService
@@ -57,11 +67,14 @@ export class ProjectPagesRoute {
       .subscribe({
         next: (page) => {
           this.page.set(page);
+          this.pageCache.set(cacheKey, page);
           this.selectedPageId.set(page.pages[0]?.id ?? null);
         },
         error: () => {
-          this.page.set(null);
-          this.errorMessage.set('Unable to load portfolio pages right now.');
+          if (!cachedPage) {
+            this.page.set(null);
+            this.errorMessage.set('Unable to load portfolio pages right now.');
+          }
         },
       });
   }
@@ -82,5 +95,9 @@ export class ProjectPagesRoute {
       month: 'short',
       day: 'numeric',
     }).format(parsed);
+  }
+
+  private buildCacheKey(projectId: number): string {
+    return `${projectId}:workspace:pages`;
   }
 }

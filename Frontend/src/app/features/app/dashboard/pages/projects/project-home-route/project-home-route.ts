@@ -5,6 +5,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { finalize, map } from 'rxjs';
 import { ProjectHomePage } from '../../../../../../core/models/project-home.model';
 import { ProjectHomeService } from '../../../../../../core/services/project-home.service';
+import { ProjectWorkspacePageCacheService } from '../../../../../../core/services/project-workspace-page-cache.service';
 import { parseServerDateToTimestamp } from '../../../../../../core/utils/server-date.util';
 import {
   getProjectWorkspaceConfig,
@@ -42,6 +43,7 @@ export class ProjectHomeRoute {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly projectHomeService = inject(ProjectHomeService);
+  private readonly pageCache = inject(ProjectWorkspacePageCacheService);
   private readonly i18n = inject(I18nService);
 
   readonly projectId = toSignal(
@@ -146,19 +148,35 @@ export class ProjectHomeRoute {
       return;
     }
 
-    this.isLoading.set(true);
+    const cacheKey = this.buildCacheKey(projectId);
+    const cachedPage = this.pageCache.get<ProjectHomePage>(cacheKey);
+    if (cachedPage) {
+      this.page.set(cachedPage);
+      this.isLoading.set(false);
+    } else {
+      this.isLoading.set(true);
+    }
     this.errorMessage.set('');
 
     this.projectHomeService
       .getHomePage(projectId)
       .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => this.page.set(page),
+        next: (page) => {
+          this.page.set(page);
+          this.pageCache.set(cacheKey, page);
+        },
         error: () => {
-          this.page.set(null);
-          this.errorMessage.set(this.i18n.t('project.home.errors.load'));
+          if (!cachedPage) {
+            this.page.set(null);
+            this.errorMessage.set(this.i18n.t('project.home.errors.load'));
+          }
         },
       });
+  }
+
+  private buildCacheKey(projectId: number): string {
+    return `${projectId}:workspace:home`;
   }
 
   formatOccurredAt(value: string): string {

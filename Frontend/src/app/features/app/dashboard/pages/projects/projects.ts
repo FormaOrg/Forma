@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
@@ -22,6 +22,7 @@ type ProjectView = 'cards' | 'rows';
   imports: [CommonModule, FormsModule, RouterLink, DataCard, ProjectCard, TranslatePipe],
   templateUrl: './projects.live.html',
   styleUrl: './projects.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class Projects implements OnInit {
   private readonly dashboardDataService = inject(DashboardDataService);

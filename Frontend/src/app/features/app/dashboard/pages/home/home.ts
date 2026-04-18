@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, of, timeout } from 'rxjs';
 import { BillingOverview, DashboardProjectItem, DashboardTemplateItem } from '../../../../../core/models/dashboard.model';
@@ -22,6 +22,7 @@ import { HomeActivityItem, HomeRecentProject, HomeRecentTemplateItem, HomeSetupS
   imports: [GreetingSection, DataCard, RecentProjects, RecentActivity, AccountSnapshot, SetupProgress, RecentTemplates, RouterLink, TranslatePipe],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class Home implements OnInit {
   private readonly userService = inject(UserService);

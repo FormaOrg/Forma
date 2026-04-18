@@ -2,13 +2,15 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  min-width: 0;
 }
 
 .sales-page {
   box-sizing: border-box;
-  max-width: 1400px;
   width: 100%;
-  padding: 24px 28px 30px;
+  max-width: 1400px;
+  min-width: 0;
+  padding: 28px 32px 36px;
   display: flex;
   flex-direction: column;
   gap: 14px;
