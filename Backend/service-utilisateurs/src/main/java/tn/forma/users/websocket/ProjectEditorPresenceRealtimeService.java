@@ -138,7 +138,9 @@ public class ProjectEditorPresenceRealtimeService {
                     unregister(context.session());
                     continue;
                 }
-                context.session().sendMessage(message);
+                synchronized (context.session()) {
+                    context.session().sendMessage(message);
+                }
             } catch (IOException ex) {
                 log.debug("Failed to broadcast to {}: {}", context.email(), ex.getMessage());
                 unregister(context.session());
@@ -178,7 +180,9 @@ public class ProjectEditorPresenceRealtimeService {
                     continue;
                 }
 
-                context.session().sendMessage(message);
+                synchronized (context.session()) {
+                    context.session().sendMessage(message);
+                }
             } catch (IOException ex) {
                 log.debug("Failed to push editor presence to {}: {}", context.email(), ex.getMessage());
                 unregister(context.session());
