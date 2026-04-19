@@ -43,6 +43,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AfterCommitExecutor afterCommitExecutor;
     private final EmailService emailService;
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
@@ -328,7 +329,12 @@ public class UserService {
         user.setLoginVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        emailService.sendLoginVerificationCode(user.getEmail(), user.getFirstName(), code, request.isEnable());
+        dispatchEmailAfterCommit(() -> emailService.sendLoginVerificationCode(
+                user.getEmail(),
+                user.getFirstName(),
+                code,
+                request.isEnable()
+        ));
         return new MessageResponse("Verification code sent to your account email");
     }
 
@@ -397,7 +403,11 @@ public class UserService {
         user.setEmailChangeCodeExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        emailService.sendEmailChangeCode(normalizedEmail, user.getFirstName(), code);
+        dispatchEmailAfterCommit(() -> emailService.sendEmailChangeCode(
+                normalizedEmail,
+                user.getFirstName(),
+                code
+        ));
         log.info("Email change requested for user {}", email);
         return new MessageResponse("Verification code sent to your new email");
     }
@@ -416,7 +426,11 @@ public class UserService {
         user.setEmailChangeCodeExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        emailService.sendEmailChangeCode(user.getPendingEmail(), user.getFirstName(), code);
+        dispatchEmailAfterCommit(() -> emailService.sendEmailChangeCode(
+                user.getPendingEmail(),
+                user.getFirstName(),
+                code
+        ));
         return new MessageResponse("Verification code resent");
     }
 
@@ -592,6 +606,10 @@ public class UserService {
         }
 
         verifyCurrentPassword(user, normalizedPassword);
+    }
+
+    private void dispatchEmailAfterCommit(Runnable action) {
+        afterCommitExecutor.execute(action);
     }
 
     private String requiredTrimmed(String value, String message) {
