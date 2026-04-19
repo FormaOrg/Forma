@@ -1,5 +1,6 @@
 package tn.forma.users.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import tn.forma.users.dto.*;
@@ -32,8 +33,8 @@ public class AuthController {
     }
 
     @GetMapping("/google/link-config")
-    public ResponseEntity<GoogleLinkConfigResponse> googleLinkConfig() {
-        return ResponseEntity.ok(authService.getGoogleLinkConfig());
+    public ResponseEntity<GoogleLinkConfigResponse> googleLinkConfig(HttpServletRequest request) {
+        return ResponseEntity.ok(authService.getGoogleLinkConfig(request));
     }
 
     @PostMapping("/google")

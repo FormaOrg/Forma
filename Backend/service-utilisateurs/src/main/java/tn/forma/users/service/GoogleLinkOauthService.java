@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +14,19 @@ import tn.forma.users.dto.GoogleLinkConfigResponse;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,18 +51,21 @@ public class GoogleLinkOauthService {
     @Value("${application.frontend-url:http://localhost:4200}")
     private String frontendUrl;
 
-    public GoogleLinkConfigResponse getConfig() {
+    @Value("${application.allowed-origins:}")
+    private String allowedOrigins;
+
+    public GoogleLinkConfigResponse getConfig(HttpServletRequest request) {
         if (linkClientId == null || linkClientId.isBlank()) {
             throw new RuntimeException("Google account linking is not configured");
         }
 
-        return new GoogleLinkConfigResponse(linkClientId, resolveRedirectUri());
+        return new GoogleLinkConfigResponse(linkClientId, resolveRedirectUri(request));
     }
 
     public GoogleIdToken.Payload exchangeCodeForPayload(String code, String redirectUri) {
-        GoogleLinkConfigResponse config = getConfig();
+        String registeredRedirectUri = resolveRegisteredRedirectUri(redirectUri);
 
-        if (!normalizeRedirectUri(config.getRedirectUri()).equals(normalizeRedirectUri(redirectUri))) {
+        if (registeredRedirectUri == null) {
             throw new RuntimeException("Invalid Google redirect URI");
         }
 
@@ -63,7 +74,7 @@ public class GoogleLinkOauthService {
         }
 
         try {
-            String form = buildFormBody(code, redirectUri, config.getClientId(), linkClientSecret);
+            String form = buildFormBody(code, registeredRedirectUri, linkClientId, linkClientSecret);
 
             HttpRequest request = HttpRequest.newBuilder(TOKEN_URI)
                     .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -81,7 +92,7 @@ public class GoogleLinkOauthService {
                 throw new RuntimeException("Google account linking failed. Please try again.");
             }
 
-            return verifyIdToken(idToken, config.getClientId());
+            return verifyIdToken(idToken, linkClientId);
         } catch (RuntimeException ex) {
             throw ex;
         } catch (InterruptedException ex) {
@@ -139,15 +150,121 @@ public class GoogleLinkOauthService {
             return "";
         }
 
-        return redirectUri.endsWith("/") ? redirectUri.substring(0, redirectUri.length() - 1) : redirectUri;
+        String normalized = redirectUri.trim();
+        return normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized;
     }
 
-    private String resolveRedirectUri() {
-        if (linkRedirectUri != null && !linkRedirectUri.isBlank()) {
-            return linkRedirectUri;
+    private String resolveRedirectUri(HttpServletRequest request) {
+        String requestedOrigin = resolveRequestOrigin(request);
+        if (requestedOrigin != null) {
+            return buildCanonicalRedirectUri(requestedOrigin);
         }
 
         String normalizedFrontendUrl = normalizeRedirectUri(frontendUrl);
         return normalizedFrontendUrl + "/google-oauth-popup.html";
+    }
+
+    private String resolveRegisteredRedirectUri(String redirectUri) {
+        String normalizedIncoming = normalizeRedirectUri(redirectUri);
+        for (String candidateOrigin : getAllowedOriginsInPriorityOrder()) {
+            String canonicalRedirectUri = buildCanonicalRedirectUri(candidateOrigin);
+            if (matchesRedirectCandidate(normalizedIncoming, canonicalRedirectUri)) {
+                return canonicalRedirectUri;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean matchesRedirectCandidate(String incomingRedirectUri, String canonicalRedirectUri) {
+        String normalizedCanonical = normalizeRedirectUri(canonicalRedirectUri);
+        if (Objects.equals(incomingRedirectUri, normalizedCanonical)) {
+            return true;
+        }
+
+        String popupWithoutHtml = normalizedCanonical.replace("/google-oauth-popup.html", "/google-oauth-popup");
+        return Objects.equals(incomingRedirectUri, popupWithoutHtml);
+    }
+
+    private String buildCanonicalRedirectUri(String origin) {
+        return normalizeRedirectUri(origin) + "/google-oauth-popup.html";
+    }
+
+    private String resolveRequestOrigin(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        String originHeader = normalizeOrigin(request.getHeader("Origin"));
+        if (originHeader != null && isConfiguredOrigin(originHeader)) {
+            return originHeader;
+        }
+
+        String refererOrigin = extractOrigin(request.getHeader("Referer"));
+        if (refererOrigin != null && isConfiguredOrigin(refererOrigin)) {
+            return refererOrigin;
+        }
+
+        return null;
+    }
+
+    private boolean isConfiguredOrigin(String origin) {
+        return getAllowedOriginsInPriorityOrder().stream()
+                .map(this::normalizeOrigin)
+                .filter(Objects::nonNull)
+                .anyMatch(origin::equals);
+    }
+
+    private List<String> getAllowedOriginsInPriorityOrder() {
+        LinkedHashSet<String> origins = new LinkedHashSet<>();
+
+        if (linkRedirectUri != null && !linkRedirectUri.isBlank()) {
+            String configuredOrigin = extractOrigin(linkRedirectUri);
+            if (configuredOrigin != null) {
+                origins.add(configuredOrigin);
+            }
+        }
+
+        String normalizedFrontendUrl = normalizeOrigin(frontendUrl);
+        if (normalizedFrontendUrl != null) {
+            origins.add(normalizedFrontendUrl);
+        }
+
+        if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+            Arrays.stream(allowedOrigins.split(","))
+                    .map(this::normalizeOrigin)
+                    .filter(Objects::nonNull)
+                    .forEach(origins::add);
+        }
+
+        return new ArrayList<>(origins);
+    }
+
+    private String normalizeOrigin(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            URI uri = new URI(normalizeRedirectUri(value));
+            String scheme = Optional.ofNullable(uri.getScheme()).map(String::toLowerCase).orElse(null);
+            String host = Optional.ofNullable(uri.getHost()).map(String::toLowerCase).orElse(null);
+            if (scheme == null || host == null) {
+                return null;
+            }
+
+            int port = uri.getPort();
+            if (port == -1 || ("https".equals(scheme) && port == 443) || ("http".equals(scheme) && port == 80)) {
+                return scheme + "://" + host;
+            }
+
+            return scheme + "://" + host + ":" + port;
+        } catch (URISyntaxException ex) {
+            return null;
+        }
+    }
+
+    private String extractOrigin(String value) {
+        return normalizeOrigin(value);
     }
 }

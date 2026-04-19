@@ -1,6 +1,7 @@
 package tn.forma.users.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -334,8 +335,8 @@ public class AuthService {
         return googleIdentityService.getClientId();
     }
 
-    public GoogleLinkConfigResponse getGoogleLinkConfig() {
-        return googleLinkOauthService.getConfig();
+    public GoogleLinkConfigResponse getGoogleLinkConfig(HttpServletRequest request) {
+        return googleLinkOauthService.getConfig(request);
     }
 
     // ── Private helpers ────────────────────────────────────
