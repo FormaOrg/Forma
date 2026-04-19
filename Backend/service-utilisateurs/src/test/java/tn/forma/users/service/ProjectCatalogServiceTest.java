@@ -44,6 +44,9 @@ class ProjectCatalogServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
+    @Mock
+    private ProjectAccessService projectAccessService;
+
     @InjectMocks
     private ProjectCatalogService projectCatalogService;
 
@@ -78,8 +81,7 @@ class ProjectCatalogServiceTest {
                 .active(false)
                 .build();
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getAccessibleProject(user.getEmail(), project.getId())).thenReturn(project);
         when(projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId()))
                 .thenReturn(List.of(activeProduct, draftProduct));
 
@@ -134,8 +136,7 @@ class ProjectCatalogServiceTest {
                 .active(false)
                 .build();
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getEditableProject(user.getEmail(), project.getId())).thenReturn(project);
         when(projectProductRepository.saveAndFlush(any(ProjectProduct.class))).thenReturn(savedProduct);
 
         var created = projectCatalogService.createProduct(user.getEmail(), project.getId(), createRequest);

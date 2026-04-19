@@ -29,10 +29,11 @@ public class ProjectMediaService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final ProjectAccessService projectAccessService;
 
     @Transactional(readOnly = true)
     public List<ProjectMediaDto> getProjectMedia(String email, Long projectId) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         return projectMediaRepository.findAllByProjectIdOrderByUploadedAtDesc(project.getId())
                 .stream()
                 .map(this::mapToDto)
@@ -41,7 +42,7 @@ public class ProjectMediaService {
 
     @Transactional
     public ProjectMediaDto uploadProjectMedia(String email, Long projectId, MultipartFile file) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
         FileUploadResponse upload = fileUploadService.uploadProjectMedia(file);
 
         ProjectMedia saved = projectMediaRepository.save(ProjectMedia.builder()
@@ -59,7 +60,7 @@ public class ProjectMediaService {
 
     @Transactional
     public ProjectMediaDto importProjectMedia(String email, Long projectId, ImportProjectMediaRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
         String sourceUrl = request.getSourceUrl().trim();
         if (sourceUrl.isEmpty()) {
             throw new RuntimeException("Source URL is required");
@@ -88,7 +89,7 @@ public class ProjectMediaService {
 
     @Transactional
     public void deleteProjectMedia(String email, Long projectId, Long mediaId) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectMedia media = projectMediaRepository.findByIdAndProjectId(mediaId, projectId)
                 .orElseThrow(() -> new RuntimeException("Media not found"));
 
@@ -113,10 +114,15 @@ public class ProjectMediaService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private String resolveFileName(String originalFilename, String publicId) {

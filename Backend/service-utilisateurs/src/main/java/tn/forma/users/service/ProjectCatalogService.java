@@ -38,6 +38,7 @@ public class ProjectCatalogService {
     private final ProjectOrderRepository projectOrderRepository;
     private final UserRepository userRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectCatalogPageDto getCatalogPage(
             String email,
@@ -46,7 +47,7 @@ public class ProjectCatalogService {
             String status,
             String category
     ) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<ProjectProduct> allProducts = projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId());
         List<ProjectCatalogProductDto> mappedProducts = allProducts.stream()
                 .map(this::mapToDto)
@@ -81,7 +82,7 @@ public class ProjectCatalogService {
 
     @Transactional
     public ProjectCatalogProductDto createProduct(String email, Long projectId, CreateProjectProductRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
         ProjectProduct product = buildProduct(project, request);
 
         syncProjectProductSequence();
@@ -105,7 +106,7 @@ public class ProjectCatalogService {
             Long productId,
             UpdateProjectProductRequest request
     ) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectProduct product = getOwnedProduct(projectId, productId);
 
         if (request.getName() != null) {
@@ -162,7 +163,7 @@ public class ProjectCatalogService {
 
     @Transactional
     public void deleteProduct(String email, Long projectId, Long productId) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectProduct product = getOwnedProduct(projectId, productId);
         projectOrderRepository.deleteAll(projectOrderRepository.findAllByProjectIdAndProductId(projectId, productId));
         projectProductRepository.delete(product);
@@ -293,10 +294,15 @@ public class ProjectCatalogService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private ProjectProduct getOwnedProduct(Long projectId, Long productId) {

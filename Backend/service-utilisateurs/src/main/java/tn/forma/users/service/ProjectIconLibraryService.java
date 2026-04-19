@@ -26,7 +26,7 @@ public class ProjectIconLibraryService {
 
     @Transactional(readOnly = true)
     public List<ProjectIconLibraryItemDto> searchProjectIcons(String email, Long projectId, String query, int limit) {
-        projectService.ensureProjectOwnership(email, projectId);
+        projectService.ensureProjectEditableAccess(email, projectId);
 
         String normalizedQuery = query == null ? "" : query.trim();
         String likeQuery = "%" + normalizedQuery + "%";

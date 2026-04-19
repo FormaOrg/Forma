@@ -39,6 +39,7 @@ public class ProjectSalesService {
     private final ProjectCustomerRepository projectCustomerRepository;
     private final ProjectProductRepository projectProductRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectSalesPageDto getSalesPage(
             String email,
@@ -51,7 +52,7 @@ public class ProjectSalesService {
             Integer page,
             Integer size
     ) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         ResolvedRange currentRange = resolveRange(rangePreset);
         ResolvedRange comparisonRange = currentRange.previous();
 
@@ -83,7 +84,7 @@ public class ProjectSalesService {
             SalesOrderSort sort,
             SalesOrderFilter filter
     ) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<ProjectOrder> orders = applyOrderFilters(loadOrders(project.getId(), resolveRange(rangePreset)), search, filter, sort);
 
         StringBuilder csv = new StringBuilder();
@@ -105,13 +106,13 @@ public class ProjectSalesService {
     }
 
     public ProjectSalesOrderEditorDto getOrder(String email, Long projectId, Long orderId) {
-        getOwnedProject(email, projectId);
+        getAccessibleProject(email, projectId);
         return mapOrderEditorDto(getOwnedOrder(projectId, orderId));
     }
 
     @Transactional
     public ProjectSalesOrderEditorDto createOrder(String email, Long projectId, CreateProjectOrderRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
 
         ProjectOrder order = new ProjectOrder();
         order.setProject(project);
@@ -127,7 +128,7 @@ public class ProjectSalesService {
             Long orderId,
             UpdateProjectOrderRequest request
     ) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectOrder order = getOwnedOrder(projectId, orderId);
         applyOrderRequest(order, projectId, request);
         return mapOrderEditorDto(projectOrderRepository.save(order));
@@ -135,7 +136,7 @@ public class ProjectSalesService {
 
     @Transactional
     public void deleteOrders(String email, Long projectId, List<Long> orderIds) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         if (orderIds == null || orderIds.isEmpty()) {
             throw new RuntimeException("At least one order must be selected.");
         }
@@ -583,8 +584,15 @@ public class ProjectSalesService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId()).orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private ResolvedRange resolveRange(SalesRangePreset rangePreset) {

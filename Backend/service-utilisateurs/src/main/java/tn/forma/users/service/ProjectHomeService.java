@@ -43,6 +43,7 @@ public class ProjectHomeService {
     private final PortfolioPageService portfolioPageService;
     private final ProjectAnalyticsEventRepository projectAnalyticsEventRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectHomePageDto getHomePage(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
@@ -359,10 +360,7 @@ public class ProjectHomeService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
     }
 
     private String displayName(User user) {

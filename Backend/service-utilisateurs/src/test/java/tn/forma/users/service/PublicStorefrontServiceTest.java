@@ -45,6 +45,9 @@ class PublicStorefrontServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private ProjectAccessService projectAccessService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
@@ -67,7 +70,8 @@ class PublicStorefrontServiceTest {
                 projectRepository,
                 projectStorefrontRepository,
                 projectProductRepository,
-                userRepository
+                userRepository,
+                projectAccessService
         );
 
         var home = service.getPublishedStorefrontHome(project.getId());
@@ -99,7 +103,8 @@ class PublicStorefrontServiceTest {
                 projectRepository,
                 projectStorefrontRepository,
                 projectProductRepository,
-                userRepository
+                userRepository,
+                projectAccessService
         );
 
         assertThatThrownBy(() -> service.getPublishedProducts(project.getId()))
@@ -149,8 +154,7 @@ class PublicStorefrontServiceTest {
                 null
         );
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getAccessibleProject(user.getEmail(), project.getId())).thenReturn(project);
         when(projectStorefrontRepository.findByProjectId(project.getId())).thenReturn(Optional.of(storefront));
         when(projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId())).thenReturn(List.of(draftProduct));
 
@@ -158,7 +162,8 @@ class PublicStorefrontServiceTest {
                 projectRepository,
                 projectStorefrontRepository,
                 projectProductRepository,
-                userRepository
+                userRepository,
+                projectAccessService
         );
 
         var home = service.getPreviewStorefrontHome(user.getEmail(), project.getId());
