@@ -101,6 +101,15 @@ public class ProjectEditorPresenceRealtimeService {
     }
 
     public void broadcastToOthers(WebSocketSession sender, Long projectId, JsonNode payload) {
+        if (sender == null || projectId == null) {
+            return;
+        }
+
+        ConnectionContext senderContext = connectionsBySocketId.get(sender.getId());
+        if (senderContext == null || !Objects.equals(senderContext.activeProjectId(), projectId)) {
+            return;
+        }
+
         Set<String> socketIds = socketIdsByProjectId.get(projectId);
         if (socketIds == null || socketIds.isEmpty()) {
             return;

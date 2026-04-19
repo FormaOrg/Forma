@@ -509,6 +509,7 @@ private readonly destroyRef = inject(DestroyRef);
 
 private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
 private isRemoteReload = false;
+private isReloadingFromRemote = false;
 private readonly cursorStaleTimers = new Map<number, ReturnType<typeof setTimeout>>();
 private static readonly CURSOR_STALE_MS = 5000;
 private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -14923,21 +14924,29 @@ isSectionAttachTarget(sectionId: string): boolean {
       return;
     }
 
+    if (this.isReloadingFromRemote) return;
+
     const projectId = this.projectId();
     if (!projectId) return;
 
-    this.isRemoteReload = true;
+    this.isReloadingFromRemote = true;
     this.projectStorefrontService
       .getStorefront(projectId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {
+          this.isReloadingFromRemote = false;
+          if (this.isDirty()) {
+            this.showRemoteUpdateBanner.set(true);
+            return;
+          }
           const snapshot = this.normalizeStorefront(storefront);
+          this.isRemoteReload = true;
           this.applyPersistedStorefront(snapshot, { resetHistory: false });
-          this.isRemoteReload = false;
+          setTimeout(() => { this.isRemoteReload = false; }, 0);
         },
         error: () => {
-          this.isRemoteReload = false;
+          this.isReloadingFromRemote = false;
         },
       });
   }
@@ -14956,19 +14965,21 @@ isSectionAttachTarget(sectionId: string): boolean {
       this.autosaveTimer = null;
     }
     this.hasPendingChanges.set(false);
+    this.isReloadingFromRemote = true;
 
-    this.isRemoteReload = true;
     this.projectStorefrontService
       .getStorefront(projectId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (storefront) => {
+          this.isReloadingFromRemote = false;
           const snapshot = this.normalizeStorefront(storefront);
+          this.isRemoteReload = true;
           this.applyPersistedStorefront(snapshot, { resetHistory: false });
-          this.isRemoteReload = false;
+          setTimeout(() => { this.isRemoteReload = false; }, 0);
         },
         error: () => {
-          this.isRemoteReload = false;
+          this.isReloadingFromRemote = false;
           this.toastService.error('Could not reload the latest version.');
         },
       });
