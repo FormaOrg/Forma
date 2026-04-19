@@ -1,4 +1,5 @@
 import { BillingMode } from '../../features/pricing/pricing-plans';
+import { BillingPlanCode } from './billing-plan.model';
 import { CreationMethod, ProjectType } from './project.model';
 
 export type DashboardProjectStatus = 'published' | 'draft' | 'archived';
@@ -98,4 +99,12 @@ export interface BillingOverview {
   activeProjectsCount: number;
   paidInvoicesCount: number;
   currentSpendLabel: string;
+}
+
+export interface ApiMessageResponse {
+  message: string;
+}
+
+export interface UpdateSubscriptionPlanRequest {
+  plan: BillingPlanCode;
 }

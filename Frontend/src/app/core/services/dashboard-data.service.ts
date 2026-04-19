@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, shareReplay } from 'rxjs/operators';
+import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import {
+  ApiMessageResponse,
   BillingOverview,
   DashboardProjectItem,
   DashboardProjectStatus,
   DashboardTemplateItem,
+  UpdateSubscriptionPlanRequest,
 } from '../models/dashboard.model';
+import { BillingPlanCode } from '../models/billing-plan.model';
 import { CreationMethod, Project, ProjectType, TemplateRecord } from '../models/project.model';
 import { AuthService } from './auth.service';
 import { ProjectService } from './project.service';
@@ -73,6 +76,14 @@ export class DashboardDataService {
     return this.billingOverviewCache$;
   }
 
+  updateSubscriptionPlan(plan: BillingPlanCode): Observable<ApiMessageResponse> {
+    const request: UpdateSubscriptionPlanRequest = { plan };
+
+    return this.http.put<ApiMessageResponse>(`${environment.billingApiUrl}/billing/subscription`, request).pipe(
+      tap(() => this.invalidateBillingOverviewCache())
+    );
+  }
+
   getTemplatesOverview(options?: { useCache?: boolean }): Observable<DashboardTemplateItem[]> {
     if (options?.useCache === false) {
       return this.fetchTemplatesOverview();
@@ -128,7 +139,7 @@ export class DashboardDataService {
   }
 
   private fetchBillingOverview(): Observable<BillingOverview> {
-    return this.http.get<BillingOverview>(`${environment.apiUrl}/billing/overview`);
+    return this.http.get<BillingOverview>(`${environment.billingApiUrl}/billing/overview`);
   }
 
   private fetchTemplatesOverview(): Observable<DashboardTemplateItem[]> {

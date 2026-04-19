@@ -248,6 +248,111 @@ app-app-header .app-header__profile {
   position: relative;
 }
 
+app-app-header .app-header__upgrade {
+  position: relative;
+}
+
+app-app-header .app-header__upgrade-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 80;
+  animation: app-header-dropdown-in 0.22s var(--ease);
+}
+
+app-app-header .app-header__upgrade-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+app-app-header .app-header__upgrade-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+app-app-header .app-header__upgrade-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(117, 102, 255, 0.1);
+  color: #5d4fd6;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+app-app-header .app-header__upgrade-list {
+  display: grid;
+  gap: 8px;
+}
+
+app-app-header .app-header__upgrade-option {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+app-app-header .app-header__upgrade-option:hover,
+app-app-header .app-header__upgrade-option--active {
+  border-color: rgba(117, 102, 255, 0.28);
+  background: rgba(117, 102, 255, 0.06);
+}
+
+app-app-header .app-header__upgrade-option--current {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+app-app-header .app-header__upgrade-option-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+app-app-header .app-header__upgrade-option-copy {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+app-app-header .app-header__upgrade-cta {
+  width: 100%;
+  margin-top: 12px;
+  height: 42px;
+  border: 1px solid #7566ff;
+  border-radius: var(--radius);
+  background: #7566ff;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--dur) var(--ease), transform 0.15s ease;
+}
+
+app-app-header .app-header__upgrade-cta:hover {
+  opacity: 0.92;
+}
+
+app-app-header .app-header__upgrade-cta:active {
+  transform: scale(0.98);
+}
+
 app-app-header .app-header__avatar-btn {
   box-sizing: border-box;
   width: 40px;
@@ -711,6 +816,35 @@ app-app-header .app-header__command-footer kbd {
   background: #182131;
   color: #f4f7ff;
   border-color: rgba(117, 102, 255, 0.24);
+}
+
+.theme-dark app-app-header .app-header__upgrade-dropdown {
+  background: #171e2a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.theme-dark app-app-header .app-header__upgrade-title,
+.theme-dark app-app-header .app-header__upgrade-option-copy {
+  color: rgba(226, 231, 244, 0.62);
+}
+
+.theme-dark app-app-header .app-header__upgrade-option {
+  background: #141c29;
+  border-color: rgba(226, 231, 244, 0.08);
+}
+
+.theme-dark app-app-header .app-header__upgrade-option-name {
+  color: #eef2ff;
+}
+
+.theme-dark app-app-header .app-header__upgrade-option:hover,
+.theme-dark app-app-header .app-header__upgrade-option--active {
+  background: rgba(117, 102, 255, 0.14);
+  border-color: rgba(117, 102, 255, 0.26);
+}
+
+.theme-dark app-app-header .app-header__upgrade-option--current {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 @keyframes app-header-command-fade {

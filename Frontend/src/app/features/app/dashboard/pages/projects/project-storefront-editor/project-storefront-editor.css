@@ -4344,6 +4344,99 @@
  width: 272px;
 }
 
+.storefront-editor__menu--upgrade {
+  left: 0;
+  width: 312px;
+  padding: 12px;
+}
+
+.storefront-editor__upgrade-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.storefront-editor__upgrade-summary-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.58);
+}
+
+.storefront-editor__upgrade-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(117, 102, 255, 0.12);
+  color: #5d4fd6;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.storefront-editor__upgrade-list {
+  display: grid;
+  gap: 8px;
+}
+
+.storefront-editor__upgrade-option {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: #fff;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.storefront-editor__upgrade-option strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.storefront-editor__upgrade-option span {
+  font-size: 13px;
+  color: rgba(15, 23, 42, 0.58);
+}
+
+.storefront-editor__upgrade-option:hover,
+.storefront-editor__upgrade-option--active {
+  border-color: rgba(117, 102, 255, 0.26);
+  background: rgba(117, 102, 255, 0.07);
+}
+
+.storefront-editor__upgrade-option--current {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.storefront-editor__upgrade-cta {
+  width: 100%;
+  margin-top: 12px;
+  height: 42px;
+  border: 1px solid #7566ff;
+  border-radius: 14px;
+  background: #7566ff;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 0.15s ease;
+}
+
+.storefront-editor__upgrade-cta:hover {
+  opacity: 0.92;
+}
+
+.storefront-editor__upgrade-cta:active {
+  transform: scale(0.98);
+}
+
 .storefront-editor__brand-kit-panel-shell {
   position: fixed;
   top: 66px;
@@ -11304,6 +11397,8 @@
 :host-context([data-theme='dark']) .storefront-editor__menu-row small,
 :host-context([data-theme='dark']) .storefront-editor__menu-icon,
 :host-context([data-theme='dark']) .storefront-editor__menu-row--muted,
+:host-context([data-theme='dark']) .storefront-editor__upgrade-summary-label,
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option span,
 :host-context([data-theme='dark']) .storefront-editor__text-link-popup-helper,
 :host-context([data-theme='dark']) .storefront-editor__menu-panel-help,
 :host-context([data-theme='dark']) .storefront-editor__menu-manage-drag,
@@ -11313,6 +11408,8 @@
 :host-context(.theme-dark) .storefront-editor__menu-row small,
 :host-context(.theme-dark) .storefront-editor__menu-icon,
 :host-context(.theme-dark) .storefront-editor__menu-row--muted,
+:host-context(.theme-dark) .storefront-editor__upgrade-summary-label,
+:host-context(.theme-dark) .storefront-editor__upgrade-option span,
 :host-context(.theme-dark) .storefront-editor__text-link-popup-helper,
 :host-context(.theme-dark) .storefront-editor__menu-panel-help,
 :host-context(.theme-dark) .storefront-editor__menu-manage-drag,
@@ -11325,16 +11422,37 @@
 :host-context([data-theme='dark']) .storefront-editor__text-link-popup-toggle-button,
 :host-context([data-theme='dark']) .storefront-editor__text-link-popup-advanced,
 :host-context([data-theme='dark']) .storefront-editor__menu-item-actions-entry,
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option,
 :host-context([data-theme='dark']) .storefront-editor__page-card-canvas-header,
 :host-context([data-theme='dark']) .storefront-editor__page-card-title,
 :host-context([data-theme='dark']) .storefront-editor__page-card-more-button,
 :host-context(.theme-dark) .storefront-editor__text-link-popup-toggle-button,
 :host-context(.theme-dark) .storefront-editor__text-link-popup-advanced,
 :host-context(.theme-dark) .storefront-editor__menu-item-actions-entry,
+:host-context(.theme-dark) .storefront-editor__upgrade-option,
 :host-context(.theme-dark) .storefront-editor__page-card-canvas-header,
 :host-context(.theme-dark) .storefront-editor__page-card-title,
 :host-context(.theme-dark) .storefront-editor__page-card-more-button {
   color: #eef2ff;
+}
+
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option,
+:host-context(.theme-dark) .storefront-editor__upgrade-option {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option:hover,
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option--active,
+:host-context(.theme-dark) .storefront-editor__upgrade-option:hover,
+:host-context(.theme-dark) .storefront-editor__upgrade-option--active {
+  background: rgba(117, 102, 255, 0.14);
+  border-color: rgba(117, 102, 255, 0.28);
+}
+
+:host-context([data-theme='dark']) .storefront-editor__upgrade-option--current,
+:host-context(.theme-dark) .storefront-editor__upgrade-option--current {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 :host-context([data-theme='dark']) .storefront-editor__text-link-popup-remove,

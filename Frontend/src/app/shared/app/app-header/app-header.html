@@ -70,6 +70,45 @@
   </div>
 
   <div class="app-header__right">
+    <div class="app-header__upgrade" data-upgrade-anchor>
+      <button
+        type="button"
+        class="app-header__action app-header__action--secondary"
+        (click)="toggleUpgradeMenu($event)"
+        [attr.aria-expanded]="isUpgradeMenuOpen"
+        aria-haspopup="menu"
+      >
+        <span>{{ 'app.header.actions.upgrade' | t }}</span>
+      </button>
+
+      @if (isUpgradeMenuOpen) {
+        <div class="app-header__upgrade-dropdown" role="menu" (click)="$event.stopPropagation()">
+          <div class="app-header__upgrade-head">
+            <span class="app-header__upgrade-title">Your current plan</span>
+            <span class="app-header__upgrade-badge">{{ toBillingPlanLabel(currentPlanCode()) }}</span>
+          </div>
+
+          <div class="app-header__upgrade-list">
+            @for (plan of upgradePlans; track plan.code) {
+              <button
+                type="button"
+                class="app-header__upgrade-option"
+                [class.app-header__upgrade-option--active]="selectedUpgradePlan() === plan.code"
+                [class.app-header__upgrade-option--current]="currentPlanCode() === plan.code"
+                (click)="selectUpgradePlan(plan.code)"
+              >
+                <span class="app-header__upgrade-option-name">{{ plan.label }}</span>
+                <span class="app-header__upgrade-option-copy">{{ plan.summary }}</span>
+              </button>
+            }
+          </div>
+
+          <button type="button" class="app-header__upgrade-cta" (click)="openUpgradeCheckout()">
+            Upgrade plan
+          </button>
+        </div>
+      }
+    </div>
 
     @for (button of actionButtons; track button.label) {
       <a

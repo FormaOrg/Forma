@@ -1,0 +1,160 @@
+<section class="checkout-page">
+  @if (isSuccess()) {
+    <div class="checkout-page__success">
+      <div class="checkout-page__success-card">
+        <span class="checkout-page__success-pill">Upgrade complete</span>
+        <h1>You are now on the {{ successLabel() }} plan! Redirecting you back...</h1>
+        <p>Your original tab will refresh automatically so your plan badge stays in sync.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="checkout-page__shell">
+      <div class="checkout-page__summary-panel">
+        <div class="checkout-page__summary-head">
+          <span class="checkout-page__eyebrow">Upgrade plan</span>
+          <h1>Choose the plan that fits your studio</h1>
+          <p>
+            Select the right plan, confirm your details, and complete your upgrade with a secure checkout experience.
+          </p>
+        </div>
+
+        <div class="checkout-page__current-strip">
+          <span class="checkout-page__current-label">Current plan</span>
+          <strong>{{ currentPlanLabel() }}</strong>
+        </div>
+
+        <div class="checkout-page__plans">
+          @for (plan of plans; track plan.code) {
+            <button
+              type="button"
+              class="checkout-page__plan-card"
+              [class.checkout-page__plan-card--active]="selectedPlan() === plan.code"
+              [class.checkout-page__plan-card--current]="currentPlan() === plan.code"
+              (click)="selectPlan(plan.code)"
+            >
+              <div class="checkout-page__plan-head">
+                <div class="checkout-page__plan-heading">
+                  <div class="checkout-page__plan-name-row">
+                    <strong>{{ plan.label }}</strong>
+                    @if (currentPlan() === plan.code) {
+                      <span class="checkout-page__current-pill">Current</span>
+                    }
+                  </div>
+                  <span>{{ plan.summary }}</span>
+                </div>
+
+                <div class="checkout-page__plan-price">
+                  <strong>{{ plan.monthlyPriceLabel }}</strong>
+                  <span>per month</span>
+                </div>
+              </div>
+
+              <ul class="checkout-page__plan-features">
+                @for (feature of plan.features; track feature) {
+                  <li>{{ feature }}</li>
+                }
+              </ul>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="checkout-page__payment-panel">
+        <div class="checkout-page__payment-card">
+          <div class="checkout-page__payment-head">
+            <span class="checkout-page__eyebrow">Payment details</span>
+            <h2>Secure checkout</h2>
+            <p>Confirm your selected plan and complete the upgrade with your billing details.</p>
+          </div>
+
+          <div class="checkout-page__order-summary">
+            <div class="checkout-page__order-row">
+              <span>Selected plan</span>
+              <strong>{{ successLabel() }}</strong>
+            </div>
+            <div class="checkout-page__order-row">
+              <span>Billing</span>
+              <span>Monthly</span>
+            </div>
+            <div class="checkout-page__order-row checkout-page__order-row--total">
+              <span>Total due today</span>
+              <strong>
+                @for (plan of plans; track plan.code) {
+                  @if (selectedPlan() === plan.code) {
+                    {{ plan.monthlyPriceLabel }}
+                  }
+                }
+              </strong>
+            </div>
+          </div>
+
+          @if (errorMessage()) {
+            <div class="checkout-page__error">{{ errorMessage() }}</div>
+          }
+
+          <form class="checkout-page__form" (submit)="$event.preventDefault(); submitUpgrade()">
+            <label class="checkout-page__field">
+              <span>Cardholder name</span>
+              <input
+                type="text"
+                [ngModel]="cardholderName()"
+                (ngModelChange)="cardholderName.set($event)"
+                name="cardholderName"
+              />
+            </label>
+
+            <label class="checkout-page__field">
+              <span>Card number</span>
+              <input
+                type="text"
+                placeholder="1234 1234 1234 1234"
+                [ngModel]="cardNumber()"
+                (ngModelChange)="cardNumber.set($event)"
+                name="cardNumber"
+              />
+            </label>
+
+            <div class="checkout-page__field-row">
+              <label class="checkout-page__field">
+                <span>Expiry</span>
+                <input
+                  type="text"
+                  placeholder="MM / YY"
+                  [ngModel]="expiry()"
+                  (ngModelChange)="expiry.set($event)"
+                  name="expiry"
+                />
+              </label>
+
+              <label class="checkout-page__field">
+                <span>CVC</span>
+                <input
+                  type="text"
+                  placeholder="123"
+                  [ngModel]="cvc()"
+                  (ngModelChange)="cvc.set($event)"
+                  name="cvc"
+                />
+              </label>
+            </div>
+
+            @if (isCurrentPlanSelected()) {
+              <div class="checkout-page__hint">You are already on this plan</div>
+            }
+
+            <button
+              type="submit"
+              class="checkout-page__submit"
+              [disabled]="isBootstrapping() || isSubmitting() || isCurrentPlanSelected()"
+            >
+              @if (isSubmitting()) {
+                <span class="checkout-page__spinner" aria-hidden="true"></span>
+              }
+              <span>{{ isSubmitting() ? 'Processing upgrade...' : 'Upgrade now' }}</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</section>

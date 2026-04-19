@@ -28,6 +28,15 @@ import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { AppRouteLoadingOverlayService } from '../../../../../../core/services/app-route-loading-overlay.service';
+import { DashboardDataService } from '../../../../../../core/services/dashboard-data.service';
+import {
+  BillingPlanCode,
+  BILLING_PLANS,
+  getDefaultUpgradeTarget,
+  toBillingPlanCode,
+  toBillingPlanLabel,
+} from '../../../../../../core/models/billing-plan.model';
+import { PlanSyncService } from '../../../../../../core/services/plan-sync.service';
 import { AppIcon, AppIconName } from '../../../../../../shared/app/icons/app-icon';
 import { StorefrontSectionType } from '../../../../../../core/models/project-storefront.model';
 import { I18nService } from '../../../../../landing-page/i18n/i18n.service';
@@ -494,6 +503,8 @@ private readonly route = inject(ActivatedRoute);
 private readonly router = inject(Router);
 private readonly destroyRef = inject(DestroyRef);
   private readonly authService = inject(AuthService);
+  private readonly dashboardDataService = inject(DashboardDataService);
+  private readonly planSyncService = inject(PlanSyncService);
   private readonly appRouteLoadingOverlayService = inject(AppRouteLoadingOverlayService);
   private readonly i18n = inject(I18nService);
   private readonly projectService = inject(ProjectService);
@@ -668,6 +679,7 @@ private activeResize:
   readonly sidebarMode = signal<EditorSidebarMode>('structure');
 readonly isFormaMenuOpen = signal(false);
 readonly isAccountMenuOpen = signal(false);
+readonly isUpgradeMenuOpen = signal(false);
 readonly isCollaboratorsPanelOpen = signal(false);
 readonly isZoomMenuOpen = signal(false);
 readonly isBrandKitPopupOpen = signal(false);
@@ -1921,6 +1933,10 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
   });
   readonly currentUserEmail = computed(() => this.currentUser()?.email || '');
   readonly currentUserAvatar = computed(() => this.currentUser()?.avatarUrl || null);
+  readonly currentPlanCode = signal<BillingPlanCode>('STARTER');
+  readonly selectedUpgradePlan = signal<BillingPlanCode>('PRO');
+  readonly upgradePlans = BILLING_PLANS;
+  readonly currentPlanLabel = computed(() => toBillingPlanLabel(this.currentPlanCode()));
   readonly currentUserInitial = computed(() => {
     const source = this.currentUser()?.firstName?.trim() || this.currentUserName();
     return source.charAt(0).toUpperCase() || 'F';
@@ -2094,6 +2110,17 @@ effect(() => {
 
 effect(() => {
   this.savedSectionBorderColors.set(this.readSavedSectionBorderColors());
+});
+
+effect(() => {
+  const userId = this.currentUser()?.id;
+  if (!userId) {
+    this.currentPlanCode.set('STARTER');
+    this.selectedUpgradePlan.set('PRO');
+    return;
+  }
+
+  this.refreshCurrentPlanFromBilling();
 });
 
 effect(() => {
@@ -2707,12 +2734,23 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
     }
   }
 
+  @HostListener('window:storage', ['$event'])
+  handlePlanUpdatedStorage(event: StorageEvent): void {
+    if (!this.planSyncService.readPlanUpdatedEvent(event)) {
+      return;
+    }
+
+    this.dashboardDataService.invalidateBillingOverviewCache();
+    this.refreshCurrentPlanFromBilling();
+  }
+
   @HostListener('document:mousedown', ['$event'])
   handleDocumentMouseDown(event: MouseEvent): void {
     const target = event.target;
     if (!(target instanceof Element)) {
       this.isFormaMenuOpen.set(false);
       this.isAccountMenuOpen.set(false);
+      this.isUpgradeMenuOpen.set(false);
       this.isBrandKitPopupOpen.set(false);
       this.isZoomMenuOpen.set(false);
       this.isAddPageMenuOpen.set(false);
@@ -2745,10 +2783,11 @@ if (event.key === 'Escape' && this.croppingImageComponentId()) {
       this.finishEditingComponentText();
     }
 
-    if ((this.isFormaMenuOpen() || this.isAccountMenuOpen() || this.isZoomMenuOpen()) &&
+    if ((this.isFormaMenuOpen() || this.isAccountMenuOpen() || this.isUpgradeMenuOpen() || this.isZoomMenuOpen()) &&
       !target.closest('.storefront-editor__floating-shell')) {
       this.isFormaMenuOpen.set(false);
       this.isAccountMenuOpen.set(false);
+      this.isUpgradeMenuOpen.set(false);
       this.isZoomMenuOpen.set(false);
     }
 
@@ -3766,6 +3805,22 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.isAccountMenuOpen.set(next);
   }
 
+  toggleUpgradeMenu(): void {
+    const next = !this.isUpgradeMenuOpen();
+    this.closeFloatingUi();
+    this.isUpgradeMenuOpen.set(next);
+  }
+
+  selectUpgradePlan(plan: BillingPlanCode): void {
+    this.selectedUpgradePlan.set(plan);
+  }
+
+  openCheckoutTab(): void {
+    const plan = this.selectedUpgradePlan();
+    this.isUpgradeMenuOpen.set(false);
+    window.open(`/checkout?plan=${plan}`, '_blank');
+  }
+
   openCollaboratorsPanel(): void {
     this.closeFloatingUi();
     this.isCollaboratorsPanelOpen.set(true);
@@ -3773,6 +3828,19 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
 
   closeCollaboratorsPanel(): void {
     this.isCollaboratorsPanelOpen.set(false);
+  }
+
+  private refreshCurrentPlanFromBilling(): void {
+    this.dashboardDataService.getBillingOverview({ useCache: false })
+      .pipe(catchError(() => of(null)))
+      .subscribe((billing) => {
+        const currentPlanCode = toBillingPlanCode(billing?.subscription.planName);
+        this.currentPlanCode.set(currentPlanCode);
+
+        if (this.selectedUpgradePlan() === currentPlanCode) {
+          this.selectedUpgradePlan.set(getDefaultUpgradeTarget(currentPlanCode));
+        }
+      });
   }
 
   toggleZoomMenu(): void {
@@ -5329,6 +5397,7 @@ finishEditingComponentText(): void {
   closeFloatingUi(): void {
     this.isFormaMenuOpen.set(false);
   this.isAccountMenuOpen.set(false);
+  this.isUpgradeMenuOpen.set(false);
   this.isBrandKitPopupOpen.set(false);
   this.isBrandKitCustomizerOpen.set(false);
   this.isZoomMenuOpen.set(false);
