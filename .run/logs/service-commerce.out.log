@@ -1,0 +1,79 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< tn.forma:service-commerce >----------------------
+[INFO] Building service-commerce 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ service-commerce ---
+[INFO] Deleting G:\Coding\Forma\Backend\service-commerce\target
+[INFO] 
+[INFO] >>> spring-boot:4.0.3:run (default-cli) > test-compile @ service-commerce >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ service-commerce ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ service-commerce ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 179 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ service-commerce ---
+[INFO] skip non existing resourceDirectory G:\Coding\Forma\Backend\service-commerce\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ service-commerce ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] /G:/Coding/Forma/Backend/service-commerce/src/test/java/tn/forma/users/service/ProjectSalesServiceTest.java: G:\Coding\Forma\Backend\service-commerce\src\test\java\tn\forma\users\service\ProjectSalesServiceTest.java uses unchecked or unsafe operations.
+[INFO] /G:/Coding/Forma/Backend/service-commerce/src/test/java/tn/forma/users/service/ProjectSalesServiceTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] <<< spring-boot:4.0.3:run (default-cli) < test-compile @ service-commerce <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.3:run (default-cli) @ service-commerce ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-19T12:23:50.704+02:00  INFO 10344 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 10344 (G:\Coding\Forma\Backend\service-commerce\target\classes started by MSI in G:\Coding\Forma\Backend\service-commerce)
+2026-04-19T12:23:50.709+02:00  INFO 10344 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-19T12:23:50.781+02:00  INFO 10344 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-19T12:23:50.781+02:00  INFO 10344 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-19T12:23:52.332+02:00  INFO 10344 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-19T12:23:52.466+02:00  INFO 10344 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 122 ms. Found 15 JPA repository interfaces.
+2026-04-19T12:23:54.469+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8083 (http)
+2026-04-19T12:23:54.490+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-19T12:23:54.495+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-19T12:23:54.583+02:00  INFO 10344 --- [service-commerce] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3800 ms
+2026-04-19T12:23:54.839+02:00  INFO 10344 --- [service-commerce] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-19T12:23:54.900+02:00  INFO 10344 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-19T12:23:55.539+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-19T12:23:55.599+02:00  WARN 10344 --- [service-commerce] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-19T12:23:55.625+02:00  INFO 10344 --- [service-commerce] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-19T12:23:57.653+02:00  INFO 10344 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-19T12:23:57.720+02:00  INFO 10344 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-19T12:23:58.952+02:00  INFO 10344 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-19T12:24:03.978+02:00  INFO 10344 --- [service-commerce] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-19T12:24:04.061+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-19T12:24:05.441+02:00  INFO 10344 --- [service-commerce] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-19T12:24:05.453+02:00  WARN 10344 --- [service-commerce] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-19T12:24:06.173+02:00  INFO 10344 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8083 (http) with context path '/'
+2026-04-19T12:24:06.179+02:00  INFO 10344 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Started Application in 16.041 seconds (process running for 16.998)
