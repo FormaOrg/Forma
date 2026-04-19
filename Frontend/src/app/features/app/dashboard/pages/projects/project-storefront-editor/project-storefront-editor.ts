@@ -2289,7 +2289,7 @@ effect(() => {
    if (this.pageDesignPickerCloseTimer) {
      clearTimeout(this.pageDesignPickerCloseTimer);
    }
-   this.stopPresenceHeartbeat();
+   this.leaveEditorPresence();
    for (const timer of this.cursorStaleTimers.values()) {
      clearTimeout(timer);
    }
@@ -3367,7 +3367,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
             this.storefront.set(null);
             this.workingStorefront.set(null);
             this.editorSession.set(this.createDefaultEditorSession());
-            this.stopPresenceHeartbeat();
+      this.leaveEditorPresence();
             this.undoStack.set([]);
             this.redoStack.set([]);
             this.selectedSectionId.set(null);
@@ -3379,7 +3379,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           this.workingStorefront.set(this.cloneStorefront(snapshot));
           const editorSession = this.normalizeEditorSession(snapshot.editorSession, snapshot.draftHomepage);
           this.editorSession.set(editorSession);
-          this.startPresenceHeartbeat();
+    this.joinEditorPresence();
           this.loadSelectedManagedPageIntoWorkingStorefront(editorSession.selectedManagedPageId ?? 'home', editorSession.managedPages ?? []);
           this.undoStack.set([]);
           this.redoStack.set([]);
@@ -3392,7 +3392,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
           this.project.set(null);
           this.storefront.set(null);
           this.workingStorefront.set(null);
-            this.stopPresenceHeartbeat();
+    this.leaveEditorPresence();
             this.editorSession.set(this.createDefaultEditorSession());
             this.undoStack.set([]);
               this.redoStack.set([]);
@@ -14765,7 +14765,7 @@ isSectionAttachTarget(sectionId: string): boolean {
         session?.selectedManagedPageId && managedPages.some((page) => page.id === session.selectedManagedPageId)
           ? session.selectedManagedPageId
           : 'home',
-      activeEditors: this.normalizeActiveEditors(session?.activeEditors),
+      activeEditors: [],
     };
   }
 
@@ -14813,7 +14813,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     });
   }
 
-  private startPresenceHeartbeat(): void {
+  private joinEditorPresence(): void {
     const projectId = this.projectId();
     if (!projectId || !this.currentUser()) {
       return;
@@ -14823,7 +14823,7 @@ isSectionAttachTarget(sectionId: string): boolean {
     this.projectEditorRealtimeService.joinProject(projectId);
   }
 
-  private stopPresenceHeartbeat(): void {
+  private leaveEditorPresence(): void {
     const projectId = this.projectId();
     if (projectId) {
       this.sendCursorClear();
@@ -15187,9 +15187,11 @@ isSectionAttachTarget(sectionId: string): boolean {
     snapshot: ProjectStorefront,
     options: { resetHistory: boolean }
   ): void {
+    const liveActiveEditors = this.normalizeActiveEditors(this.editorSession().activeEditors);
     this.storefront.set(snapshot);
     this.workingStorefront.set(this.cloneStorefront(snapshot));
     const editorSession = this.normalizeEditorSession(snapshot.editorSession, snapshot.draftHomepage);
+    editorSession.activeEditors = liveActiveEditors;
     this.editorSession.set(editorSession);
     this.loadSelectedManagedPageIntoWorkingStorefront(editorSession.selectedManagedPageId ?? 'home', editorSession.managedPages ?? []);
       this.selectedSectionId.set(editorSession.selectedSectionId);
