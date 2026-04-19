@@ -14880,7 +14880,7 @@ isSectionAttachTarget(sectionId: string): boolean {
 
   private joinEditorPresence(): void {
     const projectId = this.projectId();
-    if (!projectId || !this.currentUser()) {
+    if (!projectId) {
       return;
     }
 

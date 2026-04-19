@@ -22,6 +22,7 @@ import tn.forma.users.repository.ProjectStorefrontRepository;
 import tn.forma.users.repository.UserRepository;
 import tn.forma.users.util.ProjectDomainNormalizer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,11 +43,13 @@ public class ProjectService {
     private final ProjectOrderRepository projectOrderRepository;
     private final ProjectCustomerRepository projectCustomerRepository;
     private final ProjectProductRepository projectProductRepository;
+    private final ProjectCollaboratorService projectCollaboratorService;
+    private final ProjectAccessService projectAccessService;
 
     @Transactional(readOnly = true)
     public List<ProjectDto> getMyProjects(String email) {
         User user = getUserByEmail(email);
-        return projectRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId())
+        return mergeOwnedAndCollaboratorProjects(user)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -54,12 +57,17 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectDto getProjectById(String email, Long projectId) {
-        return mapToDto(getOwnedProject(email, projectId));
+        return mapToDto(getAccessibleProject(email, projectId));
     }
 
     @Transactional(readOnly = true)
     public void ensureProjectOwnership(String email, Long projectId) {
         getOwnedProject(email, projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public void ensureProjectEditableAccess(String email, Long projectId) {
+        getEditableProject(email, projectId);
     }
 
     @Transactional
@@ -170,6 +178,7 @@ public class ProjectService {
                 .filter(Objects::nonNull)
                 .toList();
 
+        projectCollaboratorService.deleteAllForProject(projectId);
         projectStorefrontRepository.findByProjectId(projectId)
                 .ifPresent(projectStorefrontRepository::delete);
         projectAnalyticsEventRepository.deleteAllByProjectId(projectId);
@@ -239,14 +248,19 @@ public class ProjectService {
     }
 
     private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return projectAccessService.getRequiredUser(email);
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = getUserByEmail(email);
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getOwnedProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private ProjectDto mapToDto(Project project) {
@@ -295,6 +309,22 @@ public class ProjectService {
         }
 
         throw new RuntimeException("Default domain must be a valid host name");
+    }
+
+    private List<Project> mergeOwnedAndCollaboratorProjects(User user) {
+        return java.util.stream.Stream.concat(
+                        projectRepository.findAllByUserIdOrderByUpdatedAtDesc(user.getId()).stream(),
+                        projectCollaboratorService.getAcceptedCollaboratorProjects(user).stream()
+                )
+                .collect(java.util.stream.Collectors.toMap(
+                        Project::getId,
+                        project -> project,
+                        (left, right) -> left
+                ))
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Project::getUpdatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList();
     }
 
     private String buildDuplicateName(String sourceName, Long userId) {

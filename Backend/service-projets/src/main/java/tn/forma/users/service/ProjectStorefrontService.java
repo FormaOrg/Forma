@@ -24,14 +24,10 @@ import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.ProjectStorefrontRepository;
 import tn.forma.users.repository.UserRepository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +35,6 @@ public class ProjectStorefrontService {
 
     private static final String DEFAULT_THEME_KEY = "commerce-minimal";
     private static final String DEFAULT_PAGE_KEY = "home";
-    private static final String ACTIVE_EDITORS_FIELD = "activeEditors";
-    private static final long ACTIVE_EDITOR_TTL_SECONDS = 45;
-
     private final ProjectStorefrontRepository projectStorefrontRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
@@ -56,8 +49,6 @@ public class ProjectStorefrontService {
     @Transactional
     public ProjectStorefrontDto updateStorefront(String email, Long projectId, UpdateProjectStorefrontRequest request) {
         ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (request.getStoreName() != null) {
             storefront.setStoreName(blankToNull(request.getStoreName()));
@@ -79,8 +70,7 @@ public class ProjectStorefrontService {
         if (request.getEditorSession() != null) {
             storefront.setEditorSessionJson(mergeEditorSession(
                     storefront.getEditorSessionJson(),
-                    objectMapper.valueToTree(request.getEditorSession()),
-                    currentUser
+                    objectMapper.valueToTree(request.getEditorSession())
             ));
         }
 
@@ -291,7 +281,6 @@ public class ProjectStorefrontService {
         session.put("zoomPercent", 120);
         session.set("undoStack", objectMapper.createArrayNode());
         session.set("redoStack", objectMapper.createArrayNode());
-        session.set(ACTIVE_EDITORS_FIELD, objectMapper.createArrayNode());
         return session;
     }
 
@@ -325,7 +314,7 @@ public class ProjectStorefrontService {
                 .build();
     }
 
-    private JsonNode mergeEditorSession(JsonNode existingEditorSession, JsonNode incomingEditorSession, User currentUser) {
+    private JsonNode mergeEditorSession(JsonNode existingEditorSession, JsonNode incomingEditorSession) {
         ObjectNode merged = existingEditorSession != null && existingEditorSession.isObject()
                 ? existingEditorSession.deepCopy()
                 : buildDefaultEditorSession();
@@ -334,115 +323,17 @@ public class ProjectStorefrontService {
             Iterator<Map.Entry<String, JsonNode>> fields = incomingEditorSession.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
-                if (!ACTIVE_EDITORS_FIELD.equals(field.getKey())) {
-                    merged.set(field.getKey(), field.getValue().deepCopy());
-                }
+                merged.set(field.getKey(), field.getValue().deepCopy());
             }
         }
 
-        merged.set(
-                ACTIVE_EDITORS_FIELD,
-                mergeActiveEditors(
-                        existingEditorSession,
-                        incomingEditorSession,
-                        currentUser
-                )
-        );
         return merged;
     }
 
     private JsonNode sanitizeEditorSession(JsonNode editorSession) {
-        ObjectNode sanitized = editorSession != null && editorSession.isObject()
+        return editorSession != null && editorSession.isObject()
                 ? editorSession.deepCopy()
                 : buildDefaultEditorSession();
-        sanitized.set(ACTIVE_EDITORS_FIELD, mergeActiveEditors(editorSession, null, null));
-        return sanitized;
-    }
-
-    private ArrayNode mergeActiveEditors(JsonNode existingEditorSession, JsonNode incomingEditorSession, User currentUser) {
-        Map<String, ObjectNode> mergedEditors = new LinkedHashMap<>();
-        collectActiveEditors(mergedEditors, existingEditorSession);
-        collectActiveEditors(mergedEditors, incomingEditorSession);
-
-        if (currentUser != null) {
-            ObjectNode currentEditor = objectMapper.createObjectNode();
-            currentEditor.put("userId", currentUser.getId());
-            currentEditor.put("email", currentUser.getEmail());
-            currentEditor.put("userName", buildUserDisplayName(currentUser));
-            if (blankToNull(currentUser.getAvatarUrl()) != null) {
-                currentEditor.put("avatarUrl", currentUser.getAvatarUrl());
-            } else {
-                currentEditor.putNull("avatarUrl");
-            }
-            currentEditor.put("lastSeenAt", Instant.now().toString());
-            mergedEditors.put(resolveActiveEditorKey(currentEditor), currentEditor);
-        }
-
-        Instant cutoff = Instant.now().minusSeconds(ACTIVE_EDITOR_TTL_SECONDS);
-        ArrayNode activeEditors = objectMapper.createArrayNode();
-        for (ObjectNode editor : mergedEditors.values()) {
-            if (isActiveEditorFresh(editor, cutoff)) {
-                activeEditors.add(editor);
-            }
-        }
-        return activeEditors;
-    }
-
-    private void collectActiveEditors(Map<String, ObjectNode> target, JsonNode editorSession) {
-        if (editorSession == null || !editorSession.isObject()) {
-            return;
-        }
-
-        JsonNode activeEditors = editorSession.get(ACTIVE_EDITORS_FIELD);
-        if (activeEditors == null || !activeEditors.isArray()) {
-            return;
-        }
-
-        for (JsonNode node : activeEditors) {
-            if (!node.isObject()) {
-                continue;
-            }
-
-            ObjectNode activeEditor = ((ObjectNode) node).deepCopy();
-            target.put(resolveActiveEditorKey(activeEditor), activeEditor);
-        }
-    }
-
-    private String resolveActiveEditorKey(JsonNode activeEditor) {
-        if (activeEditor.hasNonNull("userId")) {
-            return "user:" + activeEditor.get("userId").asText();
-        }
-        if (activeEditor.hasNonNull("email")) {
-            return "email:" + activeEditor.get("email").asText("").trim().toLowerCase();
-        }
-        return "name:" + activeEditor.path("userName").asText("unknown");
-    }
-
-    private boolean isActiveEditorFresh(JsonNode activeEditor, Instant cutoff) {
-        String lastSeenAt = activeEditor.path("lastSeenAt").asText(null);
-        if (lastSeenAt == null || lastSeenAt.isBlank()) {
-            return false;
-        }
-
-        try {
-            return !Instant.parse(lastSeenAt).isBefore(cutoff);
-        } catch (DateTimeParseException ignored) {
-            return false;
-        }
-    }
-
-    private String buildUserDisplayName(User user) {
-        String firstName = blankToNull(user.getFirstName());
-        String lastName = blankToNull(user.getLastName());
-        String fullName = Stream.of(firstName, lastName)
-                .filter(Objects::nonNull)
-                .reduce((left, right) -> left + " " + right)
-                .orElse(null);
-        if (fullName != null) {
-            return fullName;
-        }
-
-        return blankToNull(user.getEmail()) != null ? user.getEmail() : "Forma user";
     }
 
     private Object toPlainJson(JsonNode node) {

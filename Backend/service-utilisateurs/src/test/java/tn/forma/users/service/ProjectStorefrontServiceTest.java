@@ -35,6 +35,10 @@ class ProjectStorefrontServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProjectAccessService projectAccessService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
@@ -42,8 +46,7 @@ class ProjectStorefrontServiceTest {
         User user = buildUser();
         Project project = buildProject(user);
 
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getAccessibleProject(user.getEmail(), project.getId())).thenReturn(project);
         when(projectStorefrontRepository.findByProjectId(project.getId())).thenReturn(Optional.empty());
         when(projectStorefrontRepository.save(any(ProjectStorefront.class))).thenAnswer(invocation -> {
             ProjectStorefront storefront = invocation.getArgument(0);
@@ -55,7 +58,8 @@ class ProjectStorefrontServiceTest {
                 projectStorefrontRepository,
                 projectRepository,
                 userRepository,
-                objectMapper
+                objectMapper,
+                projectAccessService
         );
 
         var storefront = service.getStorefront(user.getEmail(), project.getId());
@@ -91,8 +95,8 @@ class ProjectStorefrontServiceTest {
                 .draftHomepageJson(objectMapper.createObjectNode().put("version", 1))
                 .build();
 
+        when(projectAccessService.getEditableProject(user.getEmail(), project.getId())).thenReturn(project);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
         when(projectStorefrontRepository.findByProjectId(project.getId())).thenReturn(Optional.of(storefront));
         when(projectStorefrontRepository.save(any(ProjectStorefront.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -100,7 +104,8 @@ class ProjectStorefrontServiceTest {
                 projectStorefrontRepository,
                 projectRepository,
                 userRepository,
-                objectMapper
+                objectMapper,
+                projectAccessService
         );
 
         UpdateProjectStorefrontRequest updateRequest = new UpdateProjectStorefrontRequest();

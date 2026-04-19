@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import tn.forma.users.websocket.ActivityWebSocketHandler;
 import tn.forma.users.websocket.JwtWebSocketHandshakeInterceptor;
+import tn.forma.users.websocket.ProjectEditorPresenceWebSocketHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final ActivityWebSocketHandler activityWebSocketHandler;
+    private final ProjectEditorPresenceWebSocketHandler projectEditorPresenceWebSocketHandler;
     private final JwtWebSocketHandshakeInterceptor jwtWebSocketHandshakeInterceptor;
 
     @Value("${application.frontend-url:http://localhost:4200}")
@@ -29,6 +31,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(activityWebSocketHandler, "/ws/activity")
+                .addInterceptors(jwtWebSocketHandshakeInterceptor)
+                .setAllowedOrigins(resolveAllowedOrigins().toArray(String[]::new));
+
+        registry.addHandler(projectEditorPresenceWebSocketHandler, "/ws/projects/editor-presence")
                 .addInterceptors(jwtWebSocketHandshakeInterceptor)
                 .setAllowedOrigins(resolveAllowedOrigins().toArray(String[]::new));
     }

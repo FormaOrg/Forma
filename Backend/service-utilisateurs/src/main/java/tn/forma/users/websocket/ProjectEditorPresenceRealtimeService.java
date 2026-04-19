@@ -249,6 +249,10 @@ public class ProjectEditorPresenceRealtimeService {
             return email;
         }
 
+        private String sessionId() {
+            return sessionId;
+        }
+
         private WebSocketSession session() {
             return session;
         }
