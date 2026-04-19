@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -32,6 +33,7 @@ public class EmailService {
 
     // ── Verification email ─────────────────────────────────
 
+    @Async
     public void sendVerificationEmail(String toEmail, String firstName, String token) {
         String verificationUrl = frontendUrl + "/verify-email?token=" + token
                 + "&email=" + URLEncoder.encode(toEmail, StandardCharsets.UTF_8);
@@ -156,6 +158,7 @@ public class EmailService {
 
     // ── Password reset email ───────────────────────────────
 
+    @Async
     public void sendPasswordResetEmail(String toEmail, String firstName, String token) {
         String resetUrl = frontendUrl + "/reset-password?token=" + token;
 
@@ -275,6 +278,7 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Reset your Forma password", html);
     }
 
+    @Async
     public void sendEmailChangeCode(String toEmail, String firstName, String code) {
         String html = """
             <!DOCTYPE html>
@@ -328,6 +332,7 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Confirm your new Forma email", html);
     }
 
+    @Async
     public void sendLoginVerificationCode(String toEmail, String firstName, String code, boolean enable) {
         String actionLabel = enable ? "enable" : "disable";
         String html = """
@@ -382,6 +387,7 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Confirm your Forma security change", html);
     }
 
+    @Async
     public void sendLoginAccessCode(String toEmail, String firstName, String code) {
         String html = """
             <!DOCTYPE html>

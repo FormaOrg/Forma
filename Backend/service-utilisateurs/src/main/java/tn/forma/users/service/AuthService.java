@@ -33,6 +33,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsServiceImpl userDetailsService;
+    private final AfterCommitExecutor afterCommitExecutor;
     private final EmailService emailService;
     private final ActivityService activityService;
     private final GoogleIdentityService googleIdentityService;
@@ -64,11 +65,11 @@ public class AuthService {
         userRepository.save(user);
         log.info("New user registered: {}", user.getEmail());
 
-        emailService.sendVerificationEmail(
+        dispatchEmailAfterCommit(() -> emailService.sendVerificationEmail(
                 user.getEmail(),
                 user.getFirstName(),
                 verificationToken
-        );
+        ));
 
         // Don't issue tokens at registration — user must verify email first
         UserDto userDto = mapToUserDto(user);
@@ -293,7 +294,11 @@ public class AuthService {
         user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
         userRepository.save(user);
 
-        emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), newToken);
+        dispatchEmailAfterCommit(() -> emailService.sendVerificationEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                newToken
+        ));
         return new MessageResponse("Verification email sent. Please check your inbox.");
     }
 
@@ -309,7 +314,11 @@ public class AuthService {
         user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(1));
         userRepository.save(user);
 
-        emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), resetToken);
+        dispatchEmailAfterCommit(() -> emailService.sendPasswordResetEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                resetToken
+        ));
         return new MessageResponse("Password reset email sent.");
     }
 
@@ -407,13 +416,21 @@ public class AuthService {
         user.setLoginVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        emailService.sendLoginAccessCode(user.getEmail(), user.getFirstName(), code);
+        dispatchEmailAfterCommit(() -> emailService.sendLoginAccessCode(
+                user.getEmail(),
+                user.getFirstName(),
+                code
+        ));
         log.info("Login verification challenge issued for {}", user.getEmail());
     }
 
     private void clearLoginVerificationCode(User user) {
         user.setLoginVerificationCode(null);
         user.setLoginVerificationCodeExpiry(null);
+    }
+
+    private void dispatchEmailAfterCommit(Runnable action) {
+        afterCommitExecutor.execute(action);
     }
 
     private String generateSixDigitCode() {
