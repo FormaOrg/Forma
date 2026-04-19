@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
+import { getApiUrl } from '../config/runtime-endpoints';
 
 interface GoogleLinkConfigResponse {
   clientId: string;
@@ -23,12 +24,13 @@ interface GoogleLinkResultPayload {
 
 @Injectable({ providedIn: 'root' })
 export class GoogleLinkOauthService {
+  private readonly apiUrl = getApiUrl();
   private readonly popupTimeoutMs = 180000;
   private readonly messageType = 'forma-google-link-result';
   private readonly channelName = 'forma-google-link';
   private readonly contextKey = 'forma_google_popup_context';
-  private readonly configUrl = `${environment.apiUrl}/auth/google/link-config`;
-  private readonly exchangeUrl = `${environment.apiUrl}/users/me/social/google/link/code`;
+  private readonly configUrl = `${this.apiUrl}/auth/google/link-config`;
+  private readonly exchangeUrl = `${this.apiUrl}/users/me/social/google/link/code`;
   private readonly stateKey = 'forma_google_link_state';
   private readonly resultKey = 'forma_google_link_result';
 
@@ -39,7 +41,7 @@ export class GoogleLinkOauthService {
 
   async start(): Promise<any> {
     localStorage.setItem(this.contextKey, JSON.stringify({
-      apiUrl: environment.apiUrl,
+      apiUrl: this.apiUrl,
       authToken: this.authService.getToken(),
       updatedAt: Date.now()
     }));

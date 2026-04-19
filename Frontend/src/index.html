@@ -655,6 +655,17 @@
     </script>
     <script>
       (function () {
+        const host = (window.location && window.location.hostname || '').toLowerCase();
+        const isLocal = host === 'localhost' || host === '127.0.0.1';
+
+        window.__FORMA_RUNTIME_CONFIG__ = {
+          apiUrl: isLocal ? 'http://localhost:8081/api' : 'https://forma-production-c40b.up.railway.app/api',
+          wsBaseUrl: isLocal ? 'ws://localhost:8081/ws' : 'wss://forma-production-c40b.up.railway.app/ws'
+        };
+      })();
+    </script>
+    <script>
+      (function () {
         const url = new URL(window.location.href);
         const state = url.searchParams.get('state');
         const code = url.searchParams.get('code');
@@ -666,7 +677,9 @@
 
         window.__FORMA_SKIP_BOOTSTRAP__ = true;
 
-        const apiUrl = 'http://localhost:8081/api';
+        const apiUrl = (window.__FORMA_RUNTIME_CONFIG__ && window.__FORMA_RUNTIME_CONFIG__.apiUrl)
+          ? window.__FORMA_RUNTIME_CONFIG__.apiUrl
+          : 'http://localhost:8081/api';
         const resultKey = 'forma_google_auth_result';
         const pendingAuthKey = 'forma_google_auth_pending_response';
         const loginVerificationKey = 'forma_login_verification';

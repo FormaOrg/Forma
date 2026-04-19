@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8081/api',
-  projectsApiUrl: 'http://localhost:8082/api',
+  apiUrl: 'https://forma-production-c40b.up.railway.app/api',
+  projectsApiUrl: 'https://forma-production-c40b.up.railway.app/api',
   pexelsApiKey: 'ISVfJFGJaqkQAscK02VlQglFQuQynfuXuJn8IUzul7TRIXf61PWwlepv'
 };

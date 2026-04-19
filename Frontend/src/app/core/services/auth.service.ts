@@ -15,10 +15,12 @@ import { I18nService } from '../../features/landing-page/i18n/i18n.service';
 import { ActivityRealtimeService } from './activity-realtime.service';
 import { ThemeService } from './theme.service';
 import { AppBootstrapService } from './app-bootstrap.service';
+import { getAuthApiUrl, getUsersApiUrl } from '../config/runtime-endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8081/api/auth';
+  private readonly apiUrl = getAuthApiUrl();
+  private readonly usersApiUrl = getUsersApiUrl();
   private readonly tokenKey = 'forma_token';
   private readonly refreshTokenKey = 'forma_refresh_token';
   private readonly userKey = 'forma_user';
@@ -192,7 +194,7 @@ export class AuthService {
       return of(true);
     }
 
-    return this.http.get<{ message: string }>('http://localhost:8081/api/users/me/session-valid').pipe(
+    return this.http.get<{ message: string }>(`${this.usersApiUrl}/me/session-valid`).pipe(
       timeout(1500),
       map(() => {
         this.lastValidatedToken = token;

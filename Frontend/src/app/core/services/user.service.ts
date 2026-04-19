@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { User, UserRole, UpdateProfileRequest } from '../models/user.model';
+import { getUsersApiUrl } from '../config/runtime-endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly baseUrl = 'http://localhost:8081/api/users';
+  private readonly baseUrl = getUsersApiUrl();
 
   constructor(private http: HttpClient) {}
 

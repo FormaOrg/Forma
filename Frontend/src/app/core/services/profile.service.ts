@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { getUsersApiUrl } from '../config/runtime-endpoints';
 import {
   ActivitySession,
   AuthResponse,
@@ -47,7 +48,7 @@ export interface UserProfileResponse {
   providedIn: 'root'
 })
 export class ProfileService {
-  private apiUrl = 'http://localhost:8081/api/users';
+  private readonly apiUrl = getUsersApiUrl();
 
   constructor(private http: HttpClient) {}
 

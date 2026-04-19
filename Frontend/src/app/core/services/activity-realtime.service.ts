@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ActivityRealtimeEvent } from '../models/user.model';
+import { getWebSocketUrl } from '../config/runtime-endpoints';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityRealtimeService {
-  private readonly socketUrl = 'ws://localhost:8081/ws/activity';
+  private readonly socketUrl = getWebSocketUrl('activity');
   private socket: WebSocket | null = null;
   private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private manuallyDisconnected = false;

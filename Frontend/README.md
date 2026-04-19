@@ -1,59 +1,80 @@
 # Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
+Angular 20 SPA for FORMA.
 
-## Development server
-
-To start a local development server, run:
+## Local development
 
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Local frontend runs on `http://localhost:4200` and expects the backend on `http://localhost:8081/api`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Production build
 
 ```bash
-ng generate component component-name
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Build output is generated in `dist/Frontend/browser`.
 
-```bash
-ng generate --help
+## Cloudflare Pages
+
+This frontend is prepared for Cloudflare Pages as a static SPA.
+
+Recommended Pages settings if the repository root is the project root:
+
+```text
+Framework preset: None
+Build command: cd Frontend && npm ci && npm run build
+Build output directory: Frontend/dist/Frontend/browser
+Root directory: /
 ```
 
-## Building
+Alternative settings if you set `Frontend/` as the Pages root directory:
 
-To build the project run:
-
-```bash
-ng build
+```text
+Framework preset: None
+Build command: npm ci && npm run build
+Build output directory: dist/Frontend/browser
+Root directory: Frontend
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Set `NODE_VERSION=20` in Cloudflare Pages build environment.
 
-## Running unit tests
+SPA fallback is handled by [public/_redirects](C:/Users/Infoshop/Desktop/forma_proj_main/Frontend/public/_redirects), so direct navigation to Angular routes works on Pages.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Production backend target
 
-```bash
-ng test
+Production frontend traffic is configured to call:
+
+```text
+https://forma-production-c40b.up.railway.app/api
 ```
 
-## Running end-to-end tests
+and WebSocket activity updates use:
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```text
+wss://forma-production-c40b.up.railway.app/ws/activity
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+If you move the backend to another hostname later, update:
 
-## Additional Resources
+- `src/environments/environment.prod.ts`
+- `src/index.html`
+- `public/google-oauth-popup.html`
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+For Railway, make sure these production variables point to your real Cloudflare frontend URL, not the old Vercel one:
+
+```text
+FRONTEND_URL=https://your-cloudflare-domain
+APP_ALLOWED_ORIGINS=https://your-cloudflare-domain
+GOOGLE_LINK_REDIRECT_URI=https://your-cloudflare-domain/google-oauth-popup.html
+MAIL_USERNAME=your-smtp-username
+MAIL_PASSWORD=your-smtp-password
+```
+
+## Important limitation
+
+Cloudflare Pages can host `formaa.studio` and `www.formaa.studio`, but it does not provide wildcard tenant subdomains by itself. Path-based public routes such as `/store/:projectId` are fine. Host-based tenant routing like `shop1.formaa.studio` needs a different Cloudflare product layer than Pages alone.

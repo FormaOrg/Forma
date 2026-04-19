@@ -149,6 +149,19 @@
           });
         }
 
+        function resolveApiUrl(context) {
+          if (context && typeof context.apiUrl === 'string' && context.apiUrl) {
+            return context.apiUrl;
+          }
+
+          var host = (window.location && window.location.hostname || '').toLowerCase();
+          if (host === 'localhost' || host === '127.0.0.1') {
+            return 'http://localhost:8081/api';
+          }
+
+          return 'https://forma-production-c40b.up.railway.app/api';
+        }
+
         function finishWithError(state, message) {
           var payload = {
             state: state || 'google-auth:error',
@@ -261,7 +274,7 @@
         var code = url.searchParams.get('code');
         var error = url.searchParams.get('error');
         var context = parseJson(localStorage.getItem(CONTEXT_KEY));
-        var apiUrl = context && typeof context.apiUrl === 'string' ? context.apiUrl : '';
+        var apiUrl = resolveApiUrl(context);
 
         if (!state) {
           finishWithError('', 'Missing Google popup state.');

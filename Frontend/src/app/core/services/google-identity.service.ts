@@ -1,8 +1,8 @@
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { GoogleClientConfigResponse } from '../models/user.model';
+import { getApiUrl } from '../config/runtime-endpoints';
 
 declare global {
   interface Window {
@@ -38,7 +38,7 @@ declare global {
 
 @Injectable({ providedIn: 'root' })
 export class GoogleIdentityService {
-  private readonly configUrl = `${environment.apiUrl}/auth/google/config`;
+  private readonly configUrl = `${getApiUrl()}/auth/google/config`;
   private clientIdPromise: Promise<string> | null = null;
   private scriptPromise: Promise<void> | null = null;
   private initializePromise: Promise<void> | null = null;

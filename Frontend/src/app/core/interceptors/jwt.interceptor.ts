@@ -9,13 +9,14 @@ import {
 import { Observable, throwError, BehaviorSubject, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { getApiUrl } from '../config/runtime-endpoints';
 import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshDone$ = new BehaviorSubject<boolean>(false);
-  private readonly apiBaseUrl = environment.apiUrl.replace(/\/+$/, '');
+  private readonly apiBaseUrl = getApiUrl();
   private readonly projectsApiBaseUrl = environment.projectsApiUrl.replace(/\/+$/, '');
 
   constructor(private authService: AuthService) {}

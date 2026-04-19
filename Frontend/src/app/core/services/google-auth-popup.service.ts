@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../models/user.model';
 import { AuthService } from './auth.service';
+import { getApiUrl } from '../config/runtime-endpoints';
 
 interface GoogleOauthConfigResponse {
   clientId: string;
@@ -26,13 +27,14 @@ interface GoogleAuthPopupResult {
 
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthPopupService {
+  private readonly apiUrl = getApiUrl();
   private readonly popupTimeoutMs = 180000;
   private readonly messageType = 'forma-google-auth-result';
   private readonly channelName = 'forma-google-auth';
   private readonly contextKey = 'forma_google_popup_context';
   private readonly pendingAuthKey = 'forma_google_auth_pending_response';
-  private readonly configUrl = `${environment.apiUrl}/auth/google/link-config`;
-  private readonly exchangeUrl = `${environment.apiUrl}/auth/google/code`;
+  private readonly configUrl = `${this.apiUrl}/auth/google/link-config`;
+  private readonly exchangeUrl = `${this.apiUrl}/auth/google/code`;
   private readonly stateKey = 'forma_google_auth_state';
   private readonly resultKey = 'forma_google_auth_result';
   private bridgeInitialized = false;
@@ -98,7 +100,7 @@ export class GoogleAuthPopupService {
     localStorage.removeItem(this.resultKey);
     localStorage.removeItem(this.pendingAuthKey);
     localStorage.setItem(this.contextKey, JSON.stringify({
-      apiUrl: environment.apiUrl,
+      apiUrl: this.apiUrl,
       updatedAt: Date.now()
     }));
 
