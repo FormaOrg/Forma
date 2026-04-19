@@ -5,3 +5,5 @@ launch-forma.cmd
 
 .vercel
 Backend/.env
+.run/logs/
+.run/pids/
