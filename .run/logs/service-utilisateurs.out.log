@@ -77,3 +77,3213 @@
 2026-04-19T12:24:06.737+02:00  WARN 22484 --- [service-utilisateurs] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
 2026-04-19T12:24:08.265+02:00  INFO 22484 --- [service-utilisateurs] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
 2026-04-19T12:24:08.372+02:00  INFO 22484 --- [service-utilisateurs] [  restartedMain] tn.forma.users.Application               : Started Application in 15.206 seconds (process running for 16.004)
+2026-04-19T12:27:40.390+02:00  INFO 22484 --- [service-utilisateurs] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-19T12:27:40.391+02:00  INFO 22484 --- [service-utilisateurs] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-19T12:27:40.393+02:00  INFO 22484 --- [service-utilisateurs] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        upper(p1_0.default_domain)=upper(?) 
+        and p1_0.is_published=true
+2026-04-19T12:27:41.565+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [java.lang.RuntimeException: Published project domain not found]
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.auto_renew,
+        s1_0.billing_mode,
+        s1_0.created_at,
+        s1_0.end_date,
+        s1_0.plan_type,
+        s1_0.price_tnd,
+        s1_0.renewal_date,
+        s1_0.start_date,
+        s1_0.status,
+        s1_0.updated_at,
+        s1_0.user_id 
+    from
+        subscriptions s1_0 
+    where
+        s1_0.user_id=? 
+    order by
+        s1_0.updated_at desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        bi1_0.id,
+        bi1_0.amount_tnd,
+        bi1_0.created_at,
+        bi1_0.download_url,
+        bi1_0.invoice_date,
+        bi1_0.invoice_number,
+        bi1_0.status,
+        bi1_0.subscription_id 
+    from
+        billing_invoices bi1_0 
+    join
+        subscriptions s1_0 
+            on s1_0.id=bi1_0.subscription_id 
+    where
+        s1_0.user_id=? 
+    order by
+        bi1_0.invoice_date desc,
+        bi1_0.created_at desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        bpm1_0.id,
+        bpm1_0.billing_email,
+        bpm1_0.brand,
+        bpm1_0.created_at,
+        bpm1_0.expiry_month,
+        bpm1_0.expiry_year,
+        bpm1_0.last4,
+        bpm1_0.updated_at,
+        bpm1_0.user_id 
+    from
+        billing_payment_methods bpm1_0 
+    where
+        bpm1_0.user_id=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+        and p1_0.status=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+        and p1_0.status=?
+Hibernate: 
+    select
+        count(bi1_0.id) 
+    from
+        billing_invoices bi1_0 
+    join
+        subscriptions s1_0 
+            on s1_0.id=bi1_0.subscription_id 
+    where
+        s1_0.user_id=? 
+        and bi1_0.status=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.category,
+        t1_0.created_at,
+        t1_0.creation_method,
+        t1_0.description,
+        t1_0.featured,
+        t1_0.name,
+        t1_0.owner_id,
+        t1_0.premium,
+        t1_0.preview_image_url,
+        t1_0.preview_route,
+        t1_0.preview_url,
+        t1_0.project_type,
+        t1_0.tags_csv,
+        t1_0.updated_at,
+        t1_0.uses_count 
+    from
+        templates t1_0 
+    where
+        t1_0.owner_id is null 
+        or t1_0.owner_id=? 
+    order by
+        t1_0.featured desc,
+        t1_0.updated_at desc
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.auto_renew,
+        s1_0.billing_mode,
+        s1_0.created_at,
+        s1_0.end_date,
+        s1_0.plan_type,
+        s1_0.price_tnd,
+        s1_0.renewal_date,
+        s1_0.start_date,
+        s1_0.status,
+        s1_0.updated_at,
+        s1_0.user_id 
+    from
+        subscriptions s1_0 
+    where
+        s1_0.user_id=? 
+    order by
+        s1_0.updated_at desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        bi1_0.id,
+        bi1_0.amount_tnd,
+        bi1_0.created_at,
+        bi1_0.download_url,
+        bi1_0.invoice_date,
+        bi1_0.invoice_number,
+        bi1_0.status,
+        bi1_0.subscription_id 
+    from
+        billing_invoices bi1_0 
+    join
+        subscriptions s1_0 
+            on s1_0.id=bi1_0.subscription_id 
+    where
+        s1_0.user_id=? 
+    order by
+        bi1_0.invoice_date desc,
+        bi1_0.created_at desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        bpm1_0.id,
+        bpm1_0.billing_email,
+        bpm1_0.brand,
+        bpm1_0.created_at,
+        bpm1_0.expiry_month,
+        bpm1_0.expiry_year,
+        bpm1_0.last4,
+        bpm1_0.updated_at,
+        bpm1_0.user_id 
+    from
+        billing_payment_methods bpm1_0 
+    where
+        bpm1_0.user_id=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+        and p1_0.status=?
+Hibernate: 
+    select
+        count(p1_0.id) 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+        and p1_0.status=?
+Hibernate: 
+    select
+        count(bi1_0.id) 
+    from
+        billing_invoices bi1_0 
+    join
+        subscriptions s1_0 
+            on s1_0.id=bi1_0.subscription_id 
+    where
+        s1_0.user_id=? 
+        and bi1_0.status=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc
+2026-04-19T12:37:49.984+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:37:54.026+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:37:58.095+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:02.041+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:06.409+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:10.801+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:14.508+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:20.094+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:25.249+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:33.310+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:38.618+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:42.980+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:49.966+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:38:55.287+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:03.784+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:07.974+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:13.138+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:18.963+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:24.741+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:32.263+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:37.519+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:42.935+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:50.227+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:39:56.626+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:03.341+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:08.089+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:16.688+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:23.060+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:28.760+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:34.797+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:39.736+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:47.290+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:52.155+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:40:58.819+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:03.445+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:08.764+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:16.541+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:21.866+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:30.915+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:37.209+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:45.370+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:50.147+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:41:58.195+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:06.576+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:12.363+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:17.082+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:25.504+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:31.362+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:37.790+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:42.451+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:50.453+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:42:57.646+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:02.680+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:09.267+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:15.358+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:23.698+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:29.118+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:36.361+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:42.304+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:50.815+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:43:55.012+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:02.696+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:10.601+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:16.100+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:23.188+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:30.566+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:36.894+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:42.005+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:48.526+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:44:55.927+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:02.668+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:09.881+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:14.974+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:20.860+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:25.494+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:33.245+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:37.974+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:45.401+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:51.310+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:45:59.100+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:02.884+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:06.879+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:10.872+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:14.878+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:18.884+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:22.875+02:00  WARN 22484 --- [service-utilisateurs] [io-8081-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:26.875+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:30.897+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:34.895+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:38.892+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+2026-04-19T12:46:42.922+02:00  WARN 22484 --- [service-utilisateurs] [nio-8081-exec-8] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource ws/projects/editor-presence for request '/ws/projects/editor-presence'.]
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        us1_0.id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=? 
+        and us1_0.revoked=false 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        us1_0.id,
+        us1_0.browser,
+        us1_0.created_at,
+        us1_0.device_name,
+        us1_0.device_type,
+        us1_0.ip_address,
+        us1_0.last_active_at,
+        us1_0.location,
+        us1_0.operating_system,
+        us1_0.remember_me,
+        us1_0.revoked,
+        us1_0.revoked_at,
+        us1_0.session_id,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_sessions us1_0 
+    where
+        us1_0.session_id=?
+Hibernate: 
+    update
+        user_sessions 
+    set
+        browser=?,
+        device_name=?,
+        device_type=?,
+        ip_address=?,
+        last_active_at=?,
+        location=?,
+        operating_system=?,
+        remember_me=?,
+        revoked=?,
+        revoked_at=?,
+        session_id=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pm1_0.id,
+        pm1_0.file_name,
+        pm1_0.file_size,
+        pm1_0.file_url,
+        pm1_0.project_id,
+        pm1_0.public_id,
+        pm1_0.type,
+        pm1_0.uploaded_at 
+    from
+        project_media pm1_0 
+    where
+        pm1_0.project_id=? 
+    order by
+        pm1_0.uploaded_at desc

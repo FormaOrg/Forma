@@ -1,6 +1,6 @@
 <div class="collaborators-panel__backdrop" (click)="close()"></div>
 
-<div class="collaborators-panel">
+<div class="collaborators-panel" (click)="closeMenus()">
   <!-- Header -->
   <div class="collaborators-panel__header">
     <h3 class="collaborators-panel__title">{{ 'project.storefront.editor.collaborators.title' | t }}</h3>
@@ -18,25 +18,29 @@
       [value]="inviteEmail()"
       (input)="inviteEmail.set($any($event.target).value)"
       (keydown.enter)="invite()"
+      (click)="stopPanelClick($event)"
     />
-    <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu">
+    <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu" (click)="stopPanelClick($event)">
       <button
         type="button"
         class="collaborators-panel__role-trigger"
         (click)="toggleInviteRoleMenu()"
         [attr.aria-expanded]="isInviteRoleMenuOpen()"
+        aria-haspopup="menu"
       >
         <span>{{ roleLabel(inviteRole()) }}</span>
         <app-icon name="chevron-down" [size]="12" />
       </button>
 
       @if (isInviteRoleMenuOpen()) {
-        <div class="collaborators-panel__menu">
+        <div class="collaborators-panel__menu" role="menu">
           <button
             type="button"
             class="collaborators-panel__menu-row"
             [class.collaborators-panel__menu-row--active]="inviteRole() === 'EDITOR'"
             (click)="selectInviteRole('EDITOR')"
+            role="menuitemradio"
+            [attr.aria-checked]="inviteRole() === 'EDITOR'"
           >
             <span>{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</span>
           </button>
@@ -45,6 +49,8 @@
             class="collaborators-panel__menu-row"
             [class.collaborators-panel__menu-row--active]="inviteRole() === 'VIEWER'"
             (click)="selectInviteRole('VIEWER')"
+            role="menuitemradio"
+            [attr.aria-checked]="inviteRole() === 'VIEWER'"
           >
             <span>{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</span>
           </button>
@@ -62,7 +68,7 @@
   </div>
 
   @if (sendError()) {
-    <p class="collaborators-panel__error">{{ sendError() }}</p>
+    <p class="collaborators-panel__error">{{ sendError()! | t }}</p>
   }
 
   @if (actionError()) {
@@ -71,74 +77,86 @@
 
   <div class="collaborators-panel__divider"></div>
 
-  <!-- List -->
-  @if (isLoading()) {
-    <div class="collaborators-panel__loading">
-      <span class="collaborators-panel__spinner"></span>
-    </div>
-  } @else if (error()) {
-    <p class="collaborators-panel__error">{{ error()! | t }}</p>
-  } @else if (collaborators().length === 0) {
-    <p class="collaborators-panel__empty">{{ 'project.storefront.editor.collaborators.empty' | t }}</p>
-  } @else {
-    <ul class="collaborators-panel__list">
-      @for (c of collaborators(); track c.id) {
-        <li class="collaborators-panel__item">
-          <div class="collaborators-panel__avatar">
-            @if (c.userAvatarUrl) {
-              <img [src]="c.userAvatarUrl" [alt]="collaboratorLabel(c)" class="collaborators-panel__avatar-img" />
-            } @else {
-              <span class="collaborators-panel__avatar-fallback">{{ collaboratorInitial(c) }}</span>
-            }
-          </div>
-          <div class="collaborators-panel__info">
-            <span class="collaborators-panel__name" [title]="collaboratorLabel(c)">{{ collaboratorLabel(c) }}</span>
-            @if (c.status === 'PENDING') {
-              <span class="collaborators-panel__badge">{{ 'project.storefront.editor.collaborators.statusPending' | t }}</span>
-            }
-          </div>
-          <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu">
-            <button
-              type="button"
-              class="collaborators-panel__role-trigger collaborators-panel__role-trigger--inline"
-              (click)="toggleCollaboratorRoleMenu(c.id)"
-              [attr.aria-expanded]="isCollaboratorRoleMenuOpen(c.id)"
+  <div class="collaborators-panel__content">
+    <!-- List -->
+    @if (isLoading()) {
+      <div class="collaborators-panel__loading">
+        <span class="collaborators-panel__spinner"></span>
+      </div>
+    } @else if (error()) {
+      <p class="collaborators-panel__error">{{ error()! | t }}</p>
+    } @else if (collaborators().length === 0) {
+      <p class="collaborators-panel__empty">{{ 'project.storefront.editor.collaborators.empty' | t }}</p>
+    } @else {
+      <ul class="collaborators-panel__list">
+        @for (c of collaborators(); track c.id) {
+          <li class="collaborators-panel__item">
+            <div class="collaborators-panel__avatar">
+              @if (c.userAvatarUrl) {
+                <img [src]="c.userAvatarUrl" [alt]="collaboratorLabel(c)" class="collaborators-panel__avatar-img" />
+              } @else {
+                <span class="collaborators-panel__avatar-fallback">{{ collaboratorInitial(c) }}</span>
+              }
+            </div>
+            <div class="collaborators-panel__info">
+              <span class="collaborators-panel__name" [title]="collaboratorLabel(c)">{{ collaboratorLabel(c) }}</span>
+              @if (c.status === 'PENDING') {
+                <span class="collaborators-panel__badge">{{ 'project.storefront.editor.collaborators.statusPending' | t }}</span>
+              }
+            </div>
+            <div
+              class="collaborators-panel__actions"
+              [class.collaborators-panel__actions--open]="isCollaboratorRoleMenuOpen(c.id)"
             >
-              <span>{{ roleLabel(c.role) }}</span>
-              <app-icon name="chevron-down" [size]="12" />
-            </button>
+              <div class="collaborators-panel__role-wrap collaborators-panel__role-wrap--menu" (click)="stopPanelClick($event)">
+                <button
+                  type="button"
+                  class="collaborators-panel__role-trigger collaborators-panel__role-trigger--inline"
+                  (click)="toggleCollaboratorRoleMenu(c.id)"
+                  [attr.aria-expanded]="isCollaboratorRoleMenuOpen(c.id)"
+                  aria-haspopup="menu"
+                >
+                  <span>{{ roleLabel(c.role) }}</span>
+                  <app-icon name="chevron-down" [size]="12" />
+                </button>
 
-            @if (isCollaboratorRoleMenuOpen(c.id)) {
-              <div class="collaborators-panel__menu collaborators-panel__menu--inline">
-                <button
-                  type="button"
-                  class="collaborators-panel__menu-row"
-                  [class.collaborators-panel__menu-row--active]="c.role === 'EDITOR'"
-                  (click)="updateRole(c, 'EDITOR')"
-                >
-                  <span>{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</span>
-                </button>
-                <button
-                  type="button"
-                  class="collaborators-panel__menu-row"
-                  [class.collaborators-panel__menu-row--active]="c.role === 'VIEWER'"
-                  (click)="updateRole(c, 'VIEWER')"
-                >
-                  <span>{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</span>
-                </button>
+                @if (isCollaboratorRoleMenuOpen(c.id)) {
+                  <div class="collaborators-panel__menu collaborators-panel__menu--inline" role="menu">
+                    <button
+                      type="button"
+                      class="collaborators-panel__menu-row"
+                      [class.collaborators-panel__menu-row--active]="c.role === 'EDITOR'"
+                      (click)="updateRole(c, 'EDITOR')"
+                      role="menuitemradio"
+                      [attr.aria-checked]="c.role === 'EDITOR'"
+                    >
+                      <span>{{ 'project.storefront.editor.collaborators.roleEditor' | t }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="collaborators-panel__menu-row"
+                      [class.collaborators-panel__menu-row--active]="c.role === 'VIEWER'"
+                      (click)="updateRole(c, 'VIEWER')"
+                      role="menuitemradio"
+                      [attr.aria-checked]="c.role === 'VIEWER'"
+                    >
+                      <span>{{ 'project.storefront.editor.collaborators.roleViewer' | t }}</span>
+                    </button>
+                  </div>
+                }
               </div>
-            }
-          </div>
-          <button
-            type="button"
-            class="collaborators-panel__remove"
-            [title]="'project.storefront.editor.collaborators.removeTooltip' | t"
-            (click)="remove(c.id)"
-          >
-            <app-icon name="trash" [size]="14" />
-          </button>
-        </li>
-      }
-    </ul>
-  }
+              <button
+                type="button"
+                class="collaborators-panel__remove"
+                [title]="'project.storefront.editor.collaborators.removeTooltip' | t"
+                (click)="remove(c.id)"
+              >
+                <app-icon name="trash" [size]="14" />
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
 </div>

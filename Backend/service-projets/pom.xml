@@ -143,7 +143,6 @@
 						<exclude>**/controller/AuthController.java</exclude>
 						<exclude>**/controller/BillingController.java</exclude>
 						<exclude>**/controller/UserController.java</exclude>
-						<exclude>**/config/WebSocketConfig.java</exclude>
 						<exclude>**/service/ActivityService.java</exclude>
 						<exclude>**/service/AuthService.java</exclude>
 						<exclude>**/service/BillingService.java</exclude>
@@ -151,7 +150,6 @@
 						<exclude>**/service/GoogleIdentityService.java</exclude>
 						<exclude>**/service/GoogleLinkOauthService.java</exclude>
 						<exclude>**/service/UserService.java</exclude>
-						<exclude>**/websocket/*.java</exclude>
 					</excludes>
 					<testExcludes>
 						<testExclude>**/service/ProjectCatalogServiceTest.java</testExclude>
