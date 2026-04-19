@@ -3,19 +3,22 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
-import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
+import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontHomepageDocument } from '../../../core/models/project-storefront.model';
+import { StorefrontEditorPreviewPageComponent } from '../shared/storefront-editor-preview-page.component';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-checkout',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, StorefrontPublicHeaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, StorefrontPublicHeaderComponent, StorefrontEditorPreviewPageComponent],
   templateUrl: './storefront-checkout.html',
   styleUrl: './storefront-checkout.css',
 })
@@ -45,11 +48,15 @@ export class StorefrontCheckout {
   readonly productsPath = computed(() => this.storefrontRouteService.buildPath(this.projectId(), this.routeMode(), 'products'));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
+  readonly previewProducts = signal<PublicStorefrontProduct[]>([]);
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
   readonly items = computed(() => this.storeCartService.itemsFor(this.projectId()));
   readonly subtotal = computed(() => this.storeCartService.subtotalFor(this.projectId()));
+  readonly previewDocument = computed<StorefrontHomepageDocument | null>(() =>
+    this.isEditorPreview() ? this.publicStorefrontService.readEditorPreviewPageDocument(this.projectId(), 'checkout') : null
+  );
 
   readonly checkoutForm = this.formBuilder.nonNullable.group({
     firstName: this.formBuilder.control('', [Validators.required, Validators.maxLength(120)]),
@@ -72,17 +79,21 @@ export class StorefrontCheckout {
       return;
     }
 
-    this.publicStorefrontService
-      .getStorefront(projectId, { preview: this.isEditorPreview() })
+    forkJoin({
+      storefront: this.publicStorefrontService.getStorefront(projectId, { preview: this.isEditorPreview() }),
+      products: this.publicStorefrontService.getProducts(projectId, { preview: this.isEditorPreview() }),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (storefront) => {
+        next: ({ storefront, products }) => {
           this.storefront.set(storefront);
+          this.previewProducts.set(products);
           this.isLoading.set(false);
           this.prefillFromAccountSession();
         },
         error: () => {
           this.storefront.set(null);
+          this.previewProducts.set([]);
           this.errorMessage.set('Unable to load checkout right now.');
           this.isLoading.set(false);
         },

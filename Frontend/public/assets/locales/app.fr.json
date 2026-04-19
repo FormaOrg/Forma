@@ -1025,6 +1025,7 @@
   "project.storefront.editor.state.mobileBlockedNote": "Ouvrez cette page sur un ordinateur ou une tablette pour continuer à éditer confortablement.",
   "project.storefront.editor.common.closeOpenPanels": "Fermer les panneaux ouverts",
   "project.storefront.editor.common.moreOptions": "Plus d'options",
+  "project.storefront.editor.common.duplicate": "Dupliquer",
   "project.storefront.editor.topbar.preview": "Aperçu",
   "project.storefront.editor.topbar.publish": "Publier",
   "project.storefront.editor.topbar.publishing": "Publication...",

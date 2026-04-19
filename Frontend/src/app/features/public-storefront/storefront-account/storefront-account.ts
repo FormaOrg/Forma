@@ -9,15 +9,26 @@ import {
   PublicStorefrontCustomerOrder,
   PublicStorefrontHome,
 } from '../../../core/models/public-storefront.model';
+import { StorefrontHomepageDocument } from '../../../core/models/project-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
+import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StorefrontCustomerSessionService } from '../../../core/services/storefront-customer-session.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontEditorPreviewPageComponent } from '../shared/storefront-editor-preview-page.component';
+import { StorefrontPublicFooterComponent } from '../shared/storefront-public-footer.component';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-account',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, StorefrontPublicHeaderComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    StorefrontPublicHeaderComponent,
+    StorefrontPublicFooterComponent,
+    StorefrontEditorPreviewPageComponent,
+  ],
   templateUrl: './storefront-account.html',
   styleUrl: './storefront-account.css',
 })
@@ -27,6 +38,7 @@ export class StorefrontAccount {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly publicStorefrontService = inject(PublicStorefrontService);
+  private readonly storefrontRouteService = inject(PublicStorefrontRouteService);
   private readonly storefrontSessionService = inject(StorefrontCustomerSessionService);
   private readonly toastService = inject(ToastService);
 
@@ -36,10 +48,10 @@ export class StorefrontAccount {
   readonly queryParamMap = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
-  readonly projectId = computed(() => {
-    const projectId = Number(this.projectParamMap()?.get('projectId') ?? '0');
-    return Number.isFinite(projectId) && projectId > 0 ? projectId : 0;
-  });
+  readonly projectIdParam = computed(() => this.projectParamMap()?.get('projectId'));
+  readonly routeMode = computed<StorefrontRouteMode>(() => this.storefrontRouteService.resolveRouteMode(this.projectIdParam()));
+  readonly isDomainRoute = computed(() => this.routeMode() === 'domain');
+  readonly projectId = computed(() => this.storefrontRouteService.resolveProjectId(this.projectIdParam()));
   readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
   readonly previewQueryParams = computed(() => (this.isEditorPreview() ? { preview: 'editor' } : null));
 
@@ -49,6 +61,9 @@ export class StorefrontAccount {
   readonly isSubmitting = signal(false);
   readonly activeTab = signal<'login' | 'register'>('login');
   readonly errorMessage = signal('');
+  readonly previewDocument = computed<StorefrontHomepageDocument | null>(() =>
+    this.isEditorPreview() ? this.publicStorefrontService.readEditorPreviewPageDocument(this.projectId(), 'account') : null
+  );
 
   readonly registerForm = this.formBuilder.nonNullable.group({
     firstName: this.formBuilder.control('', [Validators.required, Validators.maxLength(120)]),
@@ -198,9 +213,14 @@ export class StorefrontAccount {
   }
 
   goToStorefront(): void {
-    void this.router.navigate(['/store', this.projectId()], {
-      queryParams: this.previewQueryParams(),
-    });
+    void this.router.navigateByUrl(
+      this.storefrontRouteService.buildUrl(
+        this.projectId(),
+        this.routeMode(),
+        '',
+        this.previewQueryParams() ?? undefined
+      )
+    );
   }
 
   private hydrateSession(projectId: number): void {

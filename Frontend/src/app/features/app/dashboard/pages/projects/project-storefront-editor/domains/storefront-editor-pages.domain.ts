@@ -24,8 +24,8 @@ type ManagedPageHelpers = {
 const REQUIRED_MANAGED_PAGES = [
   { id: 'home', name: 'Home', kind: 'home' as const, designId: null as string | null, routeSlug: null as string | null },
   { id: 'products', name: 'Products', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
-  { id: 'collection', name: 'Collection', kind: 'designed' as const, designId: null as string | null, routeSlug: 'all' as string | null },
   { id: 'product-details', name: 'Product Details', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
+  { id: 'account', name: 'Account', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
   { id: 'cart', name: 'Cart', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
   { id: 'checkout', name: 'Checkout', kind: 'designed' as const, designId: null as string | null, routeSlug: null as string | null },
 ] as const;
@@ -84,27 +84,15 @@ export function buildDefaultManagedPageDocument(
   }
 
   if (safeManagedPageId(pageName) === 'cart') {
-    return buildManagedDocumentWithSingleComponent(
-      pageName,
-      kind,
-      designId,
-      helpers,
-      'cart-content',
-      'Cart',
-      640
-    );
+    return buildCartManagedPageDocument(pageName, kind, designId, helpers);
+  }
+
+  if (safeManagedPageId(pageName) === 'account') {
+    return buildAccountManagedPageDocument(pageName, kind, designId, helpers);
   }
 
   if (safeManagedPageId(pageName) === 'checkout') {
-    return buildManagedDocumentWithSingleComponent(
-      pageName,
-      kind,
-      designId,
-      helpers,
-      'contact-form',
-      'Checkout',
-      700
-    );
+    return buildCheckoutManagedPageDocument(pageName, kind, designId, helpers);
   }
 
   const storeName = helpers.fallbackStoreName;
@@ -356,6 +344,7 @@ function buildProductDetailsManagedPageDocument(
     base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
 
   const block = createStorefrontEditorComponentNode('product-details');
+  block.id = 'product-details-5ce3b500-4f51-471e-8b8f-cbc42796eb8e';
   block.frame = { x: 60, y: 32, width: 1080, height: 568 };
   block.props = {
     ...block.props,
@@ -416,12 +405,228 @@ function buildProductDetailsManagedPageDocument(
   };
 }
 
+function buildCartManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+
+  const block = createStorefrontEditorComponentNode('cart-content');
+  block.id = 'cart-content-3eaf6821-02b8-4c07-b054-3c61430730d2';
+  block.name = 'Cart content';
+  block.frame = { x: 50, y: 32, width: 1100, height: 568 };
+  block.props = {
+    ...block.props,
+    showMeta: true,
+    cartTitle: 'YOUR CART',
+    applyLabel: 'Apply',
+    emptyTitle: 'Your cart is empty',
+    showImages: true,
+    totalLabel: 'Total',
+    summaryTitle: 'Order Summary',
+    checkoutLabel: 'Go to Checkout',
+    showPromoCode: true,
+    subtotalLabel: 'Subtotal',
+    emptyButtonLabel: 'Continue shopping',
+    emptyDescription: 'Add products to the cart to see them here.',
+    promoPlaceholder: 'Add promo code',
+  };
+  block.responsiveFrames = {
+    tablet: { x: 20, y: 24, width: 728, height: 682 },
+    mobile: { x: 8, y: 8, width: 375, height: 989 },
+  };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'hero-s7mck7ob',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Blank section',
+      editorBlankSection: true,
+      editorHeight: 628,
+      editorTabletHeight: 723,
+      editorMobileHeight: 1013,
+      editorComponents: [block],
+      editorLayoutAssignments: [],
+      editorLayoutAssignmentsTablet: [],
+      editorLayoutAssignmentsMobile: [],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
+}
+
+function buildCheckoutManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+
+  const block = createStorefrontEditorComponentNode('checkout-form');
+  block.id = 'checkout-form-0465a7f0-2048-45ff-8ffa-20476ba11201';
+  block.name = 'Checkout form';
+  block.frame = { x: 38, y: 24, width: 1125, height: 542 };
+  block.props = {
+    ...block.props,
+    eyebrow: 'Manual checkout',
+    title: 'Checkout',
+    description: 'Collect delivery and contact information before placing the order.',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    phoneLabel: 'Phone',
+    emailLabel: 'Email',
+    addressLabel: 'Address',
+    notesLabel: 'Order notes',
+    firstNamePlaceholder: 'Jane',
+    lastNamePlaceholder: 'Cooper',
+    phonePlaceholder: '+216 00 000 000',
+    emailPlaceholder: 'jane@email.com',
+    addressPlaceholder: 'Street, city, ZIP',
+    notesPlaceholder: 'Optional notes',
+    summaryTitle: 'Order summary',
+    summaryCaption: 'Sample items update automatically in the live storefront checkout.',
+    subtotalLabel: 'Subtotal',
+    totalLabel: 'Total',
+    totalValue: 'TND 128.00',
+    submitLabel: 'Place order',
+    submitHint: 'The store owner will follow up directly after you place this order.',
+    accentColor: '#111827',
+    backgroundColor: '#ffffff',
+    panelColor: '#f8fafc',
+    textColor: '#0f172a',
+    showSummary: true,
+    showNotesField: true,
+  };
+  block.responsiveFrames = {
+    tablet: { x: 24, y: 15, width: 720, height: 984 },
+    mobile: { x: 12, y: 8, width: 366, height: 1192 },
+  };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'hero-sh3gcjuk',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Blank section',
+      editorBlankSection: true,
+      editorHeight: 590,
+      editorTabletHeight: 1022,
+      editorMobileHeight: 1218,
+      editorComponents: [block],
+      editorLayoutAssignments: [],
+      editorLayoutAssignmentsTablet: [],
+      editorLayoutAssignmentsMobile: [],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
+}
+
+function buildAccountManagedPageDocument(
+  pageName: string,
+  kind: StorefrontEditorManagedPage['kind'],
+  designId: string | null,
+  helpers: ManagedPageHelpers
+): StorefrontHomepageDocument {
+  const storeName = helpers.fallbackStoreName;
+  const base = helpers.buildDefaultHomepageDocument(storeName);
+  const header = base.sections.find((section) => section.type === 'header') ?? base.sections[0];
+  const footer = base.sections.find((section) => section.type === 'footer') ?? base.sections[base.sections.length - 1];
+  const contentBase =
+    base.sections.find((section) => section.type !== 'header' && section.type !== 'footer') ?? base.sections[0];
+
+  const block = createStorefrontEditorComponentNode('account-form');
+  block.id = 'account-form-7d36e782-8be8-4e25-91f0-8beef9c02141';
+  block.name = 'Account form';
+  block.frame = { x: 54, y: 32, width: 1092, height: 604 };
+  block.responsiveFrames = {
+    tablet: { x: 24, y: 24, width: 720, height: 854 },
+    mobile: { x: 12, y: 16, width: 366, height: 1036 },
+  };
+
+  const contentSection: StorefrontHomepageSection = {
+    ...contentBase,
+    id: 'hero-account4mq',
+    type: contentBase.type,
+    props: {
+      ...contentBase.props,
+      editorLabel: 'Blank section',
+      editorBlankSection: true,
+      editorHeight: 668,
+      editorTabletHeight: 910,
+      editorMobileHeight: 1080,
+      editorBackgroundColor: '#f8fafc',
+      editorComponents: [block],
+      editorLayoutAssignments: [],
+      editorLayoutAssignmentsTablet: [],
+      editorLayoutAssignmentsMobile: [],
+    },
+  };
+
+  return {
+    version: base.version,
+    pageKey: base.pageKey,
+    seo: {
+      title: kind === 'home' ? storeName : pageName,
+      description: designId ? `Designed ${pageName} page.` : `Editable ${pageName} page.`,
+    },
+    sections: [header, contentSection, footer].map((section) =>
+      cloneStorefrontHomepageDocument({
+        ...base,
+        sections: [section],
+      }).sections[0]
+    ),
+  };
+}
+
 function buildManagedDocumentWithSingleComponent(
   pageName: string,
   kind: StorefrontEditorManagedPage['kind'],
   designId: string | null,
   helpers: ManagedPageHelpers,
-  componentType: 'product-details' | 'cart-content' | 'contact-form',
+  componentType: 'product-details' | 'cart-content' | 'contact-form' | 'account-form',
   sectionLabel: string,
   sectionHeight: number
 ): StorefrontHomepageDocument {
@@ -454,6 +659,15 @@ function buildManagedDocumentWithSingleComponent(
     block.name = 'Checkout form';
   }
 
+  if (componentType === 'account-form') {
+    block.frame = { x: 54, y: 32, width: 1092, height: sectionHeight - 64 };
+    block.name = 'Account form';
+    block.responsiveFrames = {
+      tablet: { x: 24, y: 24, width: 720, height: Math.max(sectionHeight - 56, 520) },
+      mobile: { x: 12, y: 16, width: 366, height: Math.max(sectionHeight - 32, 680) },
+    };
+  }
+
   const contentSection: StorefrontHomepageSection = {
     ...contentBase,
     id: `${safeManagedPageId(pageName)}-content`,
@@ -464,7 +678,11 @@ function buildManagedDocumentWithSingleComponent(
       editorBlankSection: false,
       editorHeight: sectionHeight,
       editorTabletHeight: sectionHeight,
-      editorMobileHeight: componentType === 'cart-content' ? 980 : componentType === 'product-details' ? 920 : 820,
+      editorMobileHeight:
+        componentType === 'cart-content' ? 980 :
+        componentType === 'product-details' ? 920 :
+        componentType === 'account-form' ? 1080 :
+        820,
       editorComponents: [block],
       editorBackgroundColor: '#ffffff',
       editorBorderWidth: 0,

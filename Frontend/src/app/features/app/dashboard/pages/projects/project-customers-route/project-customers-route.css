@@ -189,7 +189,7 @@ app-project-customers-route .customers-page__stat {
 
 app-project-customers-route .customers-page__stat span,
 app-project-customers-route .customers-page__insight span,
-app-project-customers-route .customers-page__meta dt,
+app-project-customers-route .customers-page__meta-label,
 app-project-customers-route .customers-page__search span,
 app-project-customers-route .customers-page__zone span {
   font-size: 0.8rem;
@@ -380,23 +380,56 @@ app-project-customers-route .customers-page__card-title-group h3 {
   font-weight: 700;
 }
 
+app-project-customers-route .customers-page__card-title-group p {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 app-project-customers-route .customers-page__meta {
-  margin: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-}
-
-app-project-customers-route .customers-page__meta div {
   min-width: 0;
 }
 
-app-project-customers-route .customers-page__meta dd,
+app-project-customers-route .customers-page__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+app-project-customers-route .customers-page__meta-label {
+  margin: 0;
+}
+
+app-project-customers-route .customers-page__meta-value,
 app-project-customers-route .customers-page__footer-copy strong {
   display: block;
-  margin: 4px 0 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
   color: #111111;
   font-weight: 600;
+}
+
+app-project-customers-route .customers-page__meta-value {
+  overflow: hidden;
+}
+
+app-project-customers-route .customers-page__meta-value-ellipsis {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 app-project-customers-route .customers-page__address {
@@ -606,8 +639,8 @@ app-project-customers-route .customers-page__editor-section-head p {
 .theme-dark app-project-customers-route .customers-page__stat strong,
 :root[data-theme='dark'] app-project-customers-route .customers-page__insight strong,
 .theme-dark app-project-customers-route .customers-page__insight strong,
-:root[data-theme='dark'] app-project-customers-route .customers-page__meta dd,
-.theme-dark app-project-customers-route .customers-page__meta dd,
+:root[data-theme='dark'] app-project-customers-route .customers-page__meta-value,
+.theme-dark app-project-customers-route .customers-page__meta-value,
 :root[data-theme='dark'] app-project-customers-route .customers-page__footer-copy strong,
 .theme-dark app-project-customers-route .customers-page__footer-copy strong,
 :root[data-theme='dark'] app-project-customers-route .customers-page__search input,
@@ -637,10 +670,10 @@ app-project-customers-route .customers-page__editor-section-head p {
 .theme-dark app-project-customers-route .customers-page__editor-section-head p,
 :root[data-theme='dark'] app-project-customers-route .customers-page__stat span,
 .theme-dark app-project-customers-route .customers-page__stat span,
+:root[data-theme='dark'] app-project-customers-route .customers-page__meta-label,
+.theme-dark app-project-customers-route .customers-page__meta-label,
 :root[data-theme='dark'] app-project-customers-route .customers-page__stat small,
 .theme-dark app-project-customers-route .customers-page__stat small,
-:root[data-theme='dark'] app-project-customers-route .customers-page__meta dt,
-.theme-dark app-project-customers-route .customers-page__meta dt,
 :root[data-theme='dark'] app-project-customers-route .customers-page__search span,
 .theme-dark app-project-customers-route .customers-page__search span,
 :root[data-theme='dark'] app-project-customers-route .customers-page__zone span,

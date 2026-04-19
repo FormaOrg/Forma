@@ -303,6 +303,14 @@ export class ProjectCustomersRoute {
     return `${Math.round(value)}%`;
   }
 
+  truncateCardValue(value: string, limit: number): string {
+    if (value.length <= limit) {
+      return value;
+    }
+
+    return `${value.slice(0, Math.max(0, limit - 3))}...`;
+  }
+
   getCustomerInitials(customer: ProjectCustomer): string {
     const initials = `${customer.firstName.charAt(0)}${customer.lastName.charAt(0)}`.trim();
     return initials.toUpperCase() || 'CU';

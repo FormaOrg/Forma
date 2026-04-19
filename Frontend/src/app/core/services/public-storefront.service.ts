@@ -12,6 +12,7 @@ import {
   PublicStorefrontHome,
   PublicStorefrontProduct,
 } from '../models/public-storefront.model';
+import { StorefrontHomepageDocument } from '../models/project-storefront.model';
 
 @Injectable({ providedIn: 'root' })
 export class PublicStorefrontService {
@@ -107,6 +108,19 @@ export class PublicStorefrontService {
 
   clearEditorPreviewSnapshot(projectId: number): void {
     localStorage.removeItem(this.getEditorPreviewStorageKey(projectId));
+  }
+
+  readEditorPreviewPageDocument(projectId: number, pageId: string): StorefrontHomepageDocument | null {
+    const snapshot = this.readEditorPreviewSnapshot(projectId);
+    if (!snapshot) {
+      return null;
+    }
+
+    if (pageId === 'home') {
+      return snapshot.storefront.homepage ?? null;
+    }
+
+    return snapshot.managedPages?.find((page) => page.id === pageId)?.document ?? null;
   }
 
   private getEditorPreviewStorageKey(projectId: number): string {

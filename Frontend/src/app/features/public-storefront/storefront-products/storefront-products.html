@@ -7,6 +7,14 @@
     <h1>Catalog unavailable</h1>
     <p>{{ errorMessage() }}</p>
   </section>
+} @else if (isEditorPreview() && storefront() && previewDocument()) {
+  <app-storefront-editor-preview-page
+    [storefront]="storefront()!"
+    [document]="previewDocument()!"
+    [products]="products()"
+    [projectId]="projectId()"
+    [isDomainRoute]="isDomainRoute()"
+  />
 } @else {
   <div class="storefront-products">
     <app-storefront-public-header
@@ -20,12 +28,18 @@
       <section class="storefront-products__hero">
         <span>Store catalog</span>
         <h1>Browse products</h1>
-        <p>{{ products().length }} {{ isEditorPreview() ? 'preview item' : 'live item' }}{{ products().length === 1 ? '' : 's' }} ready to order.</p>
+        <p>{{ filteredProducts().length }} {{ isEditorPreview() ? 'preview item' : 'live item' }}{{ filteredProducts().length === 1 ? '' : 's' }} ready to order.</p>
+        @if (selectedCategoryLabel()) {
+          <div class="storefront-products__active-filter">
+            <span>Filtered by</span>
+            <strong>{{ selectedCategoryLabel() }}</strong>
+          </div>
+        }
       </section>
 
-      @if (products().length) {
+      @if (filteredProducts().length) {
         <section class="storefront-products__grid">
-          @for (product of products(); track trackProduct($index, product)) {
+          @for (product of filteredProducts(); track trackProduct($index, product)) {
             <article class="storefront-products__card">
               <a [attr.href]="productRoute(product.id)">
                 <div class="storefront-products__media">
@@ -56,8 +70,14 @@
         </section>
       } @else {
         <section class="storefront-products__empty">
-          <h2>No live products yet</h2>
-          <p>This storefront has been published, but the catalog does not have any active, ready products yet.</p>
+          <h2>{{ selectedCategoryLabel() ? 'No products match this filter yet' : 'No live products yet' }}</h2>
+          <p>
+            {{
+              selectedCategoryLabel()
+                ? 'Try another category or add products that match the selected collection.'
+                : 'This storefront has been published, but the catalog does not have any active, ready products yet.'
+            }}
+          </p>
         </section>
       }
     </main>

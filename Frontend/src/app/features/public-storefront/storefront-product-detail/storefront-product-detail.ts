@@ -10,12 +10,14 @@ import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core
 import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontHomepageDocument } from '../../../core/models/project-storefront.model';
+import { StorefrontEditorPreviewPageComponent } from '../shared/storefront-editor-preview-page.component';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-product-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent],
+  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent, StorefrontEditorPreviewPageComponent],
   templateUrl: './storefront-product-detail.html',
   styleUrl: './storefront-product-detail.css',
 })
@@ -53,9 +55,15 @@ export class StorefrontProductDetail {
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
   readonly product = signal<PublicStorefrontProduct | null>(null);
+  readonly previewProducts = signal<PublicStorefrontProduct[]>([]);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
   readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
+  readonly previewDocument = computed<StorefrontHomepageDocument | null>(() =>
+    this.isEditorPreview()
+      ? this.publicStorefrontService.readEditorPreviewPageDocument(this.projectId(), 'product-details')
+      : null
+  );
 
   constructor() {
     this.loadProduct();
@@ -76,12 +84,14 @@ export class StorefrontProductDetail {
     forkJoin({
       storefront: this.publicStorefrontService.getStorefront(projectId, { preview: this.isEditorPreview() }),
       product: this.publicStorefrontService.getProduct(projectId, productId, { preview: this.isEditorPreview() }),
+      products: this.publicStorefrontService.getProducts(projectId, { preview: this.isEditorPreview() }),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ storefront, product }) => {
+        next: ({ storefront, product, products }) => {
           this.storefront.set(storefront);
           this.product.set(product);
+          this.previewProducts.set(products);
           this.isLoading.set(false);
           if (!this.isEditorPreview()) {
             this.analyticsService.trackPageView(
@@ -94,6 +104,7 @@ export class StorefrontProductDetail {
         error: () => {
           this.storefront.set(null);
           this.product.set(null);
+          this.previewProducts.set([]);
           this.errorMessage.set('Unable to load this product right now.');
           this.isLoading.set(false);
         },

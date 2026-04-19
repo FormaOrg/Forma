@@ -7,6 +7,14 @@
     <h1>Cart unavailable</h1>
     <p>{{ errorMessage() }}</p>
   </section>
+} @else if (isEditorPreview() && storefront() && previewDocument()) {
+  <app-storefront-editor-preview-page
+    [storefront]="storefront()!"
+    [document]="previewDocument()!"
+    [products]="previewProducts()"
+    [projectId]="projectId()"
+    [isDomainRoute]="isDomainRoute()"
+  />
 } @else {
   <div class="storefront-cart">
     <app-storefront-public-header

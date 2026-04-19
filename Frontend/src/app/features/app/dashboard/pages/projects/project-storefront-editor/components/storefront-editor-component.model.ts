@@ -16,6 +16,7 @@ export type StorefrontEditorComponentType =
   | 'faq'
   | 'contact-form'
   | 'testimonials'
+  | 'account-form'
   | 'checkout-form'
   | 'container'
   | 'graphic'
@@ -287,6 +288,7 @@ export interface StorefrontEditorTestimonialsProps {
 }
 
 export interface StorefrontEditorCheckoutFormProps {
+  eyebrow: string;
   title: string;
   description: string;
   firstNameLabel: string;
@@ -295,7 +297,61 @@ export interface StorefrontEditorCheckoutFormProps {
   emailLabel: string;
   addressLabel: string;
   notesLabel: string;
+  firstNamePlaceholder: string;
+  lastNamePlaceholder: string;
+  phonePlaceholder: string;
+  emailPlaceholder: string;
+  addressPlaceholder: string;
+  notesPlaceholder: string;
+  summaryTitle: string;
+  summaryCaption: string;
+  subtotalLabel: string;
+  totalLabel: string;
+  totalValue: string;
   submitLabel: string;
+  submitHint: string;
+  accentColor: string;
+  backgroundColor: string;
+  panelColor: string;
+  textColor: string;
+  showSummary: boolean;
+  showNotesField: boolean;
+}
+
+export interface StorefrontEditorAccountFormProps {
+  eyebrow: string;
+  title: string;
+  description: string;
+  loginTabLabel: string;
+  registerTabLabel: string;
+  emailLabel: string;
+  passwordLabel: string;
+  firstNameLabel: string;
+  lastNameLabel: string;
+  phoneLabel: string;
+  addressLabel: string;
+  loginEmailPlaceholder: string;
+  loginPasswordPlaceholder: string;
+  firstNamePlaceholder: string;
+  lastNamePlaceholder: string;
+  registerEmailPlaceholder: string;
+  phonePlaceholder: string;
+  addressPlaceholder: string;
+  registerPasswordPlaceholder: string;
+  submitLoginLabel: string;
+  submitLoginPendingLabel: string;
+  submitRegisterLabel: string;
+  submitRegisterPendingLabel: string;
+  signOutLabel: string;
+  backButtonLabel: string;
+  ordersTitle: string;
+  continueShoppingLabel: string;
+  emptyOrdersLabel: string;
+  accentColor: string;
+  backgroundColor: string;
+  panelColor: string;
+  textColor: string;
+  showRegisterTab: boolean;
 }
 
 export interface StorefrontEditorContainerProps {
@@ -406,6 +462,7 @@ export type StorefrontEditorSocialLinksNode = StorefrontEditorComponentBase<'soc
 export type StorefrontEditorFaqNode = StorefrontEditorComponentBase<'faq', StorefrontEditorFaqProps>;
 export type StorefrontEditorContactFormNode = StorefrontEditorComponentBase<'contact-form', StorefrontEditorContactFormProps>;
 export type StorefrontEditorTestimonialsNode = StorefrontEditorComponentBase<'testimonials', StorefrontEditorTestimonialsProps>;
+export type StorefrontEditorAccountFormNode = StorefrontEditorComponentBase<'account-form', StorefrontEditorAccountFormProps>;
 export type StorefrontEditorCheckoutFormNode = StorefrontEditorComponentBase<'checkout-form', StorefrontEditorCheckoutFormProps>;
 export type StorefrontEditorContainerNode = StorefrontEditorComponentBase<'container', StorefrontEditorContainerProps>;
 export type StorefrontEditorGraphicNode = StorefrontEditorComponentBase<'graphic', StorefrontEditorGraphicProps>;
@@ -430,6 +487,7 @@ export type StorefrontEditorComponentNode =
   | StorefrontEditorFaqNode
   | StorefrontEditorContactFormNode
   | StorefrontEditorTestimonialsNode
+  | StorefrontEditorAccountFormNode
   | StorefrontEditorCheckoutFormNode
   | StorefrontEditorContainerNode
   | StorefrontEditorGraphicNode
@@ -492,6 +550,8 @@ function getDefaultStorefrontEditorComponentFrame(
       return { x: 32, y: 430, width: 440, height: 520 };
     case 'testimonials':
       return { x: 32, y: 32, width: 560, height: 320 };
+    case 'account-form':
+      return { x: 32, y: 120, width: 760, height: 560 };
     case 'checkout-form':
       return { x: 32, y: 120, width: 760, height: 520 };
     case 'container':
@@ -1157,11 +1217,52 @@ export function createStorefrontEditorComponentNode(
           ],
         },
       };
+    case 'account-form':
+      return {
+        ...createStorefrontEditorComponentBase('account-form'),
+        name: 'Account form',
+        props: {
+          eyebrow: 'Customer account',
+          title: 'Sign in to your storefront account',
+          description: 'Login or create an account to save your details and view future orders.',
+          loginTabLabel: 'Login',
+          registerTabLabel: 'Create account',
+          emailLabel: 'Email',
+          passwordLabel: 'Password',
+          firstNameLabel: 'First name',
+          lastNameLabel: 'Last name',
+          phoneLabel: 'Phone',
+          addressLabel: 'Address',
+          loginEmailPlaceholder: 'jane@email.com',
+          loginPasswordPlaceholder: 'Enter your password',
+          firstNamePlaceholder: 'Jane',
+          lastNamePlaceholder: 'Cooper',
+          registerEmailPlaceholder: 'jane@email.com',
+          phonePlaceholder: '+216 00 000 000',
+          addressPlaceholder: 'Street, city, ZIP',
+          registerPasswordPlaceholder: 'Create a password',
+          submitLoginLabel: 'Sign in',
+          submitLoginPendingLabel: 'Signing in...',
+          submitRegisterLabel: 'Create account',
+          submitRegisterPendingLabel: 'Creating account...',
+          signOutLabel: 'Sign out',
+          backButtonLabel: 'Back to store',
+          ordersTitle: 'Your orders',
+          continueShoppingLabel: 'Continue shopping',
+          emptyOrdersLabel: 'No orders yet. Your future orders will appear here.',
+          accentColor: '#0f172a',
+          backgroundColor: '#ffffff',
+          panelColor: '#f8fafc',
+          textColor: '#0f172a',
+          showRegisterTab: true,
+        },
+      };
     case 'checkout-form':
       return {
         ...createStorefrontEditorComponentBase('checkout-form'),
         name: 'Checkout form',
         props: {
+          eyebrow: 'Manual checkout',
           title: 'Checkout',
           description: 'Collect delivery and contact information before placing the order.',
           firstNameLabel: 'First name',
@@ -1170,7 +1271,25 @@ export function createStorefrontEditorComponentNode(
           emailLabel: 'Email',
           addressLabel: 'Address',
           notesLabel: 'Order notes',
+          firstNamePlaceholder: 'Jane',
+          lastNamePlaceholder: 'Cooper',
+          phonePlaceholder: '+216 00 000 000',
+          emailPlaceholder: 'jane@email.com',
+          addressPlaceholder: 'Street, city, ZIP',
+          notesPlaceholder: 'Optional notes',
+          summaryTitle: 'Order summary',
+          summaryCaption: 'Sample items update automatically in the live storefront checkout.',
+          subtotalLabel: 'Subtotal',
+          totalLabel: 'Total',
+          totalValue: 'TND 128.00',
           submitLabel: 'Place order',
+          submitHint: 'The store owner will follow up directly after you place this order.',
+          accentColor: '#111827',
+          backgroundColor: '#ffffff',
+          panelColor: '#f8fafc',
+          textColor: '#0f172a',
+          showSummary: true,
+          showNotesField: true,
         },
       };
     case 'container':

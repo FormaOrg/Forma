@@ -3,6 +3,15 @@ import { Injectable, signal } from '@angular/core';
 type LocaleDict = Record<string, string>;
 export type AppLanguage = 'en' | 'fr';
 
+const I18N_FALLBACKS: Record<AppLanguage, LocaleDict> = {
+  en: {
+    'project.storefront.editor.common.duplicate': 'Duplicate',
+  },
+  fr: {
+    'project.storefront.editor.common.duplicate': 'Dupliquer',
+  },
+};
+
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   private readonly langStorageKey = 'forma_lang';
@@ -24,7 +33,7 @@ export class I18nService {
   }
 
   t(key: string): string {
-    return this.dict()[key] ?? key;
+    return this.dict()[key] ?? I18N_FALLSBACK_LOOKUP(this.lang(), key) ?? key;
   }
 
   private async loadLocale(lang: AppLanguage): Promise<LocaleDict> {
@@ -46,9 +55,13 @@ export class I18nService {
 
   private async fetchLocaleFile(path: string): Promise<LocaleDict> {
     const url = new URL(path, document.baseURI).toString();
-    const res = await fetch(url, { cache: 'force-cache' });
+    const res = await fetch(url, { cache: 'no-cache' });
     if (!res.ok) return {};
     return (await res.json()) as LocaleDict;
   }
+}
+
+function I18N_FALLSBACK_LOOKUP(lang: AppLanguage, key: string): string | undefined {
+  return I18N_FALLBACKS[lang]?.[key];
 }
 

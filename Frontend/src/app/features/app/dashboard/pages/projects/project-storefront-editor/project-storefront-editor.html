@@ -1908,8 +1908,8 @@
     </button>
     <div
       class="storefront-editor__context-toolbar-shell"
-      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible()"
-      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible())"
+      [class.storefront-editor__context-toolbar-shell--visible]="isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isAccountFormToolbarVisible() || isCheckoutFormToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible()"
+      [attr.aria-hidden]="!(isSectionToolbarVisible() || isParagraphToolbarVisible() || isImageToolbarVisible() || isContainerToolbarVisible() || isCartToolbarVisible() || isCartContentToolbarVisible() || isAccountFormToolbarVisible() || isCheckoutFormToolbarVisible() || isProductDetailsToolbarVisible() || isSearchToolbarVisible() || isSocialLinksToolbarVisible() || isButtonToolbarVisible() || isMenuToolbarVisible() || isIconToolbarVisible() || isProductFeedToolbarVisible() || isAccountToolbarVisible() || isTestimonialsToolbarVisible())"
       (mousedown)="preserveRichTextEditing($event)"
     >
         @if (isSectionToolbarVisible() && selectedSection(); as activeSection) {
@@ -4295,6 +4295,64 @@
           </div>
         }
 
+        @if (isAccountFormToolbarVisible() && selectedAccountFormComponent(); as accountForm) {
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__cart-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeAccountFormToolbarMenu() === 'edit-text'"
+              (click)="toggleAccountFormToolbarMenu('edit-text')"
+            >
+              <span>Edit Text</span>
+            </button>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeAccountFormToolbarMenu() === 'settings'"
+              (click)="toggleAccountFormToolbarMenu('settings')"
+            >
+              <span>Settings</span>
+            </button>
+          </div>
+        }
+
+        @if (isCheckoutFormToolbarVisible() && selectedCheckoutFormComponent(); as checkoutForm) {
+          <div
+            class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__cart-toolbar"
+            animate.enter="storefront-editor__context-toolbar-fade-enter"
+          >
+            <button
+              type="button"
+              class="storefront-editor__context-toolbar-trigger storefront-editor__button-toolbar-text-trigger"
+              [class.storefront-editor__button-toolbar-text-trigger--active]="activeCheckoutFormToolbarMenu() === 'edit-text'"
+              (click)="toggleCheckoutFormToolbarMenu('edit-text')"
+            >
+              <span>Edit Text</span>
+            </button>
+
+            <span class="storefront-editor__context-toolbar-divider"></span>
+
+            <button
+              type="button"
+              class="storefront-editor__button-toolbar-icon-trigger"
+              [class.storefront-editor__button-toolbar-icon-trigger--active]="activeCheckoutFormToolbarMenu() === 'settings'"
+              (click)="toggleCheckoutFormToolbarMenu('settings')"
+              aria-label="Settings"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M11.99 9.51a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0-5Zm0 1.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1Z"></path>
+                <path d="M12.48 4.51c.944 0 1.71.766 1.71 1.71v.151c.08.031.16.064.239.099l.101-.1a1.705 1.705 0 0 1 2.421 0l.672.672c.686.668.676 1.759.008 2.428l-.102.1c.035.079.068.159.099.24h.152c.944 0 1.711.766 1.711 1.71v.96c0 .943-.767 1.709-1.71 1.71h-.152c-.031.08-.065.16-.1.238l.102.101a1.705 1.705 0 0 1 0 2.421l-.68.68v-.001a1.703 1.703 0 0 1-2.42 0l-.102-.1a6.084 6.084 0 0 1-.239.098v.152c0 .944-.766 1.71-1.71 1.711h-.96c-.944 0-1.71-.767-1.71-1.71v-.153a5.957 5.957 0 0 1-.239-.099l-.093.094a1.703 1.703 0 0 1-2.427.008l-.68-.68a1.705 1.705 0 0 1 0-2.42l.1-.102a5.943 5.943 0 0 1-.099-.239h-.151a1.712 1.712 0 0 1-1.712-1.71v-.96c0-.944.768-1.71 1.712-1.71h.152c.031-.08.063-.16.098-.239l-.1-.1a1.704 1.704 0 0 1 0-2.42l.68-.68a1.704 1.704 0 0 1 2.42 0l.1.1c.079-.035.16-.068.24-.099V6.22c0-.944.765-1.71 1.71-1.71h.96Zm-.96 1.5a.21.21 0 0 0-.21.21v.69a.75.75 0 0 1-.55.723 4.426 4.426 0 0 0-.975.402.751.751 0 0 1-.894-.125l-.48-.48a.205.205 0 0 0-.293-.007l-.687.687a.204.204 0 0 0-.007.292l.487.488a.752.752 0 0 1 .125.894 4.42 4.42 0 0 0-.402.975.75.75 0 0 1-.723.55h-.69a.21.21 0 0 0-.21.21v.96c0 .116.094.21.21.21h.69l.124.011c.284.048.52.257.599.541.093.338.229.662.402.975a.752.752 0 0 1-.125.894l-.48.48a.206.206 0 0 0-.032.262l.025.03.687.687c.091.09.22.08.292.007l.007-.007.48-.48.094-.08a.751.751 0 0 1 .801-.045c.312.173.638.31.975.402.325.09.55.387.55.724v.69c0 .115.095.21.21.21h.96a.21.21 0 0 0 .21-.21v-.69c0-.338.227-.634.552-.724a4.43 4.43 0 0 0 .975-.402l.112-.05a.752.752 0 0 1 .782.176l.48.48c.09.09.221.08.293.006l.686-.686a.206.206 0 0 0 .007-.293l-.486-.487a.75.75 0 0 1-.126-.894c.173-.312.31-.638.402-.975l.043-.117a.751.751 0 0 1 .68-.434h.69a.212.212 0 0 0 .211-.21v-.96a.212.212 0 0 0-.21-.21h-.69a.75.75 0 0 1-.724-.551 4.421 4.421 0 0 0-.402-.975.75.75 0 0 1 .126-.894l.48-.48a.205.205 0 0 0 .006-.293l-.686-.687a.205.205 0 0 0-.293-.007l-.007.007-.48.48a.751.751 0 0 1-.894.125 4.428 4.428 0 0 0-.975-.402.75.75 0 0 1-.552-.723v-.69a.211.211 0 0 0-.21-.21h-.96Z"></path>
+              </svg>
+            </button>
+          </div>
+        }
+
         @if (isMenuToolbarVisible() && selectedMenuComponent(); as menu) {
           <div
             class="storefront-editor__context-toolbar storefront-editor__button-toolbar storefront-editor__menu-toolbar"
@@ -6646,6 +6704,153 @@
                 @if (activeCartContentSettingsSection() === 'empty') {
                   <div class="storefront-editor__cart-settings-section">
                     <p class="storefront-editor__button-toolbar-helper">Empty-cart copy is customizable from Edit Text.</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </aside>
+        }
+      }
+
+        @if (selectedAccountFormComponent(); as accountForm) {
+          @if (activeAccountFormToolbarMenu() === 'edit-text') {
+            <aside class="storefront-editor__cart-toolbar-side-panel storefront-editor__button-toolbar-side-panel">
+              <div class="storefront-editor__button-toolbar-panel-header">
+                <h3>Edit Text</h3>
+                <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleAccountFormToolbarMenu('edit-text')">
+                  <app-icon name="x" [size]="14"></app-icon>
+                </button>
+              </div>
+
+              <div class="storefront-editor__side-panel-scroll">
+                @for (entry of accountFormEditTextValues() | keyvalue; track entry.key) {
+                  <label class="storefront-editor__button-toolbar-field">
+                    <span>{{ entry.key }}</span>
+                    <input
+                      type="text"
+                      [value]="entry.value"
+                      (input)="updateSelectedAccountFormTextValue($any(entry.key), $any($event.target).value)"
+                    />
+                  </label>
+                }
+              </div>
+            </aside>
+          }
+
+          @if (activeAccountFormToolbarMenu() === 'settings') {
+            <aside class="storefront-editor__cart-toolbar-side-panel storefront-editor__button-toolbar-side-panel storefront-editor__cart-settings-panel">
+              <div class="storefront-editor__button-toolbar-panel-header">
+                <h3>Settings</h3>
+                <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleAccountFormToolbarMenu('settings')">
+                  <app-icon name="x" [size]="14"></app-icon>
+                </button>
+              </div>
+
+              <div class="storefront-editor__cart-settings-shell">
+                <nav class="storefront-editor__cart-settings-nav">
+                  <button type="button" class="storefront-editor__cart-settings-nav-item" [class.storefront-editor__cart-settings-nav-item--active]="activeAccountFormSettingsSection() === 'layout'" (click)="setActiveAccountFormSettingsSection('layout')">Layout</button>
+                  <button type="button" class="storefront-editor__cart-settings-nav-item" [class.storefront-editor__cart-settings-nav-item--active]="activeAccountFormSettingsSection() === 'colors'" (click)="setActiveAccountFormSettingsSection('colors')">Colors</button>
+                </nav>
+
+                <div class="storefront-editor__cart-settings-content">
+                  @if (activeAccountFormSettingsSection() === 'layout') {
+                    <div class="storefront-editor__cart-settings-section">
+                      <button type="button" class="storefront-editor__button-toolbar-check-row" [class.storefront-editor__button-toolbar-check-row--active]="accountForm.props.showRegisterTab" (click)="toggleSelectedAccountFormShowRegisterTab()"><span>Show register tab</span></button>
+                    </div>
+                  }
+
+                  @if (activeAccountFormSettingsSection() === 'colors') {
+                    <div class="storefront-editor__cart-settings-section">
+                      <label class="storefront-editor__button-toolbar-field">
+                        <span>Accent color</span>
+                        <input type="color" [value]="accountForm.props.accentColor" (input)="updateSelectedAccountFormAccentColor($any($event.target).value)" />
+                      </label>
+                      <label class="storefront-editor__button-toolbar-field">
+                        <span>Background color</span>
+                        <input type="color" [value]="accountForm.props.backgroundColor" (input)="updateSelectedAccountFormBackgroundColor($any($event.target).value)" />
+                      </label>
+                      <label class="storefront-editor__button-toolbar-field">
+                        <span>Panel color</span>
+                        <input type="color" [value]="accountForm.props.panelColor" (input)="updateSelectedAccountFormPanelColor($any($event.target).value)" />
+                      </label>
+                      <label class="storefront-editor__button-toolbar-field">
+                        <span>Text color</span>
+                        <input type="color" [value]="accountForm.props.textColor" (input)="updateSelectedAccountFormTextColor($any($event.target).value)" />
+                      </label>
+                    </div>
+                  }
+                </div>
+              </div>
+            </aside>
+          }
+        }
+
+        @if (selectedCheckoutFormComponent(); as checkoutForm) {
+          @if (activeCheckoutFormToolbarMenu() === 'edit-text') {
+            <aside class="storefront-editor__cart-toolbar-side-panel storefront-editor__button-toolbar-side-panel">
+              <div class="storefront-editor__button-toolbar-panel-header">
+              <h3>Edit Text</h3>
+              <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleCheckoutFormToolbarMenu('edit-text')">
+                <app-icon name="x" [size]="14"></app-icon>
+              </button>
+            </div>
+
+            <div class="storefront-editor__side-panel-scroll">
+              @for (entry of checkoutFormEditTextValues() | keyvalue; track entry.key) {
+                <label class="storefront-editor__button-toolbar-field">
+                  <span>{{ entry.key }}</span>
+                  <input
+                    type="text"
+                    [value]="entry.value"
+                    (input)="updateSelectedCheckoutFormTextValue($any(entry.key), $any($event.target).value)"
+                  />
+                </label>
+              }
+            </div>
+          </aside>
+        }
+
+        @if (activeCheckoutFormToolbarMenu() === 'settings') {
+          <aside class="storefront-editor__cart-toolbar-side-panel storefront-editor__button-toolbar-side-panel storefront-editor__cart-settings-panel">
+            <div class="storefront-editor__button-toolbar-panel-header">
+              <h3>Settings</h3>
+              <button type="button" class="storefront-editor__button-toolbar-panel-close" (click)="toggleCheckoutFormToolbarMenu('settings')">
+                <app-icon name="x" [size]="14"></app-icon>
+              </button>
+            </div>
+
+            <div class="storefront-editor__cart-settings-shell">
+              <nav class="storefront-editor__cart-settings-nav">
+                <button type="button" class="storefront-editor__cart-settings-nav-item" [class.storefront-editor__cart-settings-nav-item--active]="activeCheckoutFormSettingsSection() === 'layout'" (click)="setActiveCheckoutFormSettingsSection('layout')">Layout</button>
+                <button type="button" class="storefront-editor__cart-settings-nav-item" [class.storefront-editor__cart-settings-nav-item--active]="activeCheckoutFormSettingsSection() === 'colors'" (click)="setActiveCheckoutFormSettingsSection('colors')">Colors</button>
+              </nav>
+
+              <div class="storefront-editor__cart-settings-content">
+                @if (activeCheckoutFormSettingsSection() === 'layout') {
+                  <div class="storefront-editor__cart-settings-section">
+                    <button type="button" class="storefront-editor__button-toolbar-check-row" [class.storefront-editor__button-toolbar-check-row--active]="checkoutForm.props.showSummary" (click)="toggleSelectedCheckoutFormShowSummary()"><span>Show summary panel</span></button>
+                    <button type="button" class="storefront-editor__button-toolbar-check-row" [class.storefront-editor__button-toolbar-check-row--active]="checkoutForm.props.showNotesField" (click)="toggleSelectedCheckoutFormShowNotesField()"><span>Show notes field</span></button>
+                  </div>
+                }
+
+                @if (activeCheckoutFormSettingsSection() === 'colors') {
+                  <div class="storefront-editor__cart-settings-section">
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Accent color</span>
+                      <input type="color" [value]="checkoutForm.props.accentColor" (input)="updateSelectedCheckoutFormAccentColor($any($event.target).value)" />
+                    </label>
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Background color</span>
+                      <input type="color" [value]="checkoutForm.props.backgroundColor" (input)="updateSelectedCheckoutFormBackgroundColor($any($event.target).value)" />
+                    </label>
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Panel color</span>
+                      <input type="color" [value]="checkoutForm.props.panelColor" (input)="updateSelectedCheckoutFormPanelColor($any($event.target).value)" />
+                    </label>
+                    <label class="storefront-editor__button-toolbar-field">
+                      <span>Text color</span>
+                      <input type="color" [value]="checkoutForm.props.textColor" (input)="updateSelectedCheckoutFormTextColor($any($event.target).value)" />
+                    </label>
                   </div>
                 }
               </div>

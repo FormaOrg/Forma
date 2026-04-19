@@ -27,6 +27,7 @@ export type StorefrontEditorAddElementsCardPreview =
   | 'faq'
   | 'contact-form'
   | 'testimonials'
+  | 'account-form'
   | 'container'
   | 'graphic'
   | 'product-feed'
@@ -114,6 +115,7 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_SUBCATEGORIES: Readonly<
     { id: 'all', label: 'All' },
     { id: 'grid-gallery', label: 'Grid gallery' },
     { id: 'featured-products', label: 'Featured products' },
+    { id: 'customer-account', label: 'Customer account' },
   ],
 };
 
@@ -174,6 +176,16 @@ export const STOREFRONT_EDITOR_ADD_ELEMENTS_LIBRARY_ITEMS: readonly StorefrontEd
     description: 'Customer reviews with star ratings, quotes, and reviewer names.',
     preview: 'testimonials',
     keywords: ['testimonials', 'reviews', 'stars', 'rating', 'social proof', 'customers'],
+  },
+  {
+    id: 'account-form',
+    title: 'Account form',
+    category: 'Forma Store',
+    subcategoryIds: ['all', 'customer-account'],
+    componentType: 'account-form',
+    description: 'Customer login and registration form for the storefront account page.',
+    preview: 'account-form',
+    keywords: ['account', 'login', 'register', 'customer', 'profile', 'orders', 'store'],
   },
   {
     id: 'checkout-form',

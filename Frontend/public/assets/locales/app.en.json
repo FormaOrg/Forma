@@ -1178,6 +1178,7 @@
   "project.storefront.editor.state.mobileBlockedNote": "Open this page on a desktop or tablet to keep editing comfortably.",
   "project.storefront.editor.common.closeOpenPanels": "Close open panels",
   "project.storefront.editor.common.moreOptions": "More options",
+  "project.storefront.editor.common.duplicate": "Duplicate",
   "project.storefront.editor.topbar.preview": "Preview",
   "project.storefront.editor.topbar.publish": "Publish",
   "project.storefront.editor.topbar.publishing": "Publishing...",

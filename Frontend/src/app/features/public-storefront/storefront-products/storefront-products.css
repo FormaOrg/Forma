@@ -79,6 +79,25 @@
   margin: 0.8rem 0 0.9rem;
 }
 
+.storefront-products__active-filter {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 40px;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(76, 57, 34, 0.12);
+  color: #4a3827;
+}
+
+.storefront-products__active-filter span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+}
+
 .storefront-products__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

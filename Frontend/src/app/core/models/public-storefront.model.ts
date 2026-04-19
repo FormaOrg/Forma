@@ -24,9 +24,15 @@ export interface PublicStorefrontHome {
   featuredProducts: PublicStorefrontProduct[];
 }
 
+export interface EditorStorefrontPreviewPageSnapshot {
+  id: string;
+  document: StorefrontHomepageDocument;
+}
+
 export interface EditorStorefrontPreviewSnapshot {
   storefront: PublicStorefrontHome;
   products: PublicStorefrontProduct[];
+  managedPages?: EditorStorefrontPreviewPageSnapshot[];
   savedAt: string;
 }
 

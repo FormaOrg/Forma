@@ -20,6 +20,7 @@ import { StorefrontEditorBlockSocialLinksComponent } from './blocks/storefront-e
 import { StorefrontEditorBlockFaqComponent } from './blocks/storefront-editor-block-faq.component';
 import { StorefrontEditorBlockContactFormComponent } from './blocks/storefront-editor-block-contact-form.component';
 import { StorefrontEditorBlockTestimonialsComponent } from './blocks/storefront-editor-block-testimonials.component';
+import { StorefrontEditorBlockAccountFormComponent } from './blocks/storefront-editor-block-account-form.component';
 import { StorefrontEditorBlockCheckoutFormComponent } from './blocks/storefront-editor-block-checkout-form.component';
 import { StorefrontEditorBlockContainerComponent } from './blocks/storefront-editor-block-container.component';
 import { StorefrontEditorBlockGraphicComponent } from './blocks/storefront-editor-block-graphic.component';
@@ -27,6 +28,7 @@ import { StorefrontEditorBlockProductFeedComponent } from './blocks/storefront-e
 import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-editor-block-blog-feed.component';
 import { StorefrontEditorBlockProductDetailsComponent } from './blocks/storefront-editor-block-product-details.component';
 import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-editor-block-cart-content.component';
+import { StorefrontPublicAccountFormComponent } from '../../../../../../public-storefront/shared/storefront-public-account-form.component';
 
 @Component({
   selector: 'app-storefront-editor-component-host',
@@ -48,6 +50,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
     StorefrontEditorBlockFaqComponent,
     StorefrontEditorBlockContactFormComponent,
     StorefrontEditorBlockTestimonialsComponent,
+    StorefrontEditorBlockAccountFormComponent,
     StorefrontEditorBlockCheckoutFormComponent,
     StorefrontEditorBlockContainerComponent,
     StorefrontEditorBlockGraphicComponent,
@@ -55,6 +58,7 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
     StorefrontEditorBlockBlogFeedComponent,
     StorefrontEditorBlockProductDetailsComponent,
     StorefrontEditorBlockCartContentComponent,
+    StorefrontPublicAccountFormComponent,
   ],
   styles: [`
     :host {
@@ -123,6 +127,18 @@ import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-e
       @case ('testimonials') {
         <app-storefront-editor-block-testimonials [node]="$any(node())" />
       }
+      @case ('account-form') {
+        @if (storefrontProjectId()) {
+          <app-storefront-public-account-form
+            [node]="$any(node())"
+            [projectId]="storefrontProjectId()"
+            [isEditorPreview]="storefrontIsEditorPreview()"
+            [isDomainRoute]="storefrontIsDomainRoute()"
+          />
+        } @else {
+          <app-storefront-editor-block-account-form [node]="$any(node())" />
+        }
+      }
       @case ('checkout-form') {
         <app-storefront-editor-block-checkout-form [node]="$any(node())" />
       }
@@ -157,4 +173,7 @@ export class StorefrontEditorComponentHostComponent {
   readonly cartCount = input<number | null>(null);
   readonly interactiveLinks = input(false);
   readonly linkHrefResolver = input<((value: string) => string) | null>(null);
+  readonly storefrontProjectId = input<number | null>(null);
+  readonly storefrontIsEditorPreview = input(false);
+  readonly storefrontIsDomainRoute = input(false);
 }

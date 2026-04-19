@@ -2,17 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 
-import { PublicStorefrontHome } from '../../../core/models/public-storefront.model';
+import { PublicStorefrontHome, PublicStorefrontProduct } from '../../../core/models/public-storefront.model';
 import { PublicStorefrontService } from '../../../core/services/public-storefront.service';
 import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
+import { StorefrontHomepageDocument } from '../../../core/models/project-storefront.model';
+import { StorefrontEditorPreviewPageComponent } from '../shared/storefront-editor-preview-page.component';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent],
+  imports: [CommonModule, RouterLink, StorefrontPublicHeaderComponent, StorefrontEditorPreviewPageComponent],
   templateUrl: './storefront-cart.html',
   styleUrl: './storefront-cart.css',
 })
@@ -39,10 +42,14 @@ export class StorefrontCart {
   readonly checkoutPath = computed(() => this.storefrontRouteService.buildPath(this.projectId(), this.routeMode(), 'checkout'));
 
   readonly storefront = signal<PublicStorefrontHome | null>(null);
+  readonly previewProducts = signal<PublicStorefrontProduct[]>([]);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
   readonly items = computed(() => this.storeCartService.itemsFor(this.projectId()));
   readonly subtotal = computed(() => this.storeCartService.subtotalFor(this.projectId()));
+  readonly previewDocument = computed<StorefrontHomepageDocument | null>(() =>
+    this.isEditorPreview() ? this.publicStorefrontService.readEditorPreviewPageDocument(this.projectId(), 'cart') : null
+  );
 
   constructor() {
     this.loadStorefront();
@@ -56,16 +63,20 @@ export class StorefrontCart {
       return;
     }
 
-    this.publicStorefrontService
-      .getStorefront(projectId, { preview: this.isEditorPreview() })
+    forkJoin({
+      storefront: this.publicStorefrontService.getStorefront(projectId, { preview: this.isEditorPreview() }),
+      products: this.publicStorefrontService.getProducts(projectId, { preview: this.isEditorPreview() }),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (storefront) => {
+        next: ({ storefront, products }) => {
           this.storefront.set(storefront);
+          this.previewProducts.set(products);
           this.isLoading.set(false);
         },
         error: () => {
           this.storefront.set(null);
+          this.previewProducts.set([]);
           this.errorMessage.set('Unable to load this cart right now.');
           this.isLoading.set(false);
         },

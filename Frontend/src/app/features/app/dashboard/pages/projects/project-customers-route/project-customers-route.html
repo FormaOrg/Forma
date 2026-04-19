@@ -112,7 +112,9 @@
                   <div class="customers-page__card-head">
                   <div class="customers-page__card-title-group">
                       <h3>{{ customer.fullName }}</h3>
-                      <p>{{ customer.email || customer.phone || ('project.customers.card.noContact' | t) }}</p>
+                      <p [attr.title]="customer.email || customer.phone || ('project.customers.card.noContact' | t)">
+                        {{ truncateCardValue(customer.email || customer.phone || ('project.customers.card.noContact' | t), 34) }}
+                      </p>
                     </div>
                   </div>
 
@@ -125,24 +127,28 @@
                 </div>
               </div>
 
-              <dl class="customers-page__meta">
-                <div>
-                  <dt>{{ 'project.customers.card.email' | t }}</dt>
-                  <dd>{{ customer.email || ('project.customers.card.noEmail' | t) }}</dd>
+              <div class="customers-page__meta">
+                <div class="customers-page__meta-item">
+                  <p class="customers-page__meta-label">{{ 'project.customers.card.email' | t }}</p>
+                  <p class="customers-page__meta-value" [attr.title]="customer.email || ('project.customers.card.noEmail' | t)">
+                    <span class="customers-page__meta-value-ellipsis">{{ truncateCardValue(customer.email || ('project.customers.card.noEmail' | t), 20) }}</span>
+                  </p>
                 </div>
-                <div>
-                  <dt>{{ 'project.customers.card.phone' | t }}</dt>
-                  <dd>{{ customer.phone || ('project.customers.card.noPhone' | t) }}</dd>
+                <div class="customers-page__meta-item">
+                  <p class="customers-page__meta-label">{{ 'project.customers.card.phone' | t }}</p>
+                  <p class="customers-page__meta-value" [attr.title]="customer.phone || ('project.customers.card.noPhone' | t)">
+                    <span class="customers-page__meta-value-ellipsis">{{ truncateCardValue(customer.phone || ('project.customers.card.noPhone' | t), 18) }}</span>
+                  </p>
                 </div>
-                <div>
-                  <dt>{{ 'project.customers.card.totalSpent' | t }}</dt>
-                  <dd>{{ formatMoney(customer.totalSpent) }} TND</dd>
+                <div class="customers-page__meta-item">
+                  <p class="customers-page__meta-label">{{ 'project.customers.card.totalSpent' | t }}</p>
+                  <p class="customers-page__meta-value">{{ formatMoney(customer.totalSpent) }} TND</p>
                 </div>
-                <div>
-                  <dt>{{ 'project.customers.card.lastOrder' | t }}</dt>
-                  <dd>{{ formatDate(customer.lastOrderAt) }}</dd>
+                <div class="customers-page__meta-item">
+                  <p class="customers-page__meta-label">{{ 'project.customers.card.lastOrder' | t }}</p>
+                  <p class="customers-page__meta-value">{{ formatDate(customer.lastOrderAt) }}</p>
                 </div>
-              </dl>
+              </div>
 
               @if (customer.address) {
                 <p class="customers-page__address">{{ customer.address }}</p>

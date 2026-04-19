@@ -62,6 +62,8 @@ import {
   StorefrontEditorContainerNode,
   StorefrontEditorIconNode,
   StorefrontEditorImageNode,
+  StorefrontEditorAccountFormNode,
+  StorefrontEditorCheckoutFormNode,
   StorefrontEditorMenuItem,
   StorefrontEditorMenuNode,
   StorefrontEditorParagraphNode,
@@ -173,6 +175,8 @@ type TestimonialsSettingsSection = 'style' | 'reviews' | 'layout';
 type CartToolbarMenu = 'edit-text' | 'settings' | null;
 type CartContentToolbarMenu = 'edit-text' | 'settings' | null;
 type ProductDetailsToolbarMenu = 'edit-text' | 'settings' | null;
+type AccountFormToolbarMenu = 'edit-text' | 'settings' | null;
+type CheckoutFormToolbarMenu = 'edit-text' | 'settings' | null;
 type SearchToolbarMenu = 'edit-text' | 'settings' | null;
 type SocialLinksToolbarMenu = 'settings' | 'background' | 'borders' | 'corners' | 'spacing' | null;
 type SocialLinkKey = 'instagram' | 'facebook' | 'tiktok' | 'whatsapp';
@@ -197,6 +201,8 @@ type SocialLinkReorderState = {
 type CartSettingsSection = 'cart-icon' | 'settings';
 type CartContentSettingsSection = 'layout' | 'empty';
 type ProductDetailsSettingsSection = 'content' | 'visibility';
+type AccountFormSettingsSection = 'layout' | 'colors';
+type CheckoutFormSettingsSection = 'layout' | 'colors';
 type ButtonTextDropdownMenu = 'preset' | 'font-family' | 'font-weight' | 'font-size' | 'line-height' | 'letter-spacing' | null;
 type ImageToolbarMenu = 'link' | 'settings' | 'opacity' | 'borders' | 'corners' | 'shadow' | null;
 type ContainerToolbarMenu = 'designs' | 'background' | 'borders' | 'corners' | 'shadow' | 'opacity' | null;
@@ -920,6 +926,14 @@ readonly selectedCartContentComponent = computed<StorefrontEditorCartContentNode
   const component = this.selectedComponent();
   return component?.type === 'cart-content' ? this.resolveResponsiveComponentNode(component) : null;
 });
+readonly selectedAccountFormComponent = computed<StorefrontEditorAccountFormNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'account-form' ? this.resolveResponsiveComponentNode(component) : null;
+});
+readonly selectedCheckoutFormComponent = computed<StorefrontEditorCheckoutFormNode | null>(() => {
+  const component = this.selectedComponent();
+  return component?.type === 'checkout-form' ? this.resolveResponsiveComponentNode(component) : null;
+});
   readonly isSectionToolbarVisible = computed(
     () => !this.isEditingComponentText() && this.selectedSection() !== null && !this.hasComponentSelection()
   );
@@ -964,6 +978,12 @@ readonly isProductDetailsToolbarVisible = computed(
 );
 readonly isCartContentToolbarVisible = computed(
   () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCartContentComponent() !== null
+);
+readonly isAccountFormToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedAccountFormComponent() !== null
+);
+readonly isCheckoutFormToolbarVisible = computed(
+  () => !this.isEditingComponentText() && this.selectedComponentIds().length === 1 && this.selectedCheckoutFormComponent() !== null
 );
   readonly canShowGroupAction = computed(
     () => this.selectedComponentIds().length >= 2 && !this.selectedComponentGroupId()
@@ -1069,6 +1089,10 @@ readonly activeCartSettingsSection = signal<CartSettingsSection>('cart-icon');
 readonly activeCartContentSettingsSection = signal<CartContentSettingsSection>('layout');
 readonly activeProductDetailsToolbarMenu = signal<ProductDetailsToolbarMenu>(null);
 readonly activeProductDetailsSettingsSection = signal<ProductDetailsSettingsSection>('content');
+readonly activeAccountFormToolbarMenu = signal<AccountFormToolbarMenu>(null);
+readonly activeAccountFormSettingsSection = signal<AccountFormSettingsSection>('layout');
+readonly activeCheckoutFormToolbarMenu = signal<CheckoutFormToolbarMenu>(null);
+readonly activeCheckoutFormSettingsSection = signal<CheckoutFormSettingsSection>('layout');
 readonly activeSearchToolbarMenu = signal<SearchToolbarMenu>(null);
 readonly activeSocialLinksToolbarMenu = signal<SocialLinksToolbarMenu>(null);
 private lastSelectedSocialLinksComponentId: string | null = null;
@@ -1098,6 +1122,8 @@ readonly buttonEditTextValue = signal('');
 readonly cartEditTextValue = signal('');
 readonly cartContentEditTextValues = signal<Record<string, string>>({});
 readonly productDetailsEditTextValues = signal<Record<string, string>>({});
+readonly accountFormEditTextValues = signal<Record<string, string>>({});
+readonly checkoutFormEditTextValues = signal<Record<string, string>>({});
 readonly searchEditLabelValue = signal('');
 readonly searchEditPlaceholderValue = signal('');
 readonly buttonLinkValue = signal('');
@@ -2253,6 +2279,82 @@ effect(() => {
   });
 });
 
+  effect(() => {
+    const component = this.selectedAccountFormComponent();
+    if (!component) {
+      this.activeAccountFormToolbarMenu.set(null);
+      this.activeAccountFormSettingsSection.set('layout');
+      this.accountFormEditTextValues.set({});
+      return;
+    }
+
+    this.accountFormEditTextValues.set({
+      eyebrow: component.props.eyebrow,
+      title: component.props.title,
+      description: component.props.description,
+      loginTabLabel: component.props.loginTabLabel,
+      registerTabLabel: component.props.registerTabLabel,
+      emailLabel: component.props.emailLabel,
+      passwordLabel: component.props.passwordLabel,
+      firstNameLabel: component.props.firstNameLabel,
+      lastNameLabel: component.props.lastNameLabel,
+      phoneLabel: component.props.phoneLabel,
+      addressLabel: component.props.addressLabel,
+      loginEmailPlaceholder: component.props.loginEmailPlaceholder,
+      loginPasswordPlaceholder: component.props.loginPasswordPlaceholder,
+      firstNamePlaceholder: component.props.firstNamePlaceholder,
+      lastNamePlaceholder: component.props.lastNamePlaceholder,
+      registerEmailPlaceholder: component.props.registerEmailPlaceholder,
+      phonePlaceholder: component.props.phonePlaceholder,
+      addressPlaceholder: component.props.addressPlaceholder,
+      registerPasswordPlaceholder: component.props.registerPasswordPlaceholder,
+      submitLoginLabel: component.props.submitLoginLabel,
+      submitLoginPendingLabel: component.props.submitLoginPendingLabel,
+      submitRegisterLabel: component.props.submitRegisterLabel,
+      submitRegisterPendingLabel: component.props.submitRegisterPendingLabel,
+      signOutLabel: component.props.signOutLabel,
+      backButtonLabel: component.props.backButtonLabel,
+      ordersTitle: component.props.ordersTitle,
+      continueShoppingLabel: component.props.continueShoppingLabel,
+      emptyOrdersLabel: component.props.emptyOrdersLabel,
+    });
+  });
+
+  effect(() => {
+    const component = this.selectedCheckoutFormComponent();
+    if (!component) {
+      this.activeCheckoutFormToolbarMenu.set(null);
+    this.activeCheckoutFormSettingsSection.set('layout');
+    this.checkoutFormEditTextValues.set({});
+    return;
+  }
+
+  this.checkoutFormEditTextValues.set({
+    eyebrow: component.props.eyebrow,
+    title: component.props.title,
+    description: component.props.description,
+    firstNameLabel: component.props.firstNameLabel,
+    lastNameLabel: component.props.lastNameLabel,
+    phoneLabel: component.props.phoneLabel,
+    emailLabel: component.props.emailLabel,
+    addressLabel: component.props.addressLabel,
+    notesLabel: component.props.notesLabel,
+    firstNamePlaceholder: component.props.firstNamePlaceholder,
+    lastNamePlaceholder: component.props.lastNamePlaceholder,
+    phonePlaceholder: component.props.phonePlaceholder,
+    emailPlaceholder: component.props.emailPlaceholder,
+    addressPlaceholder: component.props.addressPlaceholder,
+    notesPlaceholder: component.props.notesPlaceholder,
+    summaryTitle: component.props.summaryTitle,
+    summaryCaption: component.props.summaryCaption,
+    subtotalLabel: component.props.subtotalLabel,
+    totalLabel: component.props.totalLabel,
+    totalValue: component.props.totalValue,
+    submitLabel: component.props.submitLabel,
+    submitHint: component.props.submitHint,
+  });
+});
+
 effect(() => {
   if (!this.selectedProductFeedComponent()) {
     this.activeProductFeedToolbarMenu.set(null);
@@ -2403,15 +2505,27 @@ if (event.key === 'Escape' && this.activeCartToolbarMenu()) {
   return;
 }
 
-if (event.key === 'Escape' && this.activeCartContentToolbarMenu()) {
-  event.preventDefault();
-  this.activeCartContentToolbarMenu.set(null);
-  return;
-}
+    if (event.key === 'Escape' && this.activeCartContentToolbarMenu()) {
+      event.preventDefault();
+      this.activeCartContentToolbarMenu.set(null);
+      return;
+    }
 
-if (event.key === 'Escape' && this.activeProductDetailsToolbarMenu()) {
-  event.preventDefault();
-  this.activeProductDetailsToolbarMenu.set(null);
+    if (event.key === 'Escape' && this.activeAccountFormToolbarMenu()) {
+      event.preventDefault();
+      this.activeAccountFormToolbarMenu.set(null);
+      return;
+    }
+
+    if (event.key === 'Escape' && this.activeCheckoutFormToolbarMenu()) {
+      event.preventDefault();
+      this.activeCheckoutFormToolbarMenu.set(null);
+      return;
+    }
+
+    if (event.key === 'Escape' && this.activeProductDetailsToolbarMenu()) {
+      event.preventDefault();
+      this.activeProductDetailsToolbarMenu.set(null);
   return;
 }
 
@@ -3896,6 +4010,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         return 'Support';
       case 'contact-form':
         return 'Lead capture';
+      case 'account-form':
+        return 'Customer auth';
       case 'product-feed':
         return 'Store';
       case 'social-links':
@@ -3929,6 +4045,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
         return 'Useful for shipping, returns, sizing, and support pages.';
       case 'contact-form':
         return 'Ideal for contact sections, wholesale requests, and support pages.';
+      case 'account-form':
+        return 'Best for customer sign-in, registration, and saved account access.';
       case 'product-feed':
         return 'Use in homepage highlights, collection previews, and featured rows.';
       case 'social-links':
@@ -4419,6 +4537,8 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
       return 'FAQ';
     case 'contact-form':
       return 'Contact form';
+    case 'account-form':
+      return 'Account form';
     case 'container':
       return 'Container';
       case 'graphic':
@@ -5233,6 +5353,7 @@ finishEditingComponentText(): void {
 this.activeAccountToolbarMenu.set(null);
 this.activeTestimonialsToolbarMenu.set(null);
 this.activeCartToolbarMenu.set(null);
+this.activeAccountFormToolbarMenu.set(null);
 this.activeSearchToolbarMenu.set(null);
 this.activeIconToolbarMenu.set(null);
 this.closeActiveSocialLinksToolbarMenu();
@@ -5563,6 +5684,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
     }
 
     if (workingStorefront && workingStorefront.draftHomepage) {
+      const previewManagedPages = this.captureManagedPagesWithCurrentDraft().map((page) => ({
+        id: page.id,
+        document: structuredClone(
+          page.draftDocument ?? this.buildDefaultManagedPageDocument(page.name, page.kind, page.designId)
+        ),
+      }));
       const previewProducts = this.products()
         .filter(
           (product) =>
@@ -5612,11 +5739,12 @@ syncSelectedSectionRailPosition(sectionElement?: HTMLElement | null): void {
             tags: Array.isArray(product.tags) ? product.tags : [],
             createdAt: product.createdAt ?? null,
             updatedAt: product.updatedAt ?? null,
-          })),
-        },
-        products: previewProducts,
-      });
-    }
+        })),
+      },
+      products: previewProducts,
+      managedPages: previewManagedPages,
+    });
+  }
 
     const previewHref = this.buildEditorPreviewHref(this.selectedManagedPageId());
     window.open(previewHref || `/store/${projectId}?preview=editor`, '_blank', 'noopener');
@@ -8094,6 +8222,22 @@ toggleCartContentToolbarMenu(menu: Exclude<CartContentToolbarMenu, null>): void 
   }
 }
 
+toggleAccountFormToolbarMenu(menu: Exclude<AccountFormToolbarMenu, null>): void {
+  const next = this.activeAccountFormToolbarMenu() === menu ? null : menu;
+  this.activeAccountFormToolbarMenu.set(next);
+  if (next === 'settings') {
+    this.activeAccountFormSettingsSection.set('layout');
+  }
+}
+
+toggleCheckoutFormToolbarMenu(menu: Exclude<CheckoutFormToolbarMenu, null>): void {
+  const next = this.activeCheckoutFormToolbarMenu() === menu ? null : menu;
+  this.activeCheckoutFormToolbarMenu.set(next);
+  if (next === 'settings') {
+    this.activeCheckoutFormSettingsSection.set('layout');
+  }
+}
+
 toggleSearchToolbarMenu(menu: Exclude<SearchToolbarMenu, null>): void {
   const next = this.activeSearchToolbarMenu() === menu ? null : menu;
   this.activeSearchToolbarMenu.set(next);
@@ -8143,6 +8287,14 @@ setActiveProductDetailsSettingsSection(section: ProductDetailsSettingsSection): 
 
 setActiveCartContentSettingsSection(section: CartContentSettingsSection): void {
   this.activeCartContentSettingsSection.set(section);
+}
+
+setActiveAccountFormSettingsSection(section: AccountFormSettingsSection): void {
+  this.activeAccountFormSettingsSection.set(section);
+}
+
+setActiveCheckoutFormSettingsSection(section: CheckoutFormSettingsSection): void {
+  this.activeCheckoutFormSettingsSection.set(section);
 }
 
   toggleButtonTextDropdownMenu(menu: Exclude<ButtonTextDropdownMenu, null>): void {
@@ -8313,6 +8465,16 @@ updateSelectedCartContentTextValue(key: keyof StorefrontEditorCartContentNode['p
   this.updateSelectedCartContentProps({ [key]: value } as Partial<StorefrontEditorCartContentNode['props']>);
 }
 
+updateSelectedAccountFormTextValue(key: keyof StorefrontEditorAccountFormNode['props'], value: string): void {
+  this.accountFormEditTextValues.update((current) => ({ ...current, [key]: value }));
+  this.updateSelectedAccountFormProps({ [key]: value } as Partial<StorefrontEditorAccountFormNode['props']>);
+}
+
+updateSelectedCheckoutFormTextValue(key: keyof StorefrontEditorCheckoutFormNode['props'], value: string): void {
+  this.checkoutFormEditTextValues.update((current) => ({ ...current, [key]: value }));
+  this.updateSelectedCheckoutFormProps({ [key]: value } as Partial<StorefrontEditorCheckoutFormNode['props']>);
+}
+
 updateSelectedAccountIconStyle(value: StorefrontEditorAccountIconStyle): void {
   this.updateSelectedAccountProps({ iconStyle: value });
 }
@@ -8390,6 +8552,72 @@ toggleSelectedCartContentShowPromoCode(): void {
   const component = this.selectedCartContentComponent();
   if (!component) { return; }
   this.updateSelectedCartContentProps({ showPromoCode: !component.props.showPromoCode });
+}
+
+toggleSelectedAccountFormShowRegisterTab(): void {
+  const component = this.selectedAccountFormComponent();
+  if (!component) { return; }
+  this.updateSelectedAccountFormProps({ showRegisterTab: !component.props.showRegisterTab });
+}
+
+updateSelectedAccountFormAccentColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountFormProps({ accentColor: normalized });
+}
+
+updateSelectedAccountFormBackgroundColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountFormProps({ backgroundColor: normalized });
+}
+
+updateSelectedAccountFormPanelColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountFormProps({ panelColor: normalized });
+}
+
+updateSelectedAccountFormTextColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedAccountFormProps({ textColor: normalized });
+}
+
+toggleSelectedCheckoutFormShowSummary(): void {
+  const component = this.selectedCheckoutFormComponent();
+  if (!component) { return; }
+  this.updateSelectedCheckoutFormProps({ showSummary: !component.props.showSummary });
+}
+
+toggleSelectedCheckoutFormShowNotesField(): void {
+  const component = this.selectedCheckoutFormComponent();
+  if (!component) { return; }
+  this.updateSelectedCheckoutFormProps({ showNotesField: !component.props.showNotesField });
+}
+
+updateSelectedCheckoutFormAccentColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedCheckoutFormProps({ accentColor: normalized });
+}
+
+updateSelectedCheckoutFormBackgroundColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedCheckoutFormProps({ backgroundColor: normalized });
+}
+
+updateSelectedCheckoutFormPanelColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedCheckoutFormProps({ panelColor: normalized });
+}
+
+updateSelectedCheckoutFormTextColor(value: string): void {
+  const normalized = this.normalizeHexColor(value);
+  if (!normalized) { return; }
+  this.updateSelectedCheckoutFormProps({ textColor: normalized });
 }
 
   updateSelectedCartLabelFontFamily(value: string): void {
@@ -10966,6 +11194,8 @@ switch (component.type) {
         return 'FAQ';
       case 'contact-form':
         return 'Contact form';
+      case 'account-form':
+        return 'Account form';
       case 'container':
         return 'Container';
       case 'graphic':
@@ -12754,6 +12984,40 @@ private updateSelectedCartContentProps(
 
  this.updateComponentNode(sectionId, component.id, (current) =>
    current.type === 'cart-content'
+     ? this.writeComponentProps(current, patch)
+     : current
+ , options);
+}
+
+private updateSelectedAccountFormProps(
+ patch: Partial<StorefrontEditorAccountFormNode['props']>,
+ options: { transient?: boolean; preview?: boolean } = {}
+): void {
+ const sectionId = this.selectedSectionId();
+ const component = this.selectedAccountFormComponent();
+ if (!sectionId || !component) {
+   return;
+ }
+
+ this.updateComponentNode(sectionId, component.id, (current) =>
+   current.type === 'account-form'
+     ? this.writeComponentProps(current, patch)
+     : current
+ , options);
+}
+
+private updateSelectedCheckoutFormProps(
+ patch: Partial<StorefrontEditorCheckoutFormNode['props']>,
+ options: { transient?: boolean; preview?: boolean } = {}
+): void {
+ const sectionId = this.selectedSectionId();
+ const component = this.selectedCheckoutFormComponent();
+ if (!sectionId || !component) {
+   return;
+ }
+
+ this.updateComponentNode(sectionId, component.id, (current) =>
+   current.type === 'checkout-form'
      ? this.writeComponentProps(current, patch)
      : current
  , options);

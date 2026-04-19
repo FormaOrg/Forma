@@ -10,12 +10,14 @@ import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core
 import { StorefrontAnalyticsService } from '../../../core/services/storefront-analytics.service';
 import { StoreCartService } from '../../../core/services/store-cart.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { StorefrontHomepageDocument } from '../../../core/models/project-storefront.model';
+import { StorefrontEditorPreviewPageComponent } from '../shared/storefront-editor-preview-page.component';
 import { StorefrontPublicHeaderComponent } from '../shared/storefront-public-header.component';
 
 @Component({
   selector: 'app-storefront-products',
   standalone: true,
-  imports: [CommonModule, StorefrontPublicHeaderComponent],
+  imports: [CommonModule, StorefrontPublicHeaderComponent, StorefrontEditorPreviewPageComponent],
   templateUrl: './storefront-products.html',
   styleUrl: './storefront-products.css',
 })
@@ -48,6 +50,39 @@ export class StorefrontProducts {
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
   readonly cartCount = computed(() => this.storeCartService.countFor(this.projectId()));
+  readonly selectedCategory = computed(() => this.normalizeCategoryToken(this.queryParamMap()?.get('category')));
+  readonly filteredProducts = computed(() => {
+    const category = this.selectedCategory();
+    const catalog = this.products();
+
+    if (!category || category === 'all') {
+      return catalog;
+    }
+
+    return catalog.filter((product) => this.matchesCategory(product, category));
+  });
+  readonly selectedCategoryLabel = computed(() => {
+    const category = this.selectedCategory();
+    if (!category || category === 'all') {
+      return '';
+    }
+
+    if (this.isBestSellerCategory(category)) {
+      return 'Best sellers';
+    }
+
+    return category
+      .split('-')
+      .filter(Boolean)
+      .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+      .join(' ');
+  });
+  readonly previewDocument = computed<StorefrontHomepageDocument | null>(() =>
+    this.applyCategoryToPreviewDocument(
+      this.isEditorPreview() ? this.publicStorefrontService.readEditorPreviewPageDocument(this.projectId(), 'products') : null,
+      this.selectedCategory()
+    )
+  );
 
   constructor() {
     this.loadProducts();
@@ -105,5 +140,63 @@ export class StorefrontProducts {
   addToCart(product: PublicStorefrontProduct): void {
     this.storeCartService.addItem(this.projectId(), product, 1);
     this.toastService.success(`${product.name} added to cart.`);
+  }
+
+  private applyCategoryToPreviewDocument(
+    document: StorefrontHomepageDocument | null,
+    category: string
+  ): StorefrontHomepageDocument | null {
+    if (!document || !category || category === 'all') {
+      return document;
+    }
+
+    const clone = JSON.parse(JSON.stringify(document)) as StorefrontHomepageDocument;
+
+    for (const section of clone.sections) {
+      const props = section.props as Record<string, unknown>;
+      const components = Array.isArray(props['editorComponents'])
+        ? (props['editorComponents'] as Array<Record<string, unknown>>)
+        : [];
+
+      for (const component of components) {
+        if (component['type'] !== 'product-feed') {
+          continue;
+        }
+
+        const componentProps =
+          component['props'] && typeof component['props'] === 'object'
+            ? (component['props'] as Record<string, unknown>)
+            : null;
+
+        if (!componentProps) {
+          continue;
+        }
+
+        componentProps['category'] = category;
+      }
+    }
+
+    return clone;
+  }
+
+  private matchesCategory(product: PublicStorefrontProduct, category: string): boolean {
+    if (this.isBestSellerCategory(category)) {
+      return product.tags.some((tag) => this.isBestSellerCategory(this.normalizeCategoryToken(tag)));
+    }
+
+    return this.normalizeCategoryToken(product.category) === category;
+  }
+
+  private normalizeCategoryToken(value: string | null | undefined): string {
+    return (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, 'and')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  private isBestSellerCategory(value: string): boolean {
+    return value === 'best-seller' || value === 'best-sellers' || value === 'bestseller' || value === 'bestsellers';
   }
 }

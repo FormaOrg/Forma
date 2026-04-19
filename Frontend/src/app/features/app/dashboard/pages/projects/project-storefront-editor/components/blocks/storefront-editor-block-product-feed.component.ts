@@ -573,10 +573,10 @@ export class StorefrontEditorBlockProductFeedComponent {
 
   readonly visibleProducts = computed(() => {
     const props = this.node().props;
-    const category = props.category.trim().toLowerCase();
+    const category = this.normalizeCategoryToken(props.category);
     const catalog = this.availableProducts();
     const filtered = category && category !== 'all'
-      ? catalog.filter((product) => (product.category ?? '').trim().toLowerCase() === category)
+      ? catalog.filter((product) => this.matchesCategory(product, category))
       : catalog;
 
     return (filtered.length ? filtered : catalog).slice(0, Math.max(1, props.limit));
@@ -649,5 +649,26 @@ export class StorefrontEditorBlockProductFeedComponent {
       .slice(0, 2)
       .map((part) => part.charAt(0).toUpperCase())
       .join('');
+  }
+
+  private matchesCategory(product: ProjectCatalogProduct, category: string): boolean {
+    if (this.isBestSellerCategory(category)) {
+      return product.tags.some((tag) => this.isBestSellerCategory(this.normalizeCategoryToken(tag)));
+    }
+
+    return this.normalizeCategoryToken(product.category) === category;
+  }
+
+  private normalizeCategoryToken(value: string | null | undefined): string {
+    return (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, 'and')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  private isBestSellerCategory(value: string): boolean {
+    return value === 'best-seller' || value === 'best-sellers' || value === 'bestseller' || value === 'bestsellers';
   }
 }

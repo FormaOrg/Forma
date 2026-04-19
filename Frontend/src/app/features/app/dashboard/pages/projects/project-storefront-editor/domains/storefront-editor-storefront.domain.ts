@@ -234,6 +234,33 @@ function ensureHeaderCartComponent(
   }
 
   const normalized = components.map((component) => {
+    if (component.type === 'menu') {
+      const items = Array.isArray(component.props.items) ? component.props.items : [];
+      const upgradedItems = items.map((item) => {
+        if (item.id === 'menu-item-2b020776-a53f-4152-9221-4915ea4fd9d5' && item.label === 'WOMEN') {
+          return { ...item, href: '/products?category=women' };
+        }
+        if (item.id === 'menu-item-11d18524-889d-4b40-9676-b03367d402ed' && item.label === 'MEN') {
+          return { ...item, href: '/products?category=men' };
+        }
+        if (item.id === 'menu-item-d32e890b-c6c7-4270-9706-6167b98d4017' && item.label === 'KIDS') {
+          return { ...item, href: '/products?category=kids' };
+        }
+        if (item.id === 'menu-item-91197213-c4eb-48f1-88c5-beff161b1c87' && item.label === 'BEST SELLERS') {
+          return { ...item, href: '/products?category=best-sellers' };
+        }
+        return item;
+      });
+
+      return {
+        ...component,
+        props: {
+          ...component.props,
+          items: upgradedItems,
+        },
+      };
+    }
+
     if (component.type === 'button' && component.props.href === '/account') {
       return {
         ...buildHeaderAccountComponent(component.parentContainerId ?? headerContainer.id),
@@ -539,10 +566,10 @@ function buildDesignedDefaultHomepageSections(storeName: string): StorefrontHome
             frame: { x: 24, y: 16, width: 400, height: 32 },
             props: {
               items: [
-                { id: 'menu-item-2b020776-a53f-4152-9221-4915ea4fd9d5', href: '/', label: 'WOMEN', openInNewTab: false },
-                { id: 'menu-item-11d18524-889d-4b40-9676-b03367d402ed', href: '/', label: 'MEN', openInNewTab: false },
-                { id: 'menu-item-d32e890b-c6c7-4270-9706-6167b98d4017', href: '/products', label: 'KIDS', openInNewTab: false },
-                { id: 'menu-item-91197213-c4eb-48f1-88c5-beff161b1c87', href: '/products', label: 'BEST SELLERS', openInNewTab: false },
+                { id: 'menu-item-2b020776-a53f-4152-9221-4915ea4fd9d5', href: '/products?category=women', label: 'WOMEN', openInNewTab: false },
+                { id: 'menu-item-11d18524-889d-4b40-9676-b03367d402ed', href: '/products?category=men', label: 'MEN', openInNewTab: false },
+                { id: 'menu-item-d32e890b-c6c7-4270-9706-6167b98d4017', href: '/products?category=kids', label: 'KIDS', openInNewTab: false },
+                { id: 'menu-item-91197213-c4eb-48f1-88c5-beff161b1c87', href: '/products?category=best-sellers', label: 'BEST SELLERS', openInNewTab: false },
               ],
               radius: 16,
               spacing: 29,

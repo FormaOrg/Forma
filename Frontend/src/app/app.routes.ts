@@ -35,6 +35,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public-storefront/storefront-products/storefront-products').then((m) => m.StorefrontProducts)
   },
   {
+    path: 'account',
+    canMatch: [tenantStorefrontCanMatch],
+    loadComponent: () => import('./features/public-storefront/storefront-account/storefront-account').then((m) => m.StorefrontAccount)
+  },
+  {
     path: '',
     pathMatch: 'full',
     canMatch: [tenantStorefrontCanMatch],
