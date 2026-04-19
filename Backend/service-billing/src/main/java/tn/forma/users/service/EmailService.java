@@ -22,8 +22,11 @@ public class EmailService {
     @Value("${application.frontend-url}")
     private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${application.mail.from:${spring.mail.username}}")
     private String fromEmail;
+
+    @Value("${application.mail.from-name:Forma}")
+    private String fromName;
 
     // ── Verification email ─────────────────────────────────
 
@@ -440,7 +443,7 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(String.format("%s <%s>", fromName, fromEmail));
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(html, true);
