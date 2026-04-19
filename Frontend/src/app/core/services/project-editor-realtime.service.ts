@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorefrontActiveEditor } from '../models/project-storefront.model';
+import { AuthService } from './auth.service';
 
 export interface ProjectEditorPresenceEvent {
   type: 'project_editor_presence';
@@ -45,6 +46,7 @@ export function deriveUserColor(userId: number): string {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectEditorRealtimeService {
+  private readonly authService = inject(AuthService);
   private readonly socketUrl = `${environment.projectsApiUrl.replace(/\/api$/, '').replace(/^http/, 'ws')}/ws/projects/editor-presence`;
   private socket: WebSocket | null = null;
   private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -53,21 +55,41 @@ export class ProjectEditorRealtimeService {
   private readonly eventsSubject = new Subject<ProjectEditorEvent>();
   private lastCursorSentAt = 0;
   private readonly CURSOR_THROTTLE_MS = 50;
+  private isConnecting = false;
 
   readonly events$: Observable<ProjectEditorEvent> = this.eventsSubject.asObservable();
 
   connect(): void {
-    if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
+    if (this.isConnecting) {
       return;
     }
-
-    const token = this.getToken();
-    if (!token) {
+    if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
       return;
     }
 
     this.manuallyDisconnected = false;
     this.clearReconnectTimeout();
+    this.isConnecting = true;
+
+    this.resolveFreshToken().then(
+      (token) => {
+        this.isConnecting = false;
+        if (this.manuallyDisconnected || !token) {
+          return;
+        }
+        if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
+          return;
+        }
+        this.openSocket(token);
+      },
+      () => {
+        this.isConnecting = false;
+        this.scheduleReconnect();
+      },
+    );
+  }
+
+  private openSocket(token: string): void {
     this.socket = new WebSocket(`${this.socketUrl}?token=${encodeURIComponent(token)}`);
     this.socket.onopen = () => {
       if (this.joinedProjectId != null) {
@@ -87,8 +109,38 @@ export class ProjectEditorRealtimeService {
     };
   }
 
+  private resolveFreshToken(): Promise<string | null> {
+    const token = this.getToken();
+    if (!token) {
+      return Promise.resolve(null);
+    }
+    if (!this.isTokenExpiringSoon(token)) {
+      return Promise.resolve(token);
+    }
+    return new Promise((resolve) => {
+      this.authService.refreshToken().subscribe({
+        next: (response) => resolve(response.accessToken ?? this.getToken()),
+        error: () => resolve(null),
+      });
+    });
+  }
+
+  private isTokenExpiringSoon(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expSeconds = Number(payload?.exp);
+      if (!Number.isFinite(expSeconds)) {
+        return false;
+      }
+      return expSeconds * 1000 - Date.now() < 30000;
+    } catch {
+      return false;
+    }
+  }
+
   disconnect(): void {
     this.manuallyDisconnected = true;
+    this.isConnecting = false;
     this.clearReconnectTimeout();
 
     if (this.socket) {
