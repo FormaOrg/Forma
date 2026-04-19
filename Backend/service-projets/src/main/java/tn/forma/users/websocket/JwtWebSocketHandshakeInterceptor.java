@@ -9,7 +9,6 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-import tn.forma.users.service.ActivityService;
 import tn.forma.users.service.JwtService;
 
 import java.util.Map;
@@ -22,7 +21,6 @@ public class JwtWebSocketHandshakeInterceptor implements HandshakeInterceptor {
     public static final String SESSION_ID_ATTRIBUTE = "sessionId";
 
     private final JwtService jwtService;
-    private final ActivityService activityService;
 
     @Override
     public boolean beforeHandshake(
@@ -51,7 +49,7 @@ public class JwtWebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
             String email = jwtService.extractEmail(token);
             String sessionId = jwtService.extractSessionId(token);
-            if (email == null || email.isBlank() || !activityService.isSessionActive(sessionId)) {
+            if (email == null || email.isBlank()) {
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
