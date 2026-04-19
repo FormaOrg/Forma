@@ -63,15 +63,11 @@ public class AuthService {
         userRepository.save(user);
         log.info("New user registered: {}", user.getEmail());
 
-        try {
-            emailService.sendVerificationEmail(
-                    user.getEmail(),
-                    user.getFirstName(),
-                    verificationToken
-            );
-        } catch (Exception e) {
-            log.warn("Failed to send verification email to {}: {}", user.getEmail(), e.getMessage());
-        }
+        emailService.sendVerificationEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                verificationToken
+        );
 
         // Don't issue tokens at registration — user must verify email first
         UserDto userDto = mapToUserDto(user);
