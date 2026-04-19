@@ -1,0 +1,2796 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< tn.forma:service-projets >----------------------
+[INFO] Building service-projets 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ service-projets ---
+[INFO] Deleting G:\Coding\Forma\Backend\service-projets\target
+[INFO] 
+[INFO] >>> spring-boot:4.0.3:run (default-cli) > test-compile @ service-projets >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ service-projets ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ service-projets ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 218 source files with javac [debug parameters release 17] to target\classes
+[INFO] /G:/Coding/Forma/Backend/service-projets/src/main/java/tn/forma/users/service/ProjectStorefrontService.java: G:\Coding\Forma\Backend\service-projets\src\main\java\tn\forma\users\service\ProjectStorefrontService.java uses or overrides a deprecated API.
+[INFO] /G:/Coding/Forma/Backend/service-projets/src/main/java/tn/forma/users/service/ProjectStorefrontService.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ service-projets ---
+[INFO] skip non existing resourceDirectory G:\Coding\Forma\Backend\service-projets\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ service-projets ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:4.0.3:run (default-cli) < test-compile @ service-projets <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.3:run (default-cli) @ service-projets ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-19T16:23:40.286+02:00  INFO 4088 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.1 with PID 4088 (G:\Coding\Forma\Backend\service-projets\target\classes started by MSI in G:\Coding\Forma\Backend\service-projets)
+2026-04-19T16:23:40.296+02:00  INFO 4088 --- [service-projets] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-19T16:23:40.380+02:00  INFO 4088 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-19T16:23:40.382+02:00  INFO 4088 --- [service-projets] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-19T16:23:41.642+02:00  INFO 4088 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-19T16:23:41.761+02:00  INFO 4088 --- [service-projets] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 107 ms. Found 17 JPA repository interfaces.
+2026-04-19T16:23:42.610+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-19T16:23:42.628+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-19T16:23:42.629+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-19T16:23:42.690+02:00  INFO 4088 --- [service-projets] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2306 ms
+2026-04-19T16:23:42.883+02:00  INFO 4088 --- [service-projets] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-19T16:23:42.930+02:00  INFO 4088 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-19T16:23:43.517+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-19T16:23:43.774+02:00  WARN 4088 --- [service-projets] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-19T16:23:43.964+02:00  INFO 4088 --- [service-projets] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-19T16:23:45.605+02:00  INFO 4088 --- [service-projets] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-19T16:23:45.631+02:00  INFO 4088 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-19T16:23:46.639+02:00  INFO 4088 --- [service-projets] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-19T16:23:51.838+02:00  INFO 4088 --- [service-projets] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-19T16:23:51.925+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-19T16:23:53.656+02:00  INFO 4088 --- [service-projets] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-19T16:23:53.657+02:00  WARN 4088 --- [service-projets] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-19T16:23:54.264+02:00  INFO 4088 --- [service-projets] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-19T16:23:54.269+02:00  INFO 4088 --- [service-projets] [  restartedMain] tn.forma.users.Application               : Started Application in 14.721 seconds (process running for 15.559)
+2026-04-19T16:24:25.392+02:00  INFO 4088 --- [service-projets] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-19T16:24:25.393+02:00  INFO 4088 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-19T16:24:25.395+02:00  INFO 4088 --- [service-projets] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+    order by
+        p1_0.updated_at desc
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invitation_token,
+        pc1_0.invitation_token_expiry,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.user_id=? 
+        and pc1_0.status=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        pp1_0.id,
+        pp1_0.active,
+        pp1_0.category,
+        pp1_0.compare_at_price,
+        pp1_0.created_at,
+        pp1_0.description,
+        pp1_0.image_url,
+        pp1_0.inventory_quantity,
+        pp1_0.name,
+        pp1_0.price,
+        pp1_0.product_type,
+        pp1_0.project_id,
+        pp1_0.sku,
+        pp1_0.status,
+        pp1_0.tags_csv,
+        pp1_0.updated_at 
+    from
+        project_products pp1_0 
+    where
+        pp1_0.project_id=? 
+    order by
+        pp1_0.updated_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        upper(u1_0.email)=upper(?)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        project_storefronts 
+    set
+        active_page_key=?,
+        draft_homepage_json=?,
+        editor_session_json=?,
+        project_id=?,
+        published_at=?,
+        published_homepage_json=?,
+        store_name=?,
+        store_status=?,
+        theme_key=?,
+        updated_at=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        project_storefronts 
+    set
+        active_page_key=?,
+        draft_homepage_json=?,
+        editor_session_json=?,
+        project_id=?,
+        published_at=?,
+        published_homepage_json=?,
+        store_name=?,
+        store_status=?,
+        theme_key=?,
+        updated_at=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        project_storefronts 
+    set
+        active_page_key=?,
+        draft_homepage_json=?,
+        editor_session_json=?,
+        project_id=?,
+        published_at=?,
+        published_homepage_json=?,
+        store_name=?,
+        store_status=?,
+        theme_key=?,
+        updated_at=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    update
+        project_storefronts 
+    set
+        active_page_key=?,
+        draft_homepage_json=?,
+        editor_session_json=?,
+        project_id=?,
+        published_at=?,
+        published_homepage_json=?,
+        store_name=?,
+        store_status=?,
+        theme_key=?,
+        updated_at=? 
+    where
+        id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pp1_0.id,
+        pp1_0.active,
+        pp1_0.category,
+        pp1_0.compare_at_price,
+        pp1_0.created_at,
+        pp1_0.description,
+        pp1_0.image_url,
+        pp1_0.inventory_quantity,
+        pp1_0.name,
+        pp1_0.price,
+        pp1_0.product_type,
+        pp1_0.project_id,
+        pp1_0.sku,
+        pp1_0.status,
+        pp1_0.tags_csv,
+        pp1_0.updated_at 
+    from
+        project_products pp1_0 
+    where
+        pp1_0.project_id=? 
+    order by
+        pp1_0.updated_at desc
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.address,
+        pc1_0.created_at,
+        pc1_0.email,
+        pc1_0.first_name,
+        pc1_0.last_name,
+        pc1_0.phone,
+        pc1_0.project_id,
+        pc1_0.updated_at,
+        pc1_0.zone_label 
+    from
+        project_customers pc1_0 
+    where
+        pc1_0.project_id=? 
+    order by
+        pc1_0.created_at desc
+Hibernate: 
+    select
+        po1_0.id,
+        po1_0.created_at,
+        c1_0.id,
+        c1_0.address,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.first_name,
+        c1_0.last_name,
+        c1_0.phone,
+        c1_0.project_id,
+        c1_0.updated_at,
+        c1_0.zone_label,
+        po1_0.delivered_at,
+        po1_0.delivery_address,
+        po1_0.delivery_fee,
+        po1_0.fulfillment_status,
+        i1_0.order_id,
+        i1_0.id,
+        i1_0.line_total,
+        p2_0.id,
+        p2_0.active,
+        p2_0.category,
+        p2_0.compare_at_price,
+        p2_0.created_at,
+        p2_0.description,
+        p2_0.image_url,
+        p2_0.inventory_quantity,
+        p2_0.name,
+        p2_0.price,
+        p2_0.product_type,
+        p2_0.project_id,
+        p2_0.sku,
+        p2_0.status,
+        p2_0.tags_csv,
+        p2_0.updated_at,
+        i1_0.product_name,
+        i1_0.product_sku,
+        i1_0.quantity,
+        i1_0.unit_price,
+        po1_0.notes,
+        po1_0.order_number,
+        po1_0.payment_status,
+        po1_0.placed_at,
+        po1_0.project_id,
+        po1_0.scheduled_for,
+        po1_0.subtotal,
+        po1_0.total,
+        po1_0.updated_at 
+    from
+        project_orders po1_0 
+    left join
+        project_customers c1_0 
+            on c1_0.id=po1_0.customer_id 
+    left join
+        project_order_items i1_0 
+            on po1_0.id=i1_0.order_id 
+    left join
+        project_products p2_0 
+            on p2_0.id=i1_0.product_id 
+    where
+        po1_0.project_id=? 
+    order by
+        po1_0.placed_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        pp1_0.id,
+        pp1_0.active,
+        pp1_0.category,
+        pp1_0.compare_at_price,
+        pp1_0.created_at,
+        pp1_0.description,
+        pp1_0.image_url,
+        pp1_0.inventory_quantity,
+        pp1_0.name,
+        pp1_0.price,
+        pp1_0.product_type,
+        pp1_0.project_id,
+        pp1_0.sku,
+        pp1_0.status,
+        pp1_0.tags_csv,
+        pp1_0.updated_at 
+    from
+        project_products pp1_0 
+    where
+        pp1_0.project_id=? 
+    order by
+        pp1_0.updated_at desc
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.address,
+        pc1_0.created_at,
+        pc1_0.email,
+        pc1_0.first_name,
+        pc1_0.last_name,
+        pc1_0.phone,
+        pc1_0.project_id,
+        pc1_0.updated_at,
+        pc1_0.zone_label 
+    from
+        project_customers pc1_0 
+    where
+        pc1_0.project_id=? 
+    order by
+        pc1_0.created_at desc
+Hibernate: 
+    select
+        po1_0.id,
+        po1_0.created_at,
+        c1_0.id,
+        c1_0.address,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.first_name,
+        c1_0.last_name,
+        c1_0.phone,
+        c1_0.project_id,
+        c1_0.updated_at,
+        c1_0.zone_label,
+        po1_0.delivered_at,
+        po1_0.delivery_address,
+        po1_0.delivery_fee,
+        po1_0.fulfillment_status,
+        i1_0.order_id,
+        i1_0.id,
+        i1_0.line_total,
+        p2_0.id,
+        p2_0.active,
+        p2_0.category,
+        p2_0.compare_at_price,
+        p2_0.created_at,
+        p2_0.description,
+        p2_0.image_url,
+        p2_0.inventory_quantity,
+        p2_0.name,
+        p2_0.price,
+        p2_0.product_type,
+        p2_0.project_id,
+        p2_0.sku,
+        p2_0.status,
+        p2_0.tags_csv,
+        p2_0.updated_at,
+        i1_0.product_name,
+        i1_0.product_sku,
+        i1_0.quantity,
+        i1_0.unit_price,
+        po1_0.notes,
+        po1_0.order_number,
+        po1_0.payment_status,
+        po1_0.placed_at,
+        po1_0.project_id,
+        po1_0.scheduled_for,
+        po1_0.subtotal,
+        po1_0.total,
+        po1_0.updated_at 
+    from
+        project_orders po1_0 
+    left join
+        project_customers c1_0 
+            on c1_0.id=po1_0.customer_id 
+    left join
+        project_order_items i1_0 
+            on po1_0.id=i1_0.order_id 
+    left join
+        project_products p2_0 
+            on p2_0.id=i1_0.product_id 
+    where
+        po1_0.project_id=? 
+    order by
+        po1_0.placed_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.user_id=? 
+    order by
+        p1_0.updated_at desc
+Hibernate: 
+    select
+        pc1_0.id,
+        pc1_0.accepted_at,
+        pc1_0.invitation_token,
+        pc1_0.invitation_token_expiry,
+        pc1_0.invite_email,
+        pc1_0.invited_at,
+        pc1_0.project_id,
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number,
+        pc1_0.role,
+        pc1_0.status,
+        u2_0.id,
+        u2_0.avatar_public_id,
+        u2_0.avatar_url,
+        u2_0.country,
+        u2_0.created_at,
+        u2_0.email,
+        u2_0.email_change_code,
+        u2_0.email_change_code_expiry,
+        u2_0.email_verified,
+        u2_0.first_name,
+        u2_0.google_email,
+        u2_0.google_id,
+        u2_0.is_active,
+        u2_0.last_login_at,
+        u2_0.last_name,
+        u2_0.login_verification_code,
+        u2_0.login_verification_code_expiry,
+        u2_0.login_verification_enabled,
+        u2_0.password,
+        u2_0.pending_email,
+        u2_0.pending_login_verification_enabled,
+        u2_0.phone,
+        u2_0.preferred_language,
+        u2_0.preferred_theme,
+        u2_0.recovery_email,
+        u2_0.recovery_phone,
+        u2_0.role,
+        u2_0.security_answer1_hash,
+        u2_0.security_answer2_hash,
+        u2_0.security_question1,
+        u2_0.security_question2,
+        u2_0.updated_at,
+        u2_0.username,
+        u2_0.verification_token,
+        u2_0.verification_token_expiry,
+        u2_0.website 
+    from
+        project_collaborators pc1_0 
+    join
+        projects p1_0 
+            on p1_0.id=pc1_0.project_id 
+    left join
+        users u2_0 
+            on u2_0.id=pc1_0.user_id 
+    where
+        pc1_0.user_id=? 
+        and pc1_0.status=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.active_page_key,
+        ps1_0.created_at,
+        ps1_0.draft_homepage_json,
+        ps1_0.editor_session_json,
+        ps1_0.project_id,
+        ps1_0.published_at,
+        ps1_0.published_homepage_json,
+        ps1_0.store_name,
+        ps1_0.store_status,
+        ps1_0.theme_key,
+        ps1_0.updated_at 
+    from
+        project_storefronts ps1_0 
+    where
+        ps1_0.project_id=?
+Hibernate: 
+    select
+        pp1_0.id,
+        pp1_0.active,
+        pp1_0.category,
+        pp1_0.compare_at_price,
+        pp1_0.created_at,
+        pp1_0.description,
+        pp1_0.image_url,
+        pp1_0.inventory_quantity,
+        pp1_0.name,
+        pp1_0.price,
+        pp1_0.product_type,
+        pp1_0.project_id,
+        pp1_0.sku,
+        pp1_0.status,
+        pp1_0.tags_csv,
+        pp1_0.updated_at 
+    from
+        project_products pp1_0 
+    where
+        pp1_0.project_id=? 
+    order by
+        pp1_0.updated_at desc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.avatar_public_id,
+        u1_0.avatar_url,
+        u1_0.country,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.email_change_code,
+        u1_0.email_change_code_expiry,
+        u1_0.email_verified,
+        u1_0.first_name,
+        u1_0.google_email,
+        u1_0.google_id,
+        u1_0.is_active,
+        u1_0.last_login_at,
+        u1_0.last_name,
+        u1_0.login_verification_code,
+        u1_0.login_verification_code_expiry,
+        u1_0.login_verification_enabled,
+        u1_0.password,
+        u1_0.pending_email,
+        u1_0.pending_login_verification_enabled,
+        u1_0.phone,
+        u1_0.preferred_language,
+        u1_0.preferred_theme,
+        u1_0.recovery_email,
+        u1_0.recovery_phone,
+        u1_0.role,
+        u1_0.security_answer1_hash,
+        u1_0.security_answer2_hash,
+        u1_0.security_question1,
+        u1_0.security_question2,
+        u1_0.updated_at,
+        u1_0.username,
+        u1_0.verification_token,
+        u1_0.verification_token_expiry,
+        u1_0.website 
+    from
+        users u1_0 
+    where
+        upper(u1_0.email)=upper(?)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.contact_phone,
+        p1_0.created_at,
+        p1_0.creation_method,
+        p1_0.default_domain,
+        p1_0.description,
+        p1_0.facebook_url,
+        p1_0.instagram_url,
+        p1_0.logo_public_id,
+        p1_0.logo_url,
+        p1_0.meta_description,
+        p1_0.name,
+        p1_0.is_published,
+        p1_0.status,
+        p1_0.store_email,
+        p1_0.store_title,
+        p1_0.template_id,
+        p1_0.tiktok_url,
+        p1_0.type,
+        p1_0.updated_at,
+        p1_0.user_id,
+        p1_0.whatsapp_number 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
