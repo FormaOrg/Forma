@@ -9,9 +9,16 @@ import tn.forma.users.dto.ProjectDto;
 import tn.forma.users.dto.UpdateProjectRequest;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectStatus;
+import tn.forma.users.model.ProjectMedia;
 import tn.forma.users.model.Template;
 import tn.forma.users.model.User;
+import tn.forma.users.repository.ProjectAnalyticsEventRepository;
+import tn.forma.users.repository.ProjectCustomerRepository;
+import tn.forma.users.repository.ProjectMediaRepository;
+import tn.forma.users.repository.ProjectOrderRepository;
+import tn.forma.users.repository.ProjectProductRepository;
 import tn.forma.users.repository.ProjectRepository;
+import tn.forma.users.repository.ProjectStorefrontRepository;
 import tn.forma.users.repository.UserRepository;
 import tn.forma.users.util.ProjectDomainNormalizer;
 
@@ -29,6 +36,12 @@ public class ProjectService {
     private final FileUploadService fileUploadService;
     private final PortfolioPageService portfolioPageService;
     private final PortfolioInquiryService portfolioInquiryService;
+    private final ProjectStorefrontRepository projectStorefrontRepository;
+    private final ProjectAnalyticsEventRepository projectAnalyticsEventRepository;
+    private final ProjectMediaRepository projectMediaRepository;
+    private final ProjectOrderRepository projectOrderRepository;
+    private final ProjectCustomerRepository projectCustomerRepository;
+    private final ProjectProductRepository projectProductRepository;
 
     @Transactional(readOnly = true)
     public List<ProjectDto> getMyProjects(String email) {
@@ -150,9 +163,27 @@ public class ProjectService {
     public void deleteProject(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
         String logoPublicId = blankToNull(project.getLogoPublicId());
+        List<ProjectMedia> projectMedia = projectMediaRepository.findAllByProjectIdOrderByUploadedAtDesc(projectId);
+        List<String> projectMediaPublicIds = projectMedia.stream()
+                .map(ProjectMedia::getPublicId)
+                .map(this::blankToNull)
+                .filter(Objects::nonNull)
+                .toList();
+
+        projectStorefrontRepository.findByProjectId(projectId)
+                .ifPresent(projectStorefrontRepository::delete);
+        projectAnalyticsEventRepository.deleteAllByProjectId(projectId);
+        projectOrderRepository.deleteAll(projectOrderRepository.findAllByProjectIdOrderByPlacedAtDesc(projectId));
+        projectCustomerRepository.deleteAll(projectCustomerRepository.findAllByProjectIdOrderByCreatedAtDesc(projectId));
+        projectProductRepository.deleteAll(projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(projectId));
+        projectMediaRepository.deleteAll(projectMedia);
         portfolioPageService.deletePagesForProject(projectId);
         portfolioInquiryService.deleteInquiriesForProject(projectId);
         projectRepository.delete(project);
+
+        for (String publicId : projectMediaPublicIds) {
+            fileUploadService.deleteByPublicId(publicId);
+        }
         if (logoPublicId != null) {
             fileUploadService.deleteByPublicId(logoPublicId);
         }

@@ -1728,6 +1728,47 @@ function isLegacyGeneratedHomepageDocument(
   );
 }
 
+export function isPristineLegacyStarterHomepageDocument(
+  homepage: ProjectStorefront['draftHomepage'] | ProjectStorefront['publishedHomepage'] | null | undefined
+): homepage is NonNullable<ProjectStorefront['draftHomepage']> {
+  if (!isLegacyGeneratedHomepageDocument(homepage)) {
+    return false;
+  }
+
+  const seoTitle = typeof homepage.seo?.title === 'string' ? homepage.seo.title.trim() : '';
+  const announcement = homepage.sections[0];
+  const hero = homepage.sections[1];
+  const featured = homepage.sections[2];
+  const footer = homepage.sections[3];
+
+  const announcementProps = announcement?.props as Record<string, unknown> | undefined;
+  const heroProps = hero?.props as Record<string, unknown> | undefined;
+  const featuredProps = featured?.props as Record<string, unknown> | undefined;
+  const footerProps = footer?.props as Record<string, unknown> | undefined;
+
+  const heroTitle = typeof heroProps?.['title'] === 'string' ? heroProps['title'].trim() : '';
+  const footerBrandText =
+    typeof footerProps?.['brandText'] === 'string' ? footerProps['brandText'].trim() : '';
+  const productIds = Array.isArray(featuredProps?.['productIds']) ? featuredProps['productIds'] : null;
+
+  return (
+    announcementProps?.['text'] === 'Welcome to your storefront' &&
+    announcementProps?.['linkLabel'] === 'Browse products' &&
+    announcementProps?.['linkHref'] === '' &&
+    heroProps?.['eyebrow'] === 'New store' &&
+    (heroTitle === seoTitle || heroTitle === 'Your store is ready') &&
+    heroProps?.['primaryCtaLabel'] === 'Browse products' &&
+    heroProps?.['primaryCtaHref'] === '' &&
+    heroProps?.['secondaryCtaLabel'] === 'Featured picks' &&
+    heroProps?.['secondaryCtaHref'] === '#featured' &&
+    featuredProps?.['title'] === 'Featured products' &&
+    featuredProps?.['maxItems'] === 4 &&
+    productIds !== null &&
+    productIds.length === 0 &&
+    (!seoTitle || footerBrandText === seoTitle)
+  );
+}
+
 export function normalizeStorefrontData(
   storefront: ProjectStorefront,
   options: StorefrontNormalizationOptions
@@ -1739,11 +1780,11 @@ export function normalizeStorefrontData(
   snapshot.themeKey = snapshot.themeKey?.trim() || 'commerce-minimal';
   snapshot.activePageKey = 'home';
 
-  if (isLegacyGeneratedHomepageDocument(snapshot.draftHomepage)) {
+  if (isPristineLegacyStarterHomepageDocument(snapshot.draftHomepage)) {
     snapshot.draftHomepage = buildDefaultStorefrontHomepageDocument(fallbackStoreName);
   }
 
-  if (isLegacyGeneratedHomepageDocument(snapshot.publishedHomepage)) {
+  if (isPristineLegacyStarterHomepageDocument(snapshot.publishedHomepage)) {
     snapshot.publishedHomepage = buildDefaultStorefrontHomepageDocument(fallbackStoreName);
   }
 

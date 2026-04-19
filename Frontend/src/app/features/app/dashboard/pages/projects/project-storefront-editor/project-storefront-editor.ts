@@ -3463,6 +3463,7 @@ if (this.activeImageBorderColorCanvasDrag || this.activeImageBorderColorHueDrag)
     this.viewport.set(viewport);
     this.syncEditorSessionState({ viewport });
     setTimeout(() => {
+      this.ensureViewportSectionHeights(viewport);
       this.updatePreviewStageScrollbarState();
       this.refreshSectionLayoutAssignments();
     }, 0);
@@ -13448,6 +13449,70 @@ private getButtonShadowCssValue(shadow: StorefrontEditorButtonNode['props']['sha
     }, 0);
 
     return Math.max(24, Math.ceil(contentBottom));
+  }
+
+  private getRequiredViewportSectionHeight(
+    section: StorefrontHomepageSection,
+    viewport: StorefrontEditorViewport = this.viewport()
+  ): number {
+    const contentBottom = this.readSectionComponents(section).reduce((maxBottom, component) => {
+      const frame = this.getComponentFrame(component, viewport);
+      return Math.max(maxBottom, frame.y + frame.height);
+    }, 0);
+
+    return Math.max(24, Math.ceil(contentBottom));
+  }
+
+  private ensureViewportSectionHeights(viewport: StorefrontEditorViewport = this.viewport()): void {
+    const heightPropKey = this.getSectionHeightPropKey(viewport);
+    const sectionsNeedingResize = this.sections()
+      .map((section) => {
+        const currentHeight = this.readViewportSectionHeight(section, viewport);
+        const requiredHeight = this.getRequiredViewportSectionHeight(section, viewport);
+        return requiredHeight > currentHeight
+          ? {
+              sectionId: section.id,
+              requiredHeight,
+            }
+          : null;
+      })
+      .filter(
+        (
+          update
+        ): update is {
+          sectionId: string;
+          requiredHeight: number;
+        } => update !== null
+      );
+
+    if (!sectionsNeedingResize.length) {
+      return;
+    }
+
+    const requiredHeights = new Map(
+      sectionsNeedingResize.map((update) => [update.sectionId, update.requiredHeight])
+    );
+
+    this.applyStorefrontMutation((storefront) => ({
+      ...storefront,
+      draftHomepage: {
+        ...storefront.draftHomepage,
+        sections: storefront.draftHomepage.sections.map((section) => {
+          const requiredHeight = requiredHeights.get(section.id);
+          if (!requiredHeight) {
+            return section;
+          }
+
+          return {
+            ...section,
+            props: {
+              ...section.props,
+              [heightPropKey]: requiredHeight,
+            },
+          };
+        }),
+      },
+    }), { syncRail: false });
   }
 
   private getSectionLayoutCellBounds(

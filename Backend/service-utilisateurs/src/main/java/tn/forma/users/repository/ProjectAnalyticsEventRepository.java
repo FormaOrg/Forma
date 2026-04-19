@@ -15,4 +15,6 @@ public interface ProjectAnalyticsEventRepository extends JpaRepository<ProjectAn
             LocalDateTime startInclusive,
             LocalDateTime endExclusive
     );
+
+    void deleteAllByProjectId(Long projectId);
 }

@@ -7,7 +7,7 @@ import {
   StorefrontHomepageSection,
 } from '../../../../../../../core/models/project-storefront.model';
 import { createStorefrontEditorComponentNode } from '../components/storefront-editor-component.model';
-import { ensureStableStorefrontSections } from './storefront-editor-storefront.domain';
+import { ensureStableStorefrontSections, isPristineLegacyStarterHomepageDocument as isPristineLegacyStarterHomepageDocumentForStorefront } from './storefront-editor-storefront.domain';
 
 type BuildDefaultHomepageDocument = (storeName: string) => ProjectStorefront['draftHomepage'];
 type NormalizeSection = (
@@ -155,13 +155,19 @@ function isLegacyDefaultHomeStarter(document: StorefrontHomepageDocument | null 
   }
 
   const sectionTypes = document.sections.map((section) => section.type);
+  const contentDocument: StorefrontHomepageDocument = {
+    ...document,
+    sections: document.sections.filter((section) => section.type !== 'header' && section.type !== 'footer'),
+  };
+
   return (
     sectionTypes.length === 5 &&
     sectionTypes[0] === 'header' &&
     sectionTypes[1] === 'announcement-bar' &&
     sectionTypes[2] === 'hero' &&
     sectionTypes[3] === 'featured-products' &&
-    sectionTypes[4] === 'footer'
+    sectionTypes[4] === 'footer' &&
+    isPristineLegacyStarterHomepageDocumentForStorefront(contentDocument)
   );
 }
 
