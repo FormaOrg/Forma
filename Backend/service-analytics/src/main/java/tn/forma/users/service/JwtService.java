@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Base64;
 import java.util.function.Function;
 
 @Service
@@ -164,14 +166,42 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
+                .verifyWith(getSignInKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+    private SecretKey getSignInKey() {
+        return Keys.hmacShaKeyFor(resolveSecretKeyBytes());
+    }
+
+    private byte[] resolveSecretKeyBytes() {
+        String configuredSecret = secretKey == null ? "" : secretKey.trim();
+        if (configuredSecret.isEmpty()) {
+            throw new IllegalStateException("JWT secret is not configured");
+        }
+
+        if (configuredSecret.startsWith("raw:")) {
+            return configuredSecret.substring("raw:".length()).getBytes(StandardCharsets.UTF_8);
+        }
+
+        if (configuredSecret.startsWith("base64:")) {
+            return Decoders.BASE64.decode(configuredSecret.substring("base64:".length()));
+        }
+
+        if (configuredSecret.startsWith("base64url:")) {
+            return Base64.getUrlDecoder().decode(configuredSecret.substring("base64url:".length()));
+        }
+
+        if (looksLikeLegacyBase64(configuredSecret)) {
+            return Decoders.BASE64.decode(configuredSecret);
+        }
+
+        return configuredSecret.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private boolean looksLikeLegacyBase64(String value) {
+        return value.indexOf('=') >= 0 || value.indexOf('+') >= 0 || value.indexOf('/') >= 0;
     }
 }
