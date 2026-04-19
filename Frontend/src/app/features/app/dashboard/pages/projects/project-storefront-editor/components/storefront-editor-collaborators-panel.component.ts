@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  HostListener,
   inject,
   input,
   OnInit,
@@ -11,6 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../../../../../landing-page/i18n/translate.pipe';
+import { I18nService } from '../../../../../../landing-page/i18n/i18n.service';
 import { AppIcon } from '../../../../../../../shared/app/icons/app-icon';
 import { ProjectService } from '../../../../../../../core/services/project.service';
 import {
@@ -28,6 +30,7 @@ import {
 })
 export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   private readonly projectService = inject(ProjectService);
+  private readonly i18n = inject(I18nService);
 
   readonly projectId = input.required<number>();
 
@@ -120,7 +123,9 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
   }
 
   roleLabel(role: CollaboratorRole): string {
-    return role === 'EDITOR' ? 'Editor' : 'Viewer';
+    return role === 'EDITOR'
+      ? this.i18n.t('project.storefront.editor.collaborators.roleEditor')
+      : this.i18n.t('project.storefront.editor.collaborators.roleViewer');
   }
 
   toggleInviteRoleMenu(): void {
@@ -146,5 +151,19 @@ export class StorefrontEditorCollaboratorsPanelComponent implements OnInit {
     this.isInviteRoleMenuOpen.set(false);
     this.openCollaboratorRoleMenuId.set(null);
     this.closed.emit();
+  }
+
+  closeMenus(): void {
+    this.isInviteRoleMenuOpen.set(false);
+    this.openCollaboratorRoleMenuId.set(null);
+  }
+
+  stopPanelClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscapeKey(): void {
+    this.close();
   }
 }
