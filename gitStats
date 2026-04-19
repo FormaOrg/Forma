@@ -1,0 +1,32 @@
+$data = git log --no-merges --format="COMMIT:%aN" --numstat -- . ":(exclude).run" ":(exclude).run/**"
+
+$commits  = @{}
+$added    = @{}
+$removed  = @{}
+$author   = ""
+
+foreach ($line in $data) {
+    if ($line -match "^COMMIT:(.+)") {
+        $author = $matches[1].Trim()
+        if (-not $commits.ContainsKey($author)) { $commits[$author] = 0 }
+        $commits[$author]++
+    } elseif ($author -and $line -match "^(\d+|-)\t(\d+|-)\t") {
+        $a = if ($matches[1] -eq "-") { 0 } else { [int]$matches[1] }
+        $r = if ($matches[2] -eq "-") { 0 } else { [int]$matches[2] }
+        if (-not $added.ContainsKey($author))   { $added[$author] = 0 }
+        if (-not $removed.ContainsKey($author)) { $removed[$author] = 0 }
+        $added[$author]   += $a
+        $removed[$author] += $r
+    }
+}
+
+$total = ($commits.Values | Measure-Object -Sum).Sum
+"`n{0,-30} {1,8} {2,9} {3,8} {4,8} {5,8}" -f "Author","Commits","%Commits","Added","Removed","Net"
+"{0,-30} {1,8} {2,9} {3,8} {4,8} {5,8}" -f ("-"*30),("-"*8),("-"*9),("-"*8),("-"*8),("-"*8)
+
+$commits.Keys | Sort-Object { $commits[$_] } -Descending | ForEach-Object {
+    $pct = [math]::Round($commits[$_] / $total * 100, 1)
+    $net = $added[$_] - $removed[$_]
+    $netStr = if ($net -ge 0) { "+$net" } else { "$net" }
+    "{0,-30} {1,8} {2,8}% {3,8} {4,8} {5,8}" -f $_, $commits[$_], $pct, $added[$_], $removed[$_], $netStr
+}
