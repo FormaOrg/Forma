@@ -33,6 +33,7 @@ public class ProjectAnalyticsService {
     private final ProjectCustomerRepository projectCustomerRepository;
     private final ProjectAnalyticsEventRepository projectAnalyticsEventRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectAnalyticsPageDto getAnalyticsPage(String email, Long projectId, AnalyticsRangePreset rangePreset) {
         Project project = getOwnedProject(email, projectId);
@@ -721,8 +722,7 @@ public class ProjectAnalyticsService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId()).orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
     }
 
     private ResolvedRange resolveRange(AnalyticsRangePreset rangePreset) {

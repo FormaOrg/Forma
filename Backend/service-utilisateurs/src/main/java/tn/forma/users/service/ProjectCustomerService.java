@@ -35,6 +35,7 @@ public class ProjectCustomerService {
     private final ProjectCustomerRepository projectCustomerRepository;
     private final ProjectOrderRepository projectOrderRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectCustomersPageDto getCustomersPage(
             String email,
@@ -42,7 +43,7 @@ public class ProjectCustomerService {
             String search,
             String zone
     ) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<ProjectCustomer> allCustomers = projectCustomerRepository.findAllByProjectIdOrderByCreatedAtDesc(project.getId());
         List<ProjectOrder> allOrders = projectOrderRepository.findAllByProjectIdOrderByPlacedAtDesc(project.getId());
         Map<Long, CustomerOrderSnapshot> orderStats = buildOrderStats(allOrders);
@@ -84,7 +85,7 @@ public class ProjectCustomerService {
 
     @Transactional
     public ProjectCustomerDto createCustomer(String email, Long projectId, CreateProjectCustomerRequest request) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getEditableProject(email, projectId);
 
         ProjectCustomer customer = ProjectCustomer.builder()
                 .project(project)
@@ -106,7 +107,7 @@ public class ProjectCustomerService {
             Long customerId,
             UpdateProjectCustomerRequest request
     ) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         ProjectCustomer customer = getOwnedCustomer(projectId, customerId);
 
         if (request.getFirstName() != null) {
@@ -137,7 +138,7 @@ public class ProjectCustomerService {
 
     @Transactional
     public void deleteCustomer(String email, Long projectId, Long customerId) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         projectCustomerRepository.delete(getOwnedCustomer(projectId, customerId));
     }
 
@@ -197,10 +198,15 @@ public class ProjectCustomerService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private ProjectCustomer getOwnedCustomer(Long projectId, Long customerId) {

@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import tn.forma.users.dto.ProjectStorefrontDto;
 import tn.forma.users.dto.PublishProjectStorefrontResponse;
 import tn.forma.users.dto.UpdateProjectStorefrontRequest;
+import tn.forma.users.model.CollaboratorRole;
 import tn.forma.users.model.Project;
 import tn.forma.users.model.ProjectStatus;
 import tn.forma.users.model.ProjectStorefront;
@@ -20,8 +23,14 @@ import tn.forma.users.repository.ProjectRepository;
 import tn.forma.users.repository.ProjectStorefrontRepository;
 import tn.forma.users.repository.UserRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -29,20 +38,25 @@ public class ProjectStorefrontService {
 
     private static final String DEFAULT_THEME_KEY = "commerce-minimal";
     private static final String DEFAULT_PAGE_KEY = "home";
+    private static final String ACTIVE_EDITORS_FIELD = "activeEditors";
+    private static final long ACTIVE_EDITOR_TTL_SECONDS = 45;
 
     private final ProjectStorefrontRepository projectStorefrontRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final ProjectAccessService projectAccessService;
 
     public ProjectStorefrontDto getStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
-        return mapToDto(storefront);
+        ProjectStorefront storefront = getOrCreateAccessibleStorefront(email, projectId);
+        return mapToDto(storefront, sanitizeEditorSession(storefront.getEditorSessionJson()));
     }
 
     @Transactional
     public ProjectStorefrontDto updateStorefront(String email, Long projectId, UpdateProjectStorefrontRequest request) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (request.getStoreName() != null) {
             storefront.setStoreName(blankToNull(request.getStoreName()));
@@ -62,15 +76,20 @@ public class ProjectStorefrontService {
         }
 
         if (request.getEditorSession() != null) {
-            storefront.setEditorSessionJson(objectMapper.valueToTree(request.getEditorSession()));
+            storefront.setEditorSessionJson(mergeEditorSession(
+                    storefront.getEditorSessionJson(),
+                    objectMapper.valueToTree(request.getEditorSession()),
+                    currentUser
+            ));
         }
 
-        return mapToDto(projectStorefrontRepository.save(storefront));
+        ProjectStorefront savedStorefront = projectStorefrontRepository.save(storefront);
+        return mapToDto(savedStorefront, sanitizeEditorSession(savedStorefront.getEditorSessionJson()));
     }
 
     @Transactional
     public PublishProjectStorefrontResponse publishStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
         storefront.setPublishedHomepageJson(storefront.getDraftHomepageJson() != null
                 ? storefront.getDraftHomepageJson().deepCopy()
                 : null);
@@ -89,13 +108,14 @@ public class ProjectStorefrontService {
 
     @Transactional
     public ProjectStorefrontDto unpublishStorefront(String email, Long projectId) {
-        ProjectStorefront storefront = getOrCreateOwnedStorefront(email, projectId);
+        ProjectStorefront storefront = getOrCreateEditableStorefront(email, projectId);
         storefront.setStoreStatus(StorefrontStatus.DRAFT);
         storefront.setPublishedHomepageJson(null);
         storefront.setPublishedAt(null);
         storefront.getProject().setPublished(false);
         storefront.getProject().setStatus(ProjectStatus.DRAFT);
-        return mapToDto(projectStorefrontRepository.save(storefront));
+        ProjectStorefront savedStorefront = projectStorefrontRepository.save(storefront);
+        return mapToDto(savedStorefront, sanitizeEditorSession(savedStorefront.getEditorSessionJson()));
     }
 
     private ProjectStorefront getOrCreateOwnedStorefront(String email, Long projectId) {
@@ -106,17 +126,37 @@ public class ProjectStorefrontService {
                 .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
     }
 
-    private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    private ProjectStorefront getOrCreateAccessibleStorefront(String email, Long projectId) {
+        Project project = getAccessibleProject(email, projectId);
+        ensureEcommerceProject(project);
 
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectStorefrontRepository.findByProjectId(project.getId())
+                .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
+    }
+
+    private ProjectStorefront getOrCreateEditableStorefront(String email, Long projectId) {
+        Project project = getEditableProject(email, projectId);
+        ensureEcommerceProject(project);
+
+        return projectStorefrontRepository.findByProjectId(project.getId())
+                .orElseGet(() -> projectStorefrontRepository.save(buildDefaultStorefront(project)));
+    }
+
+    private Project getOwnedProject(String email, Long projectId) {
+        return projectAccessService.getOwnedProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 
     private void ensureEcommerceProject(Project project) {
         if (project.getType() != ProjectType.ECOMMERCE) {
-            throw new RuntimeException("Storefront editing is only available for ecommerce projects");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Storefront editing is only available for ecommerce projects");
         }
     }
 
@@ -230,6 +270,7 @@ public class ProjectStorefrontService {
         session.put("zoomPercent", 120);
         session.set("undoStack", objectMapper.createArrayNode());
         session.set("redoStack", objectMapper.createArrayNode());
+        session.set(ACTIVE_EDITORS_FIELD, objectMapper.createArrayNode());
         return session;
     }
 
@@ -243,6 +284,10 @@ public class ProjectStorefrontService {
     }
 
     private ProjectStorefrontDto mapToDto(ProjectStorefront storefront) {
+        return mapToDto(storefront, storefront.getEditorSessionJson());
+    }
+
+    private ProjectStorefrontDto mapToDto(ProjectStorefront storefront, JsonNode editorSession) {
         return ProjectStorefrontDto.builder()
                 .id(storefront.getId())
                 .projectId(storefront.getProject().getId())
@@ -252,11 +297,123 @@ public class ProjectStorefrontService {
                 .activePageKey(storefront.getActivePageKey())
                 .draftHomepage(toPlainJson(storefront.getDraftHomepageJson()))
                 .publishedHomepage(toPlainJson(storefront.getPublishedHomepageJson()))
-                .editorSession(toPlainJson(storefront.getEditorSessionJson()))
+                .editorSession(toPlainJson(editorSession))
                 .publishedAt(Objects.toString(storefront.getPublishedAt(), null))
                 .createdAt(Objects.toString(storefront.getCreatedAt(), null))
                 .updatedAt(Objects.toString(storefront.getUpdatedAt(), null))
                 .build();
+    }
+
+    private JsonNode mergeEditorSession(JsonNode existingEditorSession, JsonNode incomingEditorSession, User currentUser) {
+        ObjectNode merged = existingEditorSession != null && existingEditorSession.isObject()
+                ? existingEditorSession.deepCopy()
+                : buildDefaultEditorSession();
+
+        if (incomingEditorSession != null && incomingEditorSession.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = incomingEditorSession.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (!ACTIVE_EDITORS_FIELD.equals(field.getKey())) {
+                    merged.set(field.getKey(), field.getValue().deepCopy());
+                }
+            }
+        }
+
+        merged.set(ACTIVE_EDITORS_FIELD, mergeActiveEditors(existingEditorSession, incomingEditorSession, currentUser));
+        return merged;
+    }
+
+    private JsonNode sanitizeEditorSession(JsonNode editorSession) {
+        ObjectNode sanitized = editorSession != null && editorSession.isObject()
+                ? editorSession.deepCopy()
+                : buildDefaultEditorSession();
+        sanitized.set(ACTIVE_EDITORS_FIELD, mergeActiveEditors(editorSession, null, null));
+        return sanitized;
+    }
+
+    private ArrayNode mergeActiveEditors(JsonNode existingEditorSession, JsonNode incomingEditorSession, User currentUser) {
+        Map<String, ObjectNode> mergedEditors = new LinkedHashMap<>();
+        collectActiveEditors(mergedEditors, existingEditorSession);
+        collectActiveEditors(mergedEditors, incomingEditorSession);
+
+        if (currentUser != null) {
+            ObjectNode currentEditor = objectMapper.createObjectNode();
+            currentEditor.put("userId", currentUser.getId());
+            currentEditor.put("email", currentUser.getEmail());
+            currentEditor.put("userName", buildUserDisplayName(currentUser));
+            if (blankToNull(currentUser.getAvatarUrl()) != null) {
+                currentEditor.put("avatarUrl", currentUser.getAvatarUrl());
+            } else {
+                currentEditor.putNull("avatarUrl");
+            }
+            currentEditor.put("lastSeenAt", Instant.now().toString());
+            mergedEditors.put(resolveActiveEditorKey(currentEditor), currentEditor);
+        }
+
+        Instant cutoff = Instant.now().minusSeconds(ACTIVE_EDITOR_TTL_SECONDS);
+        ArrayNode activeEditors = objectMapper.createArrayNode();
+        for (ObjectNode editor : mergedEditors.values()) {
+            if (isActiveEditorFresh(editor, cutoff)) {
+                activeEditors.add(editor);
+            }
+        }
+        return activeEditors;
+    }
+
+    private void collectActiveEditors(Map<String, ObjectNode> target, JsonNode editorSession) {
+        if (editorSession == null || !editorSession.isObject()) {
+            return;
+        }
+
+        JsonNode activeEditors = editorSession.get(ACTIVE_EDITORS_FIELD);
+        if (activeEditors == null || !activeEditors.isArray()) {
+            return;
+        }
+
+        for (JsonNode node : activeEditors) {
+            if (!node.isObject()) {
+                continue;
+            }
+            ObjectNode activeEditor = ((ObjectNode) node).deepCopy();
+            target.put(resolveActiveEditorKey(activeEditor), activeEditor);
+        }
+    }
+
+    private String resolveActiveEditorKey(JsonNode activeEditor) {
+        if (activeEditor.hasNonNull("userId")) {
+            return "user:" + activeEditor.get("userId").asText();
+        }
+        if (activeEditor.hasNonNull("email")) {
+            return "email:" + activeEditor.get("email").asText("").trim().toLowerCase();
+        }
+        return "name:" + activeEditor.path("userName").asText("unknown");
+    }
+
+    private boolean isActiveEditorFresh(JsonNode activeEditor, Instant cutoff) {
+        String lastSeenAt = activeEditor.path("lastSeenAt").asText(null);
+        if (lastSeenAt == null || lastSeenAt.isBlank()) {
+            return false;
+        }
+
+        try {
+            return !Instant.parse(lastSeenAt).isBefore(cutoff);
+        } catch (DateTimeParseException ignored) {
+            return false;
+        }
+    }
+
+    private String buildUserDisplayName(User user) {
+        String firstName = blankToNull(user.getFirstName());
+        String lastName = blankToNull(user.getLastName());
+        String fullName = Stream.of(firstName, lastName)
+                .filter(Objects::nonNull)
+                .reduce((left, right) -> left + " " + right)
+                .orElse(null);
+        if (fullName != null) {
+            return fullName;
+        }
+
+        return blankToNull(user.getEmail()) != null ? user.getEmail() : "Forma user";
     }
 
     private Object toPlainJson(JsonNode node) {

@@ -37,6 +37,9 @@ class ProjectSalesServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private ProjectAccessService projectAccessService;
+
     @InjectMocks
     private ProjectSalesService projectSalesService;
 
@@ -88,8 +91,7 @@ class ProjectSalesServiceTest {
                 buildItem(datesBox, "Dates Box", "DB-1", 5, "5.00", "25.00")
         );
 
-        when(userRepository.findByEmail("owner@forma.test")).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getAccessibleProject("owner@forma.test", project.getId())).thenReturn(project);
         when(projectOrderRepository.findAllByProjectIdAndPlacedAtGreaterThanEqualAndPlacedAtLessThanOrderByPlacedAtDesc(
                 eq(project.getId()),
                 any(LocalDateTime.class),
@@ -157,8 +159,7 @@ class ProjectSalesServiceTest {
                 buildItem(oliveOil, "Olive Oil", "OO-1", 1, "24.00", "24.00")
         );
 
-        when(userRepository.findByEmail("owner@forma.test")).thenReturn(Optional.of(user));
-        when(projectRepository.findByIdAndUserId(project.getId(), user.getId())).thenReturn(Optional.of(project));
+        when(projectAccessService.getAccessibleProject("owner@forma.test", project.getId())).thenReturn(project);
         when(projectOrderRepository.findAllByProjectIdAndPlacedAtGreaterThanEqualAndPlacedAtLessThanOrderByPlacedAtDesc(
                 eq(project.getId()),
                 any(LocalDateTime.class),

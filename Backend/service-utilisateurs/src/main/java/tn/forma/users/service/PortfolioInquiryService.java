@@ -24,9 +24,10 @@ public class PortfolioInquiryService {
     private final ProjectRepository projectRepository;
     private final PortfolioInquiryRepository portfolioInquiryRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public PortfolioInquiriesPageDto getInquiriesPage(String email, Long projectId) {
-        Project project = getOwnedProject(email, projectId);
+        Project project = getAccessibleProject(email, projectId);
         List<PortfolioInquiry> inquiries = portfolioInquiryRepository.findAllByProjectIdOrderByCreatedAtDesc(project.getId());
 
         return PortfolioInquiriesPageDto.builder()
@@ -43,7 +44,7 @@ public class PortfolioInquiryService {
             Long inquiryId,
             UpdatePortfolioInquiryStatusRequest request
     ) {
-        getOwnedProject(email, projectId);
+        getEditableProject(email, projectId);
         PortfolioInquiry inquiry = portfolioInquiryRepository.findByIdAndProjectId(inquiryId, projectId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found"));
 
@@ -89,9 +90,14 @@ public class PortfolioInquiryService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getAccessibleProject(String email, Long projectId) {
+        return projectAccessService.getAccessibleProject(email, projectId);
+    }
+
+    private Project getEditableProject(String email, Long projectId) {
+        return projectAccessService.getEditableProject(email, projectId);
     }
 }

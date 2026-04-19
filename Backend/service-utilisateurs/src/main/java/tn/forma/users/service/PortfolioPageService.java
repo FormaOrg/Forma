@@ -29,6 +29,7 @@ public class PortfolioPageService {
     private final PortfolioPageRepository portfolioPageRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public PortfolioPagesPageDto getPagesPage(String email, Long projectId) {
         Project project = getOwnedProject(email, projectId);
@@ -139,9 +140,6 @@ public class PortfolioPageService {
     }
 
     private Project getOwnedProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectAccessService.getAccessibleProject(email, projectId);
     }
 }

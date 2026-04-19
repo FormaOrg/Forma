@@ -32,6 +32,7 @@ public class PublicStorefrontService {
     private final ProjectStorefrontRepository projectStorefrontRepository;
     private final ProjectProductRepository projectProductRepository;
     private final UserRepository userRepository;
+    private final ProjectAccessService projectAccessService;
 
     public PublicStorefrontHomeDto getPublishedStorefrontHome(Long projectId) {
         Project project = getPublishedEcommerceProject(projectId);
@@ -45,7 +46,7 @@ public class PublicStorefrontService {
     }
 
     public PublicStorefrontHomeDto getPreviewStorefrontHome(String email, Long projectId) {
-        Project project = getOwnedEcommerceProject(email, projectId);
+        Project project = getAccessibleEcommerceProject(email, projectId);
         ProjectStorefront storefront = getPreviewStorefront(project.getId());
         return buildStorefrontHome(
                 project,
@@ -80,7 +81,7 @@ public class PublicStorefrontService {
     }
 
     public List<PublicStorefrontProductDto> getPreviewProducts(String email, Long projectId) {
-        Project project = getOwnedEcommerceProject(email, projectId);
+        Project project = getAccessibleEcommerceProject(email, projectId);
         getPreviewStorefront(project.getId());
 
         return projectProductRepository.findAllByProjectIdOrderByUpdatedAtDesc(project.getId()).stream()
@@ -90,7 +91,7 @@ public class PublicStorefrontService {
     }
 
     public PublicStorefrontProductDto getPreviewProduct(String email, Long projectId, Long productId) {
-        Project project = getOwnedEcommerceProject(email, projectId);
+        Project project = getAccessibleEcommerceProject(email, projectId);
         getPreviewStorefront(project.getId());
 
         ProjectProduct product = projectProductRepository.findByIdAndProjectId(productId, project.getId())
@@ -115,17 +116,17 @@ public class PublicStorefrontService {
     }
 
     private Project getOwnedEcommerceProject(String email, Long projectId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Project project = projectRepository.findByIdAndUserId(projectId, user.getId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = projectAccessService.getAccessibleProject(email, projectId);
 
         if (project.getType() != ProjectType.ECOMMERCE) {
             throw new RuntimeException("Storefront is only available for ecommerce projects");
         }
 
         return project;
+    }
+
+    private Project getAccessibleEcommerceProject(String email, Long projectId) {
+        return getOwnedEcommerceProject(email, projectId);
     }
 
     private ProjectStorefront getPublishedStorefront(Long projectId) {
