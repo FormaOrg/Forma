@@ -1,12 +1,24 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanMatchFn, Routes } from '@angular/router';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { GuestGuard } from './core/guards/guest.guard';
 import { ProjectWorkspaceGuard } from './core/guards/project-workspace.guard';
 import { RootRedirectGuard } from './core/guards/root-redirect.guard';
+import { AuthService } from './core/services/auth.service';
 import { tenantStorefrontCanMatch } from './core/guards/tenant-storefront.guard';
 
+const appCheckoutCanMatch: CanMatchFn = () => {
+  const authService = inject(AuthService);
+  return authService.isLoggedIn() && !!authService.currentUserValue?.emailVerified;
+};
+
 export const routes: Routes = [
+  {
+    path: 'checkout',
+    canMatch: [appCheckoutCanMatch],
+    loadComponent: () => import('./features/app/checkout/checkout.component').then((m) => m.CheckoutComponent)
+  },
   {
     path: 'checkout/success',
     canMatch: [tenantStorefrontCanMatch],

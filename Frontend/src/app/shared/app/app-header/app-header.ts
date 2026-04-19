@@ -18,6 +18,14 @@ import { catchError, filter, of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { DashboardDataService } from '../../../core/services/dashboard-data.service';
+import {
+  BillingPlanCode,
+  BILLING_PLANS,
+  getDefaultUpgradeTarget,
+  toBillingPlanCode,
+  toBillingPlanLabel,
+} from '../../../core/models/billing-plan.model';
+import { PlanSyncService } from '../../../core/services/plan-sync.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import type { HeaderActionButton, ProfileMenuItem } from '../dashboard-nav.types';
 import { AppIcon } from '../icons/app-icon';
@@ -58,15 +66,20 @@ export class AppHeader {
   private router = inject(Router);
   private authService = inject(AuthService);
   private dashboardDataService = inject(DashboardDataService);
+  private planSyncService = inject(PlanSyncService);
   private i18n = inject(I18nService);
   private themeService = inject(ThemeService);
 
   readonly pageTitle = signal(this.readPageTitle());
   readonly commandQuery = signal('');
   readonly highlightedIndex = signal(0);
+  readonly currentPlanCode = signal<BillingPlanCode>('STARTER');
+  readonly selectedUpgradePlan = signal<BillingPlanCode>('PRO');
+  readonly upgradePlans = BILLING_PLANS;
 
   isProfileMenuOpen = false;
   isCommandPaletteOpen = false;
+  isUpgradeMenuOpen = false;
 
   search = {
     placeholderKey: 'app.header.search',
@@ -74,7 +87,6 @@ export class AppHeader {
   };
 
   actionButtons: Array<HeaderActionButton & { labelKey: string }> = [
-    { label: 'Upgrade plan', labelKey: 'app.header.actions.upgrade', variant: 'secondary', route: '/pricing' },
     { label: 'Hire a professional', labelKey: 'app.header.actions.hire', variant: 'primary', route: '/contact' }
   ];
 
@@ -277,6 +289,22 @@ export class AppHeader {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
+  toggleUpgradeMenu(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isProfileMenuOpen = false;
+    this.isUpgradeMenuOpen = !this.isUpgradeMenuOpen;
+  }
+
+  selectUpgradePlan(plan: BillingPlanCode): void {
+    this.selectedUpgradePlan.set(plan);
+  }
+
+  openUpgradeCheckout(): void {
+    const plan = this.selectedUpgradePlan();
+    this.isUpgradeMenuOpen = false;
+    window.open(`/checkout?plan=${plan}`, '_blank');
+  }
+
   onProfileAction(item: ProfileMenuItem): void {
     if (item.action === 'logout') {
       this.authService.logout();
@@ -402,6 +430,19 @@ export class AppHeader {
     if (!target.closest('[data-profile-anchor]')) {
       this.isProfileMenuOpen = false;
     }
+    if (!target.closest('[data-upgrade-anchor]')) {
+      this.isUpgradeMenuOpen = false;
+    }
+  }
+
+  @HostListener('window:storage', ['$event'])
+  handlePlanSync(event: StorageEvent): void {
+    if (!this.planSyncService.readPlanUpdatedEvent(event)) {
+      return;
+    }
+
+    this.dashboardDataService.invalidateBillingOverviewCache();
+    this.syncPlanFromBilling(this.authService.currentUser);
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -517,16 +558,23 @@ export class AppHeader {
         ...this.profile,
         role: 'Free plan'
       };
+      this.currentPlanCode.set('STARTER');
+      this.selectedUpgradePlan.set('PRO');
       return;
     }
 
     this.dashboardDataService.getBillingOverview({ useCache: false })
       .pipe(catchError(() => of(null)))
       .subscribe((billing) => {
+        const currentPlanCode = toBillingPlanCode(billing?.subscription.planName);
         this.profile = {
           ...this.profile,
           role: this.toPlanLabel(billing)
         };
+        this.currentPlanCode.set(currentPlanCode);
+        if (this.selectedUpgradePlan() === currentPlanCode) {
+          this.selectedUpgradePlan.set(getDefaultUpgradeTarget(currentPlanCode));
+        }
       });
   }
 
@@ -540,4 +588,6 @@ export class AppHeader {
 
     return planName;
   }
+
+  protected readonly toBillingPlanLabel = toBillingPlanLabel;
 }

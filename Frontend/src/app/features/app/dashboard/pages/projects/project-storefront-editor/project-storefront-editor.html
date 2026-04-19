@@ -282,7 +282,46 @@
       </div>
 
       <div class="storefront-editor__topbar-right">
-        <button type="button" class="storefront-editor__header-link">{{ 'project.storefront.editor.topbar.upgrade' | t }}</button>
+        <div class="storefront-editor__floating-shell">
+          <button
+            type="button"
+            class="storefront-editor__header-link"
+            (click)="toggleUpgradeMenu()"
+            [attr.aria-expanded]="isUpgradeMenuOpen()"
+            aria-haspopup="menu"
+          >
+            {{ 'project.storefront.editor.topbar.upgrade' | t }}
+          </button>
+
+          @if (isUpgradeMenuOpen()) {
+            <div class="storefront-editor__menu storefront-editor__menu--upgrade">
+              <div class="storefront-editor__upgrade-summary">
+                <span class="storefront-editor__upgrade-summary-label">Your current plan</span>
+                <span class="storefront-editor__upgrade-summary-badge">{{ currentPlanLabel() }}</span>
+              </div>
+
+              <div class="storefront-editor__upgrade-list">
+                @for (plan of upgradePlans; track plan.code) {
+                  <button
+                    type="button"
+                    class="storefront-editor__upgrade-option"
+                    [class.storefront-editor__upgrade-option--active]="selectedUpgradePlan() === plan.code"
+                    [class.storefront-editor__upgrade-option--current]="currentPlanCode() === plan.code"
+                    (click)="selectUpgradePlan(plan.code)"
+                  >
+                    <strong>{{ plan.label }}</strong>
+                    <span>{{ plan.summary }}</span>
+                  </button>
+                }
+              </div>
+
+              <button type="button" class="storefront-editor__upgrade-cta" (click)="openCheckoutTab()">
+                Upgrade plan
+              </button>
+            </div>
+          }
+        </div>
+
         <div class="storefront-editor__icon-button-wrap">
           <button
             type="button"

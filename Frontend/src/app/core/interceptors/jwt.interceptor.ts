@@ -18,6 +18,7 @@ export class JwtInterceptor implements HttpInterceptor {
   private refreshDone$ = new BehaviorSubject<boolean>(false);
   private readonly apiBaseUrl = getApiUrl();
   private readonly projectsApiBaseUrl = environment.projectsApiUrl.replace(/\/+$/, '');
+  private readonly billingApiBaseUrl = environment.billingApiUrl.replace(/\/+$/, '');
 
   constructor(private authService: AuthService) {}
 
@@ -44,7 +45,10 @@ export class JwtInterceptor implements HttpInterceptor {
   }
 
   private isOwnedApiRequest(url: string): boolean {
-    return url.startsWith(this.apiBaseUrl) || url.startsWith(this.projectsApiBaseUrl) || url.startsWith('/api/');
+    return url.startsWith(this.apiBaseUrl)
+      || url.startsWith(this.projectsApiBaseUrl)
+      || url.startsWith(this.billingApiBaseUrl)
+      || url.startsWith('/api/');
   }
 
   private addToken(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {

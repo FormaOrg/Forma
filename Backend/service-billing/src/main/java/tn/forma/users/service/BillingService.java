@@ -2,6 +2,7 @@ package tn.forma.users.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.forma.users.dto.*;
 import tn.forma.users.model.*;
 import tn.forma.users.repository.*;
@@ -49,6 +50,34 @@ public class BillingService {
                 .paidInvoicesCount(paidInvoicesCount)
                 .currentSpendLabel(buildCurrentSpendLabel(subscription))
                 .build();
+    }
+
+    @Transactional
+    public MessageResponse updateSubscriptionPlan(String email, SubscriptionPlan plan) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Subscription subscription = subscriptionRepository.findTopByUserIdOrderByUpdatedAtDesc(user.getId())
+                .orElseGet(() -> Subscription.builder()
+                        .user(user)
+                        .status(SubscriptionStatus.ACTIVE)
+                        .billingMode(SubscriptionBillingMode.MONTHLY)
+                        .startDate(LocalDate.now())
+                        .autoRenew(true)
+                        .build());
+
+        subscription.setPlanType(plan);
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setBillingMode(subscription.getBillingMode() == null
+                ? SubscriptionBillingMode.MONTHLY
+                : subscription.getBillingMode());
+        subscription.setStartDate(subscription.getStartDate() == null ? LocalDate.now() : subscription.getStartDate());
+        subscription.setRenewalDate(LocalDate.now().plusMonths(1));
+        subscription.setEndDate(null);
+        subscription.setPriceTnd(resolveMonthlyPrice(plan));
+        subscriptionRepository.save(subscription);
+
+        return new MessageResponse("Subscription updated successfully");
     }
 
     private List<BillingUsageMetricDto> buildUsageMetrics(
@@ -220,6 +249,14 @@ public class BillingService {
 
     private String formatDate(LocalDate date) {
         return date == null ? null : date.format(DATE_FORMATTER);
+    }
+
+    private BigDecimal resolveMonthlyPrice(SubscriptionPlan plan) {
+        return switch (plan) {
+            case STARTER -> BigDecimal.ZERO;
+            case PRO -> BigDecimal.valueOf(59);
+            case BUSINESS -> BigDecimal.valueOf(99);
+        };
     }
 
     private String formatExpiry(Integer month, Integer year) {
