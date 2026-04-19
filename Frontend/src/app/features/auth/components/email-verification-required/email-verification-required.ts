@@ -13,7 +13,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class EmailVerificationRequiredComponent implements OnInit {
 
   userEmail = '';
-  returnUrl = '/app/home';
+  returnUrl = '/dashboard';
 
   isResending = false;
   resendSuccess = '';
@@ -26,23 +26,16 @@ export class EmailVerificationRequiredComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl')
-      ?? localStorage.getItem('pendingVerificationReturnUrl')
-      ?? '/app/home';
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
 
     const user = this.authService.currentUserValue;
     this.userEmail = user?.email
       ?? localStorage.getItem('pendingVerificationEmail')
       ?? '';
 
-    if (this.userEmail) {
-      localStorage.setItem('pendingVerificationEmail', this.userEmail);
-    }
-    localStorage.setItem('pendingVerificationReturnUrl', this.returnUrl);
-
     // Already verified — redirect immediately
     if (user?.emailVerified) {
-      this.router.navigateByUrl(this.returnUrl);
+      this.router.navigate([this.returnUrl]);
     }
   }
 

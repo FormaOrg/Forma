@@ -22,10 +22,9 @@ export class JwtInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const isApiRequest = this.isOwnedApiRequest(request.url);
-    const isAuthRequest = this.isAuthRequest(request.url);
     const token = this.authService.getToken();
 
-    if (isApiRequest && !isAuthRequest && token) {
+    if (isApiRequest && token) {
       request = this.addToken(request, token);
     }
 
@@ -35,7 +34,7 @@ export class JwtInterceptor implements HttpInterceptor {
           return throwError(() => error);
         }
 
-        if (error.status === 401 && !isAuthRequest) {
+        if (error.status === 401 && !request.url.includes('/auth/')) {
           return this.handle401(request, next);
         }
         return throwError(() => error);
@@ -45,10 +44,6 @@ export class JwtInterceptor implements HttpInterceptor {
 
   private isOwnedApiRequest(url: string): boolean {
     return url.startsWith(this.apiBaseUrl) || url.startsWith(this.projectsApiBaseUrl) || url.startsWith('/api/');
-  }
-
-  private isAuthRequest(url: string): boolean {
-    return url.includes('/api/auth/');
   }
 
   private addToken(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {

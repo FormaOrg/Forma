@@ -22,11 +22,8 @@ public class CollaboratorEmailService {
     @Value("${application.frontend-url}")
     private String frontendUrl;
 
-    @Value("${application.mail.from:${spring.mail.username}}")
+    @Value("${spring.mail.username}")
     private String fromEmail;
-
-    @Value("${application.mail.from-name:Forma}")
-    private String fromName;
 
     @Async
     public void sendCollaboratorInviteEmail(String toEmail, String inviterName, String projectName, String role, String invitationToken) {
@@ -84,7 +81,7 @@ public class CollaboratorEmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(String.format("%s <%s>", fromName, fromEmail));
+            helper.setFrom(fromEmail);
             helper.setTo(toEmail);
             helper.setSubject(inviterName + " invited you to collaborate on " + projectName);
             helper.setText(html, true);

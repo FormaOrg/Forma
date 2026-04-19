@@ -58,14 +58,6 @@ export class RegisterComponent implements OnInit {
     };
 
     if (this.authService.isLoggedIn()) {
-      const user = this.authService.currentUserValue;
-      if (user && !user.emailVerified) {
-        this.router.navigate(['/verify-email-required'], {
-          queryParams: { returnUrl: this.returnUrl }
-        });
-        return;
-      }
-
       this.router.navigateByUrl(this.returnUrl);
     }
   }

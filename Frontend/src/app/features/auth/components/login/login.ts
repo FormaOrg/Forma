@@ -77,13 +77,6 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
-        console.error('Login request failed:', {
-          status: err?.status,
-          url: err?.url,
-          error: err?.error,
-          message: err?.message
-        });
-
         if (err?.status === 0) {
           this.toastService.error('We can’t reach the server right now. Check your internet connection and try again.');
           return;
@@ -98,7 +91,6 @@ export class LoginComponent implements OnInit {
         ) {
           this.emailNotVerified = true;
           localStorage.setItem('pendingVerificationEmail', this.email);
-          localStorage.setItem('pendingVerificationReturnUrl', this.returnUrl);
           this.toastService.info(msg);
         } else {
           this.toastService.error(msg);
@@ -118,14 +110,6 @@ export class LoginComponent implements OnInit {
         this.toastService.info(res.message || 'Verification email sent! Check your inbox.');
       },
       error: (err) => {
-        console.error('Resend verification request failed:', {
-          status: err?.status,
-          url: err?.url,
-          error: err?.error,
-          message: err?.message,
-          email: this.email
-        });
-
         this.isResending = false;
         if (err?.status === 0) {
           this.toastService.error('We can’t reach the server right now. Check your internet connection and try again.');
