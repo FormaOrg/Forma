@@ -31,10 +31,21 @@ export class EmailVerificationComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userEmail = localStorage.getItem('pendingVerificationEmail') ?? '';
-    this.returnUrl = localStorage.getItem('pendingVerificationReturnUrl') ?? '/app/home';
-
     const token = this.route.snapshot.queryParamMap.get('token');
+    const emailFromQuery = this.route.snapshot.queryParamMap.get('email') ?? '';
+    const returnUrlFromQuery = this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
+
+    this.userEmail = emailFromQuery
+      || localStorage.getItem('pendingVerificationEmail')
+      || '';
+    this.returnUrl = returnUrlFromQuery
+      || localStorage.getItem('pendingVerificationReturnUrl')
+      || '/app/home';
+
+    if (this.userEmail) {
+      localStorage.setItem('pendingVerificationEmail', this.userEmail);
+    }
+    localStorage.setItem('pendingVerificationReturnUrl', this.returnUrl);
 
     if (!token) {
       this.loading = false;
@@ -53,7 +64,7 @@ export class EmailVerificationComponent implements OnInit, OnDestroy {
         localStorage.removeItem('pendingVerificationEmail');
         localStorage.removeItem('pendingVerificationReturnUrl');
 
-        this.scheduleLoginRedirect(3000);
+        this.scheduleRedirectAfterVerification(3000);
       },
       error: (err: { status: number; error?: { message?: string } }) => {
         this.loading = false;
@@ -66,7 +77,7 @@ export class EmailVerificationComponent implements OnInit, OnDestroy {
           this.canResend = false;
           localStorage.removeItem('pendingVerificationEmail');
           localStorage.removeItem('pendingVerificationReturnUrl');
-          this.scheduleLoginRedirect(2000);
+          this.scheduleRedirectAfterVerification(2000);
         } else if (err.status === 400) {
           this.message = 'This verification link has expired or is invalid.';
         } else {
@@ -112,12 +123,17 @@ export class EmailVerificationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private scheduleLoginRedirect(delayMs: number): void {
+  private scheduleRedirectAfterVerification(delayMs: number): void {
     if (this.redirectTimeoutId) {
       clearTimeout(this.redirectTimeoutId);
     }
 
     this.redirectTimeoutId = setTimeout(() => {
+      if (this.authService.isLoggedIn()) {
+        void this.router.navigateByUrl(this.returnUrl);
+        return;
+      }
+
       void this.router.navigate(['/login'], {
         queryParams: {
           returnUrl: this.returnUrl,
