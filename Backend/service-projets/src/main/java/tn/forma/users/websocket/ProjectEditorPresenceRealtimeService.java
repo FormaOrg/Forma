@@ -100,6 +100,42 @@ public class ProjectEditorPresenceRealtimeService {
         publishPresence(projectId);
     }
 
+    public void broadcastToOthers(WebSocketSession sender, Long projectId, JsonNode payload) {
+        Set<String> socketIds = socketIdsByProjectId.get(projectId);
+        if (socketIds == null || socketIds.isEmpty()) {
+            return;
+        }
+
+        String payloadStr;
+        try {
+            payloadStr = objectMapper.writeValueAsString(payload);
+        } catch (Exception ex) {
+            log.debug("Could not serialize broadcast payload: {}", ex.getMessage());
+            return;
+        }
+
+        TextMessage message = new TextMessage(payloadStr);
+        for (String socketId : Set.copyOf(socketIds)) {
+            if (socketId.equals(sender.getId())) {
+                continue;
+            }
+            ConnectionContext context = connectionsBySocketId.get(socketId);
+            if (context == null) {
+                continue;
+            }
+            try {
+                if (!context.session().isOpen()) {
+                    unregister(context.session());
+                    continue;
+                }
+                context.session().sendMessage(message);
+            } catch (IOException ex) {
+                log.debug("Failed to broadcast to {}: {}", context.email(), ex.getMessage());
+                unregister(context.session());
+            }
+        }
+    }
+
     private boolean hasProjectAccess(Long projectId, Long userId) {
         return projectRepository.findByIdAndUserId(projectId, userId).isPresent()
                 || collaboratorRepository.findByProjectIdAndUserIdAndStatus(projectId, userId, CollaboratorStatus.ACCEPTED).isPresent();

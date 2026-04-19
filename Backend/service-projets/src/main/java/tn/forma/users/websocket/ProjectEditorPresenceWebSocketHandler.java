@@ -44,6 +44,8 @@ public class ProjectEditorPresenceWebSocketHandler extends TextWebSocketHandler 
                 projectEditorPresenceRealtimeService.joinProject(session, projectId);
             } else if ("leave_project_editor".equals(type)) {
                 projectEditorPresenceRealtimeService.leaveProject(session, projectId);
+            } else if ("project_editor_cursor".equals(type) || "project_storefront_updated".equals(type)) {
+                projectEditorPresenceRealtimeService.broadcastToOthers(session, projectId, payload);
             }
         } catch (Exception ex) {
             log.debug("Ignoring malformed project editor socket payload: {}", ex.getMessage());

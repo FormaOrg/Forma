@@ -23,7 +23,7 @@ import { ProjectStorefrontService } from '../../../../../../core/services/projec
 import { ProjectService } from '../../../../../../core/services/project.service';
 import { ProjectWorkspaceContextService } from '../../../../../../core/services/project-workspace-context.service';
 import { PublicStorefrontService } from '../../../../../../core/services/public-storefront.service';
-import { ProjectEditorRealtimeService } from '../../../../../../core/services/project-editor-realtime.service';
+import { ProjectEditorRealtimeService, ProjectEditorCursorEvent, deriveUserColor } from '../../../../../../core/services/project-editor-realtime.service';
 import { ToastService } from '../../../../../../core/services/toast.service';
 import { UploadService } from '../../../../../../core/services/upload.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
@@ -140,6 +140,15 @@ type EditorSnapGuide = {
   kind: 'grid' | 'alignment';
 };
 type RotationHandleCorner = 'nw' | 'ne' | 'se' | 'sw';
+type RemoteCursorState = {
+  userId: number;
+  userName: string;
+  avatarUrl: string | null;
+  x: number | null;
+  y: number | null;
+  color: string;
+  sectionLabel: string | null;
+};
 type ButtonToolbarMenu =
   | 'designs'
   | 'edit-text'
@@ -499,6 +508,9 @@ private readonly destroyRef = inject(DestroyRef);
   });
 
 private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+private isRemoteReload = false;
+private readonly cursorStaleTimers = new Map<number, ReturnType<typeof setTimeout>>();
+private static readonly CURSOR_STALE_MS = 5000;
 private addElementsPanelCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private addElementsLibraryModalCloseTimer: ReturnType<typeof setTimeout> | null = null;
 private iconLibrarySearchRequestId = 0;
@@ -751,6 +763,9 @@ readonly viewportWidth = signal(
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
   readonly isAutosaving = signal(false);
+  readonly hasPendingChanges = signal(false);
+  readonly remoteCursors = signal<Map<number, RemoteCursorState>>(new Map());
+  readonly showRemoteUpdateBanner = signal(false);
   readonly isPublishing = signal(false);
   readonly isUnpublishing = signal(false);
   readonly isMediaUploading = signal(false);
@@ -1887,6 +1902,19 @@ readonly isSectionLibraryOpen = computed(() => this.sectionLibraryTargetId() !==
     const currentUserId = this.currentUser()?.id ?? null;
     return (this.editorSession().activeEditors ?? []).filter((editor) => editor.userId !== currentUserId);
   });
+  readonly remoteCursorsArray = computed(() => Array.from(this.remoteCursors().values()).filter((c) => c.x !== null && c.y !== null));
+  readonly isDirty = computed(() => this.hasPendingChanges() || this.isAutosaving());
+  readonly canSendRealtimeEvents = computed(() => {
+    const project = this.project();
+    const user = this.currentUser();
+    return !!project && !!user;
+  });
+  readonly currentSectionLabel = computed(() => {
+    const sectionId = this.selectedSectionId();
+    if (!sectionId) return null;
+    const section = this.sections().find((s) => s.id === sectionId);
+    return section ? this.sectionLabel(section) : null;
+  });
   readonly autosaveTooltip = computed(() => {
     const updatedAt = this.storefront()?.updatedAt;
     if (this.isAutosaving()) {
@@ -2261,6 +2289,10 @@ effect(() => {
      clearTimeout(this.pageDesignPickerCloseTimer);
    }
    this.stopPresenceHeartbeat();
+   for (const timer of this.cursorStaleTimers.values()) {
+     clearTimeout(timer);
+   }
+   this.cursorStaleTimers.clear();
  });
 
     this.projectEditorRealtimeService.events$
@@ -2270,10 +2302,18 @@ effect(() => {
           return;
         }
 
-        this.editorSession.update((session) => ({
-          ...session,
-          activeEditors: this.normalizeActiveEditors(event.activeEditors),
-        }));
+        if (event.type === 'project_editor_presence') {
+          this.editorSession.update((session) => ({
+            ...session,
+            activeEditors: this.normalizeActiveEditors(event.activeEditors),
+          }));
+        } else if (event.type === 'project_editor_cursor') {
+          this.handleRemoteCursorEvent(event);
+        } else if (event.type === 'project_storefront_updated') {
+          const currentUserId = this.currentUser()?.id;
+          if (event.userId === currentUserId) return;
+          this.handleRemoteStorefrontUpdated();
+        }
       });
     this.loadEditor();
   }
@@ -14785,9 +14825,153 @@ isSectionAttachTarget(sectionId: string): boolean {
   private stopPresenceHeartbeat(): void {
     const projectId = this.projectId();
     if (projectId) {
+      this.sendCursorClear();
       this.projectEditorRealtimeService.leaveProject(projectId);
     }
     this.projectEditorRealtimeService.disconnect();
+  }
+
+  onCanvasMouseMove(event: MouseEvent): void {
+    if (!this.canSendRealtimeEvents()) return;
+    const projectId = this.projectId();
+    const user = this.currentUser();
+    if (!projectId || !user?.id) return;
+
+    const canvas = event.currentTarget as HTMLElement;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+
+    this.projectEditorRealtimeService.sendCursorUpdate({
+      projectId,
+      userId: user.id,
+      userName: this.currentUserName(),
+      avatarUrl: this.currentUserAvatar(),
+      x,
+      y,
+      color: deriveUserColor(user.id),
+      sectionLabel: this.currentSectionLabel(),
+    });
+  }
+
+  onCanvasMouseLeave(): void {
+    this.sendCursorClear();
+  }
+
+  private sendCursorClear(): void {
+    if (!this.canSendRealtimeEvents()) return;
+    const projectId = this.projectId();
+    const user = this.currentUser();
+    if (!projectId || !user?.id) return;
+
+    this.projectEditorRealtimeService.sendCursorClear({
+      projectId,
+      userId: user.id,
+      userName: this.currentUserName(),
+      avatarUrl: this.currentUserAvatar(),
+      color: deriveUserColor(user.id),
+    });
+  }
+
+  private handleRemoteCursorEvent(event: ProjectEditorCursorEvent): void {
+    const existing = this.cursorStaleTimers.get(event.userId);
+    if (existing !== undefined) {
+      clearTimeout(existing);
+      this.cursorStaleTimers.delete(event.userId);
+    }
+
+    if (event.x === null || event.y === null) {
+      this.remoteCursors.update((map) => {
+        const next = new Map(map);
+        next.delete(event.userId);
+        return next;
+      });
+      return;
+    }
+
+    this.remoteCursors.update((map) => {
+      const next = new Map(map);
+      next.set(event.userId, {
+        userId: event.userId,
+        userName: event.userName,
+        avatarUrl: event.avatarUrl ?? null,
+        x: event.x,
+        y: event.y,
+        color: event.color,
+        sectionLabel: event.sectionLabel ?? null,
+      });
+      return next;
+    });
+
+    const staleTimer = setTimeout(() => {
+      this.remoteCursors.update((map) => {
+        const next = new Map(map);
+        next.delete(event.userId);
+        return next;
+      });
+      this.cursorStaleTimers.delete(event.userId);
+    }, ProjectStorefrontEditor.CURSOR_STALE_MS);
+
+    this.cursorStaleTimers.set(event.userId, staleTimer);
+  }
+
+  private handleRemoteStorefrontUpdated(): void {
+    if (this.isDirty()) {
+      this.showRemoteUpdateBanner.set(true);
+      return;
+    }
+
+    const projectId = this.projectId();
+    if (!projectId) return;
+
+    this.isRemoteReload = true;
+    this.projectStorefrontService
+      .getStorefront(projectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (storefront) => {
+          const snapshot = this.normalizeStorefront(storefront);
+          this.applyPersistedStorefront(snapshot, { resetHistory: false });
+          this.isRemoteReload = false;
+        },
+        error: () => {
+          this.isRemoteReload = false;
+        },
+      });
+  }
+
+  dismissRemoteUpdateBanner(): void {
+    this.showRemoteUpdateBanner.set(false);
+  }
+
+  reloadFromRemote(): void {
+    this.showRemoteUpdateBanner.set(false);
+    const projectId = this.projectId();
+    if (!projectId) return;
+
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+      this.autosaveTimer = null;
+    }
+    this.hasPendingChanges.set(false);
+
+    this.isRemoteReload = true;
+    this.projectStorefrontService
+      .getStorefront(projectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (storefront) => {
+          const snapshot = this.normalizeStorefront(storefront);
+          this.applyPersistedStorefront(snapshot, { resetHistory: false });
+          this.isRemoteReload = false;
+        },
+        error: () => {
+          this.isRemoteReload = false;
+          this.toastService.error('Could not reload the latest version.');
+        },
+      });
   }
 
   collaboratorPresenceInitial(editor: StorefrontActiveEditor): string {
@@ -14919,10 +15103,15 @@ isSectionAttachTarget(sectionId: string): boolean {
   }
 
   private scheduleAutosave(): void {
+    if (this.isRemoteReload) {
+      return;
+    }
+
     if (this.autosaveTimer) {
       clearTimeout(this.autosaveTimer);
     }
 
+    this.hasPendingChanges.set(true);
     this.autosaveTimer = setTimeout(() => {
       this.persistCurrentState({ reconcileEditor: false }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         error: () => this.toastService.error('Autosave failed.'),
@@ -14961,6 +15150,15 @@ isSectionAttachTarget(sectionId: string): boolean {
         switchMap((savedStorefront) => {
           if (!savedStorefront) {
             return of(savedStorefront);
+          }
+
+          this.hasPendingChanges.set(false);
+          if (!this.isRemoteReload) {
+            const userId = this.currentUser()?.id;
+            const projectId = this.projectId();
+            if (userId && projectId && this.canSendRealtimeEvents()) {
+              this.projectEditorRealtimeService.sendStorefrontUpdated(projectId, userId);
+            }
           }
 
           const snapshot = this.normalizeStorefront(savedStorefront);

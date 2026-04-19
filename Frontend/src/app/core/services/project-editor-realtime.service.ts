@@ -10,6 +10,39 @@ export interface ProjectEditorPresenceEvent {
   occurredAt: string;
 }
 
+export interface ProjectEditorCursorEvent {
+  type: 'project_editor_cursor';
+  projectId: number;
+  userId: number;
+  userName: string;
+  avatarUrl: string | null;
+  x: number | null;
+  y: number | null;
+  color: string;
+  sectionLabel?: string | null;
+}
+
+export interface ProjectStorefrontUpdatedEvent {
+  type: 'project_storefront_updated';
+  projectId: number;
+  userId: number;
+  savedAt: string;
+}
+
+export type ProjectEditorEvent =
+  | ProjectEditorPresenceEvent
+  | ProjectEditorCursorEvent
+  | ProjectStorefrontUpdatedEvent;
+
+const USER_COLOR_PALETTE = [
+  '#4f46e5', '#0891b2', '#059669', '#d97706',
+  '#dc2626', '#7c3aed', '#db2777', '#2563eb',
+];
+
+export function deriveUserColor(userId: number): string {
+  return USER_COLOR_PALETTE[Math.abs(userId) % USER_COLOR_PALETTE.length];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProjectEditorRealtimeService {
   private readonly socketUrl = `${environment.projectsApiUrl.replace(/\/api$/, '').replace(/^http/, 'ws')}/ws/projects/editor-presence`;
@@ -17,9 +50,11 @@ export class ProjectEditorRealtimeService {
   private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private manuallyDisconnected = false;
   private joinedProjectId: number | null = null;
-  private readonly eventsSubject = new Subject<ProjectEditorPresenceEvent>();
+  private readonly eventsSubject = new Subject<ProjectEditorEvent>();
+  private lastCursorSentAt = 0;
+  private readonly CURSOR_THROTTLE_MS = 50;
 
-  readonly events$: Observable<ProjectEditorPresenceEvent> = this.eventsSubject.asObservable();
+  readonly events$: Observable<ProjectEditorEvent> = this.eventsSubject.asObservable();
 
   connect(): void {
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
@@ -93,6 +128,29 @@ export class ProjectEditorRealtimeService {
     }
   }
 
+  sendCursorUpdate(payload: Omit<ProjectEditorCursorEvent, 'type'>): void {
+    const now = Date.now();
+    if (now - this.lastCursorSentAt < this.CURSOR_THROTTLE_MS) {
+      return;
+    }
+    this.lastCursorSentAt = now;
+    this.send({ type: 'project_editor_cursor', ...payload });
+  }
+
+  sendCursorClear(payload: Omit<ProjectEditorCursorEvent, 'type' | 'x' | 'y'>): void {
+    this.lastCursorSentAt = 0;
+    this.send({ type: 'project_editor_cursor', ...payload, x: null, y: null });
+  }
+
+  sendStorefrontUpdated(projectId: number, userId: number): void {
+    this.send({
+      type: 'project_storefront_updated',
+      projectId,
+      userId,
+      savedAt: new Date().toISOString(),
+    });
+  }
+
   private send(payload: Record<string, unknown>): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       return;
@@ -103,12 +161,18 @@ export class ProjectEditorRealtimeService {
 
   private handleMessage(rawMessage: string): void {
     try {
-      const event = JSON.parse(rawMessage) as ProjectEditorPresenceEvent;
-      if (event.type === 'project_editor_presence' && Number.isFinite(event.projectId)) {
+      const event = JSON.parse(rawMessage) as ProjectEditorEvent;
+      if (!event.type || !Number.isFinite((event as { projectId?: number }).projectId)) {
+        return;
+      }
+
+      if (event.type === 'project_editor_presence') {
         this.eventsSubject.next({
           ...event,
           activeEditors: Array.isArray(event.activeEditors) ? event.activeEditors : [],
         });
+      } else if (event.type === 'project_editor_cursor' || event.type === 'project_storefront_updated') {
+        this.eventsSubject.next(event);
       }
     } catch {
       // Ignore malformed socket payloads.
