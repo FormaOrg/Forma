@@ -53,12 +53,11 @@
       }
 
       html:not(.forma-app-ready) app-root,
-      html:not(.forma-styles-ready) app-root,
-      html:not(.forma-window-loaded) app-root {
+      html:not(.forma-styles-ready) app-root {
         visibility: hidden;
       }
 
-      html.forma-app-ready.forma-styles-ready.forma-window-loaded:not(.forma-route-loading) #forma-bootstrap-fallback {
+      html.forma-app-ready.forma-styles-ready:not(.forma-route-loading) #forma-bootstrap-fallback {
         display: none;
         pointer-events: none;
       }

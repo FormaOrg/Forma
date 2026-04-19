@@ -1,0 +1,73 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< tn.forma:service-commerce >----------------------
+[INFO] Building service-commerce 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ service-commerce ---
+[INFO] Deleting C:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\service-commerce\target
+[INFO] 
+[INFO] >>> spring-boot:4.0.3:run (default-cli) > test-compile @ service-commerce >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ service-commerce ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ service-commerce ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 179 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ service-commerce ---
+[INFO] skip non existing resourceDirectory C:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\service-commerce\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ service-commerce ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] /C:/My Folders/IGL3/S2/Nouvelles Tech°/Forma/Backend/service-commerce/src/test/java/tn/forma/users/service/ProjectSalesServiceTest.java: C:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\service-commerce\src\test\java\tn\forma\users\service\ProjectSalesServiceTest.java uses unchecked or unsafe operations.
+[INFO] /C:/My Folders/IGL3/S2/Nouvelles Tech°/Forma/Backend/service-commerce/src/test/java/tn/forma/users/service/ProjectSalesServiceTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] <<< spring-boot:4.0.3:run (default-cli) < test-compile @ service-commerce <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.3:run (default-cli) @ service-commerce ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-19T13:15:30.275+01:00  INFO 20708 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : Starting Application using Java 25.0.2 with PID 20708 (C:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\service-commerce\target\classes started by Skander Boughnimi in C:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\service-commerce)
+2026-04-19T13:15:30.292+01:00  INFO 20708 --- [service-commerce] [  restartedMain] tn.forma.users.Application               : No active profile set, falling back to 1 default profile: "default"
+2026-04-19T13:15:30.467+01:00  INFO 20708 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-19T13:15:30.467+01:00  INFO 20708 --- [service-commerce] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-19T13:15:33.383+01:00  INFO 20708 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-19T13:15:33.672+01:00  INFO 20708 --- [service-commerce] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 265 ms. Found 15 JPA repository interfaces.
+2026-04-19T13:15:35.514+01:00  INFO 20708 --- [service-commerce] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8083 (http)
+2026-04-19T13:15:35.551+01:00  INFO 20708 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-19T13:15:35.552+01:00  INFO 20708 --- [service-commerce] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-19T13:15:35.686+01:00  INFO 20708 --- [service-commerce] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 5216 ms
+2026-04-19T13:15:36.189+01:00  INFO 20708 --- [service-commerce] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-19T13:15:36.332+01:00  INFO 20708 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-19T13:15:38.012+01:00  INFO 20708 --- [service-commerce] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-19T13:15:38.104+01:00  WARN 20708 --- [service-commerce] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-19T13:15:38.153+01:00  INFO 20708 --- [service-commerce] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: PostgreSQLDialect
+	Database version: 13.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-19T13:15:43.134+01:00  INFO 20708 --- [service-commerce] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-19T13:15:43.194+01:00  INFO 20708 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-19T13:15:44.793+01:00  INFO 20708 --- [service-commerce] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.

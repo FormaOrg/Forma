@@ -22,7 +22,7 @@
         @for (template of templates; track template.image) {
             <article class="template_card">
                 <div class="template_card_image_wrap">
-                    <img [src]="template.image" [alt]="template.categoryKey | t" class="template_card_image">
+                    <img [src]="template.image" [alt]="template.categoryKey | t" class="template_card_image" loading="lazy" decoding="async">
 
                     <div class="template_card_overlay"></div>
 

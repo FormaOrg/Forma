@@ -2,11 +2,19 @@
     <app-header/>
     <app-landing-page-hero-section/>
     <app-landing-page-features-section/>
-    <app-landing-page-templates-showcase/>
-    <app-landing-page-domain-section/>
-    <app-landing-page-faq-section/>
-    <app-landing-page-made-on-forma/>
-    <app-landing-page-builder-help-deck/>
-    <app-landing-page-vision-cta-wave/>
+    @defer (on idle) {
+        <app-landing-page-templates-showcase/>
+        <app-landing-page-domain-section/>
+        <app-landing-page-faq-section/>
+        <app-landing-page-made-on-forma/>
+        <app-landing-page-builder-help-deck/>
+        <app-landing-page-vision-cta-wave/>
+    } @placeholder {
+        <div class="landing-deferred-shell" aria-hidden="true">
+            <div class="landing-deferred-block landing-deferred-block--wide"></div>
+            <div class="landing-deferred-block landing-deferred-block--gallery"></div>
+            <div class="landing-deferred-block landing-deferred-block--wide"></div>
+        </div>
+    }
     <app-footer/>
 </main>

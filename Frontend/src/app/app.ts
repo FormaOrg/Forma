@@ -21,7 +21,6 @@ export class App implements OnInit {
   private hasNavigationSettled = false;
   private hasMarkedAppReady = false;
   private rootInitComplete = false;
-  private revealTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.hasNavigationSettled = this.router.navigated;
@@ -71,12 +70,10 @@ export class App implements OnInit {
     }
 
     this.hasMarkedAppReady = true;
-    this.revealTimeoutId = setTimeout(() => {
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          this.document.documentElement.classList.add('forma-app-ready');
-        });
+        this.document.documentElement.classList.add('forma-app-ready');
       });
-    }, 450);
+    });
   }
 }

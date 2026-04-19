@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -22,8 +23,11 @@ public class EmailService {
     @Value("${application.frontend-url}")
     private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${application.mail.from:${spring.mail.username}}")
     private String fromEmail;
+
+    @Value("${application.mail.from-name:Forma}")
+    private String fromName;
 
     // ── Verification email ─────────────────────────────────
 
@@ -440,13 +444,13 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(String.format("%s <%s>", fromName, fromEmail));
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(html, true);
             mailSender.send(message);
             log.info("Email sent to {}: {}", to, subject);
-        } catch (MessagingException e) {
+        } catch (MailException | MessagingException e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage());
             throw new RuntimeException("Failed to send email", e);
         }

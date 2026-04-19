@@ -46,7 +46,7 @@ export class I18nService {
 
   private async fetchLocaleFile(path: string): Promise<LocaleDict> {
     const url = new URL(path, document.baseURI).toString();
-    const res = await fetch(url, { cache: 'no-cache' });
+    const res = await fetch(url, { cache: 'force-cache' });
     if (!res.ok) return {};
     return (await res.json()) as LocaleDict;
   }

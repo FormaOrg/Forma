@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -22,8 +23,11 @@ public class CollaboratorEmailService {
     @Value("${application.frontend-url}")
     private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${application.mail.from:${spring.mail.username}}")
     private String fromEmail;
+
+    @Value("${application.mail.from-name:Forma}")
+    private String fromName;
 
     @Async
     public void sendCollaboratorInviteEmail(String toEmail, String inviterName, String projectName, String role, String invitationToken) {
@@ -81,14 +85,15 @@ public class CollaboratorEmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(String.format("%s <%s>", fromName, fromEmail));
             helper.setTo(toEmail);
             helper.setSubject(inviterName + " invited you to collaborate on " + projectName);
             helper.setText(html, true);
             mailSender.send(message);
             log.info("Collaborator invite email sent to {}", toEmail);
-        } catch (MessagingException e) {
+        } catch (MailException | MessagingException e) {
             log.error("Failed to send collaborator invite email to {}: {}", toEmail, e.getMessage());
+            throw new RuntimeException("Failed to send collaborator invitation email", e);
         }
     }
 }

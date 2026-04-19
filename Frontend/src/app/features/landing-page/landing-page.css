@@ -13,3 +13,38 @@ main {
     max-width: 100%;
     overflow-x: clip;
 }
+
+.landing-deferred-shell {
+    width: 100%;
+    padding: 40px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.landing-deferred-block {
+    width: min(1400px, 100%);
+    margin: 0 auto;
+    border-radius: 32px;
+    background:
+        linear-gradient(90deg, rgba(241, 245, 249, 0.92), rgba(226, 232, 240, 0.7), rgba(241, 245, 249, 0.92));
+    background-size: 200% 100%;
+    animation: landing-placeholder-shimmer 1.6s linear infinite;
+}
+
+.landing-deferred-block--wide {
+    min-height: 220px;
+}
+
+.landing-deferred-block--gallery {
+    min-height: 420px;
+}
+
+@keyframes landing-placeholder-shimmer {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}

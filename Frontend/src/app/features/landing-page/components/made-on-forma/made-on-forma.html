@@ -25,7 +25,7 @@
         <div class="made-on-forma__track made-on-forma__track--top" [style.transform]="topTransform()">
             @for (item of topRow(); track item.image) {
                 <article class="made-on-forma__card made-on-forma__card--top">
-                    <img [src]="item.image" [alt]="item.altKey | t" />
+                    <img [src]="item.image" [alt]="item.altKey | t" loading="lazy" decoding="async" />
                 </article>
             }
 
@@ -34,7 +34,7 @@
         <div class="made-on-forma__track made-on-forma__track--bottom" [style.transform]="bottomTransform()">
             @for (item of bottomRow(); track item.image) {
                 <article class="made-on-forma__card made-on-forma__card--bottom">
-                    <img [src]="item.image" [alt]="item.altKey | t" />
+                    <img [src]="item.image" [alt]="item.altKey | t" loading="lazy" decoding="async" />
                 </article>
             }
 

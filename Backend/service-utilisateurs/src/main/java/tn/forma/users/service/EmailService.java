@@ -5,11 +5,13 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Service
@@ -22,14 +24,17 @@ public class EmailService {
     @Value("${application.frontend-url}")
     private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${application.mail.from:${spring.mail.username}}")
     private String fromEmail;
+
+    @Value("${application.mail.from-name:Forma}")
+    private String fromName;
 
     // ── Verification email ─────────────────────────────────
 
-    @Async
     public void sendVerificationEmail(String toEmail, String firstName, String token) {
-        String verificationUrl = frontendUrl + "/verify-email?token=" + token;
+        String verificationUrl = frontendUrl + "/verify-email?token=" + token
+                + "&email=" + URLEncoder.encode(toEmail, StandardCharsets.UTF_8);
 
         String html = """
             <!DOCTYPE html>
@@ -151,7 +156,6 @@ public class EmailService {
 
     // ── Password reset email ───────────────────────────────
 
-    @Async
     public void sendPasswordResetEmail(String toEmail, String firstName, String token) {
         String resetUrl = frontendUrl + "/reset-password?token=" + token;
 
@@ -271,7 +275,6 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Reset your Forma password", html);
     }
 
-    @Async
     public void sendEmailChangeCode(String toEmail, String firstName, String code) {
         String html = """
             <!DOCTYPE html>
@@ -325,7 +328,6 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Confirm your new Forma email", html);
     }
 
-    @Async
     public void sendLoginVerificationCode(String toEmail, String firstName, String code, boolean enable) {
         String actionLabel = enable ? "enable" : "disable";
         String html = """
@@ -380,7 +382,6 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Confirm your Forma security change", html);
     }
 
-    @Async
     public void sendLoginAccessCode(String toEmail, String firstName, String code) {
         String html = """
             <!DOCTYPE html>
@@ -440,13 +441,13 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(String.format("%s <%s>", fromName, fromEmail));
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(html, true);
             mailSender.send(message);
             log.info("Email sent to {}: {}", to, subject);
-        } catch (MessagingException e) {
+        } catch (MailException | MessagingException e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage());
             throw new RuntimeException("Failed to send email", e);
         }
