@@ -256,6 +256,15 @@ export class StorefrontPublicHeaderComponent {
     );
   }
 
+  componentHref(component: StorefrontEditorComponentNode): string | null {
+    const href = (component.props as unknown as Record<string, unknown>)['href'];
+    return typeof href === 'string' && href.trim() ? this.resolveLinkHref(href.trim()) : null;
+  }
+
+  componentOpenInNewTab(component: StorefrontEditorComponentNode): boolean {
+    return Boolean((component.props as unknown as Record<string, unknown>)['openInNewTab']);
+  }
+
   private appendPreviewQuery(url: string): string {
     if (!this.isEditorPreview()) {
       return url;

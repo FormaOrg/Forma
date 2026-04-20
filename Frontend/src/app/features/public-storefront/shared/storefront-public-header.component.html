@@ -79,17 +79,37 @@
               </button>
             }
             @default {
-              <div class="storefront-public-header__component" [ngStyle]="componentStyle(component)">
-                <app-storefront-editor-component-host
-                  [node]="component"
-                  [products]="[]"
-                  [renderWidth]="component.frame.width"
-                  [renderHeight]="component.frame.height"
-                  [cartCount]="cartCount()"
-                  [interactiveLinks]="true"
-                  [linkHrefResolver]="resolveComponentLinkHref"
-                />
-              </div>
+              @if (componentHref(component); as href) {
+                <a
+                  class="storefront-public-header__component storefront-public-header__component--interactive"
+                  [ngStyle]="componentStyle(component)"
+                  [attr.href]="href"
+                  [attr.target]="componentOpenInNewTab(component) ? '_blank' : null"
+                  [attr.rel]="componentOpenInNewTab(component) ? 'noreferrer noopener' : null"
+                >
+                  <app-storefront-editor-component-host
+                    [node]="component"
+                    [products]="[]"
+                    [renderWidth]="component.frame.width"
+                    [renderHeight]="component.frame.height"
+                    [cartCount]="cartCount()"
+                    [interactiveLinks]="true"
+                    [linkHrefResolver]="resolveComponentLinkHref"
+                  />
+                </a>
+              } @else {
+                <div class="storefront-public-header__component" [ngStyle]="componentStyle(component)">
+                  <app-storefront-editor-component-host
+                    [node]="component"
+                    [products]="[]"
+                    [renderWidth]="component.frame.width"
+                    [renderHeight]="component.frame.height"
+                    [cartCount]="cartCount()"
+                    [interactiveLinks]="true"
+                    [linkHrefResolver]="resolveComponentLinkHref"
+                  />
+                </div>
+              }
             }
           }
         }

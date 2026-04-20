@@ -114,11 +114,12 @@ const PREVIEW_FONTS_URL =
                         [products]="catalogProducts()"
                         [interactiveLinks]="true"
                         [linkHrefResolver]="previewLinkResolver"
-                        [cartCount]="cartCount()"
-                        [storefrontProjectId]="projectId()"
-                        [storefrontIsEditorPreview]="true"
-                        [storefrontIsDomainRoute]="isDomainRoute()"
-                      />
+                      [cartCount]="cartCount()"
+                      [storefrontProjectId]="projectId()"
+                      [storefrontProductId]="selectedProductId()"
+                      [storefrontIsEditorPreview]="true"
+                      [storefrontIsDomainRoute]="isDomainRoute()"
+                    />
                     </div>
                   </a>
                 } @else {
@@ -140,11 +141,12 @@ const PREVIEW_FONTS_URL =
                         [products]="catalogProducts()"
                         [interactiveLinks]="true"
                         [linkHrefResolver]="previewLinkResolver"
-                        [cartCount]="cartCount()"
-                        [storefrontProjectId]="projectId()"
-                        [storefrontIsEditorPreview]="true"
-                        [storefrontIsDomainRoute]="isDomainRoute()"
-                      />
+                      [cartCount]="cartCount()"
+                      [storefrontProjectId]="projectId()"
+                      [storefrontProductId]="selectedProductId()"
+                      [storefrontIsEditorPreview]="true"
+                      [storefrontIsDomainRoute]="isDomainRoute()"
+                    />
                     </div>
                   </div>
                 }
@@ -207,6 +209,7 @@ export class StorefrontEditorPreviewPageComponent {
   readonly products = input<PublicStorefrontProduct[]>([]);
   readonly projectId = input.required<number>();
   readonly isDomainRoute = input(false);
+  readonly selectedProductId = input<number | null>(null);
 
   readonly routeMode = computed<StorefrontRouteMode>(() => (this.isDomainRoute() ? 'domain' : 'path'));
   readonly previewQueryParams = computed(() => ({ preview: 'editor' }));

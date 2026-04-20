@@ -29,6 +29,9 @@ import { StorefrontEditorBlockBlogFeedComponent } from './blocks/storefront-edit
 import { StorefrontEditorBlockProductDetailsComponent } from './blocks/storefront-editor-block-product-details.component';
 import { StorefrontEditorBlockCartContentComponent } from './blocks/storefront-editor-block-cart-content.component';
 import { StorefrontPublicAccountFormComponent } from '../../../../../../public-storefront/shared/storefront-public-account-form.component';
+import { StorefrontPublicProductDetailsComponent } from '../../../../../../public-storefront/shared/storefront-public-product-details.component';
+import { StorefrontPublicCartContentComponent } from '../../../../../../public-storefront/shared/storefront-public-cart-content.component';
+import { StorefrontPublicCheckoutFormComponent } from '../../../../../../public-storefront/shared/storefront-public-checkout-form.component';
 
 @Component({
   selector: 'app-storefront-editor-component-host',
@@ -59,6 +62,9 @@ import { StorefrontPublicAccountFormComponent } from '../../../../../../public-s
     StorefrontEditorBlockProductDetailsComponent,
     StorefrontEditorBlockCartContentComponent,
     StorefrontPublicAccountFormComponent,
+    StorefrontPublicProductDetailsComponent,
+    StorefrontPublicCartContentComponent,
+    StorefrontPublicCheckoutFormComponent,
   ],
   styles: [`
     :host {
@@ -140,7 +146,16 @@ import { StorefrontPublicAccountFormComponent } from '../../../../../../public-s
         }
       }
       @case ('checkout-form') {
-        <app-storefront-editor-block-checkout-form [node]="$any(node())" />
+        @if (storefrontProjectId()) {
+          <app-storefront-public-checkout-form
+            [node]="$any(node())"
+            [storefrontProjectId]="storefrontProjectId()!"
+            [storefrontIsEditorPreview]="storefrontIsEditorPreview()"
+            [storefrontIsDomainRoute]="storefrontIsDomainRoute()"
+          />
+        } @else {
+          <app-storefront-editor-block-checkout-form [node]="$any(node())" />
+        }
       }
       @case ('container') {
         <app-storefront-editor-block-container [node]="$any(node())" />
@@ -155,10 +170,30 @@ import { StorefrontPublicAccountFormComponent } from '../../../../../../public-s
         <app-storefront-editor-block-blog-feed [node]="$any(node())" />
       }
       @case ('product-details') {
-        <app-storefront-editor-block-product-details [node]="$any(node())" [products]="products()" />
+        @if (storefrontProjectId()) {
+          <app-storefront-public-product-details
+            [node]="$any(node())"
+            [products]="$any(products())"
+            [productId]="storefrontProductId()"
+            [storefrontProjectId]="storefrontProjectId()!"
+            [storefrontIsEditorPreview]="storefrontIsEditorPreview()"
+            [storefrontIsDomainRoute]="storefrontIsDomainRoute()"
+          />
+        } @else {
+          <app-storefront-editor-block-product-details [node]="$any(node())" [products]="products()" />
+        }
       }
       @case ('cart-content') {
-        <app-storefront-editor-block-cart-content [node]="$any(node())" [products]="products()" />
+        @if (storefrontProjectId()) {
+          <app-storefront-public-cart-content
+            [node]="$any(node())"
+            [storefrontProjectId]="storefrontProjectId()!"
+            [storefrontIsEditorPreview]="storefrontIsEditorPreview()"
+            [storefrontIsDomainRoute]="storefrontIsDomainRoute()"
+          />
+        } @else {
+          <app-storefront-editor-block-cart-content [node]="$any(node())" [products]="products()" />
+        }
       }
     }
   `,
@@ -174,6 +209,7 @@ export class StorefrontEditorComponentHostComponent {
   readonly interactiveLinks = input(false);
   readonly linkHrefResolver = input<((value: string) => string) | null>(null);
   readonly storefrontProjectId = input<number | null>(null);
+  readonly storefrontProductId = input<number | null>(null);
   readonly storefrontIsEditorPreview = input(false);
   readonly storefrontIsDomainRoute = input(false);
 }

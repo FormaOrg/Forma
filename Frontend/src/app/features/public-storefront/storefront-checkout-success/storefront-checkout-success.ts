@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core/services/public-storefront-route.service';
@@ -8,7 +8,7 @@ import { PublicStorefrontRouteService, StorefrontRouteMode } from '../../../core
 @Component({
   selector: 'app-storefront-checkout-success',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './storefront-checkout-success.html',
   styleUrl: './storefront-checkout-success.css',
 })
@@ -28,10 +28,20 @@ export class StorefrontCheckoutSuccess {
   readonly projectId = computed(() => this.storefrontRouteService.resolveProjectId(this.projectIdParam()));
   readonly isEditorPreview = computed(() => this.queryParamMap()?.get('preview') === 'editor');
   readonly homePath = computed(() =>
-    this.storefrontRouteService.buildPath(this.projectId(), this.routeMode())
+    this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      '',
+      this.isEditorPreview() ? { preview: 'editor' } : undefined
+    )
   );
   readonly productsPath = computed(() =>
-    this.storefrontRouteService.buildPath(this.projectId(), this.routeMode(), 'products')
+    this.storefrontRouteService.buildUrl(
+      this.projectId(),
+      this.routeMode(),
+      'products',
+      this.isEditorPreview() ? { preview: 'editor' } : undefined
+    )
   );
   readonly orderNumber = computed(() => this.queryParamMap()?.get('orderNumber') ?? 'Pending confirmation');
   readonly total = computed(() => Number(this.queryParamMap()?.get('total') ?? '0'));

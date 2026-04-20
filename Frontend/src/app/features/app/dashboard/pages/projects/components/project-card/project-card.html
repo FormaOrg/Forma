@@ -120,16 +120,6 @@
       } @else {
         <button type="button" class="project-card__action project-card__action--secondary" disabled>Preview</button>
       }
-      <button
-        type="button"
-        class="project-card__action project-card__action--ghost"
-        [class.project-card__action--ghost-active]="actionsOpen"
-        data-project-actions-trigger="true"
-        [attr.aria-expanded]="actionsOpen"
-        (click)="requestMoreActions($event)"
-      >
-        More
-      </button>
     </div>
   </div>
 </article>

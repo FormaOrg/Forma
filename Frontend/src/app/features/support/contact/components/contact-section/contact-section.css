@@ -55,7 +55,6 @@
   transition: fill 0.25s ease;
 }
 
-/* ✨ Hover effect (Wix style) */
 .social-item:hover {
   background: #196ef5;
   color: #ffffff;

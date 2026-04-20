@@ -25,7 +25,7 @@ export class CoursesSection {
 
   cards: CourseCard[] = [
     {
-      title: 'Build your website\nwith the Wix Editor',
+      title: 'Build your website\nwith the Forma Editor',
       description:
         'Learn how to create, build and customize your professional website exactly the way you want.',
       lessons: '9 lessons',

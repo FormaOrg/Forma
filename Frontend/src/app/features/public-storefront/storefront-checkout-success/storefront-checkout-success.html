@@ -1,23 +1,27 @@
-<section class="storefront-success">
-  <div class="storefront-success__card">
-    <span>Order placed</span>
-    <h1>Thanks, your order is in.</h1>
-    <p>The store owner can now see this order in the Forma dashboard and will follow up manually.</p>
+<div class="storefront-success">
+  <main class="storefront-success__layout">
+    <section class="storefront-success__section">
+      <div class="storefront-success__card">
+        <span>Order placed</span>
+        <h1>Thanks, your order is in.</h1>
+        <p>The store owner can now see this order in the Forma dashboard and will follow up manually.</p>
 
-    <dl class="storefront-success__summary">
-      <div>
-        <dt>Order number</dt>
-        <dd>{{ orderNumber() }}</dd>
-      </div>
-      <div>
-        <dt>Total</dt>
-        <dd>{{ total() | currency:currency():'symbol':'1.0-2' }}</dd>
-      </div>
-    </dl>
+        <dl class="storefront-success__summary">
+          <div>
+            <dt>Order number</dt>
+            <dd>{{ orderNumber() }}</dd>
+          </div>
+          <div>
+            <dt>Total</dt>
+            <dd>{{ total() | currency:currency():'symbol':'1.0-2' }}</dd>
+          </div>
+        </dl>
 
-    <div class="storefront-success__actions">
-      <a [routerLink]="homePath()">Back to storefront</a>
-      <a [routerLink]="productsPath()">Browse more products</a>
-    </div>
-  </div>
-</section>
+        <div class="storefront-success__actions">
+          <a [href]="homePath()">Back to storefront</a>
+          <a [href]="productsPath()">Browse more products</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
