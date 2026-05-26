@@ -614,10 +614,11 @@ app-projects .projects-featured__action--secondary:hover {
 
 app-projects .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 380px));
   gap: 14px;
   align-items: stretch;
   justify-items: start;
+  justify-content: start;
 }
 
 app-projects .projects-grid > app-project-card {
@@ -1044,6 +1045,14 @@ app-projects .projects-empty__text {
 
   app-projects .projects-featured {
     padding: 18px;
+  }
+
+  app-projects .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  app-projects .projects-grid > app-project-card {
+    max-width: none;
   }
 
   app-projects .projects-featured__title {

@@ -26,11 +26,7 @@ if (Test-Path $sharedEnvFile) {
 }
 
 $services = @(
-    @{ Name = "service-utilisateurs"; Port = 8081 },
-    @{ Name = "service-projets"; Port = 8082 },
-    @{ Name = "service-commerce"; Port = 8083 },
-    @{ Name = "service-analytics"; Port = 8084 },
-    @{ Name = "service-billing"; Port = 8085 }
+    @{ Name = "service-utilisateurs"; DisplayName = "forma-backend"; Port = 8081 }
 )
 
 New-Item -ItemType Directory -Force -Path $pidRoot | Out-Null
@@ -40,13 +36,14 @@ foreach ($service in $services) {
     $serviceDir = Join-Path $backendRoot $service.Name
     $pomFile = Join-Path $serviceDir "pom.xml"
     $mavenWrapper = Join-Path $serviceDir "mvnw.cmd"
+    $serviceLabel = if ($service.DisplayName) { $service.DisplayName } else { $service.Name }
 
     if (-not (Test-Path $pomFile)) {
-        throw "Missing pom.xml for $($service.Name) at $serviceDir"
+        throw "Missing pom.xml for $serviceLabel at $serviceDir"
     }
 
     if (-not (Test-Path $mavenWrapper)) {
-        throw "Missing mvnw.cmd for $($service.Name) at $serviceDir"
+        throw "Missing mvnw.cmd for $serviceLabel at $serviceDir"
     }
 
     $pidFile = Join-Path $pidRoot "$($service.Name).pid"
@@ -56,7 +53,7 @@ foreach ($service in $services) {
         if ($existingPid) {
             $existingProcess = Get-Process -Id $existingPid -ErrorAction SilentlyContinue
             if ($existingProcess) {
-                Write-Host "Stopping $($service.Name) (PID $existingPid) before restart..." -ForegroundColor Yellow
+                Write-Host "Stopping $serviceLabel (PID $existingPid) before restart..." -ForegroundColor Yellow
                 Stop-Process -Id $existingPid -Force -ErrorAction SilentlyContinue
                 Start-Sleep -Milliseconds 500
             }
@@ -67,7 +64,7 @@ foreach ($service in $services) {
     $stdoutLog = Join-Path $logRoot "$($service.Name).out.log"
     $stderrLog = Join-Path $logRoot "$($service.Name).err.log"
 
-    Write-Host "Starting $($service.Name) on port $($service.Port)..." -ForegroundColor Cyan
+    Write-Host "Starting $serviceLabel on port $($service.Port)..." -ForegroundColor Cyan
 
     $process = Start-Process `
         -FilePath $mavenWrapper `
@@ -81,11 +78,7 @@ foreach ($service in $services) {
 }
 
 Write-Host ""
-Write-Host "Backend services launched in the background." -ForegroundColor Green
+Write-Host "Backend service launched in the background." -ForegroundColor Green
 Write-Host "Logs: $logRoot"
 Write-Host "PIDs: $pidRoot"
-Write-Host "Users:      http://localhost:8081"
-Write-Host "Projects:   http://localhost:8082"
-Write-Host "Commerce:   http://localhost:8083"
-Write-Host "Analytics:  http://localhost:8084"
-Write-Host "Billing:    http://localhost:8085"
+Write-Host "Backend:    http://localhost:8081"

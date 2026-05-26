@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>tn.forma</groupId>
-	<artifactId>service-utilisateurs</artifactId>
+	<artifactId>forma-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>service-utilisateurs</name>
-	<description>User, authentication, session, and profile service</description>
+	<name>forma-backend</name>
+	<description>Unified Forma backend service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -55,12 +55,6 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>

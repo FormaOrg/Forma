@@ -1,12 +1,8 @@
-# Backend Microservices
+# Backend
 
-This backend is now organized as multiple focused Spring Boot services under `Backend/`:
+Forma now runs as a single Spring Boot backend under `Backend/service-utilisateurs`.
 
-- `service-utilisateurs`: authentication, users, profile, session activity, and avatar uploads
-- `service-projets`: project lifecycle, templates, and project asset uploads
-- `service-commerce`: catalog, customers, sales, storefront, portfolio pages, portfolio inquiries, and public checkout
-- `service-analytics`: project analytics, public analytics tracking, and dashboard home insights
-- `service-billing`: billing overview, invoices, payment methods, and subscriptions
+That service already contains the auth, users, projects, storefront, commerce, analytics, billing, media, and public storefront controllers, so the repository no longer needs to build or launch five separate backend applications for normal development.
 
 ## Build
 
@@ -16,22 +12,38 @@ From `Backend/`:
 mvn clean package
 ```
 
-## Run With Docker
+This now builds the single backend module only.
 
-From `Backend/`:
+## Run Locally
+
+From the repository root:
 
 ```bash
-docker compose up --build
+.\start-backend-local.ps1
 ```
 
-The compose setup uses the hosted database credentials from [`service-utilisateurs/.env`](g:\Coding\Forma\Backend\service-utilisateurs\.env). It does not start a local Postgres container anymore.
+The backend will be available at:
 
-If you want to run one service by itself, each service folder also has its own `docker-compose.yml` wired to the same hosted env file.
+```text
+http://localhost:8081
+```
 
-## Ports
+## Run With Docker
 
-- `service-utilisateurs`: `8081`
-- `service-projets`: `8082`
-- `service-commerce`: `8083`
-- `service-analytics`: `8084`
-- `service-billing`: `8085`
+From the repository root:
+
+```bash
+.\start-backend.ps1
+```
+
+This uses [`Backend/docker-compose.yml`](c:\My Folders\IGL3\S2\Nouvelles Tech°\Forma\Backend\docker-compose.yml) and starts a single container:
+
+- `forma_backend`
+
+## Environment
+
+The backend still reads shared environment values from:
+
+- `Backend/service-utilisateurs/.env`
+
+That file contains sensitive credentials and should not be copied into commits, docs, or logs.

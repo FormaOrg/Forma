@@ -7,11 +7,11 @@ if (-not (Test-Path $composeFile)) {
     throw "docker-compose.yml not found at $composeFile"
 }
 
-Write-Host "Stopping Forma backend services..." -ForegroundColor Yellow
+Write-Host "Stopping Forma backend service..." -ForegroundColor Yellow
 docker compose -f $composeFile down
 
 if ($LASTEXITCODE -ne 0) {
     throw "Docker Compose failed to stop the services."
 }
 
-Write-Host "Backend services stopped." -ForegroundColor Green
+Write-Host "Backend service stopped." -ForegroundColor Green

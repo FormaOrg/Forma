@@ -37,11 +37,7 @@ Write-Host "Waiting for containers to stabilize..." -ForegroundColor Cyan
 Start-Sleep -Seconds 12
 
 $containerNames = @(
-    "forma_users",
-    "forma_projects",
-    "forma_commerce",
-    "forma_analytics",
-    "forma_billing"
+    "forma_backend"
 )
 
 $runningContainers = @()
@@ -66,9 +62,5 @@ if ($runningContainers.Count -ne $containerNames.Count) {
 }
 
 Write-Host ""
-Write-Host "Backend services are starting." -ForegroundColor Green
-Write-Host "Users:      http://localhost:8081"
-Write-Host "Projects:   http://localhost:8082"
-Write-Host "Commerce:   http://localhost:8083"
-Write-Host "Analytics:  http://localhost:8084"
-Write-Host "Billing:    http://localhost:8085"
+Write-Host "Backend service is starting." -ForegroundColor Green
+Write-Host "Backend:    http://localhost:8081"

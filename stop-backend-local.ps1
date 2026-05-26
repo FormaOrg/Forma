@@ -10,7 +10,7 @@ if (-not (Test-Path $pidRoot)) {
 
 $pidFiles = Get-ChildItem $pidRoot -Filter *.pid -ErrorAction SilentlyContinue
 if (-not $pidFiles) {
-    Write-Host "No local backend services appear to be running." -ForegroundColor Yellow
+    Write-Host "No local backend service appears to be running." -ForegroundColor Yellow
     exit 0
 }
 
@@ -35,4 +35,4 @@ foreach ($pidFile in $pidFiles) {
     Remove-Item $pidFile.FullName -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "Local backend services stopped." -ForegroundColor Green
+Write-Host "Local backend service stopped." -ForegroundColor Green

@@ -11,9 +11,5 @@
 
     <modules>
         <module>service-utilisateurs</module>
-        <module>service-projets</module>
-        <module>service-commerce</module>
-        <module>service-analytics</module>
-        <module>service-billing</module>
     </modules>
 </project>
