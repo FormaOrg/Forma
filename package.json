@@ -1,0 +1,9 @@
+{
+  "name": "forma-root",
+  "version": "1.0.0",
+  "description": "Root configuration for build environment compatibility",
+  "private": true,
+  "scripts": {
+    "build": "cd Frontend && npm run build"
+  }
+}
